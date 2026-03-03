@@ -1,79 +1,140 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lamacOs GitHub Pages</title>
-    <meta name="google-site-verification" content="EIdMvf6kGZDBlsD6fxHasvmtseHlZWKRoBr4VL2OblQ" />
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            color: #007bff;
-        }
-        p {
-            max-width: 600px;
-            text-align: center;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            margin: 10px 0;
-        }
-        a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lamacOs | Home</title>
+<meta name="google-site-verification" content="EIdMvf6kGZDBlsD6fxHasvmtseHlZWKRoBr4VL2OblQ" />
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* HERO SECTION */
+
+.hero {
+    text-align: center;
+    padding: 80px 20px 40px 20px;
+    animation: fadeIn 1.5s ease;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+/* GRID SECTION */
+
+.projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    padding: 50px 40px 80px 40px;
+}
+
+/* CARD DESIGN */
+
+.card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    transition: 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.03);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.card a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.card span {
+    display: block;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    opacity: 0.7;
+}
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.6;
+    font-size: 0.9rem;
+}
+
+/* ANIMATION */
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to lamacOs GitHub Pages!</h1>
-        <p>Hi, actually my pages are not available under this domain directly. You usually have to enter the name of the website after <code>lamacos.github.io/</code>. Here are links to my websites:</p>
-        <ul>
-            <li><a href="https://lamacos.github.io/lamacOs-Kurzbefehle" target="_blank">lamacOs-Kurzbefehle</a></li>
-            <li><a href="https://lamacos.github.io/Pack-O-Mat" target="_blank">Pack-O-Mat</a></li>
-            <li><a href="https://lamacos.github.io/Smooth-Animations" target="_blank">Smooth-Animations</a></li>
-            <li><a href="https://lamacos.github.io/FlohmarktScanner/" target="_blank">Flohmarkt-Scanner</a></li>
-            <li><a href="https://lamacos.github.io/Button-Creator" target="_blank">Button-Creator</a></li>
-            <li><a href="https://lamacos.github.io/online-ticketmanager" target="_blank">Online-Ticketmanager</a></li>
-            <li><a href="https://lamacos.github.io/DeineDaten" target="_blank">Deine-Daten</a></li>
-            <li><a href="https://lamacos.github.io/Silvester-Countdown/" target="_blank">Silvester-Countdown</a></li>
-            <li><a href="https://lamacos.github.io/Paddle-Game/" target="_blank">Paddle Game</a></li>
-            <li><a href="https://lamacos.github.io/Sprach-Berater/" target="_blank">Sprach Berater</a></li>
-            <li><a href="https://lamacos.github.io/PlayHub/" target=_blank">Play Hub</a></li>
-            <li><a href="https://lamacos.github.io/Welcome-Home./" target=_blank">Welcome</a></li>
-            <li><a href="https://lamacos.github.io/Flohmarkt-Scanner-2.0/" target=_blank">Flohmarkt-Scanner 2.0</a></li>
-            <li><a href="https://lamacos.github.io/Live-World/" target=_blank">Live-World</a></li>
-            <li><a href="https://lamacos.github.io/NeoTerra/" target=_blank">NeoTerra</a></li>
-            <li><a href="https://lamacos.github.io/Hide-and-Seek/" target=_blank">Hide-and-Seek</a></li>
-            <li><a href="https://lamacos.github.io/RouteNote-Converter/" target=_blank">RouteNote-Converter</a></li>
-            <li><a href="https://lamacos.github.io/trustgamer" target=_blank">Trustgamer</a></li>
-        </ul>
-        <p>Thank you for visiting my websites.</p>
-    </div>
+
+<div class="hero">
+    <h1>Welcome to lamacOs</h1>
+    <p>Explore my creative web projects below 🚀</p>
+</div>
+
+<div class="projects">
+
+    <div class="card"><a href="https://lamacos.github.io/lamacOs-Kurzbefehle" target="_blank">lamacOs-Kurzbefehle</a><span>Smart Shortcuts</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Pack-O-Mat" target="_blank">Pack-O-Mat</a><span>Travel Helper</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Smooth-Animations" target="_blank">Smooth-Animations</a><span>Animation Showcase</span></div>
+    <div class="card"><a href="https://lamacos.github.io/FlohmarktScanner/" target="_blank">Flohmarkt-Scanner</a><span>Scan & Discover</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Button-Creator" target="_blank">Button-Creator</a><span>Create Stylish Buttons</span></div>
+    <div class="card"><a href="https://lamacos.github.io/online-ticketmanager" target="_blank">Online-Ticketmanager</a><span>Manage Tickets</span></div>
+    <div class="card"><a href="https://lamacos.github.io/DeineDaten" target="_blank">Deine-Daten</a><span>Data Project</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Silvester-Countdown/" target="_blank">Silvester-Countdown</a><span>New Year Timer</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Paddle-Game/" target="_blank">Paddle Game</a><span>Mini Arcade Game</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Sprach-Berater/" target="_blank">Sprach Berater</a><span>Language Tool</span></div>
+    <div class="card"><a href="https://lamacos.github.io/PlayHub/" target="_blank">Play Hub</a><span>Gaming Portal</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Welcome-Home./" target="_blank">Welcome</a><span>Home Experience</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Flohmarkt-Scanner-2.0/" target="_blank">Flohmarkt-Scanner 2.0</a><span>Next Generation</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Live-World/" target="_blank">Live-World</a><span>Real-Time World</span></div>
+    <div class="card"><a href="https://lamacos.github.io/NeoTerra/" target="_blank">NeoTerra</a><span>Future Concept</span></div>
+    <div class="card"><a href="https://lamacos.github.io/Hide-and-Seek/" target="_blank">Hide-and-Seek</a><span>Fun Game</span></div>
+    <div class="card"><a href="https://lamacos.github.io/RouteNote-Converter/" target="_blank">RouteNote-Converter</a><span>Music Tool</span></div>
+    <div class="card"><a href="https://lamacos.github.io/trustgamer" target="_blank">Trustgamer</a><span>Gaming Reviews</span></div>
+
+</div>
+
+<footer>
+    © 2026 lamacOs — Built with creativity & code ✨
+</footer>
+
 </body>
 </html>
