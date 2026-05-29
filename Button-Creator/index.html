@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Button Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #1e293b, #2563eb);
+  color: white;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  opacity: 0.8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.panel {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+}
+
+.panel h2 {
+  margin-bottom: 18px;
+  font-size: 1.3rem;
+}
+
+label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+input,
+select {
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  outline: none;
+}
+
+input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+option {
+  color: black;
+}
+
+.actionButton {
+  width: 100%;
+  margin-top: 18px;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  color: white;
+}
+
+.actionButton:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.previewArea {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+#previewButton,
+#fullscreenButton {
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transition: 0.3s;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+#previewButton:hover {
+  transform: scale(1.05);
+}
+
+#previewButton img,
+#previewButton video,
+#fullscreenButton img,
+#fullscreenButton video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#fullscreenView {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 30px;
+}
+
+#eventOutput {
+  display: none;
+  text-align: center;
+}
+
+#exitFullscreen {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  body {
+    padding: 14px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="hero">
+    <h1>Button Creator</h1>
+    <p>Erstelle interaktive Buttons mit eigenem Event-System 🚀</p>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>Button Einstellungen</h2>
+
+      <label>Button-Typ</label>
+      <select id="buttonType">
+        <option value="text">Text</option>
+        <option value="image">Bild</option>
+        <option value="video">Video</option>
+      </select>
+
+      <label>Button-Text</label>
+      <input id="buttonText" placeholder="Starten!">
+
+      <label>Datei hochladen</label>
+      <input type="file" id="buttonFile" accept="image/*,video/*">
+
+      <label>Button-Farbe</label>
+      <input type="color" id="buttonColor" value="#3b82f6">
+
+      <label>Textfarbe</label>
+      <input type="color" id="buttonTextColor" value="#ffffff">
+
+      <label>Button-Größe</label>
+      <input id="buttonSize" type="number" value="160">
+
+      <label>Form</label>
+      <select id="buttonShape">
+        <option value="0">Rechteck</option>
+        <option value="18">Abgerundet</option>
+        <option value="999">Kreis</option>
+      </select>
+
+      <button class="actionButton" id="applyButton">Design übernehmen</button>
+    </div>
+
+    <div class="panel">
+      <h2>Event Einstellungen</h2>
+
+      <label>Event-Typ</label>
+      <select id="eventType">
+        <option value="text">Text</option>
+        <option value="image">Bild</option>
+        <option value="video">Video</option>
+        <option value="audio">Audio</option>
+      </select>
+
+      <label>Event-Text</label>
+      <input id="eventText" placeholder="STIMMT!">
+
+      <label>Event-Farbe</label>
+      <input type="color" id="eventColor" value="#22c55e">
+
+      <label>Event-Größe</label>
+      <input id="eventSize" type="number" value="80">
+
+      <label>Event-Datei</label>
+      <input type="file" id="eventFile" accept="image/*,video/*,audio/*">
+
+      <label>Event-Dauer (ms)</label>
+      <input id="eventDuration" type="number" value="5000">
+
+      <button class="actionButton" id="fullscreenBtn">Vollbild starten</button>
+    </div>
+  </div>
+
+  <div class="previewArea">
+    <button id="previewButton">Beispiel</button>
+  </div>
+</div>
+
+<div id="fullscreenView">
+  <button id="exitFullscreen">✕</button>
+  <button id="fullscreenButton"></button>
+  <div id="eventOutput"></div>
+</div>
+
+<script>
+let buttonMediaURL = null;
+let eventMediaURL = null;
+
+function loadFile(input, callback) {
+  const file = input.files[0];
+
+  if (!file) {
+    callback(null);
+    return;
+  }
+
+  callback(URL.createObjectURL(file));
+}
+
+function applyButtonDesign(target) {
+  const type = document.getElementById('buttonType').value;
+  const size = Number(document.getElementById('buttonSize').value);
+
+  target.style.width = size + 'px';
+  target.style.height = size + 'px';
+  target.style.background = document.getElementById('buttonColor').value;
+  target.style.color = document.getElementById('buttonTextColor').value;
+  target.style.borderRadius = document.getElementById('buttonShape').value + 'px';
+  target.style.fontSize = size / 4 + 'px';
+
+  if (type === 'text') {
+    target.innerHTML = document.getElementById('buttonText').value || 'Button';
+    return;
+  }
+
+  loadFile(document.getElementById('buttonFile'), (url) => {
+    if (!url) {
+      return;
+    }
+
+    buttonMediaURL = url;
+
+    if (type === 'image') {
+      target.innerHTML = `<img src="${url}" alt="Button">`;
+    }
+
+    if (type === 'video') {
+      target.innerHTML = `<video src="${url}" autoplay loop muted playsinline></video>`;
+    }
+  });
+}
+
+document.getElementById('applyButton').addEventListener('click', () => {
+  applyButtonDesign(document.getElementById('previewButton'));
+});
+
+document.getElementById('fullscreenBtn').addEventListener('click', () => {
+  const fullscreenView = document.getElementById('fullscreenView');
+  const fullscreenButton = document.getElementById('fullscreenButton');
+
+  fullscreenView.style.display = 'flex';
+  applyButtonDesign(fullscreenButton);
+
+  if (buttonMediaURL) {
+    const type = document.getElementById('buttonType').value;
+
+    if (type === 'image') {
+      fullscreenButton.innerHTML = `<img src="${buttonMediaURL}" alt="Button">`;
+    }
+
+    if (type === 'video') {
+      fullscreenButton.innerHTML = `<video src="${buttonMediaURL}" autoplay loop muted playsinline></video>`;
+    }
+  }
+});
+
+document.getElementById('eventFile').addEventListener('change', (event) => {
+  loadFile(event.target, (url) => {
+    eventMediaURL = url;
+  });
+});
+
+document.getElementById('fullscreenButton').addEventListener('click', () => {
+  const output = document.getElementById('eventOutput');
+  const type = document.getElementById('eventType').value;
+  const duration = Number(document.getElementById('eventDuration').value);
+
+  output.style.display = 'block';
+  output.style.color = document.getElementById('eventColor').value;
+  output.style.fontSize = document.getElementById('eventSize').value + 'px';
+
+  if (type === 'text') {
+    output.innerHTML = document.getElementById('eventText').value;
+  }
+
+  if (type === 'image' && eventMediaURL) {
+    output.innerHTML = `<img src="${eventMediaURL}" style="max-width:80vw; max-height:60vh; border-radius:20px;">`;
+  }
+
+  if (type === 'video' && eventMediaURL) {
+    output.innerHTML = `<video src="${eventMediaURL}" autoplay controls style="max-width:80vw; max-height:60vh; border-radius:20px;"></video>`;
+  }
+
+  if (type === 'audio' && eventMediaURL) {
+    output.innerHTML = `<audio src="${eventMediaURL}" autoplay controls></audio>`;
+  }
+
+  setTimeout(() => {
+    output.style.display = 'none';
+  }, duration);
+});
+
+document.getElementById('exitFullscreen').addEventListener('click', () => {
+  document.getElementById('fullscreenView').style.display = 'none';
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    document.getElementById('fullscreenView').style.display = 'none';
+  }
+});
+
+applyButtonDesign(document.getElementById('previewButton'));
+</script>
+
+</body>
+</html>
