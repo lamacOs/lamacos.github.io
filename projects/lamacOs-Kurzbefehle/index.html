@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="google-site-verification" content="7T_If1MayqMWhpiRTwujhtaYsN8qay52_5r3Yo9bZ6E"/>
+  <title>lamacOs — Kurzbefehle</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>lamacOs-Kurzbefehle</h1>
+    <!--Nächste Zeile: Satz der Woche-->
+    <h4>Satz der 22 Woche des Jahres 2026: "Kleine Schritte führen zu großen Veränderungen."</h4>
+    <!--Nächste Zeile: EasterEggs-->
+    <h3>Schon gewusst? Sommerferien sind in Niedersachsen ab dem 2.7.</h3>
+  <p>!Dies ist eine iOS Website, um iOS Kurzbefehle mit anderen zu teilen, sie in Ordnern zu Ordnen oder Ordner zu sperren.!</p>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div class="user-icon" id="userIcon" title="Benutzerprofil">👤</div>
+        <div class="plus" id="plusBtn" title="Neu ➕">+</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <aside class="sidebar">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <div style="font-weight:700">Ordner</div>
+          <div class="small muted" id="folderCount">0</div>
+        </div>
+        <div id="folderList"></div>
+      </aside>
+
+      <main style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:700">Meine Kurzbefehle</div>
+          <div class="small muted">.</div>
+        </div>
+        <div class="cards" id="cardGrid"></div>
+      </main>
+    </div>
+
+    <footer>Sync: <span id="syncStatus">Nicht verbunden</span><span id="adminStatus"></span></footer>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="dialog" id="dialogContent"></div>
+  </div>
+
+  <div class="float-menu" id="floatMenu"></div>
+  <div class="float-menu" id="folderMenu"></div>
+
+  <!-- Firebase compat SDKs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/12.3.0/firebase-app-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/12.3.0/firebase-auth-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/12.3.0/firebase-database-compat.min.js"></script>
+
+  <!-- Main application script -->
+  <script src="script.js"></script>
+  
+</body>
+</html>
