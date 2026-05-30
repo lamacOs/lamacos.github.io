@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silvester Countdown 2026 🎆</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top, #1a0033 0%, #000 70%);
+      color: #fff;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      text-shadow: 0 0 20px #ff00ff;
+    }
+
+    #countdown {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      margin-top: 10px;
+      letter-spacing: 3px;
+    }
+
+    #newyear {
+      display: none;
+      font-size: clamp(3rem, 9vw, 5.5rem);
+      margin-top: 20px;
+      text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff;
+      animation: pop 1.2s ease forwards;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); opacity: 0; }
+      70% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: hsl(var(--hue), 100%, 60%);
+      top: -10px;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); }
+    }
+
+    .horn {
+      position: absolute;
+      bottom: 15px;
+      font-size: 3.5rem;
+      animation: horn 1.3s ease forwards;
+    }
+
+    @keyframes horn {
+      0% { transform: scaleX(0.1); }
+      50% { transform: scaleX(1.6); }
+      100% { transform: scaleX(1); }
+    }
+
+    .firework {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: white;
+      animation: explode 1.1s ease-out forwards;
+    }
+
+    @keyframes explode {
+      to {
+        transform: translate(var(--x), var(--y));
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⏳ Countdown bis Silvester</h1>
+  <div id="countdown">Lädt…</div>
+  <div id="newyear">🎆 HAPPY NEW YEAR! 🎆</div>
+
+  <script>
+    const countdownEl = document.getElementById("countdown");
+    const newyearEl = document.getElementById("newyear");
+    let finished = false;
+
+    function getNextNewYear() {
+      const now = new Date();
+      return new Date(`January 1, ${now.getFullYear() + 1} 00:00:00`);
+    }
+
+    const target = getNextNewYear();
+
+    const timer = setInterval(() => {
+      if (finished) return;
+      const now = new Date();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        clearInterval(timer);
+        triggerCelebration();
+        finished = true;
+        return;
+      }
+
+      const d = Math.floor(diff / 1000 / 60 / 60 / 24);
+      const h = Math.floor(diff / 1000 / 60 / 60) % 24;
+      const m = Math.floor(diff / 1000 / 60) % 60;
+      const s = Math.floor(diff / 1000) % 60;
+
+      if (d === 0 && h === 0 && m === 0 && s <= 10 && s > 0) {
+        speak(s.toString());
+      }
+
+      countdownEl.textContent = `${d}d ${h}h ${m}m ${s}s`;
+    }, 1000);
+
+    function triggerCelebration() {
+      newyearEl.style.display = "block";
+      if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+      speak("Happy New Year!");
+      createConfetti(180);
+      createHorns();
+      createFireworks(10);
+    }
+
+    function speak(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = "en-US";
+      msg.rate = 0.9;
+      speechSynthesis.speak(msg);
+    }
+
+    function createConfetti(amount) {
+      for (let i = 0; i < amount; i++) {
+        const c = document.createElement("div");
+        c.className = "confetti";
+        c.style.left = Math.random() * 100 + "vw";
+        c.style.animationDuration = 2 + Math.random() * 3 + "s";
+        c.style.setProperty("--hue", Math.random() * 360);
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 5000);
+      }
+    }
+
+    function createHorns() {
+      for (let i = 0; i < 4; i++) {
+        const h = document.createElement("div");
+        h.className = "horn";
+        h.textContent = "🎺";
+        h.style.left = 10 + i * 25 + "vw";
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 1500);
+      }
+    }
+
+    function createFireworks(amount) {
+      for (let i = 0; i < amount; i++) {
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight / 2;
+        for (let j = 0; j < 35; j++) {
+          const f = document.createElement("div");
+          f.className = "firework";
+          f.style.left = x + "px";
+          f.style.top = y + "px";
+          f.style.setProperty("--x", (Math.random() - 0.5) * 240 + "px");
+          f.style.setProperty("--y", (Math.random() - 0.5) * 240 + "px");
+          f.style.background = `hsl(${Math.random() * 360},100%,60%)`;
+          document.body.appendChild(f);
+          setTimeout(() => f.remove(), 1200);
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>
