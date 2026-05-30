@@ -1,0 +1,309 @@
+<!DOCTYPE html> 
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lamacOs Gaming</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
+body{background:#0a0a0a;color:#fff;overflow-x:hidden;}
+header{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;position:relative;}
+nav a{color:#fff;text-decoration:none;margin-left:2rem;transition:0.3s;}
+nav a:hover{color:#00ffff;}
+#rgb-corner{width:30px;height:30px;background:linear-gradient(45deg,#ff0000,#00ff00,#0000ff);border-radius:5px;cursor:pointer;transition:0.3s;}
+#rgb-corner:hover{transform:scale(1.1);}
+#loginModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:0.3s;z-index:10;}
+#loginModal.active{opacity:1;pointer-events:auto;}
+#loginForm{background:#111;padding:2rem;border-radius:10px;display:flex;flex-direction:column;width:300px;}
+#loginForm input{padding:0.5rem;margin-bottom:1rem;border:none;border-radius:5px;}
+#loginForm button{padding:0.7rem;background:#00ffff;border:none;border-radius:5px;color:#000;font-weight:bold;cursor:pointer;transition:0.3s;}
+#loginForm button:hover{background:#00cccc;}
+main{padding:2rem;}
+#cover{width:100%;height:300px;background:#222;display:flex;justify-content:center;align-items:center;margin-bottom:2rem;border-radius:15px;position:relative;overflow:hidden;transition:0.5s;}
+#cover img{width:100%;height:100%;object-fit:cover;border-radius:15px;}
+.product-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.5rem;}
+.product,.set{background:#111;padding:1rem;border-radius:10px;text-align:center;transition:0.3s;position:relative;}
+.product:hover,.set:hover{transform:translateY(-5px);box-shadow:0 0 10px #00ffff;}
+.product img,.set img{width:100%;border-radius:10px;margin-bottom:0.5rem;cursor:pointer;}
+.edit-btn{display:none;position:absolute;top:0.5rem;right:0.5rem;background:#00ffff;color:#000;padding:0.3rem 0.5rem;border-radius:5px;cursor:pointer;}
+.plus-btn{position:absolute;top:0.5rem;left:0.5rem;background:#00ffff;color:#000;padding:0.3rem 0.5rem;border-radius:50%;cursor:pointer;font-weight:bold;font-size:1.2rem;display:none;}
+#sets h2{margin-bottom:1rem;color:#00ffff;}
+footer{background:#111;text-align:center;padding:1rem;margin-top:3rem;}
+footer a{color:#00ffff;margin:0 0.5rem;text-decoration:none;}
+.fade-in{opacity:0;animation:fadeIn 1s forwards;}
+@keyframes fadeIn{to{opacity:1;}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>lamacOs Gaming</h1>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Produkte</a>
+    <a href="#">Sets</a>
+    <a href="#">Kontakt</a>
+  </nav>
+  <div id="rgb-corner"></div>
+</header>
+
+<div id="loginModal">
+  <form id="loginForm">
+    <h2>Anmeldung</h2>
+    <input type="password" id="loginCode" placeholder="Anmeldecode">
+    <button type="button" onclick="login()">Anmelden</button>
+  </form>
+</div>
+
+<main>
+  <div id="cover" class="fade-in">
+    <img id="coverImg" src="https://via.placeholder.com/1200x300/222222/00ffff?text=lamacOs+Gaming" alt="Coverbild">
+    <button id="coverUploadBtn" style="position:absolute;bottom:1rem;right:1rem;display:none;">Cover ändern</button>
+    <input type="file" id="coverInput" accept=".png,.jpg,.jpeg" style="display:none;">
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+    <h2>Produkte</h2>
+    <button id="addProductBtn" style="display:none;">+ Produkt</button>
+  </div>
+  <div class="product-gallery fade-in" id="productGallery"></div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;margin-top:2rem;">
+    <h2>Sets</h2>
+    <button id="addSetBtn" style="display:none;">+ Set</button>
+  </div>
+  <div id="setList" class="fade-in"></div>
+</main>
+
+<footer>
+  &copy; 2026 lamacOs Gaming | 
+  <a href="#">Instagram</a> | 
+  <a href="#">Twitter</a> | 
+  <a href="#">YouTube</a>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+<script>
+// ------------------ Firebase konfigurieren ------------------
+const firebaseConfig = {
+  apiKey: "AIzaSyC3llqOYDV2GJrg5NAEThQe0tI8LDqQpD4",
+  authDomain: "lamacos-technolygies.firebaseapp.com",
+  projectId: "lamacos-technolygies",
+  storageBucket: "lamacos-technolygies.firebasestorage.app",
+  messagingSenderId: "487103867292",
+  appId: "1:487103867292:web:d47007df73b201d5f98059"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// ------------------ Elemente ------------------
+const rgbCorner = document.getElementById('rgb-corner');
+const loginModal = document.getElementById('loginModal');
+const correctCode = "kdjfj_kduv,_odig158.!";
+let loggedIn = false;
+
+const coverImg = document.getElementById('coverImg');
+const coverInput = document.getElementById('coverInput');
+const coverUploadBtn = document.getElementById('coverUploadBtn');
+const addProductBtn = document.getElementById('addProductBtn');
+const addSetBtn = document.getElementById('addSetBtn');
+const productGallery = document.getElementById('productGallery');
+const setList = document.getElementById('setList');
+
+let products = [];
+let sets = [];
+
+// ------------------ LOGIN ------------------
+rgbCorner.addEventListener('click', ()=>{ loginModal.classList.toggle('active'); });
+
+async function login(){
+  const code = document.getElementById('loginCode').value;
+  if(code===correctCode){
+    loggedIn = true;
+    loginModal.classList.remove('active');
+    showButtons();
+    await ensureCoverExists();
+    await loadCover();
+    await loadProducts();
+    renderProducts();
+    await loadSets();
+    renderSets();
+    alert('Erfolgreich angemeldet!');
+  }else alert('Falscher Code!');
+}
+
+function showButtons(){
+  coverUploadBtn.style.display='block';
+  addProductBtn.style.display='inline-block';
+  addSetBtn.style.display='inline-block';
+}
+
+// ------------------ FILE SELECT & UPLOAD ------------------
+function selectFile(){
+  return new Promise(resolve=>{
+    const input=document.createElement('input');
+    input.type='file';
+    input.accept='.png,.jpg,.jpeg';
+    input.onchange=e=>resolve(e.target.files[0]);
+    input.click();
+  });
+}
+
+async function uploadFile(file,path){
+  const ref = storage.ref(path);
+  await ref.put(file);
+  return await ref.getDownloadURL();
+}
+
+// ------------------ COVER ------------------
+coverUploadBtn.addEventListener('click', ()=> coverInput.click());
+coverInput.addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const url = await uploadFile(file,'home/cover.png');
+  coverImg.src = url;
+  await db.collection('home').doc('cover').set({img:url});
+});
+
+// Cover immer laden / default setzen
+async function ensureCoverExists(){
+  const doc = await db.collection('home').doc('cover').get();
+  if(!doc.exists){
+    const defaultUrl = 'https://via.placeholder.com/1200x300/222222/00ffff?text=lamacOs+Gaming';
+    await db.collection('home').doc('cover').set({img:defaultUrl});
+  }
+}
+
+async function loadCover(){
+  const doc = await db.collection('home').doc('cover').get();
+  if(doc.exists){
+    coverImg.src = doc.data().img || 'https://via.placeholder.com/1200x300/222222/00ffff?text=lamacOs+Gaming';
+  }
+}
+
+// ------------------ PRODUKTE ------------------
+async function loadProducts(){
+  const snapshot = await db.collection('products').get();
+  products = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+}
+
+function renderProducts(){
+  productGallery.innerHTML='';
+  products.forEach(p=>{
+    const div = document.createElement('div');
+    div.className='product';
+    div.innerHTML=`
+      <img src="${p.img}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>Preis: <span>${p.price}</span></p>
+      ${loggedIn?'<span class="edit-btn" onclick="editProduct(\''+p.id+'\')">Bearbeiten</span>':''}
+    `;
+    productGallery.appendChild(div);
+  });
+}
+
+async function editProduct(id){
+  const p = products.find(x=>x.id===id);
+  if(!p) return;
+
+  const name = prompt('Neuer Name:',p.name)?.trim();
+  if(!name) return alert('Name darf nicht leer sein.');
+
+  const price = prompt('Neuer Preis:',p.price)?.trim();
+  if(!price) return alert('Preis darf nicht leer sein.');
+
+  let img = p.img;
+  const file = await selectFile();
+  if(file){
+    img = await uploadFile(file,`products/${Date.now()}_${file.name}`);
+  }
+
+  await db.collection('products').doc(id).update({name,price,img});
+  await loadProducts();
+  renderProducts();
+}
+
+addProductBtn.addEventListener('click', async ()=>{
+  const file = await selectFile();
+  if(!file) return;
+
+  const url = await uploadFile(file, `products/${Date.now()}_${file.name}`);
+
+  const name = prompt('Produktname:')?.trim();
+  if(!name) return alert('Produktname darf nicht leer sein.');
+
+  const price = prompt('Preis:')?.trim();
+  if(!price) return alert('Preis darf nicht leer sein.');
+
+  const docRef = await db.collection('products').add({img:url,name,price});
+  await loadProducts();
+  renderProducts();
+});
+
+// ------------------ SETS ------------------
+async function loadSets(){
+  const snapshot = await db.collection('sets').get();
+  sets = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+}
+
+function renderSets(){
+  setList.innerHTML='';
+  sets.forEach(s=>{
+    const div = document.createElement('div');
+    div.className='set';
+    const items = s.items || [];
+    const itemsOptions = products.map(p=>`<option value="${p.name}" ${items.includes(p.name)?'selected':''}>${p.name}</option>`).join('');
+    div.innerHTML=`
+      <h3>${s.name}</h3>
+      <p>Preis: <span>${s.price}</span></p>
+      <p>Produkte:</p>
+      <select multiple disabled>${itemsOptions}</select>
+      ${loggedIn?'<span class="edit-btn" onclick="editSet(\''+s.id+'\')">Bearbeiten</span>':''}
+    `;
+    setList.appendChild(div);
+  });
+}
+
+async function editSet(id){
+  const s = sets.find(x=>x.id===id);
+  if(!s) return;
+
+  const name = prompt('Neuer Set Name:',s.name)?.trim();
+  if(!name) return alert('Name darf nicht leer sein.');
+
+  const price = prompt('Neuer Preis:',s.price)?.trim();
+  if(!price) return alert('Preis darf nicht leer sein.');
+
+  const itemsInput = prompt('Produkte (Komma getrennt, exakt wie Namen):',s.items?.join(',')||'');
+  if(!itemsInput) return alert('Mindestens ein Produkt muss angegeben werden.');
+  const selectedProducts = itemsInput.split(',').map(x=>x.trim()).filter(x=>x);
+
+  await db.collection('sets').doc(id).update({name,price,items:selectedProducts});
+  await loadSets();
+  renderSets();
+}
+
+addSetBtn.addEventListener('click', async ()=>{
+  const name = prompt('Set Name:')?.trim();
+  if(!name) return alert('Name darf nicht leer sein.');
+
+  const price = prompt('Preis:')?.trim();
+  if(!price) return alert('Preis darf nicht leer sein.');
+
+  const itemsInput = prompt('Produkte (Komma getrennt, exakt wie Namen):');
+  if(!itemsInput) return alert('Mindestens ein Produkt muss angegeben werden.');
+  const selectedProducts = itemsInput.split(',').map(x=>x.trim()).filter(x=>x);
+
+  const docRef = await db.collection('sets').add({name,price,items:selectedProducts});
+  await loadSets();
+  renderSets();
+});
+</script>
+
+</body>
+</html>
