@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprach- und Lautstärketracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: white;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 600px;
+    }
+    #volumeMeter {
+      width: 100%;
+      height: 20px;
+      background-color: #ddd;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    #volume {
+      height: 100%;
+      background-color: #007bff;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #feedback {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    #speechAnalysis {
+      margin-top: 20px;
+      font-size: 1.1rem;
+    }
+    #stats {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #666;
+    }
+    #transcript {
+      margin-top: 20px;
+      font-size: 1rem;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+      min-height: 100px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sprach- und Lautstärketracker</h1>
+    <button id="startBtn">Start Aufzeichnung</button>
+    <div id="volumeMeter">
+      <div id="volume"></div>
+    </div>
+    <div id="speechAnalysis">Warte auf Sprachaktivität...</div>
+    <div id="feedback">Feedback: Kein Feedback noch</div>
+    <div id="stats">Gesamtsprechzeit: 0 Sekunden</div>
+    <div id="transcript">Sprach-Transkript: (Wird hier angezeigt)</div>
+  </div>
+
+  <script>
+    let audioContext;
+    let analyser;
+    let microphone;
+    let speakingStartTime = null;
+    let totalSpeakingTime = 0;
+    let totalListenerTime = 0;
+    let isSpeaking = false;
+    let lastTranscript = "";  
+    let isRecording = false;
+
+    let speakers = {};  // Sprecher ID-Tracking
+    let speakerCounter = 1;  // Zähler für Sprecher
+
+    // Web Speech API: Sprach-Erkennung starten
+    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'de-DE'; // Sprache auf Deutsch setzen
+    recognition.continuous = true;  // Kontinuierliche Erkennung
+
+    // Transkription der Sprache in Echtzeit
+    recognition.onresult = (event) => {
+      let transcript = event.results[event.results.length - 1][0].transcript;
+      let speakerId = getSpeakerId();  // Identifiziere den Sprecher
+
+      // Anzeige des Transkripts mit Sprecher-ID
+      if (transcript !== lastTranscript) {
+        document.getElementById('transcript').innerText += `Sprecher ${speakerId}: ${transcript}\n`;
+        lastTranscript = transcript;
+      }
+    };
+
+    // Wenn die Spracherkennung beginnt
+    recognition.onstart = () => {
+      console.log('Spracherkennung läuft...');
+    };
+
+    // Wenn die Spracherkennung stoppt
+    recognition.onend = () => {
+      console.log('Spracherkennung gestoppt');
+    };
+
+    // Wenn ein Fehler auftritt
+    recognition.onerror = (event) => {
+      console.error('Fehler bei der Spracherkennung:', event.error);
+    };
+
+    // Startet die Aufnahme und die Sprachtranskription
+    function startRecording() {
+      if (isRecording) {
+        return; // Verhindert das erneute Starten, wenn bereits aufgenommen wird
+      }
+
+      // Setze den Status auf "Aufnahme läuft"
+      isRecording = true;
+      document.getElementById('startBtn').textContent = 'Stop Aufzeichnung';
+
+      // Audio-Kontext für Lautstärkenerkennung
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+
+      // Zugriff auf das Mikrofon
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          microphone = audioContext.createMediaStreamSource(stream);
+          microphone.connect(analyser);
+          analyser.fftSize = 256;
+          monitorVolume();
+        })
+        .catch(error => console.error("Fehler beim Zugreifen auf das Mikrofon:", error));
+
+      // Starte die Spracherkennung
+      recognition.start(); // Startet die Spracherkennung
+    }
+
+    // Stoppt die Aufnahme und die Spracherkennung
+    function stopRecording() {
+      recognition.stop();
+      isRecording = false;
+      document.getElementById('startBtn').textContent = 'Start Aufzeichnung';
+    }
+
+    // Funktion zur Lautstärkenerkennung
+    function monitorVolume() {
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      function updateMeter() {
+        analyser.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+        const volume = average / 255;  // Normalisieren
+        document.getElementById('volume').style.width = `${volume * 100}%`;
+
+        if (volume > 0.1) {
+          if (!isSpeaking) {
+            isSpeaking = true;
+            speakingStartTime = Date.now();  // Startzeit des Sprechens
+            document.getElementById('speechAnalysis').innerText = 'Du sprichst...';
+            assignSpeaker();  // Weist einem Sprecher eine ID zu
+          }
+        } else {
+          if (isSpeaking) {
+            isSpeaking = false;
+            totalSpeakingTime += (Date.now() - speakingStartTime) / 1000;  // Umrechnung in Sekunden
+            document.getElementById('speechAnalysis').innerText = 'Du hast aufgehört zu sprechen.';
+            provideFeedback();
+          }
+        }
+
+        requestAnimationFrame(updateMeter);
+      }
+
+      updateMeter();
+    }
+
+    // Sprecher-ID zuweisen
+    function assignSpeaker() {
+      let speakerId = getSpeakerId();
+      if (!speakers[speakerId]) {
+        speakers[speakerId] = { id: speakerCounter, lastSpokenTime: Date.now() };
+        speakerCounter++;
+      }
+    }
+
+    // Gibt die Sprecher-ID zurück
+    function getSpeakerId() {
+      // Berechne basierend auf der Lautstärke, welcher Sprecher gerade spricht
+      // (Vereinfachung: Jedes Mal wird ein neuer Sprecher ID zugewiesen)
+      return speakerCounter;
+    }
+
+    // Feedback zur Kommunikation geben
+    function provideFeedback() {
+      let feedbackMessage = "Feedback: Deine Sprechzeit ist gut.";
+      if (totalSpeakingTime > 10) {
+        feedbackMessage = 'Tipp: Versuche, Pausen zu machen und anderen Raum zum Sprechen zu geben.';
+      }
+
+      document.getElementById('feedback').innerText = feedbackMessage;
+      document.getElementById('stats').innerText = `Gesamtsprechzeit: ${Math.round(totalSpeakingTime)} Sekunden`;
+      setTimeout(() => {
+        totalSpeakingTime = 0;
+      }, 30000);
+    }
+
+    // Event Listener für den Button
+    document.getElementById('startBtn').addEventListener('click', () => {
+      if (isRecording) {
+        stopRecording(); // Stoppe, wenn bereits aufgenommen wird
+      } else {
+        startRecording(); // Starte, wenn noch nicht aufgenommen wird
+      }
+    });
+  </script>
+</body>
+</html>
