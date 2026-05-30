@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>AGENT Kontakt</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>AGENT – Kontaktzentrale</header>
+
+<div class="container">
+
+<div id="agents"></div>
+
+<form id="form" action="https://formspree.io/f/xdaypnwz" method="POST">
+<h3 id="selectedAgent">Kein Agent ausgewählt</h3>
+
+<input type="hidden" name="agent" id="agentInput">
+
+<input type="email" name="email" id="email" placeholder="Deine E-Mail" required>
+<input type="number" name="price" id="price" placeholder="Vorgeschlagener Preis (€)" required>
+<textarea name="message" id="message" placeholder="Nachricht" required></textarea>
+
+<button type="submit" id="sendBtn" disabled>Absenden</button>
+</form>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
