@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Script2Movie – Film mit Audio+Animation</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.11/dist/ffmpeg.min.js"></script>
+<style>
+body { font-family: sans-serif; max-width:900px; margin:20px auto; }
+textarea,input,select,button { display:block; width:100%; margin:10px 0; padding:8px; }
+progress { width:100%; height:20px; }
+img { max-width:80px; margin:2px; }
+</style>
+</head>
+<body>
+
+<h1>Script2Movie – Film mit Audio+Animation</h1>
+
+<label>OpenAI API Key:</label>
+<input type="text" id="apiKey" placeholder="API Key">
+
+<label>Drehbuch:</label>
+<textarea id="script" rows="6" placeholder="Grobe Drehbuchbeschreibung"></textarea>
+
+<label>Film Länge (1-90 min):</label>
+<input type="number" id="length" min="1" max="90" value="5">
+
+<label>Stil:</label>
+<select id="style">
+<option value="cinematic">Cinematic</option>
+<option value="anime">Anime</option>
+<option value="cartoon">Cartoon</option>
+</select>
+
+<button id="generate">Film generieren</button>
+
+<progress id="progress" value="0" max="100"></progress>
+<div id="status"></div>
+<div id="downloads"></div>
+<div id="previews"></div>
+
+<script>
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log:true });
+
+const firebaseConfig = {
+  apiKey:"AIzaSyDL8DaqwdtM8Q5GYO_xiRRX_DqVpK_1i8E",
+  authDomain:"script2movie-f7566.firebaseapp.com",
+  projectId:"script2movie-f7566",
+  storageBucket:"script2movie-f7566.firebasestorage.app",
+  messagingSenderId:"655767564136",
+  appId:"1:655767564136:web:66823d51890f27391770dd"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function extractCharacters(text){
+  const words=text.match(/\b[A-Z][a-z]{1,10}\b/g)||[];
+  const unique=[...new Set(words)];
+  return unique.map(name=>({name,appearance:"unbekannt"}));
+}
+
+function splitScript(script,totalMinutes){
+  const totalSegments=totalMinutes*3;
+  const lines=script.split(/\r?\n/).filter(l=>l.trim()!=="");
+  const segLength=Math.ceil(lines.length/totalSegments);
+  const segments=[];
+  for(let i=0;i<totalSegments;i++){
+    segments.push(lines.slice(i*segLength,(i+1)*segLength).join("\n"));
+  }
+  return segments;
+}
+
+document.getElementById('generate').addEventListener('click',async()=>{
+  const apiKey=document.getElementById('apiKey').value.trim();
+  if(!apiKey){alert("API Key eingeben!"); return;}
+  const scriptText=document.getElementById('script').value;
+  const length=parseInt(document.getElementById('length').value);
+  const style=document.getElementById('style').value;
+  const characters=extractCharacters(scriptText);
+  const segments=splitScript(scriptText,length);
+
+  const projectRef=await db.collection('projects').add({
+    script:scriptText,
+    length:length,
+    style:style,
+    clips_total:segments.length,
+    clips_finished:0,
+    characters:characters,
+    status:'queued',
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  const downloadsDiv=document.getElementById('downloads');
+  downloadsDiv.innerHTML="";
+  const previewsDiv=document.getElementById('previews');
+  previewsDiv.innerHTML="";
+
+  const unsubscribe=projectRef.onSnapshot(doc=>{
+    const data=doc.data();
+    document.getElementById('progress').value=(data.clips_finished/data.clips_total)*100;
+    document.getElementById('status').textContent=`Fortschritt: ${data.clips_finished}/${data.clips_total}`;
+    if(data.status==='finished'){
+      document.getElementById('status').textContent="Film fertig!";
+      unsubscribe();
+    }
+  });
+
+  if(!ffmpeg.isLoaded()) await ffmpeg.load();
+
+  const clipFiles=[];
+  for(let i=0;i<segments.length;i++){
+    const promptImg=`Erstelle ein Cinematic-Bild für Szene: ${segments[i]} Stil: ${style} Charaktere: ${characters.map(c=>c.name).join(", ")}`;
+    const resImg=await fetch("https://api.openai.com/v1/images/generations",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":`Bearer ${apiKey}`
+      },
+      body:JSON.stringify({model:"gpt-image-1",prompt:promptImg,size:"512x512"})
+    });
+    const jsonImg=await resImg.json();
+    const imgUrl=jsonImg.data[0].url;
+    const imgBlob=await (await fetch(imgUrl)).blob();
+    previewsDiv.innerHTML+=`<img src="${imgUrl}" />`;
+    const imgName=`clip_${i+1}.png`;
+    ffmpeg.FS('writeFile',imgName,await fetchFile(imgBlob));
+
+    const resTTS=await fetch("https://api.openai.com/v1/audio/speech",{
+      method:"POST",
+      headers:{
+        "Authorization":`Bearer ${apiKey}`,
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({model:"gpt-4o-mini-tts",voice:"alloy",input:segments[i]})
+    });
+    const audioBlob=await resTTS.blob();
+    const audioName=`clip_${i+1}.mp3`;
+    ffmpeg.FS('writeFile',audioName,await fetchFile(audioBlob));
+
+    const vidName=`clip_${i+1}.mp4`;
+    await ffmpeg.run('-loop','1','-i',imgName,'-i',audioName,'-c:v','libx264','-t','6','-pix_fmt','yuv420p','-c:a','aac','-shortest',vidName);
+    clipFiles.push(vidName);
+
+    await projectRef.update({clips_finished:i+1});
+    await new Promise(r=>setTimeout(r,200));
+  }
+
+  const listTxt=clipFiles.map(f=>`file '${f}'`).join('\n');
+  ffmpeg.FS('writeFile','list.txt',listTxt);
+  await ffmpeg.run('-f','concat','-safe','0','-i','list.txt','-c','copy','final_movie.mp4');
+
+  const data=ffmpeg.FS('readFile','final_movie.mp4');
+  const finalBlob=new Blob([data.buffer],{type:'video/mp4'});
+  const finalUrl=URL.createObjectURL(finalBlob);
+  const finalLink=document.createElement('a');
+  finalLink.href=finalUrl;
+  finalLink.download="Script2Movie_FullFilm.mp4";
+  finalLink.textContent="Finalen Film herunterladen";
+  finalLink.style.display="block";
+  downloadsDiv.appendChild(finalLink);
+
+  await projectRef.update({status:'finished'});
+});
+</script>
+
+</body>
+</html>
