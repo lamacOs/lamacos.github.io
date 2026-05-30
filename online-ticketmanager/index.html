@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TicketShows</title>
+
+  <!-- Bibliotheken: jsQR (Scanner) + qrcode (Generator) -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --card: #fff;
+      --accent: #ff7a00;
+      --success: #16a34a;
+      --danger: #ef4444;
+    }
+
+    body {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 20px;
+      color: #111;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0 0 18px 0;
+    }
+
+    #app { max-width: 900px; margin: 0 auto; }
+
+    .top-actions {
+      display:flex;
+      gap:10px;
+      justify-content: flex-end;
+      margin-bottom:10px;
+    }
+
+    .btn {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn.plus { background: var(--accent); color: white; font-size: 20px; }
+    .btn.save { background: #059669; color: white; }
+    .btn.small { padding:6px 8px; font-size:13px; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1200;
+    }
+    .modal-backdrop.open { display:flex; }
+    .modal {
+      width: 340px;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
+    .modal h3 { margin:0 0 8px 0; }
+    .modal input {
+      width:100%;
+      padding:8px;
+      border-radius:8px;
+      border:1px solid #ddd;
+      margin-bottom:10px;
+      font-size:15px;
+    }
+    .modal .row { display:flex; gap:8px; justify-content:flex-end; }
+
+    /* Show / tickets */
+    .show {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .show-header {
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      cursor: pointer;
+    }
+    .show-title { font-weight:700; font-size:16px; }
+    .ticket-list { margin-top:10px; padding-left:12px; display:flex; flex-direction: column; gap:8px; }
+    .ticket {
+      background:#fafafa;
+      border-radius:8px;
+      padding:10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .ticket-left { max-width: 66%; }
+    .ticket.strikethrough { text-decoration: line-through; color: gray; opacity:0.8; }
+
+    .ticket .meta { font-size:13px; color:#333; margin-top:6px; }
+    .ticket .actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+    /* QR pop-up */
+    .qr-popup {
+      display:none;
+      position: fixed;
+      z-index: 1300;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      background: white;
+      padding:14px;
+      border-radius:12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+      text-align:center;
+    }
+    .qr-popup.open { display:block; }
+    .qr-popup img { max-width:260px; width:100%; height:auto; display:block; margin: 8px auto; }
+    .qr-popup .close { margin-top:10px; }
+
+    /* QR Error box */
+    .qr-error {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+      padding: 10px 18px;
+      background: var(--danger);
+      color: white;
+      border-radius: 8px;
+      font-weight:700;
+      display:none;
+      box-shadow: 0 8px 30px rgba(239,68,68,0.25);
+    }
+    .qr-error.show { display:block; animation: blink 0.35s infinite alternate; }
+
+    @keyframes blink {
+      from { opacity:1; }
+      to { opacity:0.3; }
+    }
+
+    /* Kamerabereich unten */
+    .camera-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.9);
+      padding: 8px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      align-items:center;
+      z-index: 1000;
+    }
+    #camera {
+      width: 360px;
+      max-width: 100%;
+      height: 200px;
+      border-radius:10px;
+      object-fit: cover;
+      background: black;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    }
+    .camera-controls {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      color:white;
+      font-weight:700;
+    }
+    .hint { font-size:13px; color:#444; margin-top:8px; text-align:center; }
+
+    /* responsive spacing so main content not covered by camera */
+    .content-spacer { height: 230px; } /* Platz für Camera */
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Online Ticket Manager</h1>
+<p>Mit dieser Website können sie Shows und Tickets erstellen und verwalten. Besonders geeignet für Zirkus, Theater und mehr.</p>
+   <div class="top-actions">
+      <button class="btn plus" title="Neue Show" onclick="openModalStep(1)">＋</button>
+      <button class="btn save" onclick="saveData()">Speichern</button>
+    </div>
+
+    <div id="show-list"></div>
+
+    <!-- Platzhalter, damit die Seite nicht vom Kamera-Panel überlappt wird -->
+    <div class="content-spacer"></div>
+  </div>
+
+  <!-- Modal für Show-Erstellung -->
+  <div id="backdrop" class="modal-backdrop">
+    <div class="modal">
+      <h3 id="modal-question">Wann?</h3>
+      <input id="modal-input" type="text" oninput="handleInput()" placeholder="Eingabe..." />
+      <div class="row">
+        <button class="btn small" onclick="closeModal()">Abbrechen</button>
+        <button id="confirm-button" class="btn small" disabled onclick="handleNext()">Weiter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR-Popup (echtes Bild) -->
+  <div id="qr-popup" class="qr-popup" role="dialog" aria-hidden="true">
+    <div id="qr-popup-title" style="font-weight:800"></div>
+    <img id="qr-img" src="" alt="QR Code" />
+    <div style="display:flex; gap:8px; justify-content:center;">
+      <button class="btn small" id="open-link-btn">Öffnen (prüfen)</button>
+      <button class="btn small close" onclick="closeQRPopup()">Schließen</button>
+    </div>
+  </div>
+
+  <!-- QR-Fehleranzeige -->
+  <div id="qr-error" class="qr-error">Falscher QR Code</div>
+
+  <!-- Kamera-Bereich -->
+  <div class="camera-area" aria-hidden="false">
+    <video id="camera" autoplay muted playsinline></video>
+    <div class="camera-controls">
+      <div id="camera-status">Kamera: aus</div>
+      <button class="btn small" onclick="startCamera()">Start</button>
+      <button class="btn small" onclick="stopCamera()">Stop</button>
+    </div>
+  </div>
+
+  <script>
+    /* ---------- Daten & Zustand ---------- */
+    let step = 1;
+    let currentShow = {};
+    let shows = [];
+    let expandedShow = null;
+
+    // Für Scanner: cooldown, damit nicht mehrfach ausgelöst wird
+    let lastScanTime = 0; // ms
+    const SCAN_COOLDOWN = 1500; // 1.5s
+
+    /* ---------- Laden bei Start ---------- */
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem("ticketData");
+      if (saved) {
+        try {
+          shows = JSON.parse(saved) || [];
+        } catch(e) { shows = []; }
+      }
+      renderShows();
+      // falls ?ticket=... in URL -> prüfen (z. B. wenn popup link geöffnet)
+      checkURLForTicket();
+      // Kamera nicht automatisch starten (User muss drücken), wegen Berechtigungen
+    });
+
+    /* ---------- localStorage Save ---------- */
+    function saveData() {
+      localStorage.setItem("ticketData", JSON.stringify(shows));
+      toast("Gespeichert ✅");
+    }
+
+    function toast(text, time = 900) {
+      const el = document.createElement('div');
+      el.style.position = 'fixed';
+      el.style.bottom = '260px';
+      el.style.left = '50%';
+      el.style.transform = 'translateX(-50%)';
+      el.style.background = '#111';
+      el.style.color = 'white';
+      el.style.padding = '8px 12px';
+      el.style.borderRadius = '8px';
+      el.style.zIndex = 2500;
+      el.textContent = text;
+      document.body.appendChild(el);
+      setTimeout(()=> el.remove(), time);
+    }
+
+    /* ---------- Modal Logik ---------- */
+    function openModalStep(s) {
+      step = s;
+      currentShow = { time: '', place: '', name: '', tickets: [] };
+      document.getElementById('modal-input').value = '';
+      document.getElementById('backdrop').classList.add('open');
+      updateModal();
+    }
+
+    function updateModal() {
+      const question = document.getElementById('modal-question');
+      const input = document.getElementById('modal-input');
+      const btn = document.getElementById('confirm-button');
+
+      btn.disabled = true;
+
+      if (step === 1) {
+        question.innerText = "Wann?";
+        input.placeholder = "z.B. 24.12.2025 19:00";
+      } else if (step === 2) {
+        question.innerText = "Wo?";
+        input.placeholder = "z.B. Stadthalle";
+      } else if (step === 3) {
+        question.innerText = "Euer Name?";
+        input.placeholder = "z.B. CoolBand";
+      }
+    }
+
+    function handleInput() {
+      const v = document.getElementById('modal-input').value.trim();
+      const btn = document.getElementById('confirm-button');
+      btn.disabled = !v;
+    }
+
+    function handleNext() {
+      const v = document.getElementById('modal-input').value.trim();
+      if (!v) return;
+
+      if (step === 1) currentShow.time = v;
+      else if (step === 2) currentShow.place = v;
+      else if (step === 3) {
+        currentShow.name = v;
+        currentShow.tickets = [];
+        shows.push(currentShow);
+        closeModal();
+        renderShows();
+        saveData(); // optional: direkt speichern
+        return;
+      }
+      step++;
+      document.getElementById('modal-input').value = '';
+      updateModal();
+    }
+
+    function closeModal() {
+      document.getElementById('backdrop').classList.remove('open');
+    }
+
+    /* ---------- Render Shows & Tickets ---------- */
+    function renderShows() {
+      const container = document.getElementById('show-list');
+      container.innerHTML = '';
+      shows.forEach((show, sIndex) => {
+        const showDiv = document.createElement('div');
+        showDiv.className = 'show';
+
+        const header = document.createElement('div');
+        header.className = 'show-header';
+
+        const title = document.createElement('div');
+        title.className = 'show-title';
+        title.textContent = show.name;
+
+        const right = document.createElement('div');
+        right.style.display = 'flex';
+        right.style.gap = '8px';
+        right.style.alignItems = 'center';
+
+        const info = document.createElement('div');
+        info.style.fontSize = '13px';
+        info.style.color = '#555';
+        info.textContent = `${show.place} • ${show.time}`;
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'btn small';
+        toggleBtn.textContent = expandedShow === sIndex ? '╳' : '⬇';
+        toggleBtn.onclick = (e) => { e.stopPropagation(); toggleShow(sIndex); };
+
+        const addTicketBtn = document.createElement('button');
+        addTicketBtn.className = 'btn small';
+        addTicketBtn.textContent = 'Ticket +';
+        addTicketBtn.onclick = (e) => { e.stopPropagation(); addTicketPrompt(sIndex); };
+
+        right.appendChild(info);
+        right.appendChild(addTicketBtn);
+        right.appendChild(toggleBtn);
+
+        header.appendChild(title);
+        header.appendChild(right);
+
+        header.onclick = () => toggleShow(sIndex);
+
+        showDiv.appendChild(header);
+
+        if (expandedShow === sIndex) {
+          const ticketList = document.createElement('div');
+          ticketList.className = 'ticket-list';
+
+          if (show.tickets.length === 0) {
+            const empty = document.createElement('div');
+            empty.style.color = '#666';
+            empty.textContent = 'Keine Tickets. Klick auf "Ticket +" um eins hinzuzufügen.';
+            ticketList.appendChild(empty);
+          }
+
+          show.tickets.forEach((ticket, tIndex) => {
+            const t = document.createElement('div');
+            t.className = 'ticket' + (ticket.used ? ' strikethrough' : '');
+            const left = document.createElement('div');
+            left.className = 'ticket-left';
+            const titleLine = document.createElement('div');
+            titleLine.innerHTML = `<strong>Sitz:</strong> ${escapeHtml(ticket.seat)}`;
+            const meta = document.createElement('div');
+            meta.className = 'meta';
+            meta.innerText = `${show.place} • ${show.time}`;
+            left.appendChild(titleLine);
+            left.appendChild(meta);
+
+            const actions = document.createElement('div');
+            actions.className = 'actions';
+
+            const useBtn = document.createElement('button');
+            useBtn.className = 'btn small';
+            useBtn.textContent = 'Ticket benutzt';
+            useBtn.onclick = (e) => { e.stopPropagation(); markTicketUsed(sIndex, tIndex); };
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn small';
+            delBtn.textContent = 'Löschen';
+            delBtn.onclick = (e) => { e.stopPropagation(); deleteTicket(sIndex, tIndex); };
+
+            const qrBtn = document.createElement('button');
+            qrBtn.className = 'btn small';
+            qrBtn.textContent = 'QR Code anzeigen';
+            qrBtn.onclick = (e) => { e.stopPropagation(); showTicketQR(sIndex, tIndex); };
+
+            actions.appendChild(useBtn);
+            actions.appendChild(qrBtn);
+            actions.appendChild(delBtn);
+
+            t.appendChild(left);
+            t.appendChild(actions);
+            ticketList.appendChild(t);
+          });
+
+          showDiv.appendChild(ticketList);
+        }
+
+        container.appendChild(showDiv);
+      });
+    }
+
+    /* ---------- Helper Aktionen ---------- */
+    function toggleShow(idx) {
+      expandedShow = expandedShow === idx ? null : idx;
+      renderShows();
+    }
+
+    function addTicketPrompt(showIndex) {
+      const seat = prompt("Welcher Sitzplatz?");
+      if (!seat) return;
+      shows[showIndex].tickets.push({ seat: seat.trim(), used: false });
+      renderShows();
+      saveData();
+    }
+
+    function markTicketUsed(sIndex, tIndex) {
+      if (!shows[sIndex] || !shows[sIndex].tickets[tIndex]) return;
+      shows[sIndex].tickets[tIndex].used = true;
+      renderShows();
+      saveData();
+    }
+
+    function deleteTicket(sIndex, tIndex) {
+      if (!shows[sIndex]) return;
+      shows[sIndex].tickets.splice(tIndex, 1);
+      renderShows();
+      saveData();
+    }
+
+    /* ---------- QR Bild Popup (echtes Bild) ---------- */
+    const qrPopup = document.getElementById('qr-popup');
+    const qrImg = document.getElementById('qr-img');
+    const qrTitle = document.getElementById('qr-popup-title');
+    const openLinkBtn = document.getElementById('open-link-btn');
+
+    let currentQRLink = '';
+
+    function showTicketQR(sIndex, tIndex) {
+      const codeText = `ticket=${sIndex}-${tIndex}`;
+      // Erzeuge DataURL als Bild
+      QRCode.toDataURL(codeText, { width: 512, margin: 1 }, (err, url) => {
+        if (err) {
+          alert('QR konnte nicht erzeugt werden: ' + err);
+          return;
+        }
+        currentQRLink = makeAbsoluteTicketURL(codeText);
+        qrTitle.textContent = `QR: ${shows[sIndex].name} — Sitz ${shows[sIndex].tickets[tIndex].seat}`;
+        qrImg.src = url;
+        openLinkBtn.onclick = () => {
+          // Öffnet die Seite mit ?ticket=...
+          window.location.href = currentQRLink;
+        };
+        qrPopup.classList.add('open');
+        qrPopup.setAttribute('aria-hidden', 'false');
+      });
+    }
+
+    function closeQRPopup() {
+      qrPopup.classList.remove('open');
+      qrPopup.setAttribute('aria-hidden', 'true');
+      qrImg.src = '';
+      currentQRLink = '';
+    }
+
+    // Erzeugt absolute URL zur Seite mit ?ticket=...
+    function makeAbsoluteTicketURL(codeText) {
+      // Wenn codeText ist "ticket=0-1" -> wir geben vollständige URL mit location.origin+pathname+?ticket=0-1
+      const base = location.origin + location.pathname;
+      const param = codeText.startsWith('ticket=') ? codeText.replace('ticket=', '') : codeText;
+      return base + '?ticket=' + encodeURIComponent(param);
+    }
+
+    /* ---------- URL Handling (wenn man über Link öffnet) ---------- */
+    function checkURLForTicket() {
+      const params = new URLSearchParams(window.location.search);
+      const raw = params.get('ticket');
+      if (!raw) return;
+      // raw z. B. "0-1"
+      handleQRCodeText('ticket=' + raw);
+      // Entferne Query, damit erneutes Neuladen die Aktion nicht nochmal macht
+      history.replaceState({}, document.title, location.pathname);
+    }
+
+    /* ---------- Scanner + Kamera (jsQR) ---------- */
+    const video = document.getElementById('camera');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    let stream = null;
+    let scanning = false;
+
+    async function startCamera() {
+      if (scanning) return;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+        video.srcObject = stream;
+        video.play();
+        scanning = true;
+        document.getElementById('camera-status').textContent = 'Kamera: an';
+        scanLoop();
+      } catch (err) {
+        alert('Kamera konnte nicht gestartet werden: ' + err.message);
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      scanning = false;
+      document.getElementById('camera-status').textContent = 'Kamera: aus';
+    }
+
+    function scanLoop() {
+      if (!scanning) return;
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        try {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: "attemptBoth" });
+          if (code && code.data) {
+            // Debounce / cooldown
+            const now = Date.now();
+            if (now - lastScanTime > SCAN_COOLDOWN) {
+              lastScanTime = now;
+              handleQRCodeText(code.data);
+            }
+          }
+        } catch (e) {
+          // manche Browser werfen SecurityError bei cross-origin video, ignorieren
+          // console.warn(e);
+        }
+      }
+      requestAnimationFrame(scanLoop);
+    }
+
+    /* ---------- QR Handling (gemeinsame Logik) ---------- */
+    function handleQRCodeText(text) {
+      // mögliche Formen:
+      // "ticket=0-1"
+      // "https://example.com/path?ticket=0-1"  oder "http://..." oder nur "0-1"
+      let ticketParam = null;
+
+      // 1) If text contains '?ticket='
+      try {
+        const lower = text.toLowerCase();
+        if (lower.includes('?ticket=')) {
+          const idx = lower.indexOf('?ticket=');
+          ticketParam = text.substring(idx + 8);
+          // cut off anything after & if present
+          if (ticketParam.includes('&')) ticketParam = ticketParam.split('&')[0];
+        } else if (lower.includes('ticket=')) {
+          // maybe "ticket=0-1"
+          const idx = lower.indexOf('ticket=');
+          ticketParam = text.substring(idx + 7);
+          if (ticketParam.includes('&')) ticketParam = ticketParam.split('&')[0];
+        } else {
+          // maybe it's just "0-1" or "0-1\n"
+          if (/^\d+\-\d+$/.test(text.trim())) {
+            ticketParam = text.trim();
+          }
+        }
+      } catch (e) {
+        ticketParam = null;
+      }
+
+      if (!ticketParam) {
+        flashError('Falscher QR Code');
+        return;
+      }
+
+      const parts = ticketParam.split('-');
+      const sIndex = Number(parts[0]);
+      const tIndex = Number(parts[1]);
+
+      if (!Number.isInteger(sIndex) || !Number.isInteger(tIndex)) {
+        flashError('Falscher QR Code');
+        return;
+      }
+
+      if (!shows[sIndex] || !shows[sIndex].tickets[tIndex]) {
+        flashError('Falscher QR Code');
+        return;
+      }
+
+      // gültig -> Ticket benutzen
+      shows[sIndex].tickets[tIndex].used = true;
+      saveData();
+      renderShows();
+      showSuccess(`Ticket benutzt: ${shows[sIndex].name} — Sitz ${shows[sIndex].tickets[tIndex].seat}`);
+    }
+
+    function flashError(msg) {
+      const el = document.getElementById('qr-error');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    function showSuccess(msg) {
+      toast(msg, 1200);
+    }
+
+    /* ---------- Utility ---------- */
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+  </script>
+</body>
+</html>
