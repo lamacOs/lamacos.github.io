@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>lamacOs PlayHub</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+input, button {
+  width: 240px;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 6px;
+  border: none;
+}
+button { cursor: pointer; }
+#game-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.game-card {
+  width: 150px;
+  margin: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+.game-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+iframe {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  border: none;
+  z-index: 999;
+  background: #000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="auth">
+  <h2>lamacOs PlayHub</h2>
+  <input id="email" type="email" placeholder="E-Mail" />
+  <input id="password" type="password" placeholder="Passwort" />
+  <button onclick="login()">Login</button>
+  <button onclick="showRegister()">Registrieren</button>
+</div>
+
+<div class="container" id="register" style="display:none;">
+  <h3>Registrieren</h3>
+  <input id="reg-email" type="email" placeholder="E-Mail" />
+  <input id="reg-password" type="password" placeholder="Passwort" />
+  <button onclick="register()">Account erstellen</button>
+  <button onclick="hideRegister()">Abbrechen</button>
+</div>
+<p>Besucht gerne scratch.mit.edu. Dort kommen nähmlich alle hier verfügbaren Spiele her.</p>
+<div class="container" id="upload" style="display:none;">
+  <h3>Spiel hochladen</h3>
+  <input id="game-name" placeholder="Spielname" />
+  <input id="game-link" placeholder="Scratch Link" />
+  <input id="game-cover" placeholder="Cover Bild URL" />
+  <button onclick="uploadGame()">Speichern</button>
+</div>
+
+<div class="container">
+  <h3>Spiele</h3>
+  <div id="game-list"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+/* 🔥 KORREKTE CONFIG (EU-REGION) */
+const firebaseConfig = {
+  apiKey: "AIzaSyDT58qXz9yl16t3_uxSSVqbxGsXlbqNJiY",
+  authDomain: "poki2-263c6.firebaseapp.com",
+  databaseURL: "https://poki2-263c6-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "poki2-263c6",
+  storageBucket: "poki2-263c6.appspot.com",
+  messagingSenderId: "995713391414",
+  appId: "1:995713391414:web:8c9ccfed82a82f7d27f197"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+/* UI */
+const authDiv = document.getElementById("auth");
+const registerDiv = document.getElementById("register");
+const uploadDiv = document.getElementById("upload");
+const gameList = document.getElementById("game-list");
+
+window.showRegister = () => {
+  authDiv.style.display = "none";
+  registerDiv.style.display = "flex";
+};
+window.hideRegister = () => {
+  authDiv.style.display = "flex";
+  registerDiv.style.display = "none";
+};
+
+/* Auth State */
+onAuthStateChanged(auth, user => {
+  if (user) {
+    authDiv.style.display = "none";
+    uploadDiv.style.display = "flex";
+  } else {
+    authDiv.style.display = "flex";
+    uploadDiv.style.display = "none";
+  }
+});
+
+/* Registrierung */
+window.register = async () => {
+  try {
+    await createUserWithEmailAndPassword(
+      auth,
+      document.getElementById("reg-email").value,
+      document.getElementById("reg-password").value
+    );
+    alert("Registriert!");
+    hideRegister();
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+/* Login */
+window.login = async () => {
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      document.getElementById("email").value,
+      document.getElementById("password").value
+    );
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+/* 🔥 SPIEL HOCHLADEN – FIXED */
+window.uploadGame = async () => {
+  const name = document.getElementById("game-name").value.trim();
+  const link = document.getElementById("game-link").value.trim();
+  const cover = document.getElementById("game-cover").value.trim();
+
+  if (!name || !link || !cover) {
+    alert("Bitte alle Felder ausfüllen!");
+    return;
+  }
+
+  try {
+    await push(ref(db, "games"), {
+      name,
+      link,
+      cover,
+      createdAt: Date.now()
+    });
+    alert("Spiel gespeichert!");
+  } catch (e) {
+    console.error(e);
+    alert("Upload fehlgeschlagen");
+  }
+};
+
+/* Spiele laden (LIVE) */
+onValue(ref(db, "games"), snap => {
+  gameList.innerHTML = "";
+  snap.forEach(c => {
+    const g = c.val();
+    const div = document.createElement("div");
+    div.className = "game-card";
+    div.innerHTML = `<img src="${g.cover}"><div>${g.name}</div>`;
+    div.onclick = () => playGame(g.link);
+    gameList.appendChild(div);
+  });
+});
+
+/* Spiel starten mit Zurück-Button */
+window.playGame = link => {
+  const id = link.match(/projects\/(\d+)/)?.[1];
+  if (!id) return alert("Ungültiger Scratch Link");
+
+  // Iframe erstellen
+  const iframe = document.createElement("iframe");
+  iframe.src = `https://scratch.mit.edu/projects/${id}/embed?autostart=true`;
+  document.body.appendChild(iframe);
+
+  // Zurück-Button erstellen
+  const backBtn = document.createElement("button");
+  backBtn.innerText = "Zurück";
+  backBtn.style.position = "fixed";
+  backBtn.style.top = "20px";
+  backBtn.style.left = "20px";
+  backBtn.style.padding = "10px 20px";
+  backBtn.style.fontSize = "16px";
+  backBtn.style.border = "none";
+  backBtn.style.borderRadius = "6px";
+  backBtn.style.cursor = "pointer";
+  backBtn.style.zIndex = "1000";
+  backBtn.style.background = "#f00";
+  backBtn.style.color = "#fff";
+
+  backBtn.onclick = () => {
+    iframe.remove();
+    backBtn.remove();
+  };
+
+  document.body.appendChild(backBtn);
+};
+</script>
+
+</body>
+</html>
+
