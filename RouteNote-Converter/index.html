@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteNote Converter</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>RouteNote Converter</h1>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+    <h2>Was möchtest du konvertieren?</h2>
+    <button class="primary" onclick="showScreen('coverScreen')">Bild</button>
+    <button class="secondary" onclick="showScreen('audioScreen')">Audio</button>
+</div>
+
+<!-- COVER SCREEN -->
+<div id="coverScreen" class="screen">
+    <button class="back" onclick="showScreen('startScreen')">⬅ Zurück</button>
+    <h2>Cover Converter</h2>
+
+    <input type="file" id="coverUpload" accept="image/*"><br>
+    <button id="coverConvert" class="primary" disabled>Convert</button>
+    <button id="coverDownload" class="secondary" disabled>Download JPG</button>
+
+    <canvas id="coverCanvas" width="3000" height="3000"></canvas>
+</div>
+
+<!-- AUDIO SCREEN -->
+<div id="audioScreen" class="screen">
+    <button class="back" onclick="showScreen('startScreen')">⬅ Zurück</button>
+    <h2>MP3 Converter</h2>
+    <p>MP3 • 44.1 kHz • Stereo • 320 kbps</p>
+
+    <input type="file" id="audioUpload" accept=".wav,.mp3,.m4a,.aac,.flac"><br>
+    <button id="audioConvert" class="primary" disabled>Convert</button>
+    <button id="audioDownload" class="secondary" disabled>Download MP3</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.0/lame.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
