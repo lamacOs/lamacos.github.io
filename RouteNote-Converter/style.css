@@ -1,0 +1,54 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.screen {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+button {
+    padding: 12px 22px;
+    margin: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+}
+
+.primary {
+    background: #4CAF50;
+    color: white;
+}
+
+.secondary {
+    background: #2196F3;
+    color: white;
+}
+
+.back {
+    background: #555;
+    color: white;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+canvas {
+    margin-top: 20px;
+    border: 2px solid #444;
+    max-width: 100%;
+}
