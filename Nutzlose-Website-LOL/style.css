@@ -1,0 +1,12 @@
+* { margin:0; padding:0; box-sizing:border-box; font-family:Poppins,sans-serif; }
+body { overflow:hidden; height:100vh; background:black; color:white; display:flex; align-items:center; justify-content:center; }
+#bg { position:absolute; width:100vw; height:100vh; }
+.wrapper { z-index:10; text-align:center; animation:fadeIn 1s ease forwards; }
+.title { font-size:3rem; margin-bottom:20px; animation:float 3s infinite ease-in-out; }
+.btn { padding:15px 35px; border-radius:20px; border:none; font-size:1.4rem; background:linear-gradient(135deg,#00c6ff,#0072ff); color:white; cursor:pointer; transition:.3s; }
+.btn:hover { transform:scale(1.12); }
+.output { margin-top:30px; font-size:1.6rem; opacity:0; transition:opacity 1s ease; }
+.hidden { display:none; }
+
+@keyframes fadeIn { from{opacity:0;transform:scale(0.9);} to{opacity:1;transform:scale(1);} }
+@keyframes float { 0%{transform:translateY(0);}50%{transform:translateY(-10px);}100%{transform:translateY(0);} }
