@@ -1,0 +1,76 @@
+body {
+  font-family: Arial, sans-serif;
+  background: rgba(20,20,30,0.95);
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  backdrop-filter: blur(10px);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+button {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
+
+nav ul {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  list-style: none;
+}
+
+main {
+  padding: 1rem;
+}
+
+.hidden {
+  display: none;
+}
+
+#modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: rgba(255,255,255,0.05);
+  padding: 2rem;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  width: 90%;
+  max-width: 500px;
+}
+
+.modal-content label {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+}
+
+.error {
+  color: red;
+  margin-top: 0.5rem;
+}
