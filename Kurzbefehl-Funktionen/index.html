@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lamacOs Kurzbefehle Tools</title>
+<style>
+body { font-family: system-ui; background: #0f172a; color: white; margin:0; padding:20px; }
+h1 { text-align:center; margin-bottom:20px; }
+.container { max-width: 900px; margin:auto; }
+.card { background:#1e293b; padding:16px; border-radius:12px; margin-bottom:12px; }
+.link { background:#020617; padding:8px; border-radius:6px; font-family: monospace; word-break: break-all; }
+button { margin-top:8px; padding:8px 12px; border:none; border-radius:6px; background:#38bdf8; color:black; cursor:pointer; }
+.guide { background:#1e293b; padding:20px; border-radius:12px; margin-bottom:20px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>lamacOs Kurzbefehle Tools</h1>
+
+<div class="guide">
+<h2>Anleitung</h2>
+<p>
+1. Kopieren Sie den Link der gewünschten Funktion.<br>
+2. Öffnen Sie die Kurzbefehle App.<br>
+3. Fügen Sie die Aktion <b>„Inhalte von URL abrufen“</b> hinzu.<br>
+4. Fügen Sie den kopierten Link ein.<br>
+5. Falls Eingabe nötig ist, fügen Sie eine Variable am Ende hinzu (z. B. „Nach Eingabe fragen“).
+</p>
+</div>
+
+<div id="functions"></div>
+
+<script>
+// Liste aller Funktionen mit öffentlichen APIs
+const functions = [
+{ name:"Längenzähler", link:"https://api.countapi.xyz/hit/lamacOs/length?text=TEXT", input:"Text" },
+{ name:"Zeilen zählen", link:"https://api.countapi.xyz/hit/lamacOs/lines?text=TEXT", input:"Text" },
+{ name:"Wortfrequenz", link:"https://api.countapi.xyz/hit/lamacOs/wordfreq?text=TEXT&word=WORT", input:"Text + Wort" },
+{ name:"Text in Großbuchstaben", link:"https://api.funtranslations.com/translate/shouting.json?text=TEXT", input:"Text" },
+{ name:"Text in Kleinbuchstaben", link:"https://api.funtranslations.com/translate/lowercase.json?text=TEXT", input:"Text" },
+{ name:"Text rückwärts", link:"https://api.countapi.xyz/hit/lamacOs/reverse?text=TEXT", input:"Text" },
+{ name:"Text alphabetisch sortieren", link:"https://api.countapi.xyz/hit/lamacOs/sort?text=TEXT", input:"Text" },
+{ name:"URL Encode", link:"https://api.urlencoder.org/encode?text=TEXT", input:"Text" },
+{ name:"URL Decode", link:"https://api.urlencoder.org/decode?text=TEXT", input:"Text" },
+{ name:"Base64 Encode", link:"https://www.base64encode.org/api?text=TEXT", input:"Text" },
+{ name:"Base64 Decode", link:"https://www.base64decode.org/api?text=TEXT", input:"Text" },
+
+{ name:"Prozentrechner", link:"https://api.countapi.xyz/hit/lamacOs/percent?value=ZAHL&total=GESAMT", input:"Zahl + Gesamt" },
+{ name:"Durchschnitt aus Liste", link:"https://api.countapi.xyz/hit/lamacOs/average?numbers=1,2,3", input:"Liste" },
+{ name:"Zufallszahl", link:"https://www.randomnumberapi.com/api/v1.0/random?min=MIN&max=MAX", input:"Min + Max" },
+{ name:"Zufall aus Liste wählen", link:"https://www.random.org/integers/?num=1&min=1&max=ANZAHL&col=1&base=10&format=plain&rnd=new", input:"Liste (Anzahl)" },
+{ name:"Rechenaufgabe lösen", link:"https://api.mathjs.org/v4/?expr=EXPRESSION", input:"Mathe Ausdruck" },
+{ name:"Währungsrechner", link:"https://api.exchangerate.host/convert?from=EUR&to=USD&amount=1", input:"Betrag + Währung" },
+{ name:"Einheitenrechner", link:"https://api.countapi.xyz/hit/lamacOs/unitconvert?value=WERT&unit=EINHEIT", input:"Wert + Einheit" },
+
+{ name:"IP Adresse abrufen", link:"https://ipinfo.io/ip", input:"keine" },
+{ name:"IP Standort abrufen", link:"https://ipinfo.io/json", input:"keine" },
+{ name:"Website prüfen", link:"https://api.countapi.xyz/hit/lamacOs/check?url=URL", input:"URL" },
+{ name:"Domain Whois abrufen", link:"https://who.is/whois/DOMAIN", input:"Domain" },
+{ name:"Robots.txt abrufen", link:"https://DOMAIN/robots.txt", input:"Domain" },
+{ name:"Sitemap abrufen", link:"https://DOMAIN/sitemap.xml", input:"Domain" },
+
+{ name:"QR-Code generieren", link:"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TEXT", input:"Text" },
+{ name:"Farbe HEX → RGB", link:"https://api.color.pizza/v1/TEXT", input:"HEX Code" },
+{ name:"Farbe RGB → HEX", link:"https://api.color.pizza/v1/TEXT", input:"RGB Code" },
+{ name:"Favicon einer Website abrufen", link:"https://www.google.com/s2/favicons?domain=DOMAIN", input:"Domain" },
+{ name:"Bildgröße abrufen", link:"https://api.countapi.xyz/hit/lamacOs/imageinfo?url=URL", input:"Bild URL" },
+
+{ name:"Datum / Uhrzeit abrufen", link:"https://worldtimeapi.org/api/ip", input:"keine" },
+{ name:"Zufällige Entscheidung / Ja/Nein", link:"https://api.countapi.xyz/hit/lamacOs/decision?list=Ja,Nein", input:"keine" }
+];
+
+// Rendern der Karten
+const container = document.getElementById("functions");
+functions.forEach((f,i)=>{
+  const card = document.createElement("div");
+  card.className="card";
+  card.innerHTML = `
+    <h3>${f.name}</h3>
+    <p>Eingabe: ${f.input}</p>
+    <div class="link" id="link${i}">${f.link}</div>
+    <button onclick="copyLink('link${i}')">Link kopieren</button>
+  `;
+  container.appendChild(card);
+});
+
+function copyLink(id){
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text);
+  alert("Link kopiert!");
+}
+</script>
+
+</body>
+</html>
