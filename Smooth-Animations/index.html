@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>50 Animationen</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="startPage">
+  <h1>🎬 Animation auswählen</h1>
+
+  <div id="grid"></div>
+
+  <div class="controls">
+    <span id="chosenLabel">Keine gewählt</span><br>
+    <button id="playBtn" disabled>▶ Play</button>
+    <button id="randomBtn">🎲 Zufällig</button><br>
+    <label><input type="checkbox" id="loopCheckbox"> Dauerloop</label>
+  </div>
+</div>
+
+<!-- Overlay für Animation -->
+<div id="overlay">
+  <canvas id="stage"></canvas>
+  <button id="escBtn">ESC</button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
