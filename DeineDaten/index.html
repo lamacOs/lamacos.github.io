@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>deine-daten.com</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --card:#0f1724;
+    --accent:#5ad0ff;
+    --ok:#7ee787;
+    --warn:#ffd166;
+    --muted:#9aa6b2;
+    --gap:12px;
+    font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    color:#e6eef6;
+  }
+  body{
+    margin:0;
+    background:linear-gradient(180deg,var(--bg),#07101a);
+    min-height:100vh;
+    padding:20px;
+    box-sizing:border-box;
+  }
+  .wrap{ max-width:980px; margin:0 auto; }
+  header{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  h1{ font-size:20px; margin:0; }
+  p.lead{ margin:0; color:var(--muted); font-size:13px; }
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--gap); margin-top:14px; }
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.03);
+    padding:14px;
+    border-radius:10px;
+    box-shadow:0 6px 18px rgba(2,6,12,0.6);
+  }
+  .item{ display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.02); align-items:center; }
+  .item:last-child{ border-bottom:0; }
+  .left{ display:flex; gap:10px; align-items:center; min-width:0; }
+  .key{ font-weight:600; font-size:14px; white-space:nowrap; }
+  .value{ color:var(--muted); font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:320px; }
+  .badge{ font-size:12px; padding:6px 8px; border-radius:999px; background:rgba(255,255,255,0.02); color:var(--muted); border:1px solid rgba(255,255,255,0.02); }
+  .badge.auto{ background:rgba(122,192,255,0.06); color:var(--accent); border-color:rgba(90,208,255,0.12); }
+  .badge.req{ background:rgba(255,209,102,0.06); color:var(--warn); border-color:rgba(255,209,102,0.12); }
+  button { background:transparent; border:1px solid rgba(255,255,255,0.06); color:inherit; padding:6px 10px; border-radius:8px; cursor:pointer; }
+  button.primary { background:var(--accent); color:#001; border:0; font-weight:700; }
+  .small{ font-size:12px; color:var(--muted); }
+  footer{ margin-top:14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .countdown{ font-weight:700; color:var(--accent); }
+  .timestamp{ color:var(--muted); font-size:13px; }
+  @media (max-width:800px){ .grid{ grid-template-columns:1fr; } .value{ max-width:140px; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Welche Daten kann diese Website vom Handy bekommen?</h1>
+        <p class="lead">Die Liste aktualisiert sich automatisch alle 10 Sekunden. Bei Einträgen mit "Bestätigung erforderlich" kannst du die Erlaubnis testen.</p>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div class="small">Demo — lokal im Browser</div>
+        <div id="status" class="small">Status: <span id="onlineStatus">…</span></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card" id="autoCard">
+        <h3>Automatisch verfügbare Daten (ohne zusätzliche Erlaubnis)</h3>
+        <div id="autoList">
+          <!-- Items werden hier per JS eingefügt -->
+        </div>
+      </div>
+
+      <div class="card" id="reqCard">
+        <h3>Daten, die Bestätigung / Erlaubnis benötigen</h3>
+        <div id="reqList">
+          <!-- Items werden hier per JS eingefügt -->
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Hinweis</h3>
+      <p class="small">
+        Manche Browser (insbesondere iOS Safari) erlauben oder blockieren bestimmte APIs unterschiedlich. Werte können variieren. Diese Seite zeigt dir nur, was dein Browser aktuell preisgibt.
+      </p>
+    </div>
+
+    <footer>
+      <div class="timestamp">Letzte Aktualisierung: <span id="lastUpdated">—</span></div>
+      <div>Nächste Aktualisierung in <span id="countdown" class="countdown">10</span>s</div>
+    </footer>
+  </div>
+
+<script>
+/*
+  Deutschsprachiges Demo:
+  - Sammle viele Browser/Device-Eigenschaften (die typischerweise ohne Permission verfügbar sind).
+  - Zeige Permission-required APIs mit Knopf zum Anfordern.
+  - Aktualisiert sich alle 10s und zeigt Countdown.
+*/
+
+/* Hilfsfunktionen */
+const el = id => document.getElementById(id);
+const fmt = v => (v===undefined||v===null)?'—':String(v);
+
+/* Liste: automatisch verfügbare (ohne explizite Berechtigung) */
+async function gatherAuto() {
+  const nav = navigator || {};
+  const screenInfo = window.screen || {};
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+  // Battery API (manche Browser unterstützen navigator.getBattery)
+  let battery = null;
+  try {
+    if (navigator.getBattery) battery = await navigator.getBattery();
+  } catch(e){ battery = null; }
+
+  const canvasSupported = (function(){
+    try {
+      const c = document.createElement('canvas');
+      const ctx = c.getContext && c.getContext('2d');
+      return !!ctx;
+    } catch(e){ return false; }
+  })();
+
+  return {
+    "IP-Adresse (nur serverseitig sichtbar)": "wird vom Server geloggt (nicht direkt per JS)",
+    "User-Agent": nav.userAgent,
+    "Platform (z.B. 'iPhone' / 'Linux arm')": nav.platform,
+    "Browser-Sprache(n)": (nav.languages || [nav.language || navigator.userLanguage || navigator.browserLanguage]).join(", "),
+    "Cookies aktiviert": nav.cookieEnabled,
+    "Online / Offline": navigator.onLine,
+    "Bildschirmgröße (px)": `${screenInfo.width || '—'} × ${screenInfo.height || '—'}`,
+    "Farbe/Tiefe (colorDepth)": screenInfo.colorDepth,
+    "Geräte-Touch-Support (touchPoints)": nav.maxTouchPoints ?? '—',
+    "Viewport-Größe (CSS px)": `${Math.max(document.documentElement.clientWidth, window.innerWidth || 0)} × ${Math.max(document.documentElement.clientHeight, window.innerHeight || 0)}`,
+    "TimeZone": (Intl && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : '—',
+    "Bildschirmorientierung": (screen.orientation && screen.orientation.type) ? screen.orientation.type : (screen.orientation || {}).angle ?? '—',
+    "Device-Merkmale (hardwareConcurrency - CPU threads)": nav.hardwareConcurrency ?? '—',
+    "Device-Memory (GB, falls verfügbar)": nav.deviceMemory ?? '—',
+    "Network Info (effectiveType, downlink, rtt)": `${conn.effectiveType || '—'} / downlink:${conn.downlink || '—'} / rtt:${conn.rtt || '—'}`,
+    "Do-Not-Track": nav.doNotTrack || nav.msDoNotTrack || '—',
+    "Navigator.vendor": nav.vendor || '—',
+    "Browser-Plugins (begrenzte Infos)": (() => {
+      try { return (navigator.plugins && navigator.plugins.length) ? `${navigator.plugins.length} plugins` : 'keine / nicht verfügbar'; } catch(e){ return '—'; }
+    })(),
+    "Canvas verfügbar (kann für Fingerprinting genutzt werden)": canvasSupported,
+    "WebGL verfügbar": (function(){ try { const c=document.createElement('canvas'); return !!(c.getContext('webgl')||c.getContext('experimental-webgl')); } catch(e){ return false; } })(),
+    "LocalStorage verfügbar": (function(){ try { return !!window.localStorage; } catch(e){ return false; } })(),
+    "SessionStorage verfügbar": (function(){ try { return !!window.sessionStorage; } catch(e){ return false; } })(),
+    "IndexedDB verfügbar": (function(){ try { return !!window.indexedDB; } catch(e){ return false; } })(),
+    "Cookies (JS lesbar) / document.cookie": (function(){ try { return document.cookie ? document.cookie : '(keine oder leer)'; } catch(e){ return 'nicht lesbar'; } })(),
+    "Akku (level,charging) — wenn verfügbar": battery ? `Level:${Math.round(battery.level*100)}% / charging:${battery.charging}` : 'nicht verfügbar',
+    "Screen Pixel Ratio (devicePixelRatio)": window.devicePixelRatio || 1,
+    "Installed Fonts (nicht direkt, aber durch Messungen möglich)": "nicht direkt lesbar — aber oft durch Mess-Tricks erschließbar",
+    "Referrer / vorherige URL": document.referrer || '(keine)',
+    "Viewport/Browser Fenstergröße (innerWidth/innerHeight)": `${window.innerWidth} × ${window.innerHeight}`,
+    "Cookie/Storage-Einträge (localStorage-keys) — nur wenn gesetzt": (function(){ try { return Object.keys(localStorage || {}).slice(0,10).join(", ") || '(keine)'; } catch(e){ return 'nicht lesbar'; } })()
+  };
+}
+
+/* Liste: permission-required */
+function permissionItems() {
+  return [
+    { key: "Geolocation (GPS)", api: "geolocation", desc: "exakte Position (GPS) - erfordert Zustimmung", action: requestGeolocation },
+    { key: "Kamera (Video/Foto)", api: "camera", desc: "Zugriff auf Kamera - erfordert Zustimmung", action: () => requestMedia({ video: true }) },
+    { key: "Mikrofon (Audio)", api: "microphone", desc: "Zugriff auf Mikrofon - erfordert Zustimmung", action: () => requestMedia({ audio: true }) },
+    { key: "Kamera + Mikrofon (Video + Audio)", api: "camera+microphone", desc: "beides zusammen", action: () => requestMedia({ video:true, audio:true }) },
+    { key: "Push-Benachrichtigungen", api: "notifications", desc: "Benachrichtigungen senden - erfordert Zustimmung", action: requestNotification },
+    { key: "DeviceOrientation / Motion (Sensoren)", api: "motion", desc: "Neigungs-/Bewegungsdaten — oft Berechtigung auf iOS", action: requestMotion },
+    { key: "Kontaktliste (nicht über Standard-Browser erreichbar)", api: "contacts", desc: "Browser bieten das normalerweise nicht an (außer Web Contacts API experimentell)", action: requestContacts },
+    { key: "Datei-Upload (Fotos/Dateien) — nur wenn du auswählst", api: "file", desc: "Dateien bekommst du nur, wenn du sie explizit auswählst", action: triggerFilePicker },
+    { key: "Clipboard (Einfügen/Lesen)", api: "clipboard-read", desc: "Clipboard lesen erfordert Zustimmung", action: requestClipboardRead }
+  ];
+}
+
+/* Request functions */
+function requestGeolocation(itemEl){
+  const out = itemEl.querySelector('.value');
+  if (!navigator.geolocation){ out.textContent = 'Nicht unterstützt'; return; }
+  out.textContent = 'Anfrage läuft…';
+  navigator.geolocation.getCurrentPosition(
+    p => {
+      out.textContent = `Lat:${p.coords.latitude.toFixed(6)}, Lon:${p.coords.longitude.toFixed(6)}, Genauigkeit:${p.coords.accuracy}m`;
+    },
+    err => {
+      out.textContent = `Fehler / abgelehnt: ${err.message || err.code}`;
+    },
+    {timeout:10000,maximumAge:60000}
+  );
+}
+
+async function requestMedia(constraints){
+  const id = constraints.video ? 'video' : (constraints.audio ? 'audio' : 'media');
+  // find corresponding elem
+  const list = document.querySelectorAll('#reqList .item');
+  let out=null;
+  list.forEach(it => { if(it.dataset.key=== (constraints.video && constraints.audio ? 'Kamera + Mikrofon (Video + Audio)' : (constraints.video ? 'Kamera (Video/Foto)' : 'Mikrofon (Audio)'))) out=it.querySelector('.value'); });
+  if(!out) out = document.querySelector('#reqList .value');
+  out.textContent = 'Anfrage läuft…';
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    // sofort wieder stoppen
+    stream.getTracks().forEach(t=>t.stop());
+    out.textContent = 'Zugriff erlaubt (Stream erhalten) — Tracks: ' + stream.getTracks().length;
+  } catch(e){
+    out.textContent = 'Zugriff verweigert / Fehler: ' + (e.message || e.name);
+  }
+}
+
+async function requestNotification(itemEl){
+  const out = itemEl ? itemEl.querySelector('.value') : null;
+  if (!("Notification" in window)){ if(out) out.textContent='Nicht unterstützt'; return; }
+  try {
+    const perm = await Notification.requestPermission();
+    if(out) out.textContent = 'Permission: ' + perm;
+  } catch(e){
+    if(out) out.textContent = 'Fehler: '+(e.message||e);
+  }
+}
+
+async function requestMotion(itemEl){
+  const out = itemEl.querySelector('.value');
+  // iOS requires secure context and permission via DeviceMotionEvent.requestPermission
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      const res = await DeviceMotionEvent.requestPermission();
+      out.textContent = 'Permission: ' + res;
+    } catch(e){ out.textContent = 'Fehler / abgelehnt'; }
+  } else {
+    out.textContent = 'DeviceMotion nicht via requestPermission (oder nicht notwendig).';
+  }
+}
+
+async function requestContacts(itemEl){
+  const out = itemEl.querySelector('.value');
+  // Experimental: navigator.contacts.select()
+  if (navigator.contacts && navigator.contacts.select){
+    try {
+      const props = ['name','email','tel'];
+      const contacts = await navigator.contacts.select(props, {multiple:false});
+      out.textContent = JSON.stringify(contacts.slice(0,3));
+    } catch(e){
+      out.textContent = 'Fehler / abgelehnt';
+    }
+  } else {
+    out.textContent = 'Contacts API nicht unterstützt (experimentell).';
+  }
+}
+
+function triggerFilePicker(itemEl){
+  const out = itemEl.querySelector('.value');
+  const input = document.createElement('input');
+  input.type='file';
+  input.multiple=false;
+  input.accept='image/*,application/pdf';
+  input.onchange = () => {
+    if (input.files && input.files.length) {
+      const f = input.files[0];
+      out.textContent = `Gewählte Datei: ${f.name} (${Math.round(f.size/1024)}KB)`;
+    } else out.textContent = '(keine Datei gewählt)';
+  };
+  input.click();
+}
+
+async function requestClipboardRead(itemEl){
+  const out = itemEl.querySelector('.value');
+  if (!navigator.clipboard || !navigator.clipboard.readText) {
+    out.textContent = 'Clipboard API nicht unterstützt';
+    return;
+  }
+  try {
+    const text = await navigator.clipboard.readText();
+    out.textContent = `Clipboard-Inhalt: "${text.slice(0,200)}"`;
+  } catch(e){
+    out.textContent = 'Zugriff verweigert oder Fehler';
+  }
+}
+
+/* Render functions */
+async function renderAll() {
+  // Online status
+  el('onlineStatus').textContent = navigator.onLine ? 'online' : 'offline';
+
+  // Auto list
+  const autoData = await gatherAuto();
+  const autoList = el('autoList');
+  autoList.innerHTML = '';
+  for (const [k,v] of Object.entries(autoData)) {
+    const item = document.createElement('div');
+    item.className='item';
+    item.innerHTML = `
+      <div class="left">
+        <div class="key">${k}</div>
+        <div class="value" title="${String(v).replace(/"/g,'&quot;')}">${fmt(v)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end">
+        <div class="badge auto">Automatisch</div>
+      </div>
+    `;
+    autoList.appendChild(item);
+  }
+
+  // Permission required list
+  const reqList = el('reqList');
+  reqList.innerHTML = '';
+  permissionItems().forEach(p => {
+    const item = document.createElement('div');
+    item.className='item';
+    item.dataset.key = p.key;
+    item.innerHTML = `
+      <div class="left">
+        <div style="min-width:220px">
+          <div class="key">${p.key}</div>
+          <div class="small" style="color:var(--muted);margin-top:6px">${p.desc}</div>
+        </div>
+        <div class="value" style="margin-left:8px;width:1fr">—</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <div class="badge req">Bestätigung erforderlich</div>
+        <div><button class="primary btnReq">Anfordern</button></div>
+      </div>
+    `;
+    // Button handler
+    item.querySelector('.btnReq').addEventListener('click', ()=> {
+      // call p.action with item element if it expects it
+      try {
+        const res = p.action(item);
+        if (res && res.then) res.then?.catch(()=>{});
+      } catch(e){ console.error(e); }
+    });
+    reqList.appendChild(item);
+  });
+
+  // Last updated
+  const now = new Date();
+  el('lastUpdated').textContent = now.toLocaleString();
+}
+
+/* Countdown & auto refresh every 10 seconds */
+let seconds = 10;
+let timer = null;
+function startTimer() {
+  if (timer) clearInterval(timer);
+  seconds = 10;
+  el('countdown').textContent = seconds;
+  timer = setInterval(()=>{
+    seconds--;
+    if (seconds<=0){
+      renderAll();
+      seconds = 10;
+    }
+    el('countdown').textContent = seconds;
+  },1000);
+}
+
+/* Init */
+renderAll();
+startTimer();
+
+/* Optional: re-render when online status changes */
+window.addEventListener('online', renderAll);
+window.addEventListener('offline', renderAll);
+
+// For neatness: update battery on change if supported
+if (navigator.getBattery) {
+  navigator.getBattery().then(b => {
+    b.addEventListener('chargingchange', renderAll);
+    b.addEventListener('levelchange', renderAll);
+  }).catch(()=>{});
+}
+</script>
+</body>
+</html>
