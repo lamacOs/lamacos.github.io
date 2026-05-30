@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>LinkSafe 🔗</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:50px;
+}
+
+.container{
+    background:#1e293b;
+    padding:30px;
+    border-radius:20px;
+    max-width:420px;
+    margin:auto;
+}
+
+input{
+    width:80%;
+    padding:10px;
+    border-radius:10px;
+    border:none;
+    margin-top:10px;
+}
+
+button{
+    margin-top:10px;
+    padding:10px 20px;
+    border-radius:10px;
+    border:none;
+    background:#3b82f6;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#2563eb;
+}
+
+.green{color:#22c55e;}
+.yellow{color:#eab308;}
+.red{color:#ef4444;}
+
+.preview{
+    margin-top:20px;
+    background:#0f172a;
+    padding:15px;
+    border-radius:10px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>🔗 LinkSafe</h1>
+<p>Prüfe einen Link bevor du ihn öffnest.</p>
+
+<input id="urlInput" placeholder="https://example.com">
+<br>
+<button onclick="checkLink()">Link prüfen</button>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+async function checkLink(){
+
+const url = document.getElementById("urlInput").value;
+const result = document.getElementById("result");
+
+result.innerHTML = "";
+
+if(!url.startsWith("http")){
+result.innerHTML = "<p class='red'>❌ Ungültiger Link</p>";
+return;
+}
+
+let score = 0;
+
+// einfache Fake-Erkennung
+if(url.includes("@")) score += 2;
+if(url.length > 60) score += 1;
+if(url.includes("0") || url.includes("1")) score += 1;
+if(url.includes("login") || url.includes("verify")) score += 1;
+
+let status="";
+let color="";
+
+if(score <= 1){
+status="🟢 Sicher";
+color="green";
+}
+else if(score <=3){
+status="🟡 Vorsicht";
+color="yellow";
+}
+else{
+status="🔴 Gefährlich";
+color="red";
+}
+
+result.innerHTML += `<p class="${color}"><b>${status}</b></p>`;
+
+// Website Vorschau laden
+try{
+
+const proxy = "https://api.allorigins.win/raw?url=";
+const response = await fetch(proxy + encodeURIComponent(url));
+const text = await response.text();
+
+const parser = new DOMParser();
+const doc = parser.parseFromString(text,"text/html");
+
+const title = doc.querySelector("title")?.innerText || "Kein Titel gefunden";
+const desc = doc.querySelector("meta[name='description']")?.content || "Keine Beschreibung";
+
+result.innerHTML += `
+<div class="preview">
+<h3>Vorschau</h3>
+<p><b>${title}</b></p>
+<p>${desc}</p>
+</div>
+`;
+
+}
+catch{
+result.innerHTML += "<p>⚠️ Vorschau konnte nicht geladen werden</p>";
+}
+
+}
+
+</script>
+
+</body>
+</html>
