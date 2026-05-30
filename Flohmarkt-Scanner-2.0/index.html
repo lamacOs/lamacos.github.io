@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lager App</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border: none;
+  border-radius: 10px;
+  background: #38bdf8;
+  font-weight: bold;
+}
+button.delete {
+  background: #ef4444;
+  color: white;
+}
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: none;
+}
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+.hidden { display: none; }
+.codeBox {
+  text-align: center;
+  font-size: 28px;
+  letter-spacing: 4px;
+  background: black;
+  padding: 15px;
+  border-radius: 10px;
+}
+.item {
+  background: #334155;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📦 Lager-App</h2>
+
+<div id="home">
+  <button onclick="openAdd()">➕ Erstellen</button>
+  <button onclick="openScan()">📷 Scannen</button>
+</div>
+
+<!-- ADD -->
+<div id="add" class="hidden card">
+  <select id="typ" onchange="switchTyp()">
+    <option value="produkt">Produkt</option>
+    <option value="karton">Karton</option>
+    <option value="set">Set</option>
+  </select>
+
+  <input id="productName" placeholder="Name">
+  <input id="preis" placeholder="Preis (€)">
+
+  <div id="inhaltBereich" class="hidden">
+    <h4>Inhalt</h4>
+    <div id="inhaltListe"></div>
+    <button onclick="addInhalt()">➕ Inhalt hinzufügen</button>
+  </div>
+
+  <button onclick="generateCode()">🔐 Code generieren</button>
+  <button onclick="backHome()">⬅️ Zurück</button>
+</div>
+
+<!-- CODE VIEW -->
+<div id="codeView" class="hidden card">
+  <p>Dein Code:</p>
+  <div class="codeBox" id="codeText"></div>
+  <button onclick="closeCode()">❌ Schließen</button>
+</div>
+
+<!-- SCAN -->
+<div id="scan" class="hidden card">
+  <input id="manualCode" placeholder="Code eingeben">
+  <button onclick="loadByCode()">🔎 Anzeigen</button>
+  <div id="scanResult"></div>
+  <button onclick="stopScan()">❌ Schließen</button>
+</div>
+
+<script>
+let inhalt = [];
+let scanner;
+let currentCode = null;
+
+function randomCode() {
+  return Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+/* NAV */
+function openAdd() {
+  home.classList.add("hidden");
+  add.classList.remove("hidden");
+}
+function backHome() {
+  add.classList.add("hidden");
+  home.classList.remove("hidden");
+}
+function switchTyp() {
+  const t = typ.value;
+  preis.classList.toggle("hidden", t === "karton");
+  inhaltBereich.classList.toggle("hidden", t === "produkt");
+}
+
+/* INHALT */
+function addInhalt() {
+  const box = document.createElement("div");
+  box.className = "item";
+
+  const sel = document.createElement("select");
+  ["Produkt","Inhalt","Karton","Set"].forEach(v=>{
+    const o=document.createElement("option");
+    o.value=v.toLowerCase();
+    o.textContent=v;
+    sel.appendChild(o);
+  });
+
+  const name = document.createElement("input");
+  name.placeholder = "Name";
+
+  const price = document.createElement("input");
+  price.placeholder = "Preis (optional)";
+
+  box.append(sel,name,price);
+  inhaltListe.appendChild(box);
+
+  [sel,name,price].forEach(e=>e.oninput=updateInhalt);
+  updateInhalt();
+}
+
+function updateInhalt() {
+  inhalt = [...document.querySelectorAll(".item")].map(i=>({
+    typ: i.children[0].value,
+    name: i.children[1].value,
+    preis: i.children[2].value
+  }));
+}
+
+/* GENERATE */
+function generateCode() {
+  const name = productName.value.trim();
+  if (!name) return alert("Name fehlt!");
+
+  const code = randomCode();
+  let data = { typ: typ.value, name };
+
+  if (typ.value !== "karton") {
+    if (!preis.value) return alert("Preis fehlt!");
+    data.preis = preis.value;
+  }
+
+  if (typ.value !== "produkt") {
+    data.inhalt = inhalt;
+  }
+
+  localStorage.setItem(code, JSON.stringify(data));
+  add.classList.add("hidden");
+  codeView.classList.remove("hidden");
+  codeText.textContent = code;
+}
+
+/* CODE VIEW */
+function closeCode() {
+  codeView.classList.add("hidden");
+  home.classList.remove("hidden");
+}
+
+/* SCAN */
+function openScan() {
+  home.classList.add("hidden");
+  scan.classList.remove("hidden");
+
+  scanner = new Html5Qrcode("reader");
+  scanner.start({facingMode:"environment"}, {}, text=>{
+    manualCode.value=text;
+    loadByCode();
+    scanner.stop();
+  });
+}
+
+function loadByCode() {
+  const code = manualCode.value.trim().toUpperCase();
+  const data = localStorage.getItem(code);
+  currentCode = code;
+
+  if (!data) {
+    scanResult.innerHTML = "❌ Nicht gefunden";
+    return;
+  }
+
+  const o = JSON.parse(data);
+  let html = `<h3>${o.name}</h3>`;
+  if (o.preis) html += `<p>Preis: ${o.preis} €</p>`;
+  if (o.inhalt) {
+    html += "<ul>";
+    o.inhalt.forEach(i=>{
+      html += `<li>${i.typ}: ${i.name} ${i.preis?`(${i.preis} €)`:""}</li>`;
+    });
+    html += "</ul>";
+  }
+
+  html += `<button class="delete" onclick="deleteEntry()">🗑️ Löschen</button>`;
+  scanResult.innerHTML = html;
+}
+
+function deleteEntry() {
+  if (!currentCode) return;
+  if (!confirm("Wirklich löschen?")) return;
+
+  localStorage.removeItem(currentCode);
+  scanResult.innerHTML = "✅ Eintrag gelöscht";
+  manualCode.value = "";
+  currentCode = null;
+}
+
+function stopScan() {
+  scanner?.stop();
+  scan.classList.add("hidden");
+  home.classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
