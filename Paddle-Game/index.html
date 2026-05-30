@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Paddle Game</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Verhindert das Scrollen der Seite */
+    }
+
+    canvas {
+      background: #222;
+      display: none;
+      margin: 20px auto;
+      border: 3px solid white;
+    }
+
+    #menu {
+      margin-top: 100px;
+    }
+
+    #menu h1 {
+      font-size: 40px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background: limegreen;
+      border: none;
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    #highscoreDisplay {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="menu">
+  <h1>Paddle Game</h1>
+  <button id="playButton">🎮 Spielen</button>
+  <div id="highscoreDisplay">Highscore: 0</div>
+</div>
+
+<canvas id="gameCanvas" width="600" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const menu = document.getElementById("menu");
+  const playButton = document.getElementById("playButton");
+  const highscoreDisplay = document.getElementById("highscoreDisplay");
+
+  let paddle, ball, score, highscore = 0, gameRunning = false;
+
+  function resetGame() {
+    paddle = {
+      width: 100,
+      height: 15,
+      x: canvas.width / 2 - 50,
+      y: canvas.height - 30,
+      speed: 7,
+      dx: 0
+    };
+
+    ball = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      radius: 10,
+      speed: 4,
+      dx: 4,
+      dy: -4
+    };
+
+    score = 0;
+    gameRunning = true;
+  }
+
+  function drawPaddle() {
+    ctx.fillStyle = "lime";
+    ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+  }
+
+  function drawBall() {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "red";
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function drawScore() {
+    ctx.fillStyle = "white";
+    ctx.font = "18px Arial";
+    ctx.fillText("Punkte: " + score, 10, 20);
+  }
+
+  function movePaddle() {
+    paddle.x += paddle.dx;
+    if (paddle.x < 0) paddle.x = 0;
+    if (paddle.x + paddle.width > canvas.width)
+      paddle.x = canvas.width - paddle.width;
+  }
+
+  function moveBall() {
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    // Wandkollision
+    if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width)
+      ball.dx *= -1;
+    if (ball.y - ball.radius < 0)
+      ball.dy *= -1;
+
+    // Paddle-Kollision
+    if (
+      ball.y + ball.radius >= paddle.y &&
+      ball.x >= paddle.x &&
+      ball.x <= paddle.x + paddle.width
+    ) {
+      ball.dy *= -1;
+      score++;
+      if (score > highscore) highscore = score;
+    }
+
+    // Game Over
+    if (ball.y - ball.radius > canvas.height) {
+      gameRunning = false;
+      showMenu();
+    }
+  }
+
+  function draw() {
+    if (!gameRunning) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawPaddle();
+    drawBall();
+    drawScore();
+    movePaddle();
+    moveBall();
+
+    requestAnimationFrame(draw);
+  }
+
+  function keyDown(e) {
+    if (e.key === "ArrowRight") paddle.dx = paddle.speed;
+    else if (e.key === "ArrowLeft") paddle.dx = -paddle.speed;
+  }
+
+  function keyUp(e) {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") paddle.dx = 0;
+  }
+
+  function showMenu() {
+    canvas.style.display = "none";
+    menu.style.display = "block";
+    highscoreDisplay.textContent = "Highscore: " + highscore;
+  }
+
+  function startGame() {
+    resetGame();
+    menu.style.display = "none";
+    canvas.style.display = "block";
+    draw();
+  }
+
+  // Touchsteuerung hinzufügen
+  let touchStartX = 0;
+
+  function touchStart(e) {
+    touchStartX = e.touches[0].clientX;
+    e.preventDefault(); // Verhindert das Scrollen
+  }
+
+  function touchMove(e) {
+    if (!gameRunning) return;
+    const touchMoveX = e.touches[0].clientX;
+    const touchDiff = touchMoveX - touchStartX;
+
+    // Paddle-Bewegung mit erhöhter Geschwindigkeit
+    paddle.x += touchDiff * 1.0;  // Geschwindigkeit der Bewegung auf 0.5 erhöht
+    if (paddle.x < 0) paddle.x = 0;
+    if (paddle.x + paddle.width > canvas.width)
+      paddle.x = canvas.width - paddle.width;
+
+    touchStartX = touchMoveX;  // Setze den neuen Startpunkt für den nächsten Touch
+    e.preventDefault(); // Verhindert das Scrollen
+  }
+
+  playButton.addEventListener("click", startGame);
+  document.addEventListener("keydown", keyDown);
+  document.addEventListener("keyup", keyUp);
+  canvas.addEventListener("touchstart", touchStart);
+  canvas.addEventListener("touchmove", touchMove);
+
+  showMenu();
+</script>
+
+</body>
+</html>
