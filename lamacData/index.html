@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lamacData</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="script.js"></script>
+</head>
+<body>
+<header>
+  <h1>lamacData</h1>
+  <button id="addBtn">+</button>
+</header>
+
+<nav>
+  <ul id="toc">
+    <li>Musik</li>
+    <li>YouTube</li>
+    <li>Websites</li>
+    <li>Sonstiges</li>
+  </ul>
+</nav>
+
+<main id="content">
+  <p>Keine Einträge.</p>
+</main>
+
+<!-- Modal für neue Einträge -->
+<div id="modal" class="hidden">
+  <div class="modal-content">
+    <h2>Neuen Eintrag hinzufügen</h2>
+    <label>Passwort: <input type="password" id="password"></label>
+    <label>Überschrift: <input type="text" id="title"></label>
+    <label>Bereich:
+      <select id="section">
+        <option value="Musik">Musik</option>
+        <option value="YouTube">YouTube</option>
+        <option value="Websites">Websites</option>
+        <option value="Sonstiges">Sonstiges</option>
+      </select>
+    </label>
+    <label>Inhalt: <textarea id="contentText"></textarea></label>
+    <button id="saveBtn">Speichern</button>
+    <button id="closeBtn">Abbrechen</button>
+    <p id="errorMsg" class="error"></p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</body>
+</html>
