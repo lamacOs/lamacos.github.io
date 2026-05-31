@@ -8,37 +8,51 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   background: #0b0f1a;
   color: white;
 }
 
+/* NAV */
 nav {
   display: flex;
   justify-content: space-between;
   padding: 15px;
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
 }
 
 nav a {
   color: white;
-  margin: 0 10px;
+  margin: 0 8px;
   cursor: pointer;
   text-decoration: none;
 }
 
-section { display: none; padding: 30px; }
-.active { display: block; }
+/* SECTIONS */
+section {
+  display: none;
+  padding: 30px;
+}
 
+.active {
+  display: block;
+}
+
+/* GLASS CARDS */
 .card {
   background: rgba(255,255,255,0.08);
   padding: 15px;
   margin: 10px;
   border-radius: 12px;
   display: inline-block;
+  min-width: 200px;
+  backdrop-filter: blur(10px);
 }
 
+/* FORM */
 input, textarea {
   width: 100%;
   padding: 10px;
@@ -46,6 +60,7 @@ input, textarea {
   border-radius: 8px;
   border: none;
 }
+
 button {
   padding: 10px 15px;
   border: none;
@@ -54,31 +69,72 @@ button {
   border-radius: 8px;
   cursor: pointer;
 }
+
+/* LOGO */
+.logo {
+  width: 130px;
+  height: 130px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
 </style>
 </head>
 
 <body>
 
+<!-- NAV -->
 <nav>
   <div><b>Creator Network</b></div>
   <div>
     <a onclick="show('home')">Home</a>
     <a onclick="show('creators')">Creators</a>
+    <a onclick="show('news')">News</a>
     <a onclick="show('apply')">Apply</a>
+    <a onclick="show('support')">Support</a>
   </div>
 </nav>
 
+<!-- HOME -->
 <section id="home" class="active">
+  <img class="logo" src="https://via.placeholder.com/150" alt="Logo">
+
   <h1>Creator Network</h1>
   <p>Join. Create. Grow.</p>
+
+  <div class="card">Community Plattform für Creator</div>
+  <div class="card">Discord + Website System</div>
 </section>
 
+<!-- CREATORS -->
 <section id="creators">
   <h2>Creators</h2>
+
   <div class="card">Paluten - Verified</div>
   <div class="card">iCrimax - Verified</div>
+  <div class="card">Friend1 - Member</div>
 </section>
 
+<!-- NEWS -->
+<section id="news">
+  <h2>News & Updates</h2>
+
+  <div class="card">
+    <h3>Projekt gestartet</h3>
+    <p>Creator Network Version 1 ist online.</p>
+  </div>
+
+  <div class="card">
+    <h3>Neue Creator</h3>
+    <p>Erste Creator wurden eingeladen.</p>
+  </div>
+
+  <div class="card">
+    <h3>Features</h3>
+    <p>Bewerbungssystem + Discord Integration aktiv.</p>
+  </div>
+</section>
+
+<!-- APPLY -->
 <section id="apply">
   <h2>Bewerbung</h2>
 
@@ -93,11 +149,28 @@ button {
   <p id="status"></p>
 </section>
 
+<!-- SUPPORT -->
+<section id="support">
+  <h2>Support</h2>
+
+  <div class="card">
+    <h3>Email</h3>
+    <p>skytownrp.support@lamachub.de</p>
+  </div>
+
+  <div class="card">
+    <h3>FAQ</h3>
+    <p><b>Bewerbung?</b><br>Über Apply Seite.</p>
+    <p><b>Creator werden?</b><br>Nach Prüfung.</p>
+    <p><b>Dauer?</b><br>Ein paar Tage.</p>
+  </div>
+</section>
+
 <script type="module">
-/* FIREBASE */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyBUx5Q-aJBhitaa9XPXUqkASMHvYJ6suhU",
   authDomain: "skytownrp-da7a3.firebaseapp.com",
@@ -111,38 +184,33 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* NAV */
+/* NAVIGATION */
 window.show = function(id){
   document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-}
+};
 
-/* WEBHOOK AUS FIREBASE */
+/* GET WEBHOOK */
 async function getWebhook(){
   const snap = await get(ref(db, "webhook"));
   return snap.val();
 }
 
-/* FORM SUBMIT */
+/* FORM SEND */
 document.getElementById("applyForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const webhookURL = await getWebhook();
-
-  const name = document.getElementById("name").value;
-  const yt = document.getElementById("yt").value;
-  const subs = document.getElementById("subs").value;
-  const desc = document.getElementById("desc").value;
 
   const payload = {
     content: "Neue Creator Bewerbung",
     embeds: [{
       title: "Application",
       fields: [
-        { name: "Name", value: name || "-" },
-        { name: "YouTube", value: yt || "-" },
-        { name: "Subs", value: subs || "-" },
-        { name: "Beschreibung", value: desc || "-" }
+        { name: "Name", value: document.getElementById("name").value || "-" },
+        { name: "YouTube", value: document.getElementById("yt").value || "-" },
+        { name: "Subs", value: document.getElementById("subs").value || "-" },
+        { name: "Beschreibung", value: document.getElementById("desc").value || "-" }
       ]
     }]
   };
@@ -154,7 +222,7 @@ document.getElementById("applyForm").addEventListener("submit", async (e) => {
       body: JSON.stringify(payload)
     });
 
-    document.getElementById("status").innerText = "Gesendet!";
+    document.getElementById("status").innerText = "Bewerbung gesendet!";
   } catch (err) {
     document.getElementById("status").innerText = "Fehler beim Senden";
   }
