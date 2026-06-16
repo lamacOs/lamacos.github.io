@@ -6,16 +6,20 @@
 <title>Glücksrad</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
+
 body{
     margin:0;
     height:100vh;
     display:flex;
+    flex-direction:column;
     justify-content:center;
     align-items:center;
-    flex-direction:column;
     background:#111;
+    font-family:Arial, sans-serif;
     overflow:hidden;
-    font-family:Arial,sans-serif;
 }
 
 .pointer{
@@ -26,35 +30,46 @@ body{
 }
 
 #wheel{
-    width:320px;
-    height:320px;
+    width:350px;
+    height:350px;
     border-radius:50%;
     border:8px solid white;
     cursor:pointer;
-    background:
-        linear-gradient(
-            90deg,
-            #e53935 0%,
-            #e53935 50%,
-            #43a047 50%,
-            #43a047 100%
-        );
     position:relative;
+    overflow:hidden;
     transition:transform 5s cubic-bezier(.17,.67,.17,1);
+}
+
+.red-half{
+    position:absolute;
+    left:0;
+    top:0;
+    width:50%;
+    height:100%;
+    background:#e53935;
+}
+
+.green-half{
+    position:absolute;
+    right:0;
+    top:0;
+    width:50%;
+    height:100%;
+    background:#43a047;
 }
 
 .label{
     position:absolute;
-    color:white;
-    font-weight:bold;
-    font-size:34px;
     top:50%;
     transform:translateY(-50%);
+    color:white;
+    font-size:34px;
+    font-weight:bold;
     user-select:none;
 }
 
 .niete{
-    left:40px;
+    left:35px;
 }
 
 .win{
@@ -62,10 +77,10 @@ body{
 }
 
 #result{
-    color:white;
-    font-size:60px;
-    font-weight:bold;
     margin-top:40px;
+    color:white;
+    font-size:70px;
+    font-weight:bold;
     opacity:0;
     transition:0.5s;
 }
@@ -76,6 +91,9 @@ body{
 <div class="pointer">▼</div>
 
 <div id="wheel">
+    <div class="red-half"></div>
+    <div class="green-half"></div>
+
     <div class="label niete">NIETE</div>
     <div class="label win">WIN</div>
 </div>
@@ -87,22 +105,24 @@ const wheel = document.getElementById("wheel");
 const result = document.getElementById("result");
 
 let spinning = false;
-let rotation = 0;
+let currentRotation = 0;
 
 wheel.addEventListener("click", () => {
 
-    if(spinning) return;
+    if (spinning) return;
 
     spinning = true;
     result.style.opacity = "0";
 
-    // Viele Umdrehungen + Position auf NIETE
-    const extraTurns = 360 * (8 + Math.floor(Math.random() * 5));
-    const targetAngle = 270; // landet immer auf NIETE
+    // Zufällige Anzahl voller Drehungen
+    const spins = 8 + Math.floor(Math.random() * 6);
 
-    rotation += extraTurns + targetAngle;
+    // Endet immer so, dass die rote NIETE-Seite oben beim Pfeil ist
+    const finalAngle = 90;
 
-    wheel.style.transform = `rotate(${rotation}deg)`;
+    currentRotation += spins * 360 + finalAngle;
+
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
 
     setTimeout(() => {
         result.textContent = "NIETE";
