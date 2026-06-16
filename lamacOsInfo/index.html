@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Artikel Sammlung</title>
+
+<style>
+:root{
+    --bg:#f5f7fb;
+    --card:rgba(255,255,255,.7);
+    --text:#1a1a1a;
+    --accent:#4f7cff;
+    --shadow:0 15px 40px rgba(0,0,0,.12);
+    --border:rgba(255,255,255,.6);
+}
+
+body.dark{
+    --bg:#0f1117;
+    --card:rgba(24,27,36,.7);
+    --text:#f3f4f6;
+    --accent:#6da8ff;
+    --shadow:0 15px 40px rgba(0,0,0,.45);
+    --border:rgba(255,255,255,.08);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:
+        Inter,
+        Segoe UI,
+        sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    transition:.4s;
+    overflow-x:hidden;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+        radial-gradient(circle at top left,#6da8ff33,transparent 30%),
+        radial-gradient(circle at bottom right,#7d4fff33,transparent 30%);
+    pointer-events:none;
+}
+
+header{
+    padding:40px 20px;
+}
+
+.hero{
+    max-width:1200px;
+    margin:auto;
+    background:var(--card);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    border-radius:32px;
+    padding:40px;
+    box-shadow:var(--shadow);
+}
+
+h1{
+    font-size:clamp(2rem,5vw,4rem);
+    margin-bottom:20px;
+}
+
+.theme-toggle{
+    width:70px;
+    height:70px;
+    border:none;
+    cursor:pointer;
+    border-radius:50%;
+    overflow:hidden;
+    transition:.3s;
+    box-shadow:var(--shadow);
+}
+
+.theme-toggle:hover{
+    transform:scale(1.08);
+}
+
+.theme-toggle img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.toc{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:12px;
+}
+
+.toc a{
+    text-decoration:none;
+    color:var(--text);
+    background:var(--card);
+    padding:14px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    transition:.25s;
+}
+
+.toc a:hover{
+    transform:translateY(-3px);
+    background:var(--accent);
+    color:white;
+}
+
+main{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+.article{
+    background:var(--card);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    border-radius:28px;
+    overflow:hidden;
+    margin-bottom:40px;
+    box-shadow:var(--shadow);
+
+    opacity:0;
+    transform:translateY(40px);
+    animation:show .8s forwards;
+}
+
+@keyframes show{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.article img{
+    width:100%;
+    height:400px;
+    object-fit:cover;
+    display:block;
+}
+
+.article-content{
+    padding:30px;
+}
+
+.article h2{
+    margin-bottom:15px;
+    font-size:2rem;
+}
+
+.article p{
+    line-height:1.8;
+    margin-bottom:20px;
+}
+
+.article a{
+    display:inline-block;
+    padding:12px 20px;
+    background:var(--accent);
+    color:white;
+    text-decoration:none;
+    border-radius:12px;
+    transition:.25s;
+}
+
+.article a:hover{
+    transform:translateY(-3px);
+}
+
+#topButton{
+    position:fixed;
+    bottom:25px;
+    left:50%;
+    transform:translateX(-50%);
+    width:70px;
+    height:70px;
+    border:none;
+    border-radius:50%;
+    background:var(--accent);
+    color:white;
+    font-size:30px;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+    transition:.3s;
+}
+
+#topButton:hover{
+    transform:translateX(-50%) scale(1.1);
+}
+
+footer{
+    text-align:center;
+    padding:50px 20px;
+    opacity:.7;
+}
+
+@media(max-width:700px){
+    .article img{
+        height:250px;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>
+
+<div class="hero">
+
+<h1>📚 Artikel Sammlung</h1>
+
+<button class="theme-toggle" onclick="toggleTheme()">
+<img id="themeImage"
+src="SONNE_BILD_LINK"
+alt="">
+</button>
+
+<div class="toc">
+
+<a href="#artikel1">Artikel 1</a>
+<a href="#artikel2">Artikel 2</a>
+<a href="#artikel3">Artikel 3</a>
+<a href="#artikel4">Artikel 4</a>
+<a href="#artikel5">Artikel 5</a>
+<a href="#artikel6">Artikel 6</a>
+<a href="#artikel7">Artikel 7</a>
+<a href="#artikel8">Artikel 8</a>
+<a href="#artikel9">Artikel 9</a>
+<a href="#artikel10">Artikel 10</a>
+
+</div>
+</div>
+</header>
+
+<main>
+
+<!-- ARTIKEL START -->
+<!-- Zum Hinzufügen einfach diesen Block kopieren -->
+
+<section class="article" id="artikel1">
+<img src="BILD_LINK_1" alt="">
+<div class="article-content">
+<h2>Artikel 1</h2>
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae lorem
+vel augue feugiat tincidunt. Pellentesque habitant morbi tristique senectus
+et netus et malesuada fames ac turpis egestas. Integer condimentum erat
+eget sem ultrices, et pharetra nunc dignissim. Curabitur facilisis magna
+vel nisi suscipit, vitae cursus augue porttitor.
+</p>
+<a href="LINK_1" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel2">
+<img src="BILD_LINK_2" alt="">
+<div class="article-content">
+<h2>Artikel 2</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pulvinar
+luctus velit. Integer pretium, arcu vel luctus malesuada, lacus neque
+interdum justo, non fermentum lacus nisi vel mauris.</p>
+<a href="LINK_2" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel3">
+<img src="BILD_LINK_3" alt="">
+<div class="article-content">
+<h2>Artikel 3</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
+ullamcorper lorem nec justo luctus, sed facilisis augue tincidunt.</p>
+<a href="LINK_3" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel4">
+<img src="BILD_LINK_4" alt="">
+<div class="article-content">
+<h2>Artikel 4</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget nunc
+a libero volutpat vestibulum quis sed odio.</p>
+<a href="LINK_4" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel5">
+<img src="BILD_LINK_5" alt="">
+<div class="article-content">
+<h2>Artikel 5</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec bibendum
+enim vitae ipsum tempor luctus.</p>
+<a href="LINK_5" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel6">
+<img src="BILD_LINK_6" alt="">
+<div class="article-content">
+<h2>Artikel 6</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ante
+ipsum primis in faucibus orci luctus et ultrices.</p>
+<a href="LINK_6" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel7">
+<img src="BILD_LINK_7" alt="">
+<div class="article-content">
+<h2>Artikel 7</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris viverra
+velit quis magna cursus, at faucibus elit facilisis.</p>
+<a href="LINK_7" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel8">
+<img src="BILD_LINK_8" alt="">
+<div class="article-content">
+<h2>Artikel 8</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+ullamcorper nibh vel justo interdum luctus.</p>
+<a href="LINK_8" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel9">
+<img src="BILD_LINK_9" alt="">
+<div class="article-content">
+<h2>Artikel 9</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.
+Donec sed risus vitae odio feugiat tristique.</p>
+<a href="LINK_9" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<section class="article" id="artikel10">
+<img src="BILD_LINK_10" alt="">
+<div class="article-content">
+<h2>Artikel 10</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
+fermentum lectus eget risus pellentesque ultrices.</p>
+<a href="LINK_10" target="_blank">Mehr erfahren</a>
+</div>
+</section>
+
+<!-- ARTIKEL ENDE -->
+
+</main>
+
+<footer>
+© Deine Website
+</footer>
+
+<button id="topButton" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+↑
+</button>
+
+<script>
+
+const body = document.body;
+const themeImage = document.getElementById("themeImage");
+
+const sunImage = "SONNE_BILD_LINK";
+const moonImage = "MOND_BILD_LINK";
+
+function toggleTheme(){
+
+    body.classList.toggle("dark");
+
+    if(body.classList.contains("dark")){
+        themeImage.src = moonImage;
+        localStorage.setItem("theme","dark");
+    }else{
+        themeImage.src = sunImage;
+        localStorage.setItem("theme","light");
+    }
+}
+
+if(localStorage.getItem("theme")==="dark"){
+    body.classList.add("dark");
+    themeImage.src = moonImage;
+}
+
+</script>
+
+</body>
+</html>
