@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glücksrad</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    background:#111;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+}
+
+.pointer{
+    font-size:60px;
+    color:white;
+    margin-bottom:-10px;
+    z-index:10;
+}
+
+#wheel{
+    width:320px;
+    height:320px;
+    border-radius:50%;
+    border:8px solid white;
+    cursor:pointer;
+    background:
+        linear-gradient(
+            90deg,
+            #e53935 0%,
+            #e53935 50%,
+            #43a047 50%,
+            #43a047 100%
+        );
+    position:relative;
+    transition:transform 5s cubic-bezier(.17,.67,.17,1);
+}
+
+.label{
+    position:absolute;
+    color:white;
+    font-weight:bold;
+    font-size:34px;
+    top:50%;
+    transform:translateY(-50%);
+    user-select:none;
+}
+
+.niete{
+    left:40px;
+}
+
+.win{
+    right:55px;
+}
+
+#result{
+    color:white;
+    font-size:60px;
+    font-weight:bold;
+    margin-top:40px;
+    opacity:0;
+    transition:0.5s;
+}
+</style>
+</head>
+<body>
+
+<div class="pointer">▼</div>
+
+<div id="wheel">
+    <div class="label niete">NIETE</div>
+    <div class="label win">WIN</div>
+</div>
+
+<div id="result"></div>
+
+<script>
+const wheel = document.getElementById("wheel");
+const result = document.getElementById("result");
+
+let spinning = false;
+let rotation = 0;
+
+wheel.addEventListener("click", () => {
+
+    if(spinning) return;
+
+    spinning = true;
+    result.style.opacity = "0";
+
+    // Viele Umdrehungen + Position auf NIETE
+    const extraTurns = 360 * (8 + Math.floor(Math.random() * 5));
+    const targetAngle = 270; // landet immer auf NIETE
+
+    rotation += extraTurns + targetAngle;
+
+    wheel.style.transform = `rotate(${rotation}deg)`;
+
+    setTimeout(() => {
+        result.textContent = "NIETE";
+        result.style.opacity = "1";
+        spinning = false;
+    }, 5000);
+});
+</script>
+
+</body>
+</html>
