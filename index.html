@@ -91,10 +91,65 @@ footer {
     from {opacity: 0; transform: translateY(20px);}
     to {opacity: 1; transform: translateY(0);}
 }
+
+.important-card{
+    max-width: 1100px;
+    margin: 25px auto 0 auto;
+    padding: 28px;
+    border-radius: 22px;
+    text-align: center;
+    background: linear-gradient(135deg,#ffcc00,#ff8c00,#ff4d00);
+    box-shadow: 0 0 30px rgba(255,180,0,0.7);
+    animation: pulseCard 2s ease-in-out infinite;
+    position: sticky;
+    top: 10px;
+    z-index: 9999;
+}
+
+.important-card a{
+    color:white;
+    text-decoration:none;
+    display:block;
+}
+
+.important-card h2{
+    font-size:2rem;
+    margin-bottom:10px;
+    font-weight:800;
+}
+
+.important-card p{
+    font-size:1.1rem;
+    opacity:0.95;
+    margin-bottom:12px;
+}
+
+.important-card span{
+    font-weight:700;
+    font-size:1.05rem;
+}
+
+@keyframes pulseCard{
+    0%{
+        transform:scale(1);
+    }
+    50%{
+        transform:scale(1.03);
+    }
+    100%{
+        transform:scale(1);
+    }
+}
 </style>
 </head>
 <body>
-
+<div class="important-card">
+    <a href="https://www.lamachub.de/lamacOsInfo/" target="_blank">
+        <h2>📢 lamacOsInfo 📢</h2>
+        <p>Unbedingt anschauen, bevor sie zu meinen restlichen Projekten gehen. Hier sind alle Infos zu meinen Projekten.</p>
+        <span>Jetzt öffnen →</span>
+    </a>
+</div>
 <div class="hero">
     <h1>Welcome to lamacOs</h1>
     <p>Explore my creative web projects below 🚀</p>
@@ -121,8 +176,6 @@ footer {
     <div class="card"><a href="https://www.lamachub.de/trustgamer" target="_blank">Trustgamer</a><span>Gaming Reviews</span></div>
     <div class="card"><a href="https://www.lamachub.de/AGENT" target="_blank">AGENT.</a><span>Agenten buchen</span></div>
     <div class="card"><a href="https://www.lamachub.de/InfoHub" target="_blank">InfoHub</a><span>Immer Informiert</span></div>
-    <div class="card"><a href="https://www.lamachub.de/Gluecksrad" target="_blank">Glücksrad</a><span>Ein simples 50-50 Glücksrad</span></div>
-
 </div>
 
 <footer>
