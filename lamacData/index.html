@@ -3,51 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>lamacData</title>
-<link rel="stylesheet" href="style.css">
-<script defer src="script.js"></script>
+<title>lamacOs Suche</title>
+
+<style>
+body{
+    margin:0;
+    padding:20px;
+    font-family:Arial,sans-serif;
+    background:#f5f7fb;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+}
+</style>
 </head>
 <body>
-<header>
-  <h1>lamacData</h1>
-  <button id="addBtn">+</button>
-</header>
 
-<nav>
-  <ul id="toc">
-    <li>Musik</li>
-    <li>YouTube</li>
-    <li>Websites</li>
-    <li>Sonstiges</li>
-  </ul>
-</nav>
+<div class="container">
+    <h1>🔍 lamacOs Suche</h1>
 
-<main id="content">
-  <p>Keine Einträge.</p>
-</main>
+    <script async src="https://cse.google.com/cse.js?cx=b3c6bfa976f3b4bf5"></script>
 
-<!-- Modal für neue Einträge -->
-<div id="modal" class="hidden">
-  <div class="modal-content">
-    <h2>Neuen Eintrag hinzufügen</h2>
-    <label>Passwort: <input type="password" id="password"></label>
-    <label>Überschrift: <input type="text" id="title"></label>
-    <label>Bereich:
-      <select id="section">
-        <option value="Musik">Musik</option>
-        <option value="YouTube">YouTube</option>
-        <option value="Websites">Websites</option>
-        <option value="Sonstiges">Sonstiges</option>
-      </select>
-    </label>
-    <label>Inhalt: <textarea id="contentText"></textarea></label>
-    <button id="saveBtn">Speichern</button>
-    <button id="closeBtn">Abbrechen</button>
-    <p id="errorMsg" class="error"></p>
-  </div>
+    <div class="gcse-search"></div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </body>
 </html>
