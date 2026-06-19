@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lamacOs Mitarbeiter System</title>
+
+<style>
+:root {
+  --bg: #f4f6fb;
+  --card: rgba(255,255,255,0.8);
+  --text: #1a1a1a;
+  --accent: #4f7cff;
+}
+
+body.dark {
+  --bg: #0f1115;
+  --card: rgba(25,25,35,0.8);
+  --text: #ffffff;
+  --accent: #7aa2ff;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: 0.3s;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: var(--card);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+}
+
+.logo img {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: var(--card);
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 15px;
+  backdrop-filter: blur(10px);
+}
+
+input, button {
+  padding: 10px;
+  margin: 5px 0;
+  width: 100%;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.hidden { display: none; }
+.danger { background: #ff4f4f !important; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <img src="https://via.placeholder.com/40" alt="Logo">
+    lamacOs Mitarbeiter
+  </div>
+  <button onclick="toggleTheme()">🌙 / ☀️</button>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <input id="codeInput" placeholder="Code eingeben">
+    <button onclick="checkCode()">Suchen</button>
+  </div>
+
+  <div id="infoBox" class="card hidden"></div>
+
+  <div id="adminBox" class="card hidden">
+    <h3>Admin Bereich</h3>
+
+    <input id="code" placeholder="Code">
+    <input id="name" placeholder="Name">
+    <input id="job" placeholder="Job">
+    <input id="gehalt" placeholder="Gehalt">
+    <input id="email" placeholder="Email">
+
+    <button onclick="save()">Speichern</button>
+    <button class="danger" onclick="deleteEmployee()">Löschen</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  remove,
+  onValue,
+  child
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB77noc428ceCADwzBOq5rYdIZuUywH8UI",
+  authDomain: "lamacos-mitarbeiter.firebaseapp.com",
+  databaseURL: "https://lamacos-mitarbeiter-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "lamacos-mitarbeiter",
+  storageBucket: "lamacos-mitarbeiter.firebasestorage.app",
+  messagingSenderId: "271793789111",
+  appId: "1:271793789111:web:7dd1b21050bc7c432d5532"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let cache = {};
+let adminCode = "";
+
+onValue(ref(db, "mitarbeiter"), (snap) => {
+  cache = snap.val() || {};
+});
+
+onValue(ref(db, "config/adminCode"), (snap) => {
+  adminCode = snap.val() || "";
+});
+
+window.checkCode = function () {
+  const val = document.getElementById("codeInput").value.trim().toLowerCase();
+
+  const info = document.getElementById("infoBox");
+  const admin = document.getElementById("adminBox");
+
+  info.classList.add("hidden");
+  admin.classList.add("hidden");
+
+  if (adminCode && val === adminCode.toLowerCase()) {
+    admin.classList.remove("hidden");
+    return;
+  }
+
+  const m = cache[val];
+
+  if (m) {
+    info.innerHTML =
+      "<b>Name:</b> " + m.name + "<br>" +
+      "<b>Job:</b> " + m.job + "<br>" +
+      "<b>Gehalt:</b> " + m.gehalt + "<br>" +
+      "<b>Email:</b> " + m.email;
+  } else {
+    info.innerHTML = "Nicht gefunden.";
+  }
+
+  info.classList.remove("hidden");
+};
+
+window.save = function () {
+  const code = document.getElementById("code").value.trim().toLowerCase();
+  const name = document.getElementById("name").value.trim();
+  const job = document.getElementById("job").value.trim();
+  const gehalt = document.getElementById("gehalt").value.trim();
+  const email = document.getElementById("email").value.trim();
+
+  if (!code || !name || !job || !gehalt || !email) return;
+
+  set(ref(db, "mitarbeiter/" + code), {
+    name,
+    job,
+    gehalt,
+    email
+  });
+
+  alert("Gespeichert!");
+};
+
+window.deleteEmployee = function () {
+  const code = document.getElementById("code").value.trim().toLowerCase();
+
+  if (!code) return;
+
+  remove(ref(db, "mitarbeiter/" + code));
+  alert("Gelöscht!");
+};
+
+window.toggleTheme = function () {
+  document.body.classList.toggle("dark");
+};
+</script>
+
+</body>
+</html>
