@@ -55,9 +55,59 @@
   .countdown{ font-weight:700; color:var(--accent); }
   .timestamp{ color:var(--muted); font-size:13px; }
   @media (max-width:800px){ .grid{ grid-template-columns:1fr; } .value{ max-width:140px; } }
+
+ .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    width:100%;
+    padding:12px 20px;
+    box-sizing:border-box;
+
+    background:transparent;
+    color:inherit;
+}
+
+.left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo{
+    width:40px;
+    height:40px;
+    object-fit:contain;
+}
+
+.site-name{
+    font-size:1.2rem;
+    font-weight:600;
+    color:inherit;
+}
+
+.top-link{
+    color:inherit;
+    text-decoration:none;
+    font-weight:500;
+}
+
+.top-link:hover{
+    text-decoration:underline;
+}
 </style>
 </head>
 <body>
+<body id="top">
+  <header class="topbar">
+    <div class="left">
+        <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/IMG_3056.jpeg" alt="Logo" class="logo">
+        <span class="site-name">Websitename</span>
+    </div>
+
+    <a href="#top" class="top-link">Nach oben</a>
+</header>
   <div class="wrap">
     <header>
       <div>
