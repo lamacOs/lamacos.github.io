@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AR Marker World</title>
+
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    font-family:sans-serif;
+}
+
+#menu{
+    position:fixed;
+    inset:0;
+    background:#111;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:9999;
+}
+
+button{
+    padding:15px 30px;
+    font-size:20px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+    <h1>AR starten</h1>
+    <button onclick="startAR()">Spielen</button>
+</div>
+
+<a-scene
+    mindar-image="imageTargetSrc: targets.mind;"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: true">
+
+    <a-camera look-controls="enabled: false"></a-camera>
+
+    <a-entity mindar-image-target="targetIndex: 0">
+
+        <!-- Hauptobjekt -->
+        <a-box position="0 0 0"
+               color="red"
+               animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+        </a-box>
+
+        <!-- Zusätzliche Effekte -->
+        <a-sphere position="0 1 0" radius="0.3" color="blue"></a-sphere>
+
+        <a-ring position="0 -0.5 0" radius-inner="0.4" radius-outer="0.6" color="cyan"></a-ring>
+
+    </a-entity>
+
+</a-scene>
+
+<script>
+function startAR(){
+    document.getElementById("menu").style.display="none";
+}
+</script>
+
+</body>
+</html>
