@@ -1,165 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7942104501806589"
-crossorigin="anonymous"></script>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/IMG_3056.jpeg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-adsense-account" content="ca-pub-7942104501806589">
-<title>lamacOs | Home</title>
-<meta name="google-site-verification" content="EIdMvf6kGZDBlsD6fxHasvmtseHlZWKRoBr4VL2OblQ" />
-<meta name="description" content="lamacHub – A website that offers them more than they ever expected. Among other things: a pack list creator that adapts to YOUR data, a great flea market tool, a website for sharing Cummunity Apple shortcuts and much more.">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+<title>lamacHub | Home</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root{
+    --bg:#f7f7f8;
+    --text:#111;
+    --card:#ffffff;
+    --border:#eee;
+    --muted:#666;
+    --accent:#ff7a00;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: white;
-    min-height: 100vh;
-    overflow-x: hidden;
+body.dark{
+    --bg:#0f1115;
+    --text:#f2f2f2;
+    --card:#1a1d23;
+    --border:#2a2f3a;
+    --muted:#aaa;
 }
 
-.hero {
-    text-align: center;
-    padding: 80px 20px 40px 20px;
-    animation: fadeIn 1.5s ease;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-.hero h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    background: linear-gradient(90deg, #00c6ff, #0072ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+body{
+    font-family:Inter, system-ui, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    transition:0.3s;
 }
 
-.hero p {
-    margin-top: 20px;
-    font-size: 1.1rem;
-    opacity: 0.8;
+/* NAVBAR */
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 20px;
+    background:var(--card);
+    border-bottom:1px solid var(--border);
 }
 
-.projects {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 25px;
-    padding: 50px 40px 80px 40px;
+.left{
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
-.card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 25px;
-    text-align: center;
-    transition: 0.3s ease;
-    border: 1px solid rgba(255,255,255,0.1);
+.logo img{
+    width:34px;
+    height:34px;
+    border-radius:8px;
 }
 
-.card:hover {
-    transform: translateY(-8px) scale(1.03);
-    background: rgba(255, 255, 255, 0.15);
+.divider{
+    width:1px;
+    height:22px;
+    background:var(--border);
 }
 
-.card a {
-    text-decoration: none;
-    color: white;
-    font-weight: 600;
-    font-size: 1.1rem;
+.sitename{
+    font-weight:700;
 }
 
-.card span {
-    display: block;
-    font-size: 0.9rem;
-    margin-top: 10px;
-    opacity: 0.7;
+.nav{
+    display:flex;
+    gap:18px;
+    align-items:center;
 }
 
-footer {
-    text-align: center;
-    padding: 20px;
-    opacity: 0.6;
-    font-size: 0.9rem;
-}
-
-@keyframes fadeIn {
-    from {opacity: 0; transform: translateY(20px);}
-    to {opacity: 1; transform: translateY(0);}
-}
-
-.important-card{
-    max-width: 1100px;
-    margin: 25px auto 0 auto;
-    padding: 28px;
-    border-radius: 22px;
-    text-align: center;
-    background: linear-gradient(135deg,#ffcc00,#ff8c00,#ff4d00);
-    box-shadow: 0 0 30px rgba(255,180,0,0.7);
-    animation: pulseCard 2s ease-in-out infinite;
-    position: sticky;
-    top: 10px;
-    z-index: 9999;
-}
-
-.important-card a{
-    color:white;
+.nav a{
     text-decoration:none;
+    color:var(--text);
+    font-size:14px;
+    font-weight:500;
+}
+
+.nav a:hover{
+    color:var(--accent);
+}
+
+/* BUTTONS */
+.icon-btn{
+    border:none;
+    background:none;
+    font-size:18px;
+    cursor:pointer;
+    color:var(--text);
+}
+
+/* DROPDOWN */
+.dropdown{
+    position:relative;
+}
+
+.dropdown-content{
+    display:none;
+    position:absolute;
+    right:0;
+    top:28px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px;
+    width:280px;
+    font-size:13px;
+    color:var(--muted);
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.dropdown:hover .dropdown-content{
     display:block;
 }
 
-.important-card h2{
-    font-size:2rem;
-    margin-bottom:10px;
+/* HERO */
+.hero{
+    text-align:center;
+    padding:80px 20px 40px;
+}
+
+.hero h1{
+    font-size:52px;
     font-weight:800;
+    background:linear-gradient(90deg,var(--accent),#ffb347);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
 }
 
-.important-card p{
-    font-size:1.1rem;
-    opacity:0.95;
-    margin-bottom:12px;
+.hero p{
+    margin-top:12px;
+    color:var(--muted);
 }
 
-.important-card span{
+/* GRID */
+.projects{
+    max-width:1200px;
+    margin:0 auto;
+    padding:40px 20px 80px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:18px;
+}
+
+/* CARD */
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:20px;
+    text-align:center;
+    transition:0.25s;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    border-color:var(--accent);
+}
+
+.card a{
+    text-decoration:none;
+    color:var(--accent);
     font-weight:700;
-    font-size:1.05rem;
 }
 
-@keyframes pulseCard{
-    0%{
-        transform:scale(1);
+.card span{
+    display:block;
+    margin-top:8px;
+    font-size:13px;
+    color:var(--muted);
+}
+
+/* MOBILE MENU */
+.menu-btn{
+    display:none;
+    font-size:22px;
+    background:none;
+    border:none;
+    cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+    .nav{
+        display:none;
+        position:absolute;
+        top:60px;
+        right:0;
+        background:var(--card);
+        flex-direction:column;
+        padding:12px;
+        border:1px solid var(--border);
+        border-radius:12px;
     }
-    50%{
-        transform:scale(1.03);
+
+    .nav.show{
+        display:flex;
     }
-    100%{
-        transform:scale(1);
+
+    .menu-btn{
+        display:block;
     }
+
+    .hero h1{
+        font-size:36px;
+    }
+}
+
+footer{
+    text-align:center;
+    padding:30px;
+    font-size:13px;
+    color:var(--muted);
 }
 </style>
 </head>
+
 <body>
-<div class="important-card">
-    <a href="https://www.lamachub.de/lamacOsInfo/" target="_blank">
-        <h2>📢 lamacOsInfo 📢</h2>
-        <p>Unbedingt anschauen, bevor sie zu meinen restlichen Projekten gehen. Hier sind alle Infos zu meinen Projekten.</p>
-        <span>Jetzt öffnen →</span>
-    </a>
-</div>
+
+<!-- NAVBAR -->
+<header class="topbar">
+
+    <div class="left">
+        <a class="logo" href="#">
+            <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/IMG_3056.jpeg">
+        </a>
+        <div class="divider"></div>
+        <div class="sitename">lamacHub</div>
+    </div>
+
+    <nav class="nav" id="nav">
+        <a href="#">Home</a>
+        <a href="https://www.lamachub.de/lamacOsInfo/">Projekte</a>
+
+        <div class="dropdown">
+            <a href="#">Über mich</a>
+            <div class="dropdown-content">
+                Ich programmiere seit 2 Jahren Websites und andere Codesprachen und habe 2 Podcasts.
+                <br><br>
+                🎧 <a href="https://lamachub.de/lamacOsInfo/#artikel3">Podcast 1</a><br>
+                🎧 <a href="https://lamachub.de/lamacOsInfo/#artikel4">Podcast 2</a>
+                <br><br>
+                Ich habe viele Projekte, Scratch Games und wollte schon immer YouTuber werden.
+            </div>
+        </div>
+
+        <button class="icon-btn" onclick="toggleDark()">🌙</button>
+    </nav>
+
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+</header>
+
+<!-- HERO -->
 <div class="hero">
-    <h1>Welcome to lamacOs</h1>
-    <p>Explore my creative web projects below 🚀</p>
+    <h1>lamacHub Projects</h1>
+    <p>Clean tools, creative systems & experiments 🚀</p>
 </div>
 
+<!-- PROJECTS -->
 <div class="projects">
-
     <div class="card"><a href="https://www.lamachub.de/lamacOs-Kurzbefehle" target="_blank">lamacOs-Kurzbefehle</a><span>Smart Shortcuts</span></div>
     <div class="card"><a href="https://www.lamachub.de/Pack-O-Mat" target="_blank">Pack-O-Mat</a><span>Travel Helper</span></div>
     <div class="card"><a href="https://www.lamachub.de/Smooth-Animations" target="_blank">Smooth-Animations</a><span>Animation Showcase</span></div>
@@ -183,19 +292,18 @@ footer {
 </div>
 
 <footer>
-    © 2026 lamacOs — Built with creativity & code
+    © 2026 lamacHub — Built with clean design
 </footer>
-<div style="position:fixed; bottom:15px; left:50%; transform:translateX(-50%); z-index:9999;">
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-7942104501806589"
-       data-ad-slot="8512468300"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-</div>
 
 <script>
-  (adsbygoogle = window.adsbygoogle || []).push({});
+function toggleDark(){
+    document.body.classList.toggle("dark");
+}
+
+function toggleMenu(){
+    document.getElementById("nav").classList.toggle("show");
+}
 </script>
+
 </body>
 </html>
