@@ -5,84 +5,225 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>lamacOs PlayHub</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: #fff;
+:root{
+  --bg:#ffffff;
+  --text:#111;
+  --card:#f6f7fb;
+  --accent:#ff7a00;
+  --border:rgba(0,0,0,0.08);
 }
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+
+[data-theme="dark"]{
+  --bg:#0f0f12;
+  --text:#ffffff;
+  --card:#17171c;
+  --border:rgba(255,255,255,0.08);
 }
-input, button {
-  width: 240px;
-  padding: 10px;
-  margin: 5px;
-  border-radius: 6px;
-  border: none;
+
+*{
+  box-sizing:border-box;
+  font-family:Inter,sans-serif;
 }
-button { cursor: pointer; }
-#game-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
 }
-.game-card {
-  width: 150px;
-  margin: 10px;
-  text-align: center;
-  cursor: pointer;
+
+/* NAVBAR */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 22px;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  background:var(--bg);
 }
-.game-card img {
-  width: 100%;
-  border-radius: 10px;
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
-iframe {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  border: none;
-  z-index: 999;
-  background: #000;
+
+.logo img{
+  width:34px;
+  height:34px;
+  border-radius:8px;
+}
+
+.logo span{
+  font-weight:700;
+  color:var(--text);
+}
+
+.toggle{
+  background:var(--card);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+/* LAYOUT */
+.container{
+  max-width:900px;
+  margin:30px auto;
+  padding:0 20px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:16px;
+}
+
+h2,h3{
+  color:var(--accent);
+  margin-top:0;
+}
+
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+}
+
+button{
+  background:var(--accent);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+.small{
+  font-size:13px;
+  opacity:0.7;
+}
+
+/* GAME GRID */
+#game-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.game-card{
+  width:140px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  text-align:center;
+  transition:.2s;
+}
+
+.game-card:hover{
+  transform:translateY(-3px);
+}
+
+.game-card img{
+  width:100%;
+  height:100px;
+  object-fit:cover;
+}
+
+/* IFRAME GAME */
+iframe{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  border:none;
+  z-index:999;
+  background:#000;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container" id="auth">
-  <h2>lamacOs PlayHub</h2>
-  <input id="email" type="email" placeholder="E-Mail" />
-  <input id="password" type="password" placeholder="Passwort" />
-  <button onclick="login()">Login</button>
-  <button onclick="showRegister()">Registrieren</button>
+<div class="navbar">
+  <div class="logo">
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png">
+    <span>PlayHub</span>
+  </div>
+
+  <button class="toggle" onclick="toggleTheme()">🌙 / ☀️</button>
 </div>
 
-<div class="container" id="register" style="display:none;">
-  <h3>Registrieren</h3>
-  <input id="reg-email" type="email" placeholder="E-Mail" />
-  <input id="reg-password" type="password" placeholder="Passwort" />
-  <button onclick="register()">Account erstellen</button>
-  <button onclick="hideRegister()">Abbrechen</button>
+<!-- LOGIN -->
+<div class="container" id="auth">
+  <div class="card">
+    <h2>Login</h2>
+    <input id="email" type="email" placeholder="E-Mail">
+    <input id="password" type="password" placeholder="Passwort">
+    <button onclick="login()">Login</button>
+    <button onclick="showRegister()">Registrieren</button>
+  </div>
 </div>
-<p>Besucht gerne scratch.mit.edu. Dort kommen nähmlich alle hier verfügbaren Spiele her.</p>
-<div class="container" id="upload" style="display:none;">
-  <h3>Spiel hochladen</h3>
-  <input id="game-name" placeholder="Spielname" />
-  <input id="game-link" placeholder="Scratch Link" />
-  <input id="game-cover" placeholder="Cover Bild URL" />
-  <button onclick="uploadGame()">Speichern</button>
+
+<!-- REGISTER -->
+<div class="container" id="register" style="display:none;">
+  <div class="card">
+    <h3>Registrieren</h3>
+    <input id="reg-email" type="email" placeholder="E-Mail">
+    <input id="reg-password" type="password" placeholder="Passwort">
+    <button onclick="register()">Account erstellen</button>
+    <button onclick="hideRegister()">Abbrechen</button>
+  </div>
 </div>
 
 <div class="container">
-  <h3>Spiele</h3>
-  <div id="game-list"></div>
+  <p class="small">
+    Spiele stammen von scratch.mit.edu
+  </p>
 </div>
+
+<!-- UPLOAD -->
+<div class="container" id="upload" style="display:none;">
+  <div class="card">
+    <h3>Spiel hochladen</h3>
+    <input id="game-name" placeholder="Spielname">
+    <input id="game-link" placeholder="Scratch Link">
+    <input id="game-cover" placeholder="Cover Bild URL (wird ignoriert)">
+    <button onclick="uploadGame()">Speichern</button>
+  </div>
+</div>
+
+<!-- GAMES -->
+<div class="container">
+  <div class="card">
+    <h3>Spiele</h3>
+    <div id="game-list"></div>
+  </div>
+</div>
+
+<script>
+function toggleTheme(){
+  const r=document.documentElement;
+  r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";
+}
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
@@ -99,7 +240,6 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
-/* 🔥 KORREKTE CONFIG (EU-REGION) */
 const firebaseConfig = {
   apiKey: "AIzaSyDT58qXz9yl16t3_uxSSVqbxGsXlbqNJiY",
   authDomain: "poki2-263c6.firebaseapp.com",
@@ -114,132 +254,98 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-/* UI */
-const authDiv = document.getElementById("auth");
-const registerDiv = document.getElementById("register");
-const uploadDiv = document.getElementById("upload");
-const gameList = document.getElementById("game-list");
+const gameList=document.getElementById("game-list");
 
-window.showRegister = () => {
-  authDiv.style.display = "none";
-  registerDiv.style.display = "flex";
-};
-window.hideRegister = () => {
-  authDiv.style.display = "flex";
-  registerDiv.style.display = "none";
+const LOGO_URL =
+"https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png";
+
+/* AUTH */
+window.showRegister=()=>{
+  document.getElementById("auth").style.display="none";
+  document.getElementById("register").style.display="block";
 };
 
-/* Auth State */
-onAuthStateChanged(auth, user => {
-  if (user) {
-    authDiv.style.display = "none";
-    uploadDiv.style.display = "flex";
-  } else {
-    authDiv.style.display = "flex";
-    uploadDiv.style.display = "none";
-  }
+window.hideRegister=()=>{
+  document.getElementById("auth").style.display="block";
+  document.getElementById("register").style.display="none";
+};
+
+onAuthStateChanged(auth,u=>{
+  document.getElementById("upload").style.display = u ? "block" : "none";
 });
 
-/* Registrierung */
-window.register = async () => {
-  try {
-    await createUserWithEmailAndPassword(
-      auth,
-      document.getElementById("reg-email").value,
-      document.getElementById("reg-password").value
-    );
-    alert("Registriert!");
-    hideRegister();
-  } catch (e) {
-    alert(e.message);
-  }
+/* LOGIN */
+window.login=async()=>{
+  await signInWithEmailAndPassword(
+    auth,
+    email.value,
+    password.value
+  );
 };
 
-/* Login */
-window.login = async () => {
-  try {
-    await signInWithEmailAndPassword(
-      auth,
-      document.getElementById("email").value,
-      document.getElementById("password").value
-    );
-  } catch (e) {
-    alert(e.message);
-  }
+/* REGISTER */
+window.register=async()=>{
+  await createUserWithEmailAndPassword(
+    auth,
+    reg-email.value,
+    reg-password.value
+  );
 };
 
-/* 🔥 SPIEL HOCHLADEN – FIXED */
-window.uploadGame = async () => {
-  const name = document.getElementById("game-name").value.trim();
-  const link = document.getElementById("game-link").value.trim();
-  const cover = document.getElementById("game-cover").value.trim();
-
-  if (!name || !link || !cover) {
-    alert("Bitte alle Felder ausfüllen!");
-    return;
-  }
-
-  try {
-    await push(ref(db, "games"), {
-      name,
-      link,
-      cover,
-      createdAt: Date.now()
-    });
-    alert("Spiel gespeichert!");
-  } catch (e) {
-    console.error(e);
-    alert("Upload fehlgeschlagen");
-  }
+/* UPLOAD */
+window.uploadGame=async()=>{
+  await push(ref(db,"games"),{
+    name: document.getElementById("game-name").value,
+    link: document.getElementById("game-link").value,
+    cover: document.getElementById("game-cover").value
+  });
 };
 
-/* Spiele laden (LIVE) */
-onValue(ref(db, "games"), snap => {
-  gameList.innerHTML = "";
-  snap.forEach(c => {
-    const g = c.val();
-    const div = document.createElement("div");
-    div.className = "game-card";
-    div.innerHTML = `<img src="${g.cover}"><div>${g.name}</div>`;
-    div.onclick = () => playGame(g.link);
+/* LOAD GAMES */
+onValue(ref(db,"games"),snap=>{
+  gameList.innerHTML="";
+
+  snap.forEach(c=>{
+    const g=c.val();
+
+    const div=document.createElement("div");
+    div.className="game-card";
+
+    // 🔥 FIX: IMMER LOGO ALS COVER
+    div.innerHTML=`
+      <img src="${LOGO_URL}">
+      <div style="padding:6px">${g.name}</div>
+    `;
+
+    div.onclick=()=>playGame(g.link);
     gameList.appendChild(div);
   });
 });
 
-/* Spiel starten mit Zurück-Button */
-window.playGame = link => {
-  const id = link.match(/projects\/(\d+)/)?.[1];
-  if (!id) return alert("Ungültiger Scratch Link");
+/* PLAY GAME */
+window.playGame=(link)=>{
+  const id=link.match(/projects\/(\d+)/)?.[1];
+  if(!id) return;
 
-  // Iframe erstellen
-  const iframe = document.createElement("iframe");
-  iframe.src = `https://scratch.mit.edu/projects/${id}/embed?autostart=true`;
-  document.body.appendChild(iframe);
+  const iframe=document.createElement("iframe");
+  iframe.src=`https://scratch.mit.edu/projects/${id}/embed`;
 
-  // Zurück-Button erstellen
-  const backBtn = document.createElement("button");
-  backBtn.innerText = "Zurück";
-  backBtn.style.position = "fixed";
-  backBtn.style.top = "20px";
-  backBtn.style.left = "20px";
-  backBtn.style.padding = "10px 20px";
-  backBtn.style.fontSize = "16px";
-  backBtn.style.border = "none";
-  backBtn.style.borderRadius = "6px";
-  backBtn.style.cursor = "pointer";
-  backBtn.style.zIndex = "1000";
-  backBtn.style.background = "#f00";
-  backBtn.style.color = "#fff";
+  const btn=document.createElement("button");
+  btn.innerText="Zurück";
+  btn.style.position="fixed";
+  btn.style.top="20px";
+  btn.style.left="20px";
+  btn.style.zIndex="1000";
 
-  backBtn.onclick = () => {
+  btn.onclick=()=>{
     iframe.remove();
-    backBtn.remove();
+    btn.remove();
   };
 
-  document.body.appendChild(backBtn);
+  document.body.appendChild(iframe);
+  document.body.appendChild(btn);
 };
 </script>
 
 </body>
 </html>
-
