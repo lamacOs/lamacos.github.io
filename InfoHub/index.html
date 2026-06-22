@@ -1,105 +1,150 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>InfoHub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
 
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #ffffff;
-      --accent: #38bdf8;
-    }
+</style>
+</head>
+<body>
 
-    body.light {
-      --bg: #f1f5f9;
-      --card: #ffffff;
-      --text: #0f172a;
-      --accent: #2563eb;
-    }
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfoHub</title>
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: 0.3s;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    header {
-      padding: 18px;
-      background: var(--card);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-    }
+<style>
+:root{
+  --bg:#f5f6f8;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --accent:#ff7a00;
+  --border:rgba(0,0,0,0.08);
+}
 
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-    }
+.dark{
+  --bg:#0b0f17;
+  --card:#111827;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --border:rgba(255,255,255,0.08);
+}
 
-    .container {
-      max-width: 950px;
-      margin: auto;
-      padding: 20px;
-      display: grid;
-      gap: 16px;
-    }
+body{
+  margin:0;
+  font-family:Inter, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:0.3s;
+}
 
-    .card {
-      background: var(--card);
-      padding: 15px;
-      border-radius: 12px;
-    }
+/* NAVBAR */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 20px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+}
 
-    .news-item {
-      margin-bottom: 15px;
-      padding: 14px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.05);
-    }
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
 
-    body.light .news-item {
-      background: rgba(0,0,0,0.05);
-    }
+.logo img{
+  width:32px;
+  height:32px;
+}
 
-    .small {
-      font-size: 13px;
-      opacity: 0.8;
-    }
+.logo span{
+  color:black; /* WICHTIG: einzige schwarze Überschrift */
+  font-weight:700;
+}
 
-    h3 {
-      margin-top: 0;
-    }
+.toggle{
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:10px 14px;
+  border-radius:12px;
+  cursor:pointer;
+}
 
-    button {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: var(--accent);
-      color: white;
-    }
+/* LAYOUT */
+.container{
+  max-width:950px;
+  margin:auto;
+  padding:20px;
+  display:grid;
+  gap:16px;
+}
 
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-  </style>
+/* CARDS */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+}
+
+/* TEXT */
+h2{
+  margin-top:0;
+  color:var(--accent);
+}
+
+h3{
+  margin:0 0 6px 0;
+}
+
+.small{
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* NEWS */
+.news-item{
+  margin-top:12px;
+  padding:14px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.04);
+}
+
+.dark .news-item{
+  background:rgba(255,255,255,0.03);
+}
+
+/* LINKS */
+a{
+  color:var(--accent);
+  text-decoration:none;
+}
+</style>
 </head>
 
 <body>
 
-<header>
-  <div class="title">InfoHub</div>
-  <button onclick="toggleMode()">Dark / Light</button>
-</header>
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">
+    <img src="https://raw.githubusercontent.com/lamacos/lamacos.github.io/refs/heads/main/logo.png">
+    <span>InfoHub</span>
+  </div>
 
+  <button class="toggle" onclick="toggleMode()">🌗</button>
+</div>
+
+<!-- CONTENT -->
 <div class="container">
 
   <div class="card">
@@ -109,19 +154,17 @@
 
   <div class="card">
     <h2>Satz der Woche</h2>
-    <div>
-      Kleine Schritte führen zu großen Veränderungen
-    </div>
+    <div>Kleine Schritte führen zu großen Veränderungen</div>
   </div>
 
   <div class="card">
     <h2>Wort des Tages</h2>
-    <div id="word">Lade Wort...</div>
+    <div id="word">Lade...</div>
   </div>
 
   <div class="card">
     <h2>News</h2>
-    <div id="news">Lade News...</div>
+    <div id="news">Lade...</div>
   </div>
 
 </div>
@@ -132,152 +175,104 @@ const RSS_PROXY =
   "https://api.rss2json.com/v1/api.json?rss_url=";
 
 const customNews = [
-
   {
     title: "Hide and Seek entfällt",
     date: "29.05.2026 11:15",
     description:
-      "Das am 20.6.2026 geplante 'Hide and Seek' im Dorf Middelsfähr fällt laut Organisator wegen mangelnden Teilnehmern wahrscheinlich aus."
+      "Das geplante Event fällt wahrscheinlich aus."
   }
-
 ];
 
-// DARK MODE
-function toggleMode() {
-  document.body.classList.toggle("light");
+/* MODE */
+function toggleMode(){
+  document.body.classList.toggle("dark");
 }
 
-// KALENDERWOCHE
-function getWeekNumber(d) {
-
-  d = new Date(
-    Date.UTC(
-      d.getFullYear(),
-      d.getMonth(),
-      d.getDate()
-    )
-  );
-
+/* WEEK */
+function getWeekNumber(d){
+  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const dayNum = d.getUTCDay() || 7;
-
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-
-  const yearStart = new Date(
-    Date.UTC(d.getUTCFullYear(), 0, 1)
-  );
-
-  return Math.ceil(
-    (((d - yearStart) / 86400000) + 1) / 7
-  );
-
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
-function loadWeek() {
-
-  const week = getWeekNumber(new Date());
-
+function loadWeek(){
   document.getElementById("week").innerHTML =
-    "Kalenderwoche: <b>" + week + "</b>";
-
+    "Kalenderwoche: <b>" + getWeekNumber(new Date()) + "</b>";
 }
 
-// WORT DES TAGES
-async function loadWord() {
-
-  try {
-
-    const url =
-      RSS_PROXY +
-      encodeURIComponent(
-        "https://www.merriam-webster.com/wotd/feed/rss2"
-      );
+/* WORD */
+async function loadWord(){
+  try{
+    const url = RSS_PROXY + encodeURIComponent(
+      "https://www.merriam-webster.com/wotd/feed/rss2"
+    );
 
     const res = await fetch(url);
-
     const data = await res.json();
-
     const item = data.items[0];
 
     document.getElementById("word").innerHTML = `
       <h3>${item.title}</h3>
-      <p class="small">${item.pubDate}</p>
+      <div class="small">${item.pubDate}</div>
       <p>${item.description}</p>
     `;
-
-  } catch (e) {
-
-    document.getElementById("word").innerHTML =
-      "Fehler beim Laden.";
-
+  } catch(e){
+    document.getElementById("word").innerHTML = "Fehler beim Laden.";
   }
-
 }
 
-// NEWS
-async function loadNews() {
-
-  try {
-
-    const url =
-      RSS_PROXY +
-      encodeURIComponent(
-        "https://www.tagesschau.de/xml/rss2"
-      );
+/* NEWS */
+async function loadNews(){
+  try{
+    const url = RSS_PROXY + encodeURIComponent(
+      "https://www.tagesschau.de/xml/rss2"
+    );
 
     const res = await fetch(url);
-
     const data = await res.json();
 
     let html = "";
 
-    // EIGENE NEWS
-    customNews.forEach(item => {
-
+    customNews.forEach(n=>{
       html += `
         <div class="news-item">
-          <h3>${item.title}</h3>
-          <p class="small">${item.date}</p>
-          <p>${item.description}</p>
+          <h3>${n.title}</h3>
+          <div class="small">${n.date}</div>
+          <p>${n.description}</p>
         </div>
       `;
-
     });
 
-    // TAGESSCHAU NEWS
-    data.items.slice(0, 50).forEach(item => {
-
+    data.items.slice(0,15).forEach(n=>{
       html += `
         <div class="news-item">
-          <h3>${item.title}</h3>
-
-          <p class="small">
-            ${item.pubDate}
-          </p>
-
-          <p>
-            ${item.description || ""}
-          </p>
+          <h3>${n.title}</h3>
+          <div class="small">${n.pubDate}</div>
+          <p>${n.description || ""}</p>
         </div>
       `;
-
     });
 
-    document.getElementById("news").innerHTML =
-      html;
+    document.getElementById("news").innerHTML = html;
 
-  } catch (e) {
-
-    document.getElementById("news").innerHTML =
-      "Fehler beim Laden.";
-
+  } catch(e){
+    document.getElementById("news").innerHTML = "Fehler beim Laden.";
   }
-
 }
 
-// START
+/* INIT */
 loadWeek();
 loadWord();
 loadNews();
+
+</script>
+
+</body>
+</html>
+
+<script>
 
 </script>
 
