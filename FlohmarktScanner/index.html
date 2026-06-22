@@ -3,162 +3,206 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlohmarktScanner</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #0f172a, #1e293b, #2563eb);
-  min-height: 100vh;
-  color: white;
-  padding: 20px;
-}
-
-.container {
-  max-width: 1000px;
-  margin: auto;
-}
-
-.hero {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.hero h1 {
-  font-size: 3rem;
-  margin-bottom: 10px;
-}
-
-.hero p {
-  opacity: 0.8;
-}
-
-.card {
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 28px;
-  padding: 24px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-}
-
-.notice {
-  margin-bottom: 22px;
-  padding: 14px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.08);
-}
-
-.notice a {
-  color: #93c5fd;
-}
-
-.buttonGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 18px;
-}
-
-.mainButton,
-.smallButton {
-  border: none;
-  border-radius: 18px;
-  cursor: pointer;
-  transition: 0.25s;
-  color: white;
-  font-family: inherit;
-}
-
-.mainButton {
-  padding: 22px;
-  font-size: 1rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-}
-
-.mainButton:hover,
-.smallButton:hover {
-  transform: translateY(-2px) scale(1.01);
-}
-
-#cameraArea {
-  display: none;
-  margin-top: 25px;
-  text-align: center;
-}
-
-video,
-canvas {
-  width: 100%;
-  max-height: 420px;
-  border-radius: 22px;
-  object-fit: cover;
-  background: black;
-  margin-bottom: 18px;
-}
-
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-}
-
-.smallButton {
-  padding: 14px 18px;
-  background: rgba(255,255,255,0.12);
-}
-
-#priceInput {
-  display: none;
-  margin-top: 24px;
-}
-
-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 16px;
-  border: none;
-  background: rgba(255,255,255,0.12);
-  color: white;
-  font-size: 16px;
-  margin-bottom: 14px;
-}
-
-input::placeholder {
-  color: rgba(255,255,255,0.6);
-}
-
-@media (max-width: 700px) {
-  .hero h1 {
-    font-size: 2.2rem;
-  }
-}
 </style>
 </head>
 <body>
 
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlohmarktScanner</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#f5f6f8;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --accent:#ff7a00;
+  --border:rgba(0,0,0,0.08);
+}
+
+.dark{
+  --bg:#0b0f17;
+  --card:#111827;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --border:rgba(255,255,255,0.08);
+}
+
+body{
+  margin:0;
+  font-family:Inter, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:0.3s;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
+
+/* NAVBAR */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo img{
+  width:32px;
+  height:32px;
+}
+
+.logo span{
+  color:black; /* WICHTIG: einzige schwarze Überschrift */
+  font-weight:700;
+}
+
+.toggleBtn{
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:10px 14px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+/* HERO */
+.hero{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.hero h1{
+  color:var(--accent);
+  margin-bottom:6px;
+}
+
+.hero p{
+  color:var(--muted);
+}
+
+/* CARD */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+}
+
+/* BUTTONS */
+.buttonGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:15px;
+}
+
+.mainButton,
+.smallButton{
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+  transition:0.2s;
+  font-family:inherit;
+}
+
+.mainButton{
+  background:var(--accent);
+  color:white;
+  padding:18px;
+  font-weight:600;
+}
+
+.smallButton{
+  background:rgba(255,255,255,0.08);
+  color:var(--text);
+  padding:12px;
+}
+
+.mainButton:hover,
+.smallButton:hover{
+  transform:scale(1.02);
+}
+
+/* CAMERA */
+#cameraArea{
+  display:none;
+  margin-top:20px;
+  text-align:center;
+}
+
+video, canvas{
+  width:100%;
+  max-height:420px;
+  border-radius:16px;
+  background:black;
+}
+
+.controls{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+/* INPUT */
+#priceInput{
+  display:none;
+  margin-top:15px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+}
+</style>
+</head>
+
+<body class="light">
+
 <div class="container">
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo">
+      <img src="https://raw.githubusercontent.com/lamacos/lamacos.github.io/refs/heads/main/logo.png">
+      <span>FlohmarktScanner</span>
+    </div>
+
+    <button class="toggleBtn" onclick="toggleMode()">🌗</button>
+  </div>
+
+  <!-- HERO -->
   <div class="hero">
     <h1>FlohmarktScanner</h1>
     <p>Scanne Gegenstände und speichere Preise smarter 🔍</p>
   </div>
 
   <div class="card">
-    <div class="notice">
-      Neuer Scanner verfügbar:
-      <a href="https://lamacos.github.io/Flohmarkt-Scanner-2.0/" target="_blank">Flohmarkt-Scanner 2.0</a>
-    </div>
 
     <div class="buttonGrid" id="startButtons">
       <button class="mainButton" onclick="startAdd()">📦 Neues Objekt hinzufügen</button>
-      <button class="mainButton" onclick="startScan()">🔍 Vorhandenes Objekt scannen</button>
+      <button class="mainButton" onclick="startScan()">🔍 Objekt scannen</button>
     </div>
 
     <div id="cameraArea">
@@ -166,16 +210,17 @@ input::placeholder {
       <canvas id="snapshot"></canvas>
 
       <div class="controls">
-        <button class="smallButton" onclick="takePicture()">📸 Foto machen</button>
-        <button class="smallButton" onclick="switchCamera()">🔄 Kamera wechseln</button>
+        <button class="smallButton" onclick="takePicture()">📸 Foto</button>
+        <button class="smallButton" onclick="switchCamera()">🔄 Kamera</button>
         <button class="smallButton" onclick="cancel()">✖ Abbrechen</button>
       </div>
     </div>
 
     <div id="priceInput">
-      <input type="text" id="price" placeholder="z.B. 3.50 ohne €">
+      <input type="text" id="price" placeholder="z.B. 3.50">
       <button class="mainButton" onclick="saveObject()">Speichern</button>
     </div>
+
   </div>
 </div>
 
@@ -183,6 +228,7 @@ input::placeholder {
 const video = document.getElementById('camera');
 const canvas = document.getElementById('snapshot');
 const ctx = canvas.getContext('2d');
+
 const priceDiv = document.getElementById('priceInput');
 const priceInput = document.getElementById('price');
 const startButtons = document.getElementById('startButtons');
@@ -193,168 +239,175 @@ let currentImageData = null;
 let stream = null;
 let useFront = false;
 
-function startCamera() {
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
+/* DARK/LIGHT */
+function toggleMode(){
+  document.body.classList.toggle('dark');
+  document.body.classList.toggle('light');
+}
+
+/* CAMERA */
+function startCamera(){
+  if(stream){
+    stream.getTracks().forEach(t => t.stop());
   }
 
   navigator.mediaDevices.getUserMedia({
-    video: {
-      facingMode: useFront ? 'user' : 'environment'
-    }
-  }).then((cameraStream) => {
-    stream = cameraStream;
+    video:{ facingMode: useFront ? 'user' : 'environment' }
+  }).then(s=>{
+    stream = s;
     video.srcObject = stream;
-    video.style.display = 'block';
-    canvas.style.display = 'none';
     cameraArea.style.display = 'block';
-  }).catch((error) => {
-    alert('Kamera-Fehler: ' + error);
+  }).catch(e=>{
+    alert('Kamera Fehler: ' + e);
   });
 }
 
-function switchCamera() {
+function switchCamera(){
   useFront = !useFront;
   startCamera();
 }
 
-function startAdd() {
-  mode = 'add';
-  startButtons.style.display = 'none';
-  priceDiv.style.display = 'none';
+/* MODES */
+function startAdd(){
+  mode='add';
+  startButtons.style.display='none';
+  priceDiv.style.display='none';
   startCamera();
 }
 
-function startScan() {
-  mode = 'scan';
-  startButtons.style.display = 'none';
-  priceDiv.style.display = 'none';
+function startScan(){
+  mode='scan';
+  startButtons.style.display='none';
+  priceDiv.style.display='none';
   startCamera();
 }
 
-function takePicture() {
-  const tempCanvas = document.createElement('canvas');
-  const tempCtx = tempCanvas.getContext('2d');
+/* PHOTO */
+function takePicture(){
+  const temp = document.createElement('canvas');
+  const tctx = temp.getContext('2d');
 
-  tempCanvas.width = 100;
-  tempCanvas.height = 100;
+  temp.width = 200;
+  temp.height = 200;
 
-  tempCtx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, 100, 100);
+  tctx.drawImage(video,0,0,video.videoWidth,video.videoHeight,0,0,200,200);
 
-  currentImageData = tempCanvas.toDataURL('image/jpeg', 0.4);
+  currentImageData = temp.toDataURL('image/jpeg',0.6);
 
-  video.style.display = 'none';
-  canvas.width = 100;
-  canvas.height = 100;
-  ctx.drawImage(tempCanvas, 0, 0);
-  canvas.style.display = 'block';
+  canvas.width = 200;
+  canvas.height = 200;
+  ctx.drawImage(temp,0,0);
 
-  if (mode === 'add') {
-    priceDiv.style.display = 'block';
+  video.style.display='none';
+  canvas.style.display='block';
+
+  if(mode==='add'){
+    priceDiv.style.display='block';
   } else {
     scanObject();
   }
 }
 
-function cancel() {
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
+/* CANCEL */
+function cancel(){
+  if(stream){
+    stream.getTracks().forEach(t=>t.stop());
   }
-
-  cameraArea.style.display = 'none';
-  priceDiv.style.display = 'none';
-  startButtons.style.display = 'grid';
+  cameraArea.style.display='none';
+  priceDiv.style.display='none';
+  startButtons.style.display='grid';
+  video.style.display='block';
+  canvas.style.display='none';
 }
 
-function saveObject() {
-  const price = parseFloat(priceInput.value.replace(',', '.'));
+/* SAVE */
+function saveObject(){
+  const price = parseFloat(priceInput.value.replace(',','.'));
 
-  if (!currentImageData || isNaN(price)) {
-    alert('Bitte gültige Daten eingeben');
+  if(!currentImageData || isNaN(price)){
+    alert('Ungültig');
     return;
   }
 
-  const list = JSON.parse(localStorage.getItem('objects') || '[]');
+  const list = JSON.parse(localStorage.getItem('objects')||'[]');
 
-  list.push({
-    image: currentImageData,
-    price: price.toFixed(2)
-  });
-
-  localStorage.setItem('objects', JSON.stringify(list));
+  list.push({image:currentImageData,price:price.toFixed(2)});
+  localStorage.setItem('objects',JSON.stringify(list));
 
   alert('Gespeichert!');
   cancel();
 }
 
-async function scanObject() {
+/* SCAN */
+async function scanObject(){
   const ref = await getAvgColor(currentImageData);
-  const list = JSON.parse(localStorage.getItem('objects') || '[]');
+  const list = JSON.parse(localStorage.getItem('objects')||'[]');
 
-  let bestMatch = null;
-  let bestScore = Infinity;
+  let best=null;
+  let bestScore=999999;
 
-  for (const obj of list) {
+  for(const obj of list){
     const cmp = await getAvgColor(obj.image);
 
     const d = Math.sqrt(
-      (ref.r - cmp.r) ** 2 +
-      (ref.g - cmp.g) ** 2 +
-      (ref.b - cmp.b) ** 2
+      (ref.r-cmp.r)**2 +
+      (ref.g-cmp.g)**2 +
+      (ref.b-cmp.b)**2
     );
 
-    if (d < bestScore) {
-      bestScore = d;
-      bestMatch = obj;
+    if(d<bestScore){
+      bestScore=d;
+      best=obj;
     }
   }
 
-  if (bestMatch && bestScore < 40) {
-    alert('Preis: ' + bestMatch.price + ' €');
+  if(best && bestScore<40){
+    alert('Preis: '+best.price+' €');
   } else {
-    alert('Kein passendes Objekt gefunden.');
+    alert('Kein Treffer');
   }
 
   cancel();
 }
 
-function getAvgColor(dataUrl) {
-  return new Promise((resolve) => {
-    const img = new Image();
+/* COLOR */
+function getAvgColor(dataUrl){
+  return new Promise(resolve=>{
+    const img=new Image();
 
-    img.onload = () => {
-      const temp = document.createElement('canvas');
-      const tempCtx = temp.getContext('2d');
+    img.onload=()=>{
+      const c=document.createElement('canvas');
+      const x=c.getContext('2d');
 
-      temp.width = img.width;
-      temp.height = img.height;
+      c.width=img.width;
+      c.height=img.height;
 
-      tempCtx.drawImage(img, 0, 0);
+      x.drawImage(img,0,0);
 
-      const area = tempCtx.getImageData(img.width / 2 - 10, img.height / 2 - 10, 20, 20).data;
+      const d=x.getImageData(0,0,20,20).data;
 
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      let n = 0;
+      let r=0,g=0,b=0,n=0;
 
-      for (let i = 0; i < area.length; i += 4) {
-        r += area[i];
-        g += area[i + 1];
-        b += area[i + 2];
+      for(let i=0;i<d.length;i+=4){
+        r+=d[i];
+        g+=d[i+1];
+        b+=d[i+2];
         n++;
       }
 
-      resolve({
-        r: r / n,
-        g: g / n,
-        b: b / n
-      });
+      resolve({r:r/n,g:g/n,b:b/n});
     };
 
-    img.src = dataUrl;
+    img.src=dataUrl;
   });
 }
+</script>
+
+</body>
+</html>
+
+<script>
+
 </script>
 
 </body>
