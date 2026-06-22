@@ -191,6 +191,7 @@ footer{
 }
 </style>
 </head>
+
 <body>
 
 <nav class="navbar">
@@ -242,6 +243,11 @@ footer{
 
                 <button class="action-btn" onclick="updatePreview()">
                     Vorschau aktualisieren
+                </button>
+
+                <!-- 🔥 NEU -->
+                <button class="action-btn" onclick="toggleFullscreen()">
+                    Vollbild
                 </button>
             </div>
 
@@ -425,6 +431,19 @@ function downloadHTML(){
     URL.revokeObjectURL(
         a.href
     );
+}
+
+/* 🔥 NEU: FULLSCREEN */
+function toggleFullscreen(){
+
+    const iframe =
+    document.getElementById("preview");
+
+    if(!document.fullscreenElement){
+        iframe.requestFullscreen();
+    }else{
+        document.exitFullscreen();
+    }
 }
 
 updatePreview();
