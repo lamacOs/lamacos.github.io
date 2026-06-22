@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Builder</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --accent:#ff7a00;
+    --bg:#f6f8fb;
+    --card:rgba(255,255,255,.88);
+    --text:#111827;
+    --muted:#64748b;
+    --border:rgba(0,0,0,.08);
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+[data-theme="dark"]{
+    --bg:#0b1220;
+    --card:rgba(15,23,42,.88);
+    --text:#ffffff;
+    --muted:#94a3b8;
+    --border:rgba(255,255,255,.08);
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Inter,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    transition:.25s;
+}
+
+.navbar{
+    max-width:1400px;
+    margin:auto;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.brand img{
+    width:44px;
+    height:44px;
+    object-fit:contain;
+}
+
+.brand span{
+    font-weight:800;
+    font-size:1.2rem;
+}
+
+button{
+    border:none;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.theme-btn,
+.action-btn{
+    background:var(--accent);
+    color:white;
+    border-radius:12px;
+    padding:12px 18px;
+    font-weight:600;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:20px;
+}
+
+.hero{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.hero h1{
+    color:var(--accent);
+    font-size:3rem;
+    margin-bottom:10px;
+}
+
+.hero p{
+    color:var(--muted);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.card{
+    background:var(--card);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:20px;
+}
+
+h1,h2,h3,h4,h5,h6{
+    color:var(--accent);
+}
+
+.card h2{
+    margin-bottom:15px;
+}
+
+textarea{
+    width:100%;
+    min-height:250px;
+    resize:vertical;
+
+    border-radius:12px;
+    border:1px solid var(--border);
+
+    background:transparent;
+    color:var(--text);
+
+    padding:14px;
+    font-family:monospace;
+    font-size:14px;
+}
+
+.actions{
+    margin-top:20px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.output{
+    margin-top:20px;
+}
+
+#output{
+    min-height:250px;
+}
+
+.preview{
+    width:100%;
+    height:500px;
+    border:none;
+    border-radius:16px;
+    background:white;
+}
+
+footer{
+    text-align:center;
+    margin-top:40px;
+    padding:30px;
+    color:var(--muted);
+}
+
+@media(max-width:1000px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .hero h1{
+        font-size:2rem;
+    }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="brand">
+        <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png" alt="Logo">
+        <span>lamacOs</span>
+    </div>
+
+    <button id="themeToggle" class="theme-btn">
+        Dark Mode
+    </button>
+</nav>
+
+<div class="container">
+
+    <div class="hero">
+        <h1>HTML Builder</h1>
+        <p>HTML, CSS und JavaScript eingeben und als vollständige HTML-Datei generieren.</p>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h2>HTML</h2>
+
+            <textarea id="htmlInput" placeholder="<h1>Hallo Welt</h1>"></textarea>
+
+            <h2 style="margin-top:20px;">CSS</h2>
+
+            <textarea id="cssInput" placeholder="body{background:red;}"></textarea>
+
+            <h2 style="margin-top:20px;">JavaScript</h2>
+
+            <textarea id="jsInput" placeholder="console.log('Hallo');"></textarea>
+
+            <div class="actions">
+                <button class="action-btn" onclick="generateHTML()">
+                    HTML generieren
+                </button>
+
+                <button class="action-btn" onclick="copyHTML()">
+                    Kopieren
+                </button>
+
+                <button class="action-btn" onclick="downloadHTML()">
+                    Herunterladen
+                </button>
+
+                <button class="action-btn" onclick="updatePreview()">
+                    Vorschau aktualisieren
+                </button>
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Generierter HTML-Code</h2>
+
+            <textarea id="output" readonly></textarea>
+
+            <h2 style="margin-top:20px;">Live Vorschau</h2>
+
+            <iframe id="preview" class="preview"></iframe>
+
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 lamacHub
+</footer>
+
+<script>
+const themeToggle =
+document.getElementById("themeToggle");
+
+if(localStorage.getItem("theme")==="dark"){
+    document.documentElement.setAttribute(
+        "data-theme",
+        "dark"
+    );
+    themeToggle.textContent="Light Mode";
+}
+
+themeToggle.onclick=()=>{
+
+    const dark =
+    document.documentElement.getAttribute(
+        "data-theme"
+    )==="dark";
+
+    if(dark){
+
+        document.documentElement.setAttribute(
+            "data-theme",
+            "light"
+        );
+
+        localStorage.setItem(
+            "theme",
+            "light"
+        );
+
+        themeToggle.textContent=
+        "Dark Mode";
+
+    }else{
+
+        document.documentElement.setAttribute(
+            "data-theme",
+            "dark"
+        );
+
+        localStorage.setItem(
+            "theme",
+            "dark"
+        );
+
+        themeToggle.textContent=
+        "Light Mode";
+    }
+};
+
+function buildHTML(){
+
+    const html =
+    document.getElementById(
+        "htmlInput"
+    ).value;
+
+    const css =
+    document.getElementById(
+        "cssInput"
+    ).value;
+
+    const js =
+    document.getElementById(
+        "jsInput"
+    ).value;
+
+    return `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+${css}
+</style>
+</head>
+<body>
+
+${html}
+
+<script>
+${js}
+<\/script>
+
+</body>
+</html>`;
+}
+
+function generateHTML(){
+
+    document.getElementById(
+        "output"
+    ).value = buildHTML();
+}
+
+function updatePreview(){
+
+    const iframe =
+    document.getElementById(
+        "preview"
+    );
+
+    iframe.srcdoc = buildHTML();
+
+    generateHTML();
+}
+
+function copyHTML(){
+
+    generateHTML();
+
+    navigator.clipboard.writeText(
+        document.getElementById(
+            "output"
+        ).value
+    );
+
+    alert(
+        "HTML kopiert."
+    );
+}
+
+function downloadHTML(){
+
+    generateHTML();
+
+    const content =
+    document.getElementById(
+        "output"
+    ).value;
+
+    const blob =
+    new Blob(
+        [content],
+        {
+            type:"text/html"
+        }
+    );
+
+    const a =
+    document.createElement(
+        "a"
+    );
+
+    a.href =
+    URL.createObjectURL(
+        blob
+    );
+
+    a.download =
+    "website.html";
+
+    a.click();
+
+    URL.revokeObjectURL(
+        a.href
+    );
+}
+
+updatePreview();
+</script>
+
+</body>
+</html>
