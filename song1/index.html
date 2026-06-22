@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Player</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#f7f7f8;
+    --text:#111;
+    --card:#ffffff;
+    --border:#eeeeee;
+    --muted:#666666;
+    --accent:#ff7a00;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Inter,system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.player-card{
+    width:100%;
+    max-width:700px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:40px;
+    text-align:center;
+    transition:.25s;
+}
+
+.player-card:hover{
+    transform:translateY(-4px);
+    border-color:var(--accent);
+}
+
+h1{
+    font-size:48px;
+    font-weight:800;
+    margin-bottom:12px;
+    background:linear-gradient(90deg,var(--accent),#ffb347);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+p{
+    color:var(--muted);
+    margin-bottom:30px;
+}
+
+audio{
+    width:100%;
+    border-radius:12px;
+}
+
+footer{
+    margin-top:25px;
+    font-size:13px;
+    color:var(--muted);
+}
+
+@media(max-width:768px){
+    h1{
+        font-size:34px;
+    }
+
+    .player-card{
+        padding:25px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="player-card">
+    <h1>Audio Player</h1>
+    <p>Jetzt anhören 🎧</p>
+
+    <audio controls>
+        <source src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/song1/song.mp3" type="audio/mpeg">
+        Dein Browser unterstützt kein Audio.
+    </audio>
+
+    <footer>
+        Powered by lamacHub
+    </footer>
+</div>
+
+</body>
+</html>
