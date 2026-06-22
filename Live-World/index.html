@@ -3,94 +3,161 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LIVE WELT 🌍</title>
+<title>Live Welt</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ffff">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
+:root{
+  --bg:#f5f6f8;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --accent:#ff7a00;
+  --border:rgba(0,0,0,0.08);
+}
+
+.dark{
+  --bg:#0b0f17;
+  --card:#111827;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --border:rgba(255,255,255,0.08);
+}
+
 body{
-    margin:0;
-    background:#0a0a0a;
-    color:white;
-    font-family:Arial, sans-serif;
+  margin:0;
+  font-family:Inter, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:0.3s;
 }
-h1{
-    text-align:center;
-    margin:20px;
+
+/* NAV */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 22px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
 }
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo img{
+  width:32px;
+  height:32px;
+}
+
+.logo span{
+  color:black; /* Design1 Regel */
+  font-weight:700;
+}
+
+.toggle{
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:10px 14px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+/* GRID */
 .dashboard{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:18px;
-    padding:20px;
+  max-width:1100px;
+  margin:auto;
+  padding:30px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:22px; /* viel Abstand = Design1 */
 }
+
+/* CARD */
 .card{
-    background:#141414;
-    border-radius:18px;
-    padding:20px;
-    text-align:center;
-    box-shadow:0 0 15px rgba(0,255,255,0.15);
-    transition:0.2s;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;
+  text-align:center;
+  transition:0.2s;
 }
+
 .card:hover{
-    transform:scale(1.05);
+  transform:translateY(-3px);
 }
+
 .label{
-    opacity:0.7;
-    font-size:0.9em;
+  color:var(--muted);
+  font-size:14px;
 }
+
 .number{
-    font-size:1.7em;
-    margin-top:10px;
-    color:#00ffff;
+  margin-top:10px;
+  font-size:1.6rem;
+  font-weight:600;
+  color:var(--accent);
 }
 </style>
 </head>
 
 <body>
 
-<h1>🌍 LIVE WELT – ULTRA DATA</h1>
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">
+    <img src="https://raw.githubusercontent.com/lamacos/lamacos.github.io/refs/heads/main/logo.png">
+    <span>Live Welt</span>
+  </div>
 
+  <button class="toggle" onclick="toggleMode()">🌗</button>
+</div>
+
+<!-- DASHBOARD -->
 <div class="dashboard">
+ 
+  <div class="card"><div class="label">Weltbevölkerung</div><div id="population" class="number">...</div></div>
+  <div class="card"><div class="label">Geburten</div><div id="births" class="number">...</div></div>
+  <div class="card"><div class="label">Todesfälle</div><div id="deaths" class="number">...</div></div>
+  <div class="card"><div class="label">Hochzeiten</div><div id="marriages" class="number">...</div></div>
+  <div class="card"><div class="label">Scheidungen</div><div id="divorces" class="number">...</div></div>
 
-<div class="card"><div class="label">🧑 Weltbevölkerung</div><div id="population" class="number">...</div></div>
-<div class="card"><div class="label">👶 Geburten heute</div><div id="births" class="number">...</div></div>
-<div class="card"><div class="label">☠️ Todesfälle heute</div><div id="deaths" class="number">...</div></div>
-<div class="card"><div class="label">💍 Hochzeiten</div><div id="marriages" class="number">...</div></div>
-<div class="card"><div class="label">💔 Scheidungen</div><div id="divorces" class="number">...</div></div>
+  <div class="card"><div class="label">Internetnutzer</div><div id="internet" class="number">...</div></div>
+  <div class="card"><div class="label">E-Mails heute</div><div id="emails" class="number">...</div></div>
+  <div class="card"><div class="label">Google-Suchen</div><div id="searches" class="number">...</div></div>
+  <div class="card"><div class="label">Instagram-Posts</div><div id="insta" class="number">...</div></div>
+  <div class="card"><div class="label">Spotify-Streams</div><div id="spotify" class="number">...</div></div>
 
-<div class="card"><div class="label">🌐 Internetnutzer</div><div id="internet" class="number">...</div></div>
-<div class="card"><div class="label">📧 E-Mails heute</div><div id="emails" class="number">...</div></div>
-<div class="card"><div class="label">🔍 Google-Suchen</div><div id="searches" class="number">...</div></div>
-<div class="card"><div class="label">📸 Instagram-Posts</div><div id="insta" class="number">...</div></div>
-<div class="card"><div class="label">🎵 Spotify-Streams</div><div id="spotify" class="number">...</div></div>
+  <div class="card"><div class="label">Gefällte Bäume</div><div id="trees" class="number">...</div></div>
+  <div class="card"><div class="label">Geschmolzenes Eis</div><div id="ice" class="number">...</div></div>
+  <div class="card"><div class="label">Ölverbrauch</div><div id="oil" class="number">...</div></div>
+  <div class="card"><div class="label">Autos weltweit</div><div id="cars" class="number">...</div></div>
 
-<div class="card"><div class="label">🌳 Gefällte Bäume</div><div id="trees" class="number">...</div></div>
-<div class="card"><div class="label">🧊 Geschmolzenes Eis (t)</div><div id="ice" class="number">...</div></div>
-<div class="card"><div class="label">🛢️ Ölverbrauch</div><div id="oil" class="number">...</div></div>
-<div class="card"><div class="label">🚗 Autos weltweit</div><div id="cars" class="number">...</div></div>
+  <div class="card"><div class="label">Satelliten</div><div id="satellites" class="number">...</div></div>
+  <div class="card"><div class="label">Erde–Mond</div><div id="moon" class="number">...</div></div>
+  <div class="card"><div class="label">Sonnenenergie</div><div id="sun" class="number">...</div></div>
 
-<div class="card"><div class="label">🛰️ Aktive Satelliten</div><div id="satellites" class="number">...</div></div>
-<div class="card"><div class="label">🌕 Erde–Mond</div><div id="moon" class="number">...</div></div>
-<div class="card"><div class="label">☀️ Sonnenenergie</div><div id="sun" class="number">...</div></div>
+  <div class="card"><div class="label">Bitcoin</div><div id="btc" class="number">...</div></div>
+  <div class="card"><div class="label">Ethereum</div><div id="eth" class="number">...</div></div>
 
-<div class="card"><div class="label">₿ Bitcoin (USD)</div><div id="btc" class="number">...</div></div>
-<div class="card"><div class="label">💵 Ethereum (USD)</div><div id="eth" class="number">...</div></div>
-
-<div class="card"><div class="label">🕒 Weltzeit (UTC)</div><div id="time" class="number">...</div></div>
+  <div class="card"><div class="label">UTC Zeit</div><div id="time" class="number">...</div></div>
 
 </div>
 
 <script>
-// ===== SERVICE WORKER =====
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-    .then(() => console.log('Service Worker registered'))
-    .catch(err => console.log('Service Worker failed:', err));
+
+/* MODE */
+function toggleMode(){
+  document.body.classList.toggle("dark");
 }
 
-// ===== STARTWERTE =====
+/* LIVE DATA */
 let population = 8100000000;
 let births = 0;
 let deaths = 0;
@@ -104,71 +171,75 @@ let trees = 0;
 let ice = 0;
 let oil = 0;
 
-// ===== LIVE ZÄHLER =====
-setInterval(() => {
-    population += 2;
-    births += 4;
-    deaths += 2;
-    marriages += 1;
-    divorces += 0.4;
+setInterval(()=>{
+  population += 2;
+  births += 4;
+  deaths += 2;
+  marriages += 1;
+  divorces += 0.4;
 
-    emails += 2500000;
-    searches += 100000;
-    insta += 2000;
-    spotify += 80000;
+  emails += 2500000;
+  searches += 100000;
+  insta += 2000;
+  spotify += 80000;
 
-    trees += 3000;
-    ice += 15000;
-    oil += 95000;
+  trees += 3000;
+  ice += 15000;
+  oil += 95000;
 
-    set("population", population);
-    set("births", births);
-    set("deaths", deaths);
-    set("marriages", marriages);
-    set("divorces", divorces);
-    set("emails", emails);
-    set("searches", searches);
-    set("insta", insta);
-    set("spotify", spotify);
-    set("trees", trees);
-    set("ice", ice);
-    set("oil", oil);
+  set("population", population);
+  set("births", births);
+  set("deaths", deaths);
+  set("marriages", marriages);
+  set("divorces", divorces);
+  set("emails", emails);
+  set("searches", searches);
+  set("insta", insta);
+  set("spotify", spotify);
+  set("trees", trees);
+  set("ice", ice);
+  set("oil", oil);
 },1000);
 
-// ===== HELPER =====
-function set(id,val){document.getElementById(id).innerText=Math.round(val).toLocaleString();}
+function set(id,val){
+  document.getElementById(id).innerText =
+    Math.round(val).toLocaleString();
+}
 
-// ===== FESTE DATEN =====
+/* FIXED VALUES */
 document.getElementById("cars").innerText = "1.450.000.000";
 document.getElementById("satellites").innerText = "8.500";
 document.getElementById("moon").innerText = "384.400 km";
 document.getElementById("sun").innerText = "173.000 TW";
 
-// ===== INTERNETNUTZER =====
+/* INTERNET */
 fetch("https://api.worldbank.org/v2/country/WLD/indicator/IT.NET.USER.ZS?format=json")
 .then(r=>r.json())
 .then(d=>{
-    const percent=d[1][0].value;
-    set("internet", Math.round(population*(percent/100)));
+  const percent=d[1][0].value;
+  set("internet", Math.round(population*(percent/100)));
 });
 
-// ===== CRYPTO =====
+/* CRYPTO */
 async function loadCrypto(){
-    const res = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
-    );
-    const data = await res.json();
-    document.getElementById("btc").innerText = "$"+data.bitcoin.usd;
-    document.getElementById("eth").innerText = "$"+data.ethereum.usd;
+  const res = await fetch(
+    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
+  );
+  const data = await res.json();
+
+  document.getElementById("btc").innerText = "$"+data.bitcoin.usd;
+  document.getElementById("eth").innerText = "$"+data.ethereum.usd;
 }
+
 loadCrypto();
 setInterval(loadCrypto,60000);
 
-// ===== UHR =====
+/* TIME */
 setInterval(()=>{
-    document.getElementById("time").innerText=
-        new Date().toUTCString().slice(17,25);
+  document.getElementById("time").innerText =
+    new Date().toUTCString().slice(17,25);
 },1000);
+
 </script>
 
 </body>
