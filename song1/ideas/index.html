@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Song Player</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#f7f7f8;
+    --text:#111;
+    --card:#ffffff;
+    --border:#eeeeee;
+    --muted:#666666;
+    --accent:#ff7a00;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Inter,system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    padding:40px 20px;
+}
+
+.container{
+    max-width:800px;
+    margin:0 auto;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:30px;
+    transition:.25s;
+    margin-bottom:20px;
+}
+
+.card:hover{
+    transform:translateY(-4px);
+    border-color:var(--accent);
+}
+
+h1{
+    text-align:center;
+    font-size:52px;
+    font-weight:800;
+    margin-bottom:12px;
+    background:linear-gradient(90deg,var(--accent),#ffb347);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+    text-align:center;
+    color:var(--muted);
+    margin-bottom:25px;
+}
+
+audio{
+    width:100%;
+}
+
+h2{
+    margin-bottom:18px;
+}
+
+.input{
+    width:100%;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,sans-serif;
+    margin-bottom:14px;
+    font-size:14px;
+}
+
+.textarea{
+    min-height:160px;
+    resize:vertical;
+}
+
+.upload-box{
+    padding:14px;
+    border:1px dashed var(--border);
+    border-radius:12px;
+    margin-bottom:18px;
+    color:var(--muted);
+}
+
+.upload-box input{
+    margin-top:10px;
+    width:100%;
+}
+
+button{
+    width:100%;
+    border:none;
+    border-radius:12px;
+    padding:15px;
+    background:var(--accent);
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+    transition:.25s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.message{
+    margin-top:12px;
+    text-align:center;
+    font-size:14px;
+}
+
+.success{
+    color:green;
+}
+
+.error{
+    color:red;
+}
+
+footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    margin-top:20px;
+}
+
+@media(max-width:768px){
+
+    h1{
+        font-size:36px;
+    }
+
+    .card{
+        padding:20px;
+    }
+
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Song Player</h1>
+
+        <p class="subtitle">
+            Höre den Song und sende deine Ideen 🎧
+        </p>
+
+        <audio controls>
+            <source src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/song1/song.mp3" type="audio/mpeg">
+            Dein Browser unterstützt kein Audio.
+        </audio>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Song-Idee senden</h2>
+
+        <form
+            id="songForm"
+            action="https://api.web3forms.com/submit"
+            method="POST">
+
+            <input
+                type="hidden"
+                name="access_key"
+                value="6337e4b8-3259-4901-b83b-5f95f2513404">
+
+            <input
+                type="hidden"
+                name="subject"
+                value="Neue Song-Idee">
+
+            <input
+                class="input"
+                type="text"
+                id="nameIdea"
+                name="Namensidee"
+                placeholder="Namensidee (optional)">
+
+            <textarea
+                class="input textarea"
+                id="lyricsIdea"
+                name="Songtextidee"
+                placeholder="Songtextidee (optional)"></textarea>
+
+            <div class="upload-box">
+                Alternativ kannst du eine .txt-Datei hochladen:
+
+                <input
+                    type="file"
+                    id="lyricsFile"
+                    accept=".txt">
+            </div>
+
+            <button type="submit">
+                Idee absenden
+            </button>
+
+            <div id="message" class="message"></div>
+
+        </form>
+
+    </div>
+
+    <footer>
+        © 2026 lamacHub • Design1
+    </footer>
+
+</div>
+
+<script>
+const form = document.getElementById("songForm");
+
+form.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const message =
+        document.getElementById("message");
+
+    const nameIdea =
+        document.getElementById("nameIdea").value.trim();
+
+    const lyricsIdea =
+        document.getElementById("lyricsIdea").value.trim();
+
+    const file =
+        document.getElementById("lyricsFile").files[0];
+
+    if(
+        nameIdea === "" &&
+        lyricsIdea === "" &&
+        !file
+    ){
+        message.className = "message error";
+        message.textContent =
+            "Bitte mindestens ein Feld ausfüllen.";
+        return;
+    }
+
+    let finalLyrics = lyricsIdea;
+
+    if(file){
+
+        const text =
+            await file.text();
+
+        finalLyrics +=
+            "\n\n----- TXT DATEI -----\n\n" +
+            text;
+    }
+
+    const formData = new FormData();
+
+    formData.append(
+        "access_key",
+        "6337e4b8-3259-4901-b83b-5f95f2513404"
+    );
+
+    formData.append(
+        "subject",
+        "Neue Song-Idee"
+    );
+
+    formData.append(
+        "Namensidee",
+        nameIdea
+    );
+
+    formData.append(
+        "Songtextidee",
+        finalLyrics
+    );
+
+    try{
+
+        const response = await fetch(
+            "https://api.web3forms.com/submit",
+            {
+                method:"POST",
+                body:formData
+            }
+        );
+
+        const result =
+            await response.json();
+
+        if(result.success){
+
+            message.className =
+                "message success";
+
+            message.textContent =
+                "Idee erfolgreich gesendet!";
+
+            form.reset();
+
+        }else{
+
+            message.className =
+                "message error";
+
+            message.textContent =
+                "Fehler beim Senden.";
+
+        }
+
+    }catch{
+
+        message.className =
+            "message error";
+
+        message.textContent =
+            "Netzwerkfehler.";
+
+    }
+
+});
+</script>
+
+</body>
+</html>
