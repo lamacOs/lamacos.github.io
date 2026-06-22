@@ -1,431 +1,1133 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>deine-daten.com</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  :root{
-    --bg:#0b1220;
-    --card:#0f1724;
-    --accent:#5ad0ff;
-    --ok:#7ee787;
-    --warn:#ffd166;
-    --muted:#9aa6b2;
-    --gap:12px;
-    font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
-    color:#e6eef6;
-  }
-  body{
-    margin:0;
-    background:linear-gradient(180deg,var(--bg),#07101a);
-    min-height:100vh;
-    padding:20px;
-    box-sizing:border-box;
-  }
-  .wrap{ max-width:980px; margin:0 auto; }
-  header{
-    display:flex;
-    gap:16px;
-    align-items:center;
-    margin-bottom:18px;
-  }
-  h1{ font-size:20px; margin:0; }
-  p.lead{ margin:0; color:var(--muted); font-size:13px; }
-  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--gap); margin-top:14px; }
-  .card{
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,255,255,0.03);
-    padding:14px;
-    border-radius:10px;
-    box-shadow:0 6px 18px rgba(2,6,12,0.6);
-  }
-  .item{ display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.02); align-items:center; }
-  .item:last-child{ border-bottom:0; }
-  .left{ display:flex; gap:10px; align-items:center; min-width:0; }
-  .key{ font-weight:600; font-size:14px; white-space:nowrap; }
-  .value{ color:var(--muted); font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:320px; }
-  .badge{ font-size:12px; padding:6px 8px; border-radius:999px; background:rgba(255,255,255,0.02); color:var(--muted); border:1px solid rgba(255,255,255,0.02); }
-  .badge.auto{ background:rgba(122,192,255,0.06); color:var(--accent); border-color:rgba(90,208,255,0.12); }
-  .badge.req{ background:rgba(255,209,102,0.06); color:var(--warn); border-color:rgba(255,209,102,0.12); }
-  button { background:transparent; border:1px solid rgba(255,255,255,0.06); color:inherit; padding:6px 10px; border-radius:8px; cursor:pointer; }
-  button.primary { background:var(--accent); color:#001; border:0; font-weight:700; }
-  .small{ font-size:12px; color:var(--muted); }
-  footer{ margin-top:14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-  .countdown{ font-weight:700; color:var(--accent); }
-  .timestamp{ color:var(--muted); font-size:13px; }
-  @media (max-width:800px){ .grid{ grid-template-columns:1fr; } .value{ max-width:140px; } }
+/* =========================
+   DESIGN1 - DEINEDATEN
+   ========================= */
 
- .topbar{
+:root{
+    --bg:#f5f7fb;
+    --card:rgba(255,255,255,0.85);
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:rgba(15,23,42,0.08);
+    --accent:#ff7a00;
+    --shadow:0 10px 30px rgba(0,0,0,0.08);
+    --radius:16px;
+}
+
+[data-theme="dark"]{
+    --bg:#0b0f19;
+    --card:rgba(17,24,39,0.78);
+    --text:#ffffff;
+    --muted:rgba(255,255,255,0.65);
+    --border:rgba(255,255,255,0.08);
+    --shadow:0 10px 30px rgba(0,0,0,0.35);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:"Inter",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    transition:.25s;
+}
+
+/* =========================
+   ALLE ÜBERSCHRIFTEN ORANGE
+   ========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6{
+    color:var(--accent);
+}
+
+/* =========================
+   NAVBAR
+   ========================= */
+
+.navbar{
     display:flex;
     justify-content:space-between;
     align-items:center;
 
-    width:100%;
-    padding:12px 20px;
-    box-sizing:border-box;
+    max-width:1200px;
+    margin:20px auto 0 auto;
 
-    background:transparent;
-    color:inherit;
+    padding:16px 20px;
+
+    border-radius:16px;
+
+    background:var(--card);
+    backdrop-filter:blur(14px);
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
 }
 
-.left{
+.nav-left{
     display:flex;
     align-items:center;
     gap:12px;
 }
 
 .logo{
-    width:40px;
-    height:40px;
+    width:42px;
+    height:42px;
+    border-radius:12px;
     object-fit:contain;
 }
 
-.site-name{
-    font-size:1.2rem;
+.brand{
+    font-weight:700;
+    font-size:1.15rem;
+}
+
+.theme-btn{
+    border:none;
+    cursor:pointer;
+
+    background:var(--accent);
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:12px;
+
     font-weight:600;
-    color:inherit;
+
+    transition:.2s;
 }
 
-.top-link{
-    color:inherit;
-    text-decoration:none;
-    font-weight:500;
+.theme-btn:hover{
+    transform:translateY(-2px);
 }
 
-.top-link:hover{
-    text-decoration:underline;
+/* =========================
+   CONTAINER
+   ========================= */
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:24px;
+}
+
+/* =========================
+   HERO
+   ========================= */
+
+.hero{
+    margin-bottom:24px;
+}
+
+.hero h1{
+    font-size:clamp(2rem,4vw,3rem);
+    margin-bottom:10px;
+}
+
+.lead{
+    color:var(--muted);
+    line-height:1.6;
+}
+
+.hero-status{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+
+    margin-top:16px;
+
+    color:var(--muted);
+}
+
+/* =========================
+   GRID
+   ========================= */
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+/* =========================
+   CARDS
+   ========================= */
+
+.card{
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius);
+
+    padding:22px;
+
+    backdrop-filter:blur(14px);
+
+    box-shadow:var(--shadow);
+}
+
+.card h2{
+    margin-bottom:18px;
+}
+
+/* =========================
+   AUTOMATISCHE DATEN
+   ========================= */
+
+.data-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+
+    gap:14px;
+
+    padding:12px 0;
+
+    border-bottom:1px solid var(--border);
+}
+
+.data-item:last-child{
+    border-bottom:none;
+}
+
+.data-name{
+    font-weight:600;
+}
+
+.data-value{
+    color:var(--muted);
+    text-align:right;
+    word-break:break-word;
+    max-width:50%;
+}
+
+/* =========================
+   ERLAUBNIS EINTRÄGE
+   ========================= */
+
+.permission-item{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+
+    padding:14px 0;
+
+    border-bottom:1px solid var(--border);
+}
+
+.permission-item:last-child{
+    border-bottom:none;
+}
+
+.permission-info h3{
+    margin-bottom:4px;
+    font-size:1rem;
+}
+
+.permission-info p{
+    color:var(--muted);
+    font-size:.9rem;
+}
+
+.permission-action{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
+}
+
+.action-btn{
+    border:none;
+    cursor:pointer;
+
+    padding:10px 14px;
+
+    border-radius:12px;
+
+    background:var(--accent);
+    color:white;
+
+    font-weight:600;
+
+    transition:.2s;
+}
+
+.action-btn:hover{
+    transform:translateY(-2px);
+}
+
+.result{
+    max-width:250px;
+    text-align:right;
+
+    color:var(--muted);
+
+    font-size:.85rem;
+}
+
+/* =========================
+   INFO CARD
+   ========================= */
+
+.info-card{
+    margin-top:20px;
+}
+
+.info-card p{
+    color:var(--muted);
+    line-height:1.7;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.footer{
+    margin-top:20px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+    color:var(--muted);
+
+    padding-bottom:20px;
+}
+
+#countdown{
+    color:var(--accent);
+    font-weight:700;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width:900px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .permission-item{
+        flex-direction:column;
+    }
+
+    .permission-action{
+        align-items:flex-start;
+    }
+
+    .result{
+        text-align:left;
+        max-width:none;
+    }
+
+    .data-item{
+        flex-direction:column;
+    }
+
+    .data-value{
+        max-width:none;
+        text-align:left;
+    }
+}
+
+@media (max-width:600px){
+
+    .container{
+        padding:16px;
+    }
+
+    .navbar{
+        margin:12px;
+    }
+
+    .hero-status{
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .theme-btn{
+        padding:8px 12px;
+        font-size:.9rem;
+    }
 }
 </style>
 </head>
 <body>
+
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeineDaten</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+
 <body id="top">
-  <header class="topbar">
-    <div class="left">
-        <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/IMG_3056.jpeg" alt="Logo" class="logo">
-        <span class="site-name">Websitename</span>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <img
+            src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png"
+            alt="Logo"
+            class="logo"
+        >
+
+        <span class="brand">
+            DeineDaten
+        </span>
     </div>
 
-    <a href="#top" class="top-link">Nach oben</a>
-</header>
-  <div class="wrap">
-    <header>
-      <div>
+    <div class="nav-right">
+        <button id="themeToggle" class="theme-btn">
+            Dark Mode
+        </button>
+    </div>
+</nav>
+
+<div class="container">
+
+    <header class="hero">
         <h1>Welche Daten kann diese Website vom Handy bekommen?</h1>
-        <p class="lead">Die Liste aktualisiert sich automatisch alle 10 Sekunden. Bei Einträgen mit "Bestätigung erforderlich" kannst du die Erlaubnis testen.</p>
-      </div>
-      <div style="margin-left:auto;text-align:right">
-        <div class="small">Demo — lokal im Browser</div>
-        <div id="status" class="small">Status: <span id="onlineStatus">…</span></div>
-      </div>
+
+        <p class="lead">
+            Die Liste aktualisiert sich automatisch alle 10 Sekunden.
+            Bei Funktionen mit Berechtigung kannst du die Anfrage direkt testen.
+        </p>
+
+        <div class="hero-status">
+            <span>
+                Status:
+                <strong id="onlineStatus">...</strong>
+            </span>
+
+            <span>
+                Letzte Aktualisierung:
+                <strong id="lastUpdated">...</strong>
+            </span>
+        </div>
     </header>
 
     <div class="grid">
-      <div class="card" id="autoCard">
-        <h3>Automatisch verfügbare Daten (ohne zusätzliche Erlaubnis)</h3>
-        <div id="autoList">
-          <!-- Items werden hier per JS eingefügt -->
-        </div>
-      </div>
 
-      <div class="card" id="reqCard">
-        <h3>Daten, die Bestätigung / Erlaubnis benötigen</h3>
-        <div id="reqList">
-          <!-- Items werden hier per JS eingefügt -->
-        </div>
-      </div>
+        <!-- AUTOMATISCHE DATEN -->
+
+        <section class="card">
+            <h2>
+                Automatisch verfügbare Daten
+            </h2>
+
+            <div id="autoList">
+                <!-- JS -->
+            </div>
+        </section>
+
+        <!-- ERLAUBNIS DATEN -->
+
+        <section class="card">
+            <h2>
+                Daten mit Erlaubnis
+            </h2>
+
+            <div id="permissionList">
+
+                <div class="permission-item" data-type="geo">
+                    <div class="permission-info">
+                        <h3>GPS-Position (Geolocation)</h3>
+                        <p>Standort & Sensoren</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="geoBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="geoResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-item" data-type="motion">
+                    <div class="permission-info">
+                        <h3>Bewegungs-/Neigungssensoren</h3>
+                        <p>Standort & Sensoren</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="motionBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="motionResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-item" data-type="camera">
+                    <div class="permission-info">
+                        <h3>Kamera-Zugriff</h3>
+                        <p>Medien</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="cameraBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="cameraResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-item" data-type="microphone">
+                    <div class="permission-info">
+                        <h3>Mikrofon-Zugriff</h3>
+                        <p>Medien</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="microphoneBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="microphoneResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-item" data-type="both">
+                    <div class="permission-info">
+                        <h3>Kamera + Mikrofon</h3>
+                        <p>Medien</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="bothBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="bothResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-item" data-type="notifications">
+                    <div class="permission-info">
+                        <h3>Push-Benachrichtigungen</h3>
+                        <p>Kommunikation</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="notificationBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="notificationResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-item" data-type="contacts">
+                    <div class="permission-info">
+                        <h3>Kontakte</h3>
+                        <p>System / Experimente</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="contactsBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="contactsResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-item" data-type="clipboard">
+                    <div class="permission-info">
+                        <h3>Zwischenablage lesen</h3>
+                        <p>System / Experimente</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="clipboardBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="clipboardResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-item" data-type="files">
+                    <div class="permission-info">
+                        <h3>Dateien auswählen</h3>
+                        <p>System / Experimente</p>
+                    </div>
+
+                    <div class="permission-action">
+                        <button class="action-btn" id="fileBtn">
+                            Anfordern
+                        </button>
+
+                        <div class="result" id="fileResult">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
     </div>
 
-    <div class="card" style="margin-top:12px">
-      <h3>Hinweis</h3>
-      <p class="small">
-        Manche Browser (insbesondere iOS Safari) erlauben oder blockieren bestimmte APIs unterschiedlich. Werte können variieren. Diese Seite zeigt dir nur, was dein Browser aktuell preisgibt.
-      </p>
-    </div>
+    <section class="card info-card">
+        <h2>Hinweis</h2>
 
-    <footer>
-      <div class="timestamp">Letzte Aktualisierung: <span id="lastUpdated">—</span></div>
-      <div>Nächste Aktualisierung in <span id="countdown" class="countdown">10</span>s</div>
+        <p>
+            Manche Browser unterstützen nicht alle Funktionen.
+            Besonders iOS, Android, Chrome, Firefox und Safari
+            unterscheiden sich bei Berechtigungen und verfügbaren APIs.
+        </p>
+    </section>
+
+    <footer class="footer">
+
+        <div>
+            Nächste Aktualisierung in
+            <span id="countdown">10</span>s
+        </div>
+
+        <div>
+            © 2026 lamacHub
+        </div>
+
     </footer>
-  </div>
+
+</div>
+
+<!-- Versteckter Datei-Picker -->
+
+<input
+    type="file"
+    id="hiddenFileInput"
+    hidden
+    accept="image/*,video/*,audio/*,.pdf,.txt"
+/>
+
+<script src="script.js"></script>
+
+</body>
+</html>
 
 <script>
-/*
-  Deutschsprachiges Demo:
-  - Sammle viele Browser/Device-Eigenschaften (die typischerweise ohne Permission verfügbar sind).
-  - Zeige Permission-required APIs mit Knopf zum Anfordern.
-  - Aktualisiert sich alle 10s und zeigt Countdown.
-*/
+/* =========================
+   DEINEDATEN
+   JavaScript
+   ========================= */
 
-/* Hilfsfunktionen */
-const el = id => document.getElementById(id);
-const fmt = v => (v===undefined||v===null)?'—':String(v);
+const $ = id => document.getElementById(id);
 
-/* Liste: automatisch verfügbare (ohne explizite Berechtigung) */
-async function gatherAuto() {
-  const nav = navigator || {};
-  const screenInfo = window.screen || {};
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
-  // Battery API (manche Browser unterstützen navigator.getBattery)
-  let battery = null;
-  try {
-    if (navigator.getBattery) battery = await navigator.getBattery();
-  } catch(e){ battery = null; }
+/* =========================
+   DARKMODE
+   ========================= */
 
-  const canvasSupported = (function(){
-    try {
-      const c = document.createElement('canvas');
-      const ctx = c.getContext && c.getContext('2d');
-      return !!ctx;
-    } catch(e){ return false; }
-  })();
+(function initTheme(){
+    const saved = localStorage.getItem("theme");
 
-  return {
-    "IP-Adresse (nur serverseitig sichtbar)": "wird vom Server geloggt (nicht direkt per JS)",
-    "User-Agent": nav.userAgent,
-    "Platform (z.B. 'iPhone' / 'Linux arm')": nav.platform,
-    "Browser-Sprache(n)": (nav.languages || [nav.language || navigator.userLanguage || navigator.browserLanguage]).join(", "),
-    "Cookies aktiviert": nav.cookieEnabled,
-    "Online / Offline": navigator.onLine,
-    "Bildschirmgröße (px)": `${screenInfo.width || '—'} × ${screenInfo.height || '—'}`,
-    "Farbe/Tiefe (colorDepth)": screenInfo.colorDepth,
-    "Geräte-Touch-Support (touchPoints)": nav.maxTouchPoints ?? '—',
-    "Viewport-Größe (CSS px)": `${Math.max(document.documentElement.clientWidth, window.innerWidth || 0)} × ${Math.max(document.documentElement.clientHeight, window.innerHeight || 0)}`,
-    "TimeZone": (Intl && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : '—',
-    "Bildschirmorientierung": (screen.orientation && screen.orientation.type) ? screen.orientation.type : (screen.orientation || {}).angle ?? '—',
-    "Device-Merkmale (hardwareConcurrency - CPU threads)": nav.hardwareConcurrency ?? '—',
-    "Device-Memory (GB, falls verfügbar)": nav.deviceMemory ?? '—',
-    "Network Info (effectiveType, downlink, rtt)": `${conn.effectiveType || '—'} / downlink:${conn.downlink || '—'} / rtt:${conn.rtt || '—'}`,
-    "Do-Not-Track": nav.doNotTrack || nav.msDoNotTrack || '—',
-    "Navigator.vendor": nav.vendor || '—',
-    "Browser-Plugins (begrenzte Infos)": (() => {
-      try { return (navigator.plugins && navigator.plugins.length) ? `${navigator.plugins.length} plugins` : 'keine / nicht verfügbar'; } catch(e){ return '—'; }
-    })(),
-    "Canvas verfügbar (kann für Fingerprinting genutzt werden)": canvasSupported,
-    "WebGL verfügbar": (function(){ try { const c=document.createElement('canvas'); return !!(c.getContext('webgl')||c.getContext('experimental-webgl')); } catch(e){ return false; } })(),
-    "LocalStorage verfügbar": (function(){ try { return !!window.localStorage; } catch(e){ return false; } })(),
-    "SessionStorage verfügbar": (function(){ try { return !!window.sessionStorage; } catch(e){ return false; } })(),
-    "IndexedDB verfügbar": (function(){ try { return !!window.indexedDB; } catch(e){ return false; } })(),
-    "Cookies (JS lesbar) / document.cookie": (function(){ try { return document.cookie ? document.cookie : '(keine oder leer)'; } catch(e){ return 'nicht lesbar'; } })(),
-    "Akku (level,charging) — wenn verfügbar": battery ? `Level:${Math.round(battery.level*100)}% / charging:${battery.charging}` : 'nicht verfügbar',
-    "Screen Pixel Ratio (devicePixelRatio)": window.devicePixelRatio || 1,
-    "Installed Fonts (nicht direkt, aber durch Messungen möglich)": "nicht direkt lesbar — aber oft durch Mess-Tricks erschließbar",
-    "Referrer / vorherige URL": document.referrer || '(keine)',
-    "Viewport/Browser Fenstergröße (innerWidth/innerHeight)": `${window.innerWidth} × ${window.innerHeight}`,
-    "Cookie/Storage-Einträge (localStorage-keys) — nur wenn gesetzt": (function(){ try { return Object.keys(localStorage || {}).slice(0,10).join(", ") || '(keine)'; } catch(e){ return 'nicht lesbar'; } })()
-  };
-}
-
-/* Liste: permission-required */
-function permissionItems() {
-  return [
-    { key: "Geolocation (GPS)", api: "geolocation", desc: "exakte Position (GPS) - erfordert Zustimmung", action: requestGeolocation },
-    { key: "Kamera (Video/Foto)", api: "camera", desc: "Zugriff auf Kamera - erfordert Zustimmung", action: () => requestMedia({ video: true }) },
-    { key: "Mikrofon (Audio)", api: "microphone", desc: "Zugriff auf Mikrofon - erfordert Zustimmung", action: () => requestMedia({ audio: true }) },
-    { key: "Kamera + Mikrofon (Video + Audio)", api: "camera+microphone", desc: "beides zusammen", action: () => requestMedia({ video:true, audio:true }) },
-    { key: "Push-Benachrichtigungen", api: "notifications", desc: "Benachrichtigungen senden - erfordert Zustimmung", action: requestNotification },
-    { key: "DeviceOrientation / Motion (Sensoren)", api: "motion", desc: "Neigungs-/Bewegungsdaten — oft Berechtigung auf iOS", action: requestMotion },
-    { key: "Kontaktliste (nicht über Standard-Browser erreichbar)", api: "contacts", desc: "Browser bieten das normalerweise nicht an (außer Web Contacts API experimentell)", action: requestContacts },
-    { key: "Datei-Upload (Fotos/Dateien) — nur wenn du auswählst", api: "file", desc: "Dateien bekommst du nur, wenn du sie explizit auswählst", action: triggerFilePicker },
-    { key: "Clipboard (Einfügen/Lesen)", api: "clipboard-read", desc: "Clipboard lesen erfordert Zustimmung", action: requestClipboardRead }
-  ];
-}
-
-/* Request functions */
-function requestGeolocation(itemEl){
-  const out = itemEl.querySelector('.value');
-  if (!navigator.geolocation){ out.textContent = 'Nicht unterstützt'; return; }
-  out.textContent = 'Anfrage läuft…';
-  navigator.geolocation.getCurrentPosition(
-    p => {
-      out.textContent = `Lat:${p.coords.latitude.toFixed(6)}, Lon:${p.coords.longitude.toFixed(6)}, Genauigkeit:${p.coords.accuracy}m`;
-    },
-    err => {
-      out.textContent = `Fehler / abgelehnt: ${err.message || err.code}`;
-    },
-    {timeout:10000,maximumAge:60000}
-  );
-}
-
-async function requestMedia(constraints){
-  const id = constraints.video ? 'video' : (constraints.audio ? 'audio' : 'media');
-  // find corresponding elem
-  const list = document.querySelectorAll('#reqList .item');
-  let out=null;
-  list.forEach(it => { if(it.dataset.key=== (constraints.video && constraints.audio ? 'Kamera + Mikrofon (Video + Audio)' : (constraints.video ? 'Kamera (Video/Foto)' : 'Mikrofon (Audio)'))) out=it.querySelector('.value'); });
-  if(!out) out = document.querySelector('#reqList .value');
-  out.textContent = 'Anfrage läuft…';
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    // sofort wieder stoppen
-    stream.getTracks().forEach(t=>t.stop());
-    out.textContent = 'Zugriff erlaubt (Stream erhalten) — Tracks: ' + stream.getTracks().length;
-  } catch(e){
-    out.textContent = 'Zugriff verweigert / Fehler: ' + (e.message || e.name);
-  }
-}
-
-async function requestNotification(itemEl){
-  const out = itemEl ? itemEl.querySelector('.value') : null;
-  if (!("Notification" in window)){ if(out) out.textContent='Nicht unterstützt'; return; }
-  try {
-    const perm = await Notification.requestPermission();
-    if(out) out.textContent = 'Permission: ' + perm;
-  } catch(e){
-    if(out) out.textContent = 'Fehler: '+(e.message||e);
-  }
-}
-
-async function requestMotion(itemEl){
-  const out = itemEl.querySelector('.value');
-  // iOS requires secure context and permission via DeviceMotionEvent.requestPermission
-  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-    try {
-      const res = await DeviceMotionEvent.requestPermission();
-      out.textContent = 'Permission: ' + res;
-    } catch(e){ out.textContent = 'Fehler / abgelehnt'; }
-  } else {
-    out.textContent = 'DeviceMotion nicht via requestPermission (oder nicht notwendig).';
-  }
-}
-
-async function requestContacts(itemEl){
-  const out = itemEl.querySelector('.value');
-  // Experimental: navigator.contacts.select()
-  if (navigator.contacts && navigator.contacts.select){
-    try {
-      const props = ['name','email','tel'];
-      const contacts = await navigator.contacts.select(props, {multiple:false});
-      out.textContent = JSON.stringify(contacts.slice(0,3));
-    } catch(e){
-      out.textContent = 'Fehler / abgelehnt';
+    if(saved === "dark"){
+        document.documentElement.setAttribute("data-theme","dark");
+        $("themeToggle").textContent = "Light Mode";
     }
-  } else {
-    out.textContent = 'Contacts API nicht unterstützt (experimentell).';
-  }
+})();
+
+$("themeToggle").addEventListener("click", () => {
+
+    const root = document.documentElement;
+    const dark = root.getAttribute("data-theme") === "dark";
+
+    if(dark){
+        root.setAttribute("data-theme","light");
+        localStorage.setItem("theme","light");
+        $("themeToggle").textContent = "Dark Mode";
+    }else{
+        root.setAttribute("data-theme","dark");
+        localStorage.setItem("theme","dark");
+        $("themeToggle").textContent = "Light Mode";
+    }
+
+});
+
+/* =========================
+   AUTOMATISCHE DATEN
+   ========================= */
+
+async function gatherAutomaticData(){
+
+    const nav = navigator;
+    const screenInfo = screen;
+
+    const connection =
+        nav.connection ||
+        nav.mozConnection ||
+        nav.webkitConnection ||
+        {};
+
+    let batteryInfo = "Nicht verfügbar";
+
+    try{
+        if(nav.getBattery){
+            const battery = await nav.getBattery();
+
+            batteryInfo =
+                Math.round(battery.level * 100) +
+                "% | lädt: " +
+                battery.charging;
+        }
+    }catch(e){}
+
+    return {
+
+        "User-Agent":
+            nav.userAgent,
+
+        "Betriebssystem / Plattform":
+            nav.platform,
+
+        "Browser-Sprache(n)":
+            (nav.languages || []).join(", ") || nav.language,
+
+        "CPU-Kerne":
+            nav.hardwareConcurrency || "—",
+
+        "RAM-Schätzung (GB)":
+            nav.deviceMemory || "Nicht verfügbar",
+
+        "Vendor":
+            nav.vendor || "—",
+
+        "Bildschirmauflösung":
+            screenInfo.width + " × " + screenInfo.height,
+
+        "Viewport":
+            window.innerWidth + " × " + window.innerHeight,
+
+        "Pixel-Dichte":
+            window.devicePixelRatio,
+
+        "Farbtiefe":
+            screenInfo.colorDepth,
+
+        "Orientierung":
+            screen.orientation?.type || "Nicht verfügbar",
+
+        "Online Status":
+            navigator.onLine ? "Online" : "Offline",
+
+        "Netzwerktyp":
+            connection.effectiveType || "Nicht verfügbar",
+
+        "Geschwindigkeit":
+            connection.downlink
+                ? `${connection.downlink} Mbit/s | RTT ${connection.rtt}ms`
+                : "Nicht verfügbar",
+
+        "LocalStorage":
+            !!window.localStorage,
+
+        "LocalStorage Keys":
+            Object.keys(localStorage).join(", ") || "(keine)",
+
+        "SessionStorage":
+            !!window.sessionStorage,
+
+        "IndexedDB":
+            !!window.indexedDB,
+
+        "Cookies aktiviert":
+            navigator.cookieEnabled,
+
+        "document.cookie":
+            document.cookie || "(leer)",
+
+        "Touch-Support":
+            navigator.maxTouchPoints || 0,
+
+        "Canvas":
+            (() => {
+                try{
+                    const c = document.createElement("canvas");
+                    return !!c.getContext("2d");
+                }catch{
+                    return false;
+                }
+            })(),
+
+        "WebGL":
+            (() => {
+                try{
+                    const c = document.createElement("canvas");
+                    return !!(
+                        c.getContext("webgl") ||
+                        c.getContext("experimental-webgl")
+                    );
+                }catch{
+                    return false;
+                }
+            })(),
+
+        "Plugins":
+            navigator.plugins?.length || 0,
+
+        "Battery":
+            batteryInfo,
+
+        "Zeitzone":
+            Intl.DateTimeFormat()
+                .resolvedOptions()
+                .timeZone,
+
+        "Referrer":
+            document.referrer || "(keiner)",
+
+        "Do Not Track":
+            navigator.doNotTrack || "—",
+
+        "IP-Adresse":
+            "Nur serverseitig sichtbar",
+
+        "Fonts":
+            "Nur indirekt ermittelbar"
+    };
 }
 
-function triggerFilePicker(itemEl){
-  const out = itemEl.querySelector('.value');
-  const input = document.createElement('input');
-  input.type='file';
-  input.multiple=false;
-  input.accept='image/*,application/pdf';
-  input.onchange = () => {
-    if (input.files && input.files.length) {
-      const f = input.files[0];
-      out.textContent = `Gewählte Datei: ${f.name} (${Math.round(f.size/1024)}KB)`;
-    } else out.textContent = '(keine Datei gewählt)';
-  };
-  input.click();
-}
+async function renderAutomaticData(){
 
-async function requestClipboardRead(itemEl){
-  const out = itemEl.querySelector('.value');
-  if (!navigator.clipboard || !navigator.clipboard.readText) {
-    out.textContent = 'Clipboard API nicht unterstützt';
-    return;
-  }
-  try {
-    const text = await navigator.clipboard.readText();
-    out.textContent = `Clipboard-Inhalt: "${text.slice(0,200)}"`;
-  } catch(e){
-    out.textContent = 'Zugriff verweigert oder Fehler';
-  }
-}
+    const data = await gatherAutomaticData();
 
-/* Render functions */
-async function renderAll() {
-  // Online status
-  el('onlineStatus').textContent = navigator.onLine ? 'online' : 'offline';
+    const list = $("autoList");
 
-  // Auto list
-  const autoData = await gatherAuto();
-  const autoList = el('autoList');
-  autoList.innerHTML = '';
-  for (const [k,v] of Object.entries(autoData)) {
-    const item = document.createElement('div');
-    item.className='item';
-    item.innerHTML = `
-      <div class="left">
-        <div class="key">${k}</div>
-        <div class="value" title="${String(v).replace(/"/g,'&quot;')}">${fmt(v)}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end">
-        <div class="badge auto">Automatisch</div>
-      </div>
-    `;
-    autoList.appendChild(item);
-  }
+    list.innerHTML = "";
 
-  // Permission required list
-  const reqList = el('reqList');
-  reqList.innerHTML = '';
-  permissionItems().forEach(p => {
-    const item = document.createElement('div');
-    item.className='item';
-    item.dataset.key = p.key;
-    item.innerHTML = `
-      <div class="left">
-        <div style="min-width:220px">
-          <div class="key">${p.key}</div>
-          <div class="small" style="color:var(--muted);margin-top:6px">${p.desc}</div>
-        </div>
-        <div class="value" style="margin-left:8px;width:1fr">—</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-        <div class="badge req">Bestätigung erforderlich</div>
-        <div><button class="primary btnReq">Anfordern</button></div>
-      </div>
-    `;
-    // Button handler
-    item.querySelector('.btnReq').addEventListener('click', ()=> {
-      // call p.action with item element if it expects it
-      try {
-        const res = p.action(item);
-        if (res && res.then) res.then?.catch(()=>{});
-      } catch(e){ console.error(e); }
+    Object.entries(data).forEach(([key,value]) => {
+
+        const row = document.createElement("div");
+        row.className = "data-item";
+
+        row.innerHTML = `
+            <div class="data-name">${key}</div>
+            <div class="data-value">${value}</div>
+        `;
+
+        list.appendChild(row);
     });
-    reqList.appendChild(item);
-  });
 
-  // Last updated
-  const now = new Date();
-  el('lastUpdated').textContent = now.toLocaleString();
+    $("onlineStatus").textContent =
+        navigator.onLine ? "Online" : "Offline";
+
+    $("lastUpdated").textContent =
+        new Date().toLocaleString();
 }
 
-/* Countdown & auto refresh every 10 seconds */
-let seconds = 10;
-let timer = null;
-function startTimer() {
-  if (timer) clearInterval(timer);
-  seconds = 10;
-  el('countdown').textContent = seconds;
-  timer = setInterval(()=>{
-    seconds--;
-    if (seconds<=0){
-      renderAll();
-      seconds = 10;
+/* =========================
+   GPS
+   ========================= */
+
+$("geoBtn").addEventListener("click", () => {
+
+    const out = $("geoResult");
+
+    if(!navigator.geolocation){
+        out.textContent = "Nicht unterstützt";
+        return;
     }
-    el('countdown').textContent = seconds;
-  },1000);
+
+    out.textContent = "Anfrage läuft...";
+
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+
+            out.textContent =
+                `Lat ${pos.coords.latitude.toFixed(5)}, ` +
+                `Lon ${pos.coords.longitude.toFixed(5)}`;
+
+        },
+        err => {
+            out.textContent = err.message;
+        }
+    );
+
+});
+
+/* =========================
+   SENSOR
+   ========================= */
+
+$("motionBtn").addEventListener("click", async () => {
+
+    const out = $("motionResult");
+
+    try{
+
+        if(
+            typeof DeviceMotionEvent !== "undefined" &&
+            typeof DeviceMotionEvent.requestPermission === "function"
+        ){
+
+            const result =
+                await DeviceMotionEvent.requestPermission();
+
+            out.textContent = result;
+
+        }else{
+
+            out.textContent =
+                "Sensor verfügbar oder keine Anfrage nötig";
+
+        }
+
+    }catch{
+
+        out.textContent = "Abgelehnt";
+    }
+
+});
+
+/* =========================
+   KAMERA
+   ========================= */
+
+async function requestMedia(constraints,resultId){
+
+    const out = $(resultId);
+
+    try{
+
+        const stream =
+            await navigator.mediaDevices.getUserMedia(constraints);
+
+        stream.getTracks().forEach(t => t.stop());
+
+        out.textContent = "Zugriff erlaubt";
+
+    }catch(e){
+
+        out.textContent =
+            e.message || "Abgelehnt";
+    }
 }
 
-/* Init */
-renderAll();
-startTimer();
+$("cameraBtn").addEventListener("click", () => {
+    requestMedia(
+        {video:true},
+        "cameraResult"
+    );
+});
 
-/* Optional: re-render when online status changes */
-window.addEventListener('online', renderAll);
-window.addEventListener('offline', renderAll);
+$("microphoneBtn").addEventListener("click", () => {
+    requestMedia(
+        {audio:true},
+        "microphoneResult"
+    );
+});
 
-// For neatness: update battery on change if supported
-if (navigator.getBattery) {
-  navigator.getBattery().then(b => {
-    b.addEventListener('chargingchange', renderAll);
-    b.addEventListener('levelchange', renderAll);
-  }).catch(()=>{});
-}
+$("bothBtn").addEventListener("click", () => {
+    requestMedia(
+        {
+            video:true,
+            audio:true
+        },
+        "bothResult"
+    );
+});
+
+/* =========================
+   NOTIFICATIONS
+   ========================= */
+
+$("notificationBtn").addEventListener("click", async () => {
+
+    const out = $("notificationResult");
+
+    if(!("Notification" in window)){
+        out.textContent = "Nicht unterstützt";
+        return;
+    }
+
+    const result =
+        await Notification.requestPermission();
+
+    out.textContent = result;
+});
+
+/* =========================
+   CLIPBOARD
+   ========================= */
+
+$("clipboardBtn").addEventListener("click", async () => {
+
+    const out = $("clipboardResult");
+
+    try{
+
+        const text =
+            await navigator.clipboard.readText();
+
+        out.textContent =
+            text.substring(0,150) || "(leer)";
+
+    }catch{
+
+        out.textContent =
+            "Zugriff verweigert";
+    }
+
+});
+
+/* =========================
+   DATEIPICKER
+   ========================= */
+
+$("fileBtn").addEventListener("click", () => {
+
+    $("hiddenFileInput").click();
+
+});
+
+$("hiddenFileInput").addEventListener("change", e => {
+
+    const out = $("fileResult");
+
+    const file = e.target.files[0];
+
+    if(!file){
+        out.textContent = "Keine Datei";
+        return;
+    }
+
+    out.textContent =
+        `${file.name} (${Math.round(file.size/1024)} KB`;
+
+});
+
+/* =========================
+   KONTAKTE
+   ========================= */
+
+$("contactsBtn").addEventListener("click", async () => {
+
+    const out = $("contactsResult");
+
+    try{
+
+        if(
+            navigator.contacts &&
+            navigator.contacts.select
+        ){
+
+            const contacts =
+                await navigator.contacts.select(
+                    ["name","email","tel"],
+                    {multiple:false}
+                );
+
+            out.textContent =
+                JSON.stringify(contacts);
+
+        }else{
+
+            out.textContent =
+                "API nicht unterstützt";
+        }
+
+    }catch{
+
+        out.textContent =
+            "Abgelehnt";
+    }
+
+});
+
+/* =========================
+   TIMER
+   ========================= */
+
+let seconds = 10;
+
+setInterval(() => {
+
+    seconds--;
+
+    if(seconds <= 0){
+
+        renderAutomaticData();
+        seconds = 10;
+    }
+
+    $("countdown").textContent = seconds;
+
+},1000);
+
+/* =========================
+   EVENTS
+   ========================= */
+
+window.addEventListener(
+    "online",
+    renderAutomaticData
+);
+
+window.addEventListener(
+    "offline",
+    renderAutomaticData
+);
+
+/* =========================
+   START
+   ========================= */
+
+renderAutomaticData();
 </script>
+
 </body>
 </html>
