@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCR to PDF</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Tesseract + jsPDF -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Inter, sans-serif;
+    background:#f5f5f5;
+    color:#111;
+}
+
+.navbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px 40px;
+    background:white;
+    border-bottom:1px solid #eee;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-weight:700;
+    color:#ff7a00;
+    font-size:18px;
+}
+
+.container{
+    max-width:900px;
+    margin:60px auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:16px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.05);
+}
+
+h1{
+    color:#ff7a00;
+    margin-bottom:10px;
+}
+
+input[type="file"]{
+    padding:12px;
+    border:2px dashed #ddd;
+    border-radius:12px;
+    width:100%;
+    cursor:pointer;
+}
+
+button{
+    margin-top:20px;
+    padding:12px 18px;
+    border:none;
+    border-radius:12px;
+    background:#ff7a00;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+#status{
+    margin-top:15px;
+    font-size:14px;
+    color:#555;
+}
+
+pre{
+    margin-top:20px;
+    background:#fafafa;
+    padding:15px;
+    border-radius:12px;
+    white-space:pre-wrap;
+    max-height:300px;
+    overflow:auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="logo">🟠 lamacOCR</div>
+    <div>© 2026 lamacHub</div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h1>Bild → Text → PDF</h1>
+        <p>Lade ein Bild hoch, erkenne den Text und exportiere ihn als PDF.</p>
+
+        <input type="file" id="imageInput" accept="image/*">
+
+        <button onclick="startOCR()">Text erkennen</button>
+        <button onclick="downloadPDF()">PDF herunterladen</button>
+
+        <div id="status"></div>
+        <pre id="output"></pre>
+    </div>
+</div>
+
+<script>
+let extractedText = "";
+
+async function startOCR(){
+    const file = document.getElementById("imageInput").files[0];
+    if(!file){
+        alert("Bitte erst ein Bild auswählen");
+        return;
+    }
+
+    document.getElementById("status").innerText = "Erkenne Text... ⏳";
+
+    const reader = new FileReader();
+    reader.onload = async function(){
+        const img = reader.result;
+
+        const result = await Tesseract.recognize(
+            img,
+            "deu+eng",
+            {
+                logger: m => {
+                    if(m.status){
+                        document.getElementById("status").innerText =
+                        m.status + " " + Math.round(m.progress*100) + "%";
+                    }
+                }
+            }
+        );
+
+        extractedText = result.data.text;
+        document.getElementById("output").innerText = extractedText;
+
+        document.getElementById("status").innerText = "Fertig ✅";
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function downloadPDF(){
+    if(!extractedText){
+        alert("Kein Text vorhanden");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const lines = doc.splitTextToSize(extractedText, 180);
+    doc.text(lines, 10, 10);
+
+    doc.save("ocr-text.pdf");
+}
+</script>
+
+</body>
+</html>
