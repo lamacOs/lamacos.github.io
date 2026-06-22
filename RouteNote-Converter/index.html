@@ -3,44 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RouteNote Converter</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+<title>RouteNote Converter - Design1</title>
 
-<h1>RouteNote Converter</h1>
-
-<!-- START SCREEN -->
-<div id="startScreen" class="screen active">
-    <h2>Was möchtest du konvertieren?</h2>
-    <button class="primary" onclick="showScreen('coverScreen')">Bild</button>
-    <button class="secondary" onclick="showScreen('audioScreen')">Audio</button>
-</div>
-
-<!-- COVER SCREEN -->
-<div id="coverScreen" class="screen">
-    <button class="back" onclick="showScreen('startScreen')">⬅ Zurück</button>
-    <h2>Cover Converter</h2>
-
-    <input type="file" id="coverUpload" accept="image/*"><br>
-    <button id="coverConvert" class="primary" disabled>Convert</button>
-    <button id="coverDownload" class="secondary" disabled>Download JPG</button>
-
-    <canvas id="coverCanvas" width="3000" height="3000"></canvas>
-</div>
-
-<!-- AUDIO SCREEN -->
-<div id="audioScreen" class="screen">
-    <button class="back" onclick="showScreen('startScreen')">⬅ Zurück</button>
-    <h2>MP3 Converter</h2>
-    <p>MP3 • 44.1 kHz • Stereo • 320 kbps</p>
-
-    <input type="file" id="audioUpload" accept=".wav,.mp3,.m4a,.aac,.flac"><br>
-    <button id="audioConvert" class="primary" disabled>Convert</button>
-    <button id="audioDownload" class="secondary" disabled>Download MP3</button>
-</div>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.0/lame.min.js"></script>
-<script src="script.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Inter, sans-serif;
+    background:#f5f5f5;
+    color:#111;
+}
+
+/* NAVBAR */
+.navbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 40px;
+    background:white;
+    border-bottom:1px solid #eee;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+    color:#ff7a00;
+}
+
+.logo img{
+    width:34px;
+    height:34px;
+    border-radius:8px;
+}
+
+/* LAYOUT */
+.container{
+    max-width:900px;
+    margin:50px auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:16px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.05);
+}
+
+h1,h2{
+    color:#ff7a00;
+}
+
+/* BUTTONS */
+button{
+    padding:12px 18px;
+    margin:8px;
+    border:none;
+    border-radius:12px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.primary{
+    background:#ff7a00;
+    color:white;
+}
+
+.secondary{
+    background:#111;
+    color:white;
+}
+
+.back{
+    background:#ddd;
+    color:#111;
+}
+
+button:hover{
+    transform:scale(1.03);
+}
+
+/* SCREENS */
+.screen{
+    display:none;
+}
+
+.active{
+    display:block;
+}
+
+input{
+    margin-top:10px;
+    padding:12px;
+    border:2px dashed #ddd;
+    border-radius:12px;
+    width:100%;
+    background:#fafafa;
+}
+
+canvas{
+    margin-top:20px;
+    border-radius:12px;
+    max-width:100%;
+    border:1px solid #eee;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="logo">
+        <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png">
+        RouteNote Converter
+    </div>
+    <div>© 2026 lamacHub</div>
+</div>
+
+<div class="container">
+
+<!-- START -->
+<div id="startScreen" class="screen active">
+    <div class="card">
+        <h1>Was möchtest du konvertieren?</h1>
+        <button class="primary" onclick="showScreen('coverScreen')">Bild</button>
+        <button class="secondary" onclick="showScreen('audioScreen')">Audio</button>
+    </div>
+</div>
+
+<!-- COVER -->
+<div id="coverScreen" class="screen">
+    <div class="card">
+        <button class="back" onclick="showScreen('startScreen')">⬅ Zurück</button>
+        <h2>Cover Converter</h2>
+
+        <input type="file" id="coverUpload" accept="image/*">
+        <br>
+
+        <button id="coverConvert" class="primary" disabled>Convert</button>
+        <button id="coverDownload" class="secondary" disabled>Download JPG</button>
+
+        <canvas id="coverCanvas" width="3000" height="3000"></canvas>
+    </div>
+</div>
+
+<!-- AUDIO -->
+<div id="audioScreen" class="screen">
+    <div class="card">
+        <button class="back" onclick="showScreen('startScreen')">⬅ Zurück</button>
+        <h2>MP3 Converter</h2>
+        <p>MP3 • 44.1 kHz • Stereo • 320 kbps</p>
+
+        <input type="file" id="audioUpload" accept=".wav,.mp3,.m4a,.aac,.flac">
+
+        <button id="audioConvert" class="primary" disabled>Convert</button>
+        <button id="audioDownload" class="secondary" disabled>Download MP3</button>
+    </div>
+</div>
+
+</div>
+
+<script>
+function showScreen(id){
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+/* COVER */
+const coverUpload = document.getElementById("coverUpload");
+const coverConvertBtn = document.getElementById("coverConvert");
+const coverDownloadBtn = document.getElementById("coverDownload");
+const coverCanvas = document.getElementById("coverCanvas");
+const coverCtx = coverCanvas.getContext("2d");
+
+let coverImage = null;
+
+coverUpload.addEventListener("change", e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = ()=>{
+        coverImage = new Image();
+        coverImage.onload = ()=> coverConvertBtn.disabled = false;
+        coverImage.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+coverConvertBtn.onclick = ()=>{
+    const size = Math.min(coverImage.width, coverImage.height);
+    const sx = (coverImage.width - size)/2;
+    const sy = (coverImage.height - size)/2;
+
+    coverCtx.clearRect(0,0,3000,3000);
+    coverCtx.drawImage(coverImage, sx, sy, size, size, 0,0,3000,3000);
+
+    coverDownloadBtn.disabled = false;
+};
+
+coverDownloadBtn.onclick = ()=>{
+    const a = document.createElement("a");
+    a.download = "cover.jpg";
+    a.href = coverCanvas.toDataURL("image/jpeg",0.95);
+    a.click();
+};
+
+/* AUDIO */
+const audioUpload = document.getElementById("audioUpload");
+const audioConvertBtn = document.getElementById("audioConvert");
+const audioDownloadBtn = document.getElementById("audioDownload");
+
+let audioBuffer;
+let mp3Blob;
+
+audioUpload.addEventListener("change", async e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const ctx = new AudioContext({sampleRate:44100});
+    audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+    audioConvertBtn.disabled = false;
+});
+
+audioConvertBtn.onclick = ()=>{
+    const left = audioBuffer.getChannelData(0);
+    const right = audioBuffer.numberOfChannels>1 ? audioBuffer.getChannelData(1) : left;
+
+    const enc = new lamejs.Mp3Encoder(2,44100,320);
+    const block = 1152;
+    const data = [];
+
+    for(let i=0;i<left.length;i+=block){
+        const l = floatTo16(left.subarray(i,i+block));
+        const r = floatTo16(right.subarray(i,i+block));
+        const buf = enc.encodeBuffer(l,r);
+        if(buf.length>0) data.push(buf);
+    }
+
+    const end = enc.flush();
+    if(end.length>0) data.push(end);
+
+    mp3Blob = new Blob(data,{type:"audio/mp3"});
+    audioDownloadBtn.disabled = false;
+};
+
+audioDownloadBtn.onclick = ()=>{
+    const url = URL.createObjectURL(mp3Blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "audio.mp3";
+    a.click();
+};
+
+function floatTo16(input){
+    const out = new Int16Array(input.length);
+    for(let i=0;i<input.length;i++){
+        out[i] = Math.max(-1,Math.min(1,input[i]))*0x7FFF;
+    }
+    return out;
+}
+</script>
+
 </body>
 </html>
