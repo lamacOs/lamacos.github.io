@@ -8,21 +8,23 @@
 
 <style>
 :root{
-    --bg:#f5f7fb;
-    --card:rgba(255,255,255,.7);
-    --text:#1a1a1a;
-    --accent:#4f7cff;
-    --shadow:0 15px 40px rgba(0,0,0,.12);
-    --border:rgba(255,255,255,.6);
+    --bg:#ffffff;
+    --card:#ffffff;
+    --text:#111111;
+    --secondary-text:#666666;
+    --accent:#ff7a00;
+    --shadow:0 8px 24px rgba(0,0,0,0.08);
+    --border:#eaeaea;
 }
 
 body.dark{
-    --bg:#0f1117;
-    --card:rgba(24,27,36,.7);
-    --text:#f3f4f6;
-    --accent:#6da8ff;
-    --shadow:0 15px 40px rgba(0,0,0,.45);
-    --border:rgba(255,255,255,.08);
+    --bg:#0f1115;
+    --card:#171a21;
+    --text:#ffffff;
+    --secondary-text:#bdbdbd;
+    --accent:#ff7a00;
+    --shadow:0 8px 24px rgba(0,0,0,0.3);
+    --border:#2b2f38;
 }
 
 *{
@@ -33,59 +35,74 @@ body.dark{
 }
 
 body{
-    font-family:
-        Inter,
-        Segoe UI,
-        sans-serif;
+    font-family: Inter, sans-serif;
     background:var(--bg);
     color:var(--text);
-    transition:.4s;
+    transition:.3s;
     overflow-x:hidden;
 }
 
-body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    background:
-        radial-gradient(circle at top left,#6da8ff33,transparent 30%),
-        radial-gradient(circle at bottom right,#7d4fff33,transparent 30%);
-    pointer-events:none;
+/* Navbar */
+nav{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:rgba(255,255,255,0.7);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+    padding:20px 40px;
 }
 
-header{
-    padding:40px 20px;
+body.dark nav{
+    background:rgba(15,17,21,0.7);
 }
 
-.hero{
+.navbar-container{
     max-width:1200px;
-    margin:auto;
-    background:var(--card);
-    backdrop-filter:blur(20px);
-    border:1px solid var(--border);
-    border-radius:32px;
-    padding:40px;
-    box-shadow:var(--shadow);
+    margin:0 auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-h1{
-    font-size:clamp(2rem,5vw,4rem);
-    margin-bottom:20px;
+.navbar-logo{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    text-decoration:none;
+}
+
+.navbar-logo-img{
+    height:40px;
+    width:auto;
+}
+
+.navbar-logo-text{
+    font-size:1.2rem;
+    color:var(--text);
+    font-weight:700;
+}
+
+.navbar-menu{
+    display:flex;
+    align-items:center;
+    gap:20px;
 }
 
 .theme-toggle{
-    width:70px;
-    height:70px;
+    width:50px;
+    height:50px;
     border:none;
     cursor:pointer;
     border-radius:50%;
     overflow:hidden;
     transition:.3s;
-    box-shadow:var(--shadow);
+    background:var(--card);
+    border:1px solid var(--border);
 }
 
 .theme-toggle:hover{
-    transform:scale(1.08);
+    transform:scale(1.1);
 }
 
 .theme-toggle img{
@@ -94,266 +111,383 @@ h1{
     object-fit:cover;
 }
 
+/* Header/Hero */
+header{
+    padding:80px 40px;
+}
+
+.hero{
+    max-width:1200px;
+    margin:0 auto;
+    text-align:center;
+}
+
+h1{
+    font-size:clamp(2.8rem, 5vw, 5rem);
+    font-weight:800;
+    color:var(--accent);
+    margin-bottom:20px;
+}
+
+.hero-description{
+    font-size:1.1rem;
+    color:var(--secondary-text);
+    margin-bottom:50px;
+    max-width:600px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
 .toc{
-    margin-top:30px;
+    margin-top:40px;
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:12px;
+    gap:16px;
+    max-width:1200px;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 .toc a{
     text-decoration:none;
     color:var(--text);
     background:var(--card);
-    padding:14px;
-    border-radius:14px;
+    padding:16px 20px;
+    border-radius:12px;
     border:1px solid var(--border);
-    transition:.25s;
+    transition:.3s;
+    font-weight:500;
 }
 
 .toc a:hover{
-    transform:translateY(-3px);
+    transform:translateY(-4px);
     background:var(--accent);
     color:white;
+    border-color:var(--accent);
 }
 
+/* Main Content */
 main{
     max-width:1200px;
-    margin:auto;
-    padding:20px;
+    margin:0 auto;
+    padding:40px 20px;
 }
 
 .article{
     background:var(--card);
-    backdrop-filter:blur(20px);
     border:1px solid var(--border);
-    border-radius:28px;
+    border-radius:16px;
     overflow:hidden;
-    margin-bottom:40px;
+    margin-bottom:60px;
     box-shadow:var(--shadow);
-
     opacity:0;
-    transform:translateY(40px);
-    animation:show .8s forwards;
+    animation:slideUp 0.6s ease forwards;
 }
 
-@keyframes show{
+@keyframes slideUp{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
     to{
         opacity:1;
         transform:translateY(0);
     }
 }
 
+.article:nth-child(1){ animation-delay:0.1s; }
+.article:nth-child(2){ animation-delay:0.2s; }
+.article:nth-child(3){ animation-delay:0.3s; }
+.article:nth-child(4){ animation-delay:0.4s; }
+.article:nth-child(5){ animation-delay:0.5s; }
+.article:nth-child(6){ animation-delay:0.6s; }
+.article:nth-child(7){ animation-delay:0.7s; }
+.article:nth-child(8){ animation-delay:0.8s; }
+
 .article img{
     width:100%;
-    height:400px;
+    height:300px;
     object-fit:cover;
     display:block;
 }
 
 .article-content{
-    padding:30px;
+    padding:40px;
 }
 
 .article h2{
-    margin-bottom:15px;
+    margin-bottom:16px;
     font-size:2rem;
+    font-weight:700;
+    color:var(--accent);
 }
 
 .article p{
     line-height:1.8;
-    margin-bottom:20px;
+    margin-bottom:24px;
+    color:var(--secondary-text);
+}
+
+.article-links{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
 }
 
 .article a{
     display:inline-block;
-    padding:12px 20px;
+    padding:12px 24px;
     background:var(--accent);
     color:white;
     text-decoration:none;
     border-radius:12px;
-    transition:.25s;
+    transition:.3s;
+    font-weight:500;
 }
 
 .article a:hover{
-    transform:translateY(-3px);
+    transform:translateY(-2px);
 }
 
+/* Top Button */
 #topButton{
     position:fixed;
-    bottom:25px;
-    left:50%;
-    transform:translateX(-50%);
-    width:70px;
-    height:70px;
+    bottom:30px;
+    right:30px;
+    width:60px;
+    height:60px;
     border:none;
     border-radius:50%;
     background:var(--accent);
     color:white;
-    font-size:30px;
+    font-size:24px;
     cursor:pointer;
     box-shadow:var(--shadow);
     transition:.3s;
+    opacity:0;
+    visibility:hidden;
+}
+
+#topButton.show{
+    opacity:1;
+    visibility:visible;
 }
 
 #topButton:hover{
-    transform:translateX(-50%) scale(1.1);
+    transform:scale(1.1);
 }
 
+/* Footer */
 footer{
     text-align:center;
-    padding:50px 20px;
-    opacity:.7;
+    padding:80px 40px;
+    color:var(--secondary-text);
+    border-top:1px solid var(--border);
 }
 
-@media(max-width:700px){
+/* Responsive */
+@media(max-width:768px){
+    nav{
+        padding:15px 20px;
+    }
+
+    .navbar-container{
+        gap:20px;
+    }
+
+    header{
+        padding:60px 20px;
+    }
+
+    .toc{
+        grid-template-columns:1fr;
+    }
+
+    .article-content{
+        padding:24px;
+    }
+
+    .article h2{
+        font-size:1.5rem;
+    }
+
     .article img{
-        height:250px;
+        height:200px;
+    }
+
+    #topButton{
+        width:50px;
+        height:50px;
+        font-size:20px;
+        bottom:20px;
+        right:20px;
+    }
+}
+
+@media(max-width:480px){
+    nav{
+        padding:12px 16px;
+    }
+
+    h1{
+        font-size:2rem;
+    }
+
+    .article-links{
+        flex-direction:column;
+    }
+
+    .article a{
+        width:100%;
+        text-align:center;
     }
 }
 </style>
 </head>
 <body>
 
+<!-- Navbar -->
+<nav>
+    <div class="navbar-container">
+        <a href="#" class="navbar-logo">
+            <img class="navbar-logo-img" src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png" alt="lamacOs">
+            <span class="navbar-logo-text">lamacOs</span>
+        </a>
+        <div class="navbar-menu">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Theme Toggle">
+                <img id="themeImage" src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/Lightmode.png" alt="">
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Header -->
 <header>
+    <div class="hero">
+        <h1>Alle Infos über meine Projekte</h1>
+        <p class="hero-description">Entdecke meine spannendsten Projekte und Initiativen</p>
 
-<div class="hero">
-
-<h1>Alle Infos über meine Projekte</h1>
-
-<button class="theme-toggle" onclick="toggleTheme()">
-<img id="themeImage"
-src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/Lightmode.png"
-alt="">
-</button>
-
-<div class="toc">
-
-<a href="#artikel1">lamachub.de</a>
-<a href="#artikel2">SkyTownRP</a>
-<a href="#artikel3">Weißt du was du Weißt</a>
-<a href="#artikel4">Klar soweit? - Wissenszeit</a>
-<a href="#artikel5">NeoTerra</a>
-<a href="#artikel6">Scratch</a>
-<a href="#artikel8">Giphy</a>
-
-</div>
-</div>
+        <div class="toc">
+            <a href="#artikel1">lamachub.de</a>
+            <a href="#artikel2">SkyTownRP</a>
+            <a href="#artikel3">Weißt du was du Weißt</a>
+            <a href="#artikel4">Klar soweit? - Wissenszeit</a>
+            <a href="#artikel5">NeoTerra</a>
+            <a href="#artikel6">Scratch</a>
+            <a href="#artikel8">Giphy</a>
+        </div>
+    </div>
 </header>
 
+<!-- Main Content -->
 <main>
 
-<!-- ARTIKEL START -->
-<!-- Zum Hinzufügen einfach diesen Block kopieren -->
-
 <section class="article" id="artikel1">
-<img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/lamachub.png" alt="">
-<div class="article-content">
-<h2>lamachub.de</h2>
-<p>
-lamachub.de ist meine Hauptwebsite. Hier sind Links zu fast allen meiner Websites, was ziemlich viele sind. Meine erste Domain war lamacos.github.io. Mit meiner aktuellen (lamachub.de) habe ich auch einige Email Adressen.
-</p>
-<a href="https://lamachub.de" target="_blank">Mehr erfahren</a>
-</div>
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/lamachub.png" alt="lamachub.de">
+    <div class="article-content">
+        <h2>lamachub.de</h2>
+        <p>lamachub.de ist meine Hauptwebsite. Hier sind Links zu fast allen meiner Websites, was ziemlich viele sind. Meine erste Domain war lamacos.github.io. Mit meiner aktuellen (lamachub.de) habe ich auch einige Email Adressen.</p>
+        <div class="article-links">
+            <a href="https://lamachub.de" target="_blank">Mehr erfahren</a>
+        </div>
+    </div>
 </section>
 
 <section class="article" id="artikel2">
-<img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/skytownrp.png" alt="">
-<div class="article-content">
-<h2>SkyTown RP</h2>
-<p>SkyTown RP ist ein Java Minecraft Server, auf dem einige YouTuber und einige Random Typen. Bewerbt euch gerne, wenn ihr berühmte YouTuber seid. Damit sind YouTuber gemeint, die am besten über 450.000 Follower haben.</p>
-<a href="https://lamachub.de/skytownrp" target="_blank">Mehr erfahren oder Bewerben</a>
-</div>
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/skytownrp.png" alt="SkyTown RP">
+    <div class="article-content">
+        <h2>SkyTown RP</h2>
+        <p>SkyTown RP ist ein Java Minecraft Server, auf dem einige YouTuber und einige Random Typen. Bewerbt euch gerne, wenn ihr berühmte YouTuber seid. Damit sind YouTuber gemeint, die am besten über 450.000 Follower haben.</p>
+        <div class="article-links">
+            <a href="https://lamachub.de/skytownrp" target="_blank">Mehr erfahren oder Bewerben</a>
+        </div>
+    </div>
 </section>
 
 <section class="article" id="artikel3">
-<img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/weisstduwasduweisst.png" alt="">
-<div class="article-content">
-<h2>Weißt du was du weißt?</h2>
-<p>Weißt du was du weißt ist eine Quizsendung, dessen Idee ich von EinfachGustaf hatte. Es geht so:
-Es gibt ein Haupthema und 3 Unterkategorien. In jeder Unterkategorie gibt es 5 Fragen und jeweils 3 Tipps.
-Es gibt auch eine Bonusfrage am ende der Quizschow, die 5 Tipss hat und einen Zusatzpunkt gibt.
-Vor jeder Unterkategorie muss man sagen, wie viele Fragen man richtig beantworten wird. Liegt man
-falsch (egal in welcher weise), bekommt man 0 Punkte fü diese Kategorie. Liegt man richtig, bekommt man
-die jeweilige Anzahl an Punkten. Jeder kann mitmachen und sich über die Website bewerben.</p>
-<a href="https://weisstduwasduweisst.podview.com" target="_blank">Mehr erfahren</a>
-<a href="https://weisstduwasduweisst.podview.com/contact" target="_blank">Bewerben</a>
-</div>
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/weisstduwasduweisst.png" alt="Weißt du was du weißt?">
+    <div class="article-content">
+        <h2>Weißt du was du weißt?</h2>
+        <p>Weißt du was du weißt ist eine Quizsendung, dessen Idee ich von EinfachGustaf hatte. Es gibt ein Haupthema und 3 Unterkategorien. In jeder Unterkategorie gibt es 5 Fragen und jeweils 3 Tipps. Es gibt auch eine Bonusfrage am ende der Quizschow, die 5 Tipss hat und einen Zusatzpunkt gibt. Vor jeder Unterkategorie muss man sagen, wie viele Fragen man richtig beantworten wird. Liegt man falsch (egal in welcher weise), bekommt man 0 Punkte fü diese Kategorie. Liegt man richtig, bekommt man die jeweilige Anzahl an Punkten. Jeder kann mitmachen und sich über die Website bewerben.</p>
+        <div class="article-links">
+            <a href="https://weisstduwasduweisst.podview.com" target="_blank">Mehr erfahren</a>
+            <a href="https://weisstduwasduweisst.podview.com/contact" target="_blank">Bewerben</a>
+        </div>
+    </div>
 </section>
 
 <section class="article" id="artikel4">
-<img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/klarsoweitwissenszeit.png" alt="">
-<div class="article-content">
-<h2>Klar soweit? - Wissenszeit!</h2>
-<p>Klar soweit? - Wissenszeit ist eine Wissenssendung für Kinder und jugendliche, in der Sachen leicht verständlich erklärt werden.</p>
-<a href="https://klarsoweitwissenszeit.podview.com" target="_blank">Mehr erfahren</a>
-</div>
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/klarsoweitwissenszeit.png" alt="Klar soweit? - Wissenszeit!">
+    <div class="article-content">
+        <h2>Klar soweit? - Wissenszeit!</h2>
+        <p>Klar soweit? - Wissenszeit ist eine Wissenssendung für Kinder und jugendliche, in der Sachen leicht verständlich erklärt werden.</p>
+        <div class="article-links">
+            <a href="https://klarsoweitwissenszeit.podview.com" target="_blank">Mehr erfahren</a>
+        </div>
+    </div>
 </section>
 
 <section class="article" id="artikel5">
-<img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/neoterra.png" alt="">
-<div class="article-content">
-<h2>NeoTerra...</h2>
-<p>...ist ein Sandbox Spiel, welches sich aktuell noch in der entwicklungsphase befindet, und daher noch nicht spielbar ist.
-Die Zielgruppe sind Kinder von 12-17 Jahren und Junge Erwachsene.</p>
-<a href="https://www.lamachub.de/NeoTerra" target="_blank">Mehr erfahren</a>
-</div>
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/neoterra.png" alt="NeoTerra">
+    <div class="article-content">
+        <h2>NeoTerra</h2>
+        <p>NeoTerra ist ein Sandbox Spiel, welches sich aktuell noch in der entwicklungsphase befindet, und daher noch nicht spielbar ist. Die Zielgruppe sind Kinder von 12-17 Jahren und Junge Erwachsene.</p>
+        <div class="article-links">
+            <a href="https://www.lamachub.de/NeoTerra" target="_blank">Mehr erfahren</a>
+        </div>
+    </div>
 </section>
 
 <section class="article" id="artikel6">
-<img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/scratch.png" alt="">
-<div class="article-content">
-<h2>Scratch</h2>
-<p>Ich habe mit Scratch angefangen zu Programmieren, und tue es heute noch. Einfach weil es so Spaß macht und so... einfach ist.
-Und man kann viel mehr damit machen, als man denkt. Ich habe diesen Artikel geschrieben, weil ich Scratch danken möchte, dass sie Leuten, die mit dem Programmieren anfangen möchten, einen
-so einfachen Start ermöglichen. Ich habe auch eine Website programmiert, auf der ihr gute Scratch Spiele sehen, Spielen und sogar eure eigenen hochladen könnt.</p>
-<a href="https://lamachub.de/PlayHub" target="_blank">Website - Play Hub</a>
-<a href="https://scratch.mit.edu/users/lamacOs" target="_blank">Meine Spiele</a>
-</div>
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/scratch.png" alt="Scratch">
+    <div class="article-content">
+        <h2>Scratch</h2>
+        <p>Ich habe mit Scratch angefangen zu Programmieren, und tue es heute noch. Einfach weil es so Spaß macht und so einfach ist. Und man kann viel mehr damit machen, als man denkt. Ich habe diesen Artikel geschrieben, weil ich Scratch danken möchte, dass sie Leuten, die mit dem Programmieren anfangen möchten, einen so einfachen Start ermöglichen.</p>
+        <div class="article-links">
+            <a href="https://lamachub.de/PlayHub" target="_blank">Website - Play Hub</a>
+            <a href="https://scratch.mit.edu/users/lamacOs" target="_blank">Meine Spiele</a>
+        </div>
+    </div>
 </section>
 
 <section class="article" id="artikel8">
-<img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/giphy.png" alt="">
-<div class="article-content">
-<h2>Giphy</h2>
-<p>Seid neusten bin ich auf auf Giphy. Ich heiße dort lamacOs und habe bis jetzt erst ein GIF veröffentlicht.
-Giphy ist eine Plattform, wo GIFs und Sticker veröffentlicht werden, mit denen dann WhatsApp, Apple Nachrichten,
-seid neustem auch Goodnotes und viele andere Programme arbeiten. Falls ihr also das nächste mal bei WhatsApp schreibt,
-sucht gerne nach meinem GIF unter lamacOs, controller, gaming oder, um ganz sicher zu gehen, dass ihr ihn wirklich findet,
-sucht nach xa500lamacos.</p>
-<a href="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExazd0ejJrM2F1OTY5aWcwam5xenI1em03b3h2cjlnbjd1a2xuc2Z4aCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/EoiPi2ae0rNBnyijxI/giphy.gif" target="_blank">Meine GIFs</a>
-</div>
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/giphy.png" alt="Giphy">
+    <div class="article-content">
+        <h2>Giphy</h2>
+        <p>Seid neusten bin ich auf Giphy. Ich heiße dort lamacOs und habe bis jetzt erst ein GIF veröffentlicht. Giphy ist eine Plattform, wo GIFs und Sticker veröffentlicht werden, mit denen dann WhatsApp, Apple Nachrichten, seid neustem auch Goodnotes und viele andere Programme arbeiten.</p>
+        <div class="article-links">
+            <a href="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExazd0ejJrM2F1OTY5aWcwam5xenI1em03b3h2cjlnbjd1YWtudnNmeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/EoiPi2ae0rNBnyijxI/giphy.gif" target="_blank">Meine GIFs</a>
+        </div>
+    </div>
 </section>
 
 <section class="article" id="artikel7">
-<img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/comingsoon.png" alt="">
-<div class="article-content">
-<h2>Coming Soon</h2>
-<p>Weitere Artikel sind in Arbeit und werden kommen.</p>
-</div>
+    <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/comingsoon.png" alt="Coming Soon">
+    <div class="article-content">
+        <h2>Coming Soon</h2>
+        <p>Weitere Artikel sind in Arbeit und werden kommen.</p>
+    </div>
 </section>
-<!-- ARTIKEL ENDE -->
 
 </main>
 
+<!-- Footer -->
 <footer>
-© lamacOsInfo - lamachub.de/lamacOsInfo
+© 2026 lamacHub
 </footer>
 
-<button id="topButton" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-↑
-</button>
+<!-- Top Button -->
+<button id="topButton" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
-
 const body = document.body;
 const themeImage = document.getElementById("themeImage");
+const topButton = document.getElementById("topButton");
 
 const sunImage = "https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/Lightmode.png";
 const moonImage = "https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/Darkmode.png";
 
 function toggleTheme(){
-
     body.classList.toggle("dark");
 
     if(body.classList.contains("dark")){
@@ -370,6 +504,14 @@ if(localStorage.getItem("theme")==="dark"){
     themeImage.src = moonImage;
 }
 
+// Top Button Visibility
+window.addEventListener("scroll", () => {
+    if(window.scrollY > 300){
+        topButton.classList.add("show");
+    }else{
+        topButton.classList.remove("show");
+    }
+});
 </script>
 
 </body>
