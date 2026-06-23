@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crêpe Status Board</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#f6f8fc;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --accent:#ff7a00;
+    --success:#10b981;
+    --border:#e5e7eb;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html, body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+body{
+    font-family:Inter,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:30px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+h1{
+    color:var(--accent);
+    font-size:28px;
+}
+
+.nav-buttons{
+    display:flex;
+    gap:10px;
+}
+
+button{
+    background:var(--accent);
+    border:none;
+    color:white;
+    padding:10px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:all 0.3s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+button:hover, button:active{
+    opacity:0.9;
+}
+
+button.secondary{
+    background:#e5e7eb;
+    color:#111;
+}
+
+button.secondary:hover, button.secondary:active{
+    background:#d1d5db;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    height:calc(100vh - 150px);
+    overflow:hidden;
+}
+
+.board{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    height:100%;
+}
+
+.column{
+    background:var(--card);
+    border:2px solid var(--border);
+    border-radius:16px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+.column.in-zubereitung{
+    border-color:#ff7a00;
+}
+
+.column.fertig{
+    border-color:#10b981;
+}
+
+.column-header{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:20px;
+    padding-bottom:10px;
+    border-bottom:3px solid;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-shrink:0;
+}
+
+.column.in-zubereitung .column-header{
+    color:#ff7a00;
+    border-color:#ff7a00;
+}
+
+.column.fertig .column-header{
+    color:#10b981;
+    border-color:#10b981;
+}
+
+.count{
+    background:var(--muted);
+    color:white;
+    padding:2px 8px;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.items-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    overflow-y:auto;
+    flex:1;
+    padding-right:5px;
+}
+
+.items-list::-webkit-scrollbar{
+    width:8px;
+}
+
+.items-list::-webkit-scrollbar-track{
+    background:#f1f1f1;
+    border-radius:10px;
+}
+
+.items-list::-webkit-scrollbar-thumb{
+    background:#888;
+    border-radius:10px;
+}
+
+.items-list::-webkit-scrollbar-thumb:hover{
+    background:#555;
+}
+
+.card-item{
+    background:#f9fafb;
+    border:2px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    cursor:grab;
+    transition:all 0.2s;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+    flex-shrink:0;
+}
+
+.card-item:active{
+    cursor:grabbing;
+}
+
+.card-item:hover, .card-item:active{
+    transform:translateY(-4px);
+    box-shadow:0 8px 16px rgba(0,0,0,0.1);
+}
+
+.card-item.in-zubereitung{
+    border-color:#ff7a00;
+    background:rgba(255,122,0,0.05);
+}
+
+.card-item.fertig{
+    border-color:#10b981;
+    background:rgba(16,185,129,0.05);
+}
+
+.card-number{
+    font-size:32px;
+    font-weight:700;
+    color:var(--accent);
+    margin-bottom:8px;
+}
+
+.card-item.fertig .card-number{
+    color:#10b981;
+}
+
+.card-name{
+    font-size:16px;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:8px;
+}
+
+.card-price{
+    color:var(--muted);
+    font-size:14px;
+    margin-bottom:10px;
+}
+
+.card-time{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.empty{
+    text-align:center;
+    color:var(--muted);
+    padding:40px 20px;
+    font-style:italic;
+}
+
+.drag-over{
+    background:#e0e7ff;
+    border-color:var(--accent) !important;
+}
+
+/* Mobile optimierung */
+@media (max-width: 768px) {
+    body{
+        padding:15px;
+    }
+
+    header{
+        flex-direction:column;
+        gap:15px;
+        align-items:flex-start;
+        margin-bottom:15px;
+    }
+
+    .nav-buttons{
+        width:100%;
+        flex-wrap:wrap;
+    }
+
+    .nav-buttons button{
+        flex:1;
+        min-width:100px;
+        font-size:12px;
+        padding:8px 12px;
+    }
+
+    .container{
+        height:calc(100vh - 130px);
+    }
+
+    .board{
+        grid-template-columns:1fr;
+        gap:15px;
+    }
+
+    .column-header{
+        font-size:18px;
+        margin-bottom:15px;
+    }
+
+    .card-number{
+        font-size:24px;
+    }
+
+    .card-name{
+        font-size:14px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+    <h1>Crêpe Status Board</h1>
+</header>
+
+<div class="board">
+    <div class="column in-zubereitung">
+        <div class="column-header">
+            In Zubereitung
+            <span class="count" id="countIn">0</span>
+        </div>
+        <div class="items-list" id="inZubereitung" ondrop="drop(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ontouchend="touchEnd(event)" ontouchover="touchOver(event)"></div>
+    </div>
+
+    <div class="column fertig">
+        <div class="column-header">
+            Fertig zum Abholen
+            <span class="count" id="countFertig">0</span>
+        </div>
+        <div class="items-list" id="fertig" ondrop="drop(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ontouchend="touchEnd(event)" ontouchover="touchOver(event)"></div>
+    </div>
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDD08pTJTixg1zG3eflPWW7Bf_AalTotMI",
+    authDomain: "crepes-47350.firebaseapp.com",
+    databaseURL: "https://crepes-47350-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "crepes-47350",
+    storageBucket: "crepes-47350.firebasestorage.app",
+    messagingSenderId: "99668031660",
+    appId: "1:99668031660:web:817ef15db10bd488f74709"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const inZubereitung = document.getElementById("inZubereitung");
+const fertig = document.getElementById("fertig");
+let draggedItem = null;
+let touchItem = null;
+let touchStartY = 0;
+
+// ===== MOUSE DRAG & DROP =====
+window.dragStart = (e) => {
+    draggedItem = e.target.closest(".card-item");
+    if(draggedItem){
+        e.target.closest(".card-item").style.opacity = "0.5";
+    }
+}
+
+window.dragEnd = (e) => {
+    if(e.target.closest(".card-item")){
+        e.target.closest(".card-item").style.opacity = "1";
+    }
+}
+
+window.dragOver = (e) => {
+    e.preventDefault();
+    e.currentTarget.classList.add("drag-over");
+}
+
+window.dragLeave = (e) => {
+    e.currentTarget.classList.remove("drag-over");
+}
+
+window.drop = (e) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove("drag-over");
+    
+    if(!draggedItem) return;
+    
+    const orderId = draggedItem.dataset.id;
+    const newStatus = e.currentTarget.id === "inZubereitung" ? "in_zubereitung" : "fertig";
+    
+    update(ref(db, `orders/${orderId}`), {
+        status: newStatus
+    });
+    
+    draggedItem = null;
+}
+
+// ===== TOUCH SUPPORT =====
+window.touchStart = (e) => {
+    touchItem = e.target.closest(".card-item");
+    if(touchItem){
+        touchStartY = e.touches[0].clientY;
+        touchItem.style.opacity = "0.7";
+        touchItem.style.transform = "scale(1.05)";
+    }
+}
+
+window.touchEnd = (e) => {
+    if(!touchItem) return;
+    
+    const touch = e.changedTouches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    const targetColumn = element?.closest(".items-list");
+    
+    if(targetColumn){
+        const orderId = touchItem.dataset.id;
+        const newStatus = targetColumn.id === "inZubereitung" ? "in_zubereitung" : "fertig";
+        
+        update(ref(db, `orders/${orderId}`), {
+            status: newStatus
+        });
+    }
+    
+    if(touchItem){
+        touchItem.style.opacity = "1";
+        touchItem.style.transform = "translateY(0)";
+    }
+    touchItem = null;
+}
+
+window.touchMove = (e) => {
+    if(!touchItem) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const deltaY = touch.clientY - touchStartY;
+    touchItem.style.transform = `scale(1.05) translateY(${deltaY}px)`;
+}
+
+window.touchOver = (e) => {
+    if(touchItem){
+        e.currentTarget.classList.add("drag-over");
+    }
+}
+
+window.touchLeave = (e) => {
+    e.currentTarget.classList.remove("drag-over");
+}
+
+// LIVE UPDATE
+onValue(ref(db, "orders"), (snapshot) => {
+    inZubereitung.innerHTML = "";
+    fertig.innerHTML = "";
+    let countIn = 0;
+    let countFertig = 0;
+
+    snapshot.forEach((child) => {
+        const data = child.val();
+        const orderId = child.key;
+
+        const time = new Date(data.time).toLocaleString("de-DE", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+
+        const div = document.createElement("div");
+        div.className = `card-item ${data.status}`;
+        div.dataset.id = orderId;
+        div.draggable = true;
+        div.ondragstart = window.dragStart;
+        div.ondragend = window.dragEnd;
+        div.ontouchstart = window.touchStart;
+        div.ontouchend = window.touchEnd;
+        div.ontouchmove = window.touchMove;
+
+        div.innerHTML = `
+            <div class="card-number">#${data.nummer}</div>
+            <div class="card-name">${data.sorte}</div>
+            <div class="card-price">${data.preis}</div>
+            <div class="card-time">${time} Uhr</div>
+        `;
+
+        if(data.status === "in_zubereitung"){
+            inZubereitung.appendChild(div);
+            countIn++;
+        } else if(data.status === "fertig"){
+            fertig.appendChild(div);
+            countFertig++;
+        }
+    });
+
+    if(countIn === 0){
+        inZubereitung.innerHTML = '<div class="empty">Keine Bestellungen!</div>';
+    }
+    if(countFertig === 0){
+        fertig.innerHTML = '<div class="empty">Alle abgeholt!</div>';
+    }
+
+    document.getElementById("countIn").textContent = countIn;
+    document.getElementById("countFertig").textContent = countFertig;
+});
+
+// Prevent default touch behavior
+document.addEventListener('touchmove', function(e) {
+    if(e.target.closest('.card-item')) {
+        e.preventDefault();
+    }
+}, {passive: false});
+</script>
+
+</body>
+</html>
