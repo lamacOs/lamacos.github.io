@@ -9,68 +9,278 @@
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
 
 <style>
-body{
-    margin:0;
-    overflow:hidden;
-    font-family:sans-serif;
+:root{
+    --bg:#ffffff;
+    --card:#ffffff;
+    --text:#111111;
+    --secondary-text:#666666;
+    --accent:#ff7a00;
+    --shadow:0 8px 24px rgba(0,0,0,0.08);
+    --border:#eaeaea;
 }
 
+body.dark{
+    --bg:#0f1115;
+    --card:#171a21;
+    --text:#ffffff;
+    --secondary-text:#bdbdbd;
+    --accent:#ff7a00;
+    --shadow:0 8px 24px rgba(0,0,0,0.3);
+    --border:#2b2f38;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Inter, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    transition:.3s;
+    overflow:hidden;
+}
+
+/* Navbar */
+nav{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:1000;
+    background:rgba(255,255,255,0.7);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+    padding:20px 40px;
+}
+
+body.dark nav{
+    background:rgba(15,17,21,0.7);
+}
+
+.navbar-container{
+    max-width:1200px;
+    margin:0 auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.navbar-logo{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    text-decoration:none;
+}
+
+.navbar-logo-img{
+    height:40px;
+    width:auto;
+}
+
+.navbar-logo-text{
+    font-size:1.2rem;
+    color:var(--text);
+    font-weight:700;
+}
+
+.navbar-menu{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.theme-toggle{
+    width:50px;
+    height:50px;
+    border:none;
+    cursor:pointer;
+    border-radius:50%;
+    overflow:hidden;
+    transition:.3s;
+    background:var(--card);
+    border:1px solid var(--border);
+}
+
+.theme-toggle:hover{
+    transform:scale(1.1);
+}
+
+.theme-toggle img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* Menu Overlay */
 #menu{
     position:fixed;
     inset:0;
-    background:#111;
-    color:white;
+    background:var(--bg);
+    color:var(--text);
     display:flex;
     justify-content:center;
     align-items:center;
     flex-direction:column;
     z-index:9999;
+    gap:50px;
+    padding:40px 20px;
+    padding-top:100px;
 }
 
-button{
-    padding:15px 30px;
-    font-size:20px;
+body.dark #menu{
+    background:var(--bg);
+}
+
+#menu h1{
+    font-size:clamp(2.8rem, 5vw, 5rem);
+    font-weight:800;
+    color:var(--accent);
+    text-align:center;
+    margin:0;
+}
+
+#menu p{
+    font-size:1.1rem;
+    color:var(--secondary-text);
+    text-align:center;
+    max-width:600px;
+}
+
+#menu button{
+    padding:16px 48px;
+    font-size:1.1rem;
     cursor:pointer;
+    background:var(--accent);
+    color:white;
+    border:none;
+    border-radius:12px;
+    font-weight:600;
+    transition:.3s;
+    font-family:Inter, sans-serif;
+}
+
+#menu button:hover{
+    transform:translateY(-2px);
+}
+
+/* A-Frame Scene */
+a-scene{
+    padding-top:80px;
+}
+
+@media(max-width:768px){
+    nav{
+        padding:15px 20px;
+    }
+
+    #menu{
+        gap:30px;
+    }
+
+    #menu h1{
+        font-size:2rem;
+    }
+
+    #menu button{
+        padding:14px 40px;
+        font-size:1rem;
+    }
 }
 </style>
 </head>
 
 <body>
 
+<!-- Navbar -->
+<nav>
+    <div class="navbar-container">
+        <a href="#" class="navbar-logo">
+            <img class="navbar-logo-img" src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png" alt="lamacOs">
+            <span class="navbar-logo-text">lamacOs</span>
+        </a>
+        <div class="navbar-menu">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Theme Toggle">
+                <img id="themeImage" src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/Lightmode.png" alt="">
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Menu -->
 <div id="menu">
-    <h1>AR starten</h1>
-    <button onclick="startAR()">Spielen</button>
+    <div>
+        <h1>AR Marker World</h1>
+        <p>Erkunden Sie die erweiterte Realität mit interaktiven 3D-Objekten</p>
+    </div>
+    <button onclick="startAR()">Jetzt starten</button>
 </div>
 
+<!-- A-Frame Scene -->
 <a-scene
-    mindar-image="imageTargetSrc: imageTargetSrc: https://lamacos.github.io/lamacos.github.io/main/lamacVR/targets.mind;"
+    mindar-image="imageTargetSrc: https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacVR/targets.mind;"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: true">
 
-    <a-camera look-controls="enabled: false"></a-camera>
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <a-entity mindar-image-target="targetIndex: 0">
 
-        <!-- Hauptobjekt -->
+        <!-- Hauptobjekt - Orange Box -->
         <a-box position="0 0 0"
-               color="red"
+               color="#ff7a00"
                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
         </a-box>
 
-        <!-- Zusätzliche Effekte -->
-        <a-sphere position="0 1 0" radius="0.3" color="blue"></a-sphere>
+        <!-- Sekundäres Objekt - Orange Sphere -->
+        <a-sphere position="0 1 0" 
+                   radius="0.3" 
+                   color="#ff7a00"
+                   animation="property: position; to: 0 1.3 0; loop: true; dur: 1500; dir: alternate">
+        </a-sphere>
 
-        <a-ring position="0 -0.5 0" radius-inner="0.4" radius-outer="0.6" color="cyan"></a-ring>
+        <!-- Accent Ring - Orange -->
+        <a-ring position="0 -0.5 0" 
+                 radius-inner="0.4" 
+                 radius-outer="0.6" 
+                 color="#ff7a00"
+                 animation="property: rotation; to: 360 0 0; loop: true; dur: 3000">
+        </a-ring>
 
     </a-entity>
 
 </a-scene>
 
 <script>
-function startAR(){
-    document.getElementById("menu").style.display="none";
+const body = document.body;
+const themeImage = document.getElementById("themeImage");
+
+const sunImage = "https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/Lightmode.png";
+const moonImage = "https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/lamacOsInfo/Darkmode.png";
+
+function toggleTheme(){
+    body.classList.toggle("dark");
+
+    if(body.classList.contains("dark")){
+        themeImage.src = moonImage;
+        localStorage.setItem("theme", "dark");
+    }else{
+        themeImage.src = sunImage;
+        localStorage.setItem("theme", "light");
+    }
 }
-<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+// Theme aus localStorage laden
+if(localStorage.getItem("theme") === "dark"){
+    body.classList.add("dark");
+    themeImage.src = moonImage;
+}
+
+function startAR(){
+    document.getElementById("menu").style.display = "none";
+}
 </script>
 
 </body>
