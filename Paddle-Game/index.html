@@ -1,212 +1,138 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260623-05-892e748"}');</script><script src="/_sdk/558340785a07a8b2.telemetry_sdk.js" integrity="sha512-w6huTWybcELc18WJb0w+HZlX471QfzMUh7gbslB6onKoaFEogFDmOPMV5FcEo5/Ws8CyGWJgk7MOklfxKnVegA=="></script>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paddle Game</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
   <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      overflow: hidden; /* Verhindert das Scrollen der Seite */
-    }
-
-    canvas {
-      background: #222;
-      display: none;
-      margin: 20px auto;
-      border: 3px solid white;
-    }
-
-    #menu {
-      margin-top: 100px;
-    }
-
-    #menu h1 {
-      font-size: 40px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 18px;
-      background: limegreen;
-      border: none;
-      cursor: pointer;
-      margin: 10px;
-    }
-
-    #highscoreDisplay {
-      margin-top: 20px;
-      font-size: 20px;
-    }
+    body { font-family: 'Inter', sans-serif; overflow: hidden; }
+    canvas { border: 3px solid #f97316; }
   </style>
-</head>
-<body>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+  <script src="/_sdk/458114e02319f6fb.data_sdk.js" type="text/javascript" integrity="sha512-MqxhlifLEIhxYPJAUg/WtiC5CY0R45RHAAwK31m2gePcEv6/zWdaNb/OHXNXZYtkB4TsvIOYMOacwywX7AXC3g=="></script>
+  <script src="/_sdk/4f463046f01e739c.resizing_sdk.js" type="text/javascript" integrity="sha512-OGc2bZH1Y6D53dobLIprnf87bgcAUXhOSYQ1OhcaN/Jy2cDLElITNEl2Qopej2NN/r19T/IbMrsIB0GWsE/X9w=="></script>
+ </head>
+ <body data-template-id="__page-root" class="min-h-screen flex items-center justify-center">
+  <main class="w-full flex flex-col items-center justify-center p-4">
+   <div id="menu" class="flex flex-col items-center gap-6">
+    <h1 data-template-id="game-title" class="canva-text text-4xl font-bold"></h1><button data-template-id="play-button" id="playButton" class="canva-button px-8 py-3 rounded-lg text-lg font-semibold transition hover:scale-105"></button>
+    <p data-template-id="highscore-label" id="highscoreDisplay" class="canva-text text-lg"></p>
+   </div>
+   <canvas id="gameCanvas" width="600" height="400" class="hidden rounded-lg mt-6 max-w-full"></canvas>
+  </main>
+  <script src="/_sdk/af9aec02508dd970.editing_sdk.js" integrity="sha512-fsy2Z3UbJmnouhVbv0VqJVrV0hyi1IuWxdqGzSzAFvoFOz70AMGtneepS8GQ7l9Gn8E+gxDThKQ4COjMQn6RKA=="></script>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const menu = document.getElementById("menu");
+    const playButton = document.getElementById("playButton");
+    const highscoreDisplay = document.getElementById("highscoreDisplay");
 
-<div id="menu">
-  <h1>Paddle Game</h1>
-  <button id="playButton">🎮 Spielen</button>
-  <div id="highscoreDisplay">Highscore: 0</div>
-</div>
+    let paddle, ball, score, highscore = 0, gameRunning = false;
 
-<canvas id="gameCanvas" width="600" height="400"></canvas>
-
-<script>
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
-  const menu = document.getElementById("menu");
-  const playButton = document.getElementById("playButton");
-  const highscoreDisplay = document.getElementById("highscoreDisplay");
-
-  let paddle, ball, score, highscore = 0, gameRunning = false;
-
-  function resetGame() {
-    paddle = {
-      width: 100,
-      height: 15,
-      x: canvas.width / 2 - 50,
-      y: canvas.height - 30,
-      speed: 7,
-      dx: 0
-    };
-
-    ball = {
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      radius: 10,
-      speed: 4,
-      dx: 4,
-      dy: -4
-    };
-
-    score = 0;
-    gameRunning = true;
-  }
-
-  function drawPaddle() {
-    ctx.fillStyle = "lime";
-    ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-  }
-
-  function drawBall() {
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "red";
-    ctx.fill();
-    ctx.closePath();
-  }
-
-  function drawScore() {
-    ctx.fillStyle = "white";
-    ctx.font = "18px Arial";
-    ctx.fillText("Punkte: " + score, 10, 20);
-  }
-
-  function movePaddle() {
-    paddle.x += paddle.dx;
-    if (paddle.x < 0) paddle.x = 0;
-    if (paddle.x + paddle.width > canvas.width)
-      paddle.x = canvas.width - paddle.width;
-  }
-
-  function moveBall() {
-    ball.x += ball.dx;
-    ball.y += ball.dy;
-
-    // Wandkollision
-    if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width)
-      ball.dx *= -1;
-    if (ball.y - ball.radius < 0)
-      ball.dy *= -1;
-
-    // Paddle-Kollision
-    if (
-      ball.y + ball.radius >= paddle.y &&
-      ball.x >= paddle.x &&
-      ball.x <= paddle.x + paddle.width
-    ) {
-      ball.dy *= -1;
-      score++;
-      if (score > highscore) highscore = score;
+    function resetGame() {
+      paddle = { width: 100, height: 15, x: canvas.width / 2 - 50, y: canvas.height - 30, speed: 7, dx: 0 };
+      ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 10, speed: 4, dx: 4, dy: -4 };
+      score = 0;
+      gameRunning = true;
     }
 
-    // Game Over
-    if (ball.y - ball.radius > canvas.height) {
-      gameRunning = false;
-      showMenu();
+    function drawPaddle() {
+      ctx.fillStyle = "#f97316";
+      ctx.beginPath();
+      ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, 6);
+      ctx.fill();
     }
-  }
 
-  function draw() {
-    if (!gameRunning) return;
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#facc15";
+      ctx.fill();
+      ctx.closePath();
+    }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function drawScore() {
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "600 18px Inter";
+      ctx.fillText("Punkte: " + score, 10, 25);
+    }
 
-    drawPaddle();
-    drawBall();
-    drawScore();
-    movePaddle();
-    moveBall();
+    function movePaddle() {
+      paddle.x += paddle.dx;
+      if (paddle.x < 0) paddle.x = 0;
+      if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+    }
 
-    requestAnimationFrame(draw);
-  }
+    function moveBall() {
+      ball.x += ball.dx;
+      ball.y += ball.dy;
+      if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) ball.dx *= -1;
+      if (ball.y - ball.radius < 0) ball.dy *= -1;
+      if (ball.y + ball.radius >= paddle.y && ball.x >= paddle.x && ball.x <= paddle.x + paddle.width) {
+        ball.dy *= -1;
+        score++;
+        if (score > highscore) highscore = score;
+      }
+      if (ball.y - ball.radius > canvas.height) {
+        gameRunning = false;
+        showMenu();
+      }
+    }
 
-  function keyDown(e) {
-    if (e.key === "ArrowRight") paddle.dx = paddle.speed;
-    else if (e.key === "ArrowLeft") paddle.dx = -paddle.speed;
-  }
+    function draw() {
+      if (!gameRunning) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPaddle();
+      drawBall();
+      drawScore();
+      movePaddle();
+      moveBall();
+      requestAnimationFrame(draw);
+    }
 
-  function keyUp(e) {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") paddle.dx = 0;
-  }
+    function keyDown(e) {
+      if (e.key === "ArrowRight") paddle.dx = paddle.speed;
+      else if (e.key === "ArrowLeft") paddle.dx = -paddle.speed;
+    }
 
-  function showMenu() {
-    canvas.style.display = "none";
-    menu.style.display = "block";
-    highscoreDisplay.textContent = "Highscore: " + highscore;
-  }
+    function keyUp(e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") paddle.dx = 0;
+    }
 
-  function startGame() {
-    resetGame();
-    menu.style.display = "none";
-    canvas.style.display = "block";
-    draw();
-  }
+    function showMenu() {
+      canvas.classList.add("hidden");
+      menu.style.display = "flex";
+      highscoreDisplay.textContent = "Highscore: " + highscore;
+    }
 
-  // Touchsteuerung hinzufügen
-  let touchStartX = 0;
+    function startGame() {
+      resetGame();
+      menu.style.display = "none";
+      canvas.classList.remove("hidden");
+      draw();
+    }
 
-  function touchStart(e) {
-    touchStartX = e.touches[0].clientX;
-    e.preventDefault(); // Verhindert das Scrollen
-  }
+    let touchStartX = 0;
+    function touchStart(e) { touchStartX = e.touches[0].clientX; e.preventDefault(); }
+    function touchMove(e) {
+      if (!gameRunning) return;
+      const diff = e.touches[0].clientX - touchStartX;
+      paddle.x += diff;
+      if (paddle.x < 0) paddle.x = 0;
+      if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+      touchStartX = e.touches[0].clientX;
+      e.preventDefault();
+    }
 
-  function touchMove(e) {
-    if (!gameRunning) return;
-    const touchMoveX = e.touches[0].clientX;
-    const touchDiff = touchMoveX - touchStartX;
-
-    // Paddle-Bewegung mit erhöhter Geschwindigkeit
-    paddle.x += touchDiff * 1.0;  // Geschwindigkeit der Bewegung auf 0.5 erhöht
-    if (paddle.x < 0) paddle.x = 0;
-    if (paddle.x + paddle.width > canvas.width)
-      paddle.x = canvas.width - paddle.width;
-
-    touchStartX = touchMoveX;  // Setze den neuen Startpunkt für den nächsten Touch
-    e.preventDefault(); // Verhindert das Scrollen
-  }
-
-  playButton.addEventListener("click", startGame);
-  document.addEventListener("keydown", keyDown);
-  document.addEventListener("keyup", keyUp);
-  canvas.addEventListener("touchstart", touchStart);
-  canvas.addEventListener("touchmove", touchMove);
-
-  showMenu();
-</script>
-
-</body>
+    playButton.addEventListener("click", startGame);
+    document.addEventListener("keydown", keyDown);
+    document.addEventListener("keyup", keyUp);
+    canvas.addEventListener("touchstart", touchStart);
+    canvas.addEventListener("touchmove", touchMove);
+    showMenu();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1056b53725a670b',t:'MTc4MjIzNzkwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
