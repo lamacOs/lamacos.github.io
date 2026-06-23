@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crêpe Kiosk</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#f6f8fc;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --accent:#ff7a00;
+    --success:#10b981;
+    --border:#e5e7eb;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:Inter,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:30px;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+h1{
+    color:var(--accent);
+    font-size:28px;
+}
+
+.nav-buttons{
+    display:flex;
+    gap:10px;
+}
+
+button{
+    background:var(--accent);
+    border:none;
+    color:white;
+    padding:10px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:all 0.3s;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+button.secondary{
+    background:#e5e7eb;
+    color:#111;
+}
+
+button.secondary:hover{
+    background:#d1d5db;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+}
+
+.board{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+}
+
+.column{
+    background:var(--card);
+    border:3px solid var(--border);
+    border-radius:20px;
+    padding:30px;
+    min-height:600px;
+}
+
+.column.in-zubereitung{
+    border-color:#ff7a00;
+}
+
+.column.fertig{
+    border-color:#10b981;
+}
+
+.column-header{
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:30px;
+    padding-bottom:15px;
+    border-bottom:4px solid;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.column.in-zubereitung .column-header{
+    color:#ff7a00;
+    border-color:#ff7a00;
+}
+
+.column.fertig .column-header{
+    color:#10b981;
+    border-color:#10b981;
+}
+
+.count{
+    background:var(--muted);
+    color:white;
+    padding:5px 15px;
+    border-radius:25px;
+    font-size:24px;
+    font-weight:700;
+}
+
+.items-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+    gap:15px;
+}
+
+.order-card{
+    background:#f9fafb;
+    border:3px solid var(--border);
+    border-radius:16px;
+    padding:20px;
+    text-align:center;
+    cursor:default;
+    transition:all 0.3s;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    min-height:150px;
+}
+
+.order-card:hover{
+    transform:scale(1.05);
+    box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+.order-card.in-zubereitung{
+    border-color:#ff7a00;
+    background:rgba(255,122,0,0.08);
+}
+
+.order-card.fertig{
+    border-color:#10b981;
+    background:rgba(16,185,129,0.08);
+}
+
+.order-number{
+    font-size:56px;
+    font-weight:700;
+    line-height:1;
+    margin-bottom:10px;
+}
+
+.order-card.in-zubereitung .order-number{
+    color:#ff7a00;
+}
+
+.order-card.fertig .order-number{
+    color:#10b981;
+}
+
+.order-name{
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    word-break:break-word;
+}
+
+.empty{
+    text-align:center;
+    color:var(--muted);
+    padding:60px 20px;
+    font-size:18px;
+    font-style:italic;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:400px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .board{
+        grid-template-columns:1fr;
+    }
+
+    .items-grid{
+        grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .order-number{
+        font-size:40px;
+    }
+
+    .column-header{
+        font-size:24px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+    <h1>Crêpe Stand</h1>
+</header>
+
+<div class="board">
+    <div class="column in-zubereitung">
+        <div class="column-header">
+            In Zubereitung
+            <span class="count" id="countIn">0</span>
+        </div>
+        <div class="items-grid" id="inZubereitung"></div>
+    </div>
+
+    <div class="column fertig">
+        <div class="column-header">
+            Fertig zum Abholen
+            <span class="count" id="countFertig">0</span>
+        </div>
+        <div class="items-grid" id="fertig"></div>
+    </div>
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDD08pTJTixg1zG3eflPWW7Bf_AalTotMI",
+    authDomain: "crepes-47350.firebaseapp.com",
+    databaseURL: "https://crepes-47350-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "crepes-47350",
+    storageBucket: "crepes-47350.firebasestorage.app",
+    messagingSenderId: "99668031660",
+    appId: "1:99668031660:web:817ef15db10bd488f74709"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const inZubereitung = document.getElementById("inZubereitung");
+const fertig = document.getElementById("fertig");
+
+// LIVE UPDATE
+onValue(ref(db, "orders"), (snapshot) => {
+    inZubereitung.innerHTML = "";
+    fertig.innerHTML = "";
+    let countIn = 0;
+    let countFertig = 0;
+
+    const orders = [];
+    snapshot.forEach((child) => {
+        orders.push({id: child.key, ...child.val()});
+    });
+
+    // Sortieren nach Nummer
+    orders.sort((a, b) => parseInt(a.nummer) - parseInt(b.nummer));
+
+    orders.forEach((data) => {
+        const div = document.createElement("div");
+        div.className = `order-card ${data.status}`;
+
+        div.innerHTML = `
+            <div class="order-number">#${data.nummer}</div>
+            <div class="order-name">${data.sorte}</div>
+        `;
+
+        if(data.status === "in_zubereitung"){
+            inZubereitung.appendChild(div);
+            countIn++;
+        } else if(data.status === "fertig"){
+            fertig.appendChild(div);
+            countFertig++;
+        }
+    });
+
+    if(countIn === 0){
+        inZubereitung.innerHTML = '<div class="empty">🎉 Alles erledigt!</div>';
+    }
+    if(countFertig === 0){
+        fertig.innerHTML = '<div class="empty">👌 Alle abgeholt!</div>';
+    }
+
+    document.getElementById("countIn").textContent = countIn;
+    document.getElementById("countFertig").textContent = countFertig;
+});
+</script>
+
+</body>
+</html>
