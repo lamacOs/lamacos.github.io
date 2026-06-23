@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crêpe mit Kinderschokolade</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --accent:#ff7a00;
+    --border:#e5e7eb;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 20px;
+}
+
+.container{
+    max-width:800px;
+    width:100%;
+    text-align:center;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:50px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.06);
+}
+
+.logo{
+    width:140px;
+    height:auto;
+    margin-bottom:30px;
+}
+
+h1{
+    color:var(--accent);
+    font-size:clamp(2rem,5vw,3.5rem);
+    margin-bottom:25px;
+    font-weight:800;
+}
+
+p{
+    color:var(--muted);
+    font-size:1.15rem;
+    line-height:1.8;
+    max-width:650px;
+    margin:0 auto;
+}
+
+@media (max-width:700px){
+    .card{
+        padding:35px 25px;
+    }
+
+    p{
+        font-size:1rem;
+    }
+
+    .logo{
+        width:110px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <!-- Standardlogo -->
+        <img
+            src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png"
+            alt="Logo"
+            class="logo"
+        >
+
+        <h1>Crêpe mit Kinderschokolade</h1>
+
+        <p>
+            Ein Crêpe mit Kinderschokolade ist eine köstliche Süßspeise aus einem
+            dünnen, goldbraun gebackenen Teig. Direkt nach dem Backen wird die
+            zarte Kinderschokolade auf den warmen Crêpe gelegt, sodass sie langsam
+            schmilzt und eine cremige Füllung bildet. Der feine Duft des frischen
+            Crêpes verbindet sich dabei mit dem unverwechselbaren Geschmack der
+            milden Vollmilchschokolade. Anschließend wird der Crêpe zusammengefaltet
+            oder eingerollt und warm serviert. Die Kombination aus dem weichen Teig
+            und der geschmolzenen Schokolade sorgt für ein besonders süßes und
+            leckeres Geschmackserlebnis, das bei Kindern und Erwachsenen
+            gleichermaßen beliebt ist.
+        </p>
+
+    </div>
+</div>
+
+</body>
+</html>
