@@ -245,16 +245,12 @@ h2{
 <div class="container">
 
 <header>
-    <h1>🥐 Crêpe Bestellungen</h1>
-    <div class="nav-buttons">
-        <button class="secondary" onclick="window.location.href='status.html'">📊 Status Board</button>
-        <button class="secondary" onclick="window.location.href='kiosk.html'">🖥️ Kiosk Ansicht</button>
-    </div>
+    <h1>Crêpe Bestellungen</h1>
 </header>
 
 <!-- FORM -->
 <div class="card" id="formCard" style="display:none;">
-    <h2>➕ Neue Crêpe Bestellung</h2>
+    <h2>Neue Bestellung</h2>
 
     <div class="form-group">
         <label for="nummer">Bestellnummer</label>
@@ -263,28 +259,28 @@ h2{
 
     <div class="form-group">
         <label for="sorte">Sorte</label>
-        <input id="sorte" placeholder="z.B. Nutella, Straciatella">
+        <input id="sorte" placeholder="z.B. Nutella, Schinken-Käse">
     </div>
 
     <div class="form-group">
         <label for="preis">Preis</label>
-        <input id="preis" placeholder="z.B. 4.50€">
+        <input id="preis" placeholder="z.B. 2.50€">
     </div>
 
     <div class="form-buttons">
-        <button onclick="addOrder()">✅ Speichern</button>
-        <button class="secondary" onclick="hideForm()">❌ Abbrechen</button>
+        <button onclick="addOrder()">Speichern</button>
+        <button class="secondary" onclick="hideForm()">Abbrechen</button>
     </div>
 </div>
 
 <!-- TOGGLE BUTTON -->
 <div style="margin-top:20px;">
-    <button onclick="showForm()" id="toggleBtn">➕ Neue Bestellung</button>
+    <button onclick="showForm()" id="toggleBtn">Neue Bestellung</button>
 </div>
 
 <!-- LIST -->
 <div class="card">
-    <h2>📋 Aktuelle Bestellungen (In Zubereitung)</h2>
+    <h2>Aktuelle Bestellungen (In Zubereitung)</h2>
     <div id="list" class="list"></div>
 </div>
 
@@ -328,7 +324,7 @@ window.addOrder = () => {
     const preis = document.getElementById("preis").value;
 
     if(!nummer || !sorte || !preis){
-        alert("❌ Bitte alle Felder ausfüllen!");
+        alert("Bitte alle Felder ausfüllen!");
         return;
     }
 
@@ -344,7 +340,7 @@ window.addOrder = () => {
 }
 
 window.deleteOrder = (orderId) => {
-    if(confirm("🗑️ Diese Bestellung wirklich löschen?")){
+    if(confirm("Diese Bestellung wirklich löschen?")){
         remove(ref(db, `orders/${orderId}`));
     }
 }
@@ -367,7 +363,7 @@ onValue(ref(db, "orders"), (snapshot) => {
     orders.sort((a, b) => parseInt(a.nummer) - parseInt(b.nummer));
 
     if(count === 0){
-        list.innerHTML = '<div class="empty">✨ Keine Bestellungen - Ruhe vor dem Sturm!</div>';
+        list.innerHTML = '<div class="empty">Keine Bestellungen - Ruhe vor dem Sturm!</div>';
         return;
     }
 
@@ -391,7 +387,7 @@ onValue(ref(db, "orders"), (snapshot) => {
                 <div style="font-size:18px;font-weight:700;color:var(--accent);">${order.preis}</div>
             </div>
             <div class="item-actions">
-                <button class="danger" onclick="deleteOrder('${order.id}')">🗑️ Löschen</button>
+                <button class="danger" onclick="deleteOrder('${order.id}')">Löschen</button>
             </div>
         `;
 
