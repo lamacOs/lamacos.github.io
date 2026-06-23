@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crêpe Bestellungen</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#f6f8fc;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --accent:#ff7a00;
+    --border:#e5e7eb;
+    --danger:#ef4444;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:Inter,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:30px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+h1{
+    color:var(--accent);
+    font-size:28px;
+}
+
+.nav-buttons{
+    display:flex;
+    gap:10px;
+}
+
+button{
+    background:var(--accent);
+    border:none;
+    color:white;
+    padding:10px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:all 0.3s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+button:hover, button:active{
+    opacity:0.9;
+    transform:translateY(-2px);
+}
+
+button.secondary{
+    background:#e5e7eb;
+    color:#111;
+}
+
+button.secondary:hover, button.secondary:active{
+    background:#d1d5db;
+}
+
+button.danger{
+    background:var(--danger);
+    padding:8px 12px;
+    font-size:14px;
+}
+
+button.danger:hover, button.danger:active{
+    background:#dc2626;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:20px;
+    margin-top:20px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border:1px solid var(--border);
+    border-radius:10px;
+    outline:none;
+    font-size:16px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(255,122,0,0.1);
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+label{
+    display:block;
+    font-weight:600;
+    margin-bottom:5px;
+    color:var(--text);
+}
+
+.form-buttons{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.form-buttons button{
+    flex:1;
+}
+
+.list{
+    margin-top:20px;
+}
+
+.item{
+    padding:16px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#f9fafb;
+    transition:all 0.3s;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.item:hover, .item:active{
+    border-color:var(--accent);
+    box-shadow:0 2px 8px rgba(255,122,0,0.1);
+}
+
+.item-info{
+    flex:1;
+    min-width:200px;
+}
+
+.item-number{
+    font-size:24px;
+    font-weight:700;
+    color:var(--accent);
+}
+
+.item-name{
+    font-size:16px;
+    font-weight:600;
+    margin:5px 0;
+}
+
+.item-price{
+    color:var(--muted);
+    font-size:14px;
+}
+
+.item-time{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:5px;
+}
+
+.item-actions{
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+
+.empty{
+    text-align:center;
+    color:var(--muted);
+    padding:30px;
+}
+
+h2{
+    font-size:20px;
+    margin-bottom:10px;
+    color:var(--text);
+}
+
+/* Mobile optimierung */
+@media (max-width: 600px) {
+    body{
+        padding:15px;
+    }
+
+    header{
+        flex-direction:column;
+        gap:15px;
+        align-items:flex-start;
+    }
+
+    .nav-buttons{
+        width:100%;
+        flex-wrap:wrap;
+    }
+
+    .nav-buttons button{
+        flex:1;
+        min-width:120px;
+    }
+
+    .item{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .item-actions{
+        width:100%;
+    }
+
+    .item-actions button{
+        flex:1;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+    <h1>🥐 Crêpe Bestellungen</h1>
+    <div class="nav-buttons">
+        <button class="secondary" onclick="window.location.href='status.html'">📊 Status Board</button>
+        <button class="secondary" onclick="window.location.href='kiosk.html'">🖥️ Kiosk Ansicht</button>
+    </div>
+</header>
+
+<!-- FORM -->
+<div class="card" id="formCard" style="display:none;">
+    <h2>➕ Neue Crêpe Bestellung</h2>
+
+    <div class="form-group">
+        <label for="nummer">Bestellnummer</label>
+        <input id="nummer" type="number" placeholder="z.B. 12" min="1" max="999">
+    </div>
+
+    <div class="form-group">
+        <label for="sorte">Sorte</label>
+        <input id="sorte" placeholder="z.B. Nutella, Straciatella">
+    </div>
+
+    <div class="form-group">
+        <label for="preis">Preis</label>
+        <input id="preis" placeholder="z.B. 4.50€">
+    </div>
+
+    <div class="form-buttons">
+        <button onclick="addOrder()">✅ Speichern</button>
+        <button class="secondary" onclick="hideForm()">❌ Abbrechen</button>
+    </div>
+</div>
+
+<!-- TOGGLE BUTTON -->
+<div style="margin-top:20px;">
+    <button onclick="showForm()" id="toggleBtn">➕ Neue Bestellung</button>
+</div>
+
+<!-- LIST -->
+<div class="card">
+    <h2>📋 Aktuelle Bestellungen (In Zubereitung)</h2>
+    <div id="list" class="list"></div>
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDD08pTJTixg1zG3eflPWW7Bf_AalTotMI",
+    authDomain: "crepes-47350.firebaseapp.com",
+    databaseURL: "https://crepes-47350-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "crepes-47350",
+    storageBucket: "crepes-47350.firebasestorage.app",
+    messagingSenderId: "99668031660",
+    appId: "1:99668031660:web:817ef15db10bd488f74709"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const list = document.getElementById("list");
+
+window.showForm = () => {
+    document.getElementById("formCard").style.display = "block";
+    document.getElementById("toggleBtn").style.display = "none";
+}
+
+window.hideForm = () => {
+    document.getElementById("formCard").style.display = "none";
+    document.getElementById("toggleBtn").style.display = "block";
+    document.getElementById("nummer").value = "";
+    document.getElementById("sorte").value = "";
+    document.getElementById("preis").value = "";
+}
+
+window.addOrder = () => {
+    const nummer = document.getElementById("nummer").value;
+    const sorte = document.getElementById("sorte").value;
+    const preis = document.getElementById("preis").value;
+
+    if(!nummer || !sorte || !preis){
+        alert("❌ Bitte alle Felder ausfüllen!");
+        return;
+    }
+
+    push(ref(db, "orders"), {
+        nummer: nummer.toString(),
+        sorte,
+        preis,
+        status: "in_zubereitung",
+        time: Date.now()
+    });
+
+    hideForm();
+}
+
+window.deleteOrder = (orderId) => {
+    if(confirm("🗑️ Diese Bestellung wirklich löschen?")){
+        remove(ref(db, `orders/${orderId}`));
+    }
+}
+
+// LIVE UPDATE
+onValue(ref(db, "orders"), (snapshot) => {
+    list.innerHTML = "";
+    let count = 0;
+
+    const orders = [];
+    snapshot.forEach((child) => {
+        const data = child.val();
+        if(data.status === "in_zubereitung"){
+            orders.push({id: child.key, ...data});
+            count++;
+        }
+    });
+
+    // Sortieren nach Nummer
+    orders.sort((a, b) => parseInt(a.nummer) - parseInt(b.nummer));
+
+    if(count === 0){
+        list.innerHTML = '<div class="empty">✨ Keine Bestellungen - Ruhe vor dem Sturm!</div>';
+        return;
+    }
+
+    orders.forEach((order) => {
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const time = new Date(order.time).toLocaleString("de-DE", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+
+        div.innerHTML = `
+            <div class="item-info">
+                <div class="item-number">#${order.nummer}</div>
+                <div class="item-name">${order.sorte}</div>
+                <div class="item-time">${time} Uhr</div>
+            </div>
+            <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+                <div style="font-size:18px;font-weight:700;color:var(--accent);">${order.preis}</div>
+            </div>
+            <div class="item-actions">
+                <button class="danger" onclick="deleteOrder('${order.id}')">🗑️ Löschen</button>
+            </div>
+        `;
+
+        list.appendChild(div);
+    });
+});
+</script>
+
+</body>
+</html>
