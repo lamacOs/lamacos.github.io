@@ -297,10 +297,10 @@ onValue(ref(db, "orders"), (snapshot) => {
     });
 
     if(countIn === 0){
-        inZubereitung.innerHTML = '<div class="empty">🎉 Alles erledigt!</div>';
+        inZubereitung.innerHTML = '<div class="empty">Alles erledigt!</div>';
     }
     if(countFertig === 0){
-        fertig.innerHTML = '<div class="empty">👌 Alle abgeholt!</div>';
+        fertig.innerHTML = '<div class="empty">Alle abgeholt!</div>';
     }
 
     document.getElementById("countIn").textContent = countIn;
