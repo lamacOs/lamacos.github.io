@@ -3,149 +3,214 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sprach- und Lautstärketracker</title>
+  <title>SprachTracker</title>
   <style>
-:root{
-    --bg:#ffffff;
-    --card:rgba(255,255,255,.85);
-    --text:#111111;
-    --text-secondary:#666666;
-    --border:#eaeaea;
-    --accent:#ff7a00;
-    --shadow:0 10px 30px rgba(0,0,0,.08);
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:Inter,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:40px 20px;
-}
-
-.container{
-    width:100%;
-    max-width:900px;
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:40px;
-    box-shadow:var(--shadow);
-    backdrop-filter:blur(20px);
-    text-align:center;
-}
-
-h1{
-    color:var(--accent);
-    font-size:clamp(2rem,4vw,3rem);
-    font-weight:800;
-    margin-bottom:30px;
-}
-
-button{
-    background:var(--accent);
-    color:white;
-    border:none;
-    border-radius:12px;
-    padding:14px 24px;
-    font-size:1rem;
-    font-weight:600;
-    cursor:pointer;
-    transition:.25s;
-}
-
-button:hover{
-    transform:translateY(-2px);
-}
-
-#volumeMeter{
-    width:100%;
-    height:22px;
-    background:#f2f2f2;
-    border-radius:999px;
-    overflow:hidden;
-    margin-top:30px;
-    border:1px solid var(--border);
-}
-
-#volume{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#ff7a00,#ff9d3d);
-    border-radius:999px;
-    transition:.15s;
-}
-
-#speechAnalysis,
-#feedback,
-#stats{
-    margin-top:24px;
-    font-size:1rem;
-    color:var(--text-secondary);
-}
-
-#speechAnalysis{
-    font-size:1.1rem;
-    font-weight:600;
-}
-
-#feedback{
-    font-weight:600;
-}
-
-#transcript{
-    margin-top:30px;
-    min-height:180px;
-    max-height:300px;
-    overflow-y:auto;
-    text-align:left;
-    background:#fafafa;
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:20px;
-    line-height:1.7;
-    color:var(--text);
-}
-
-#transcript::-webkit-scrollbar{
-    width:8px;
-}
-
-#transcript::-webkit-scrollbar-thumb{
-    background:#ddd;
-    border-radius:999px;
-}
-
-@media (prefers-color-scheme: dark){
-    :root{
-        --bg:#0f1115;
-        --card:#171a21;
-        --text:#ffffff;
-        --text-secondary:#bdbdbd;
-        --border:#2b2f38;
-        --shadow:none;
+    :root {
+      --bg: #ffffff;
+      --card: rgba(255, 255, 255, 0.85);
+      --text: #111111;
+      --text-secondary: #666666;
+      --border: #eaeaea;
+      --accent: #ff7a00;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
-    #volumeMeter{
-        background:#222;
+    [data-theme="dark"] {
+      --bg: #0f1115;
+      --card: #171a21;
+      --text: #ffffff;
+      --text-secondary: #bdbdbd;
+      --border: #2b2f38;
+      --shadow: none;
     }
 
-    #transcript{
-        background:#11151c;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-}
-</style>
+
+    body {
+      font-family: Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-section img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .theme-toggle {
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: 0.3s;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    .container {
+      flex: 1;
+      width: 100%;
+      max-width: 900px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: var(--shadow);
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--accent);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 30px;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+
+    #volumeMeter {
+      width: 100%;
+      height: 22px;
+      background: #f2f2f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 30px;
+      border: 1px solid var(--border);
+    }
+
+    [data-theme="dark"] #volumeMeter {
+      background: #222;
+    }
+
+    #volume {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff7a00, #ff9d3d);
+      border-radius: 999px;
+      transition: 0.15s;
+    }
+
+    #speechAnalysis,
+    #feedback,
+    #stats {
+      margin-top: 24px;
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+
+    #speechAnalysis {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    #feedback {
+      font-weight: 600;
+    }
+
+    #transcript {
+      margin-top: 30px;
+      min-height: 180px;
+      max-height: 300px;
+      overflow-y: auto;
+      text-align: left;
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    [data-theme="dark"] #transcript {
+      background: #11151c;
+    }
+
+    #transcript::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #transcript::-webkit-scrollbar-thumb {
+      background: #ddd;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 16px 20px;
+      }
+
+      .container {
+        margin: 20px;
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <nav class="navbar">
+    <div class="logo-section">
+      <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png" alt="Logo">
+      <span class="logo-text">SprachTracker</span>
+    </div>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+  </nav>
+
   <div class="container">
     <h1>Sprach- und Lautstärketracker</h1>
     <button id="startBtn">Start Aufzeichnung</button>
@@ -159,66 +224,80 @@ button:hover{
   </div>
 
   <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+    
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    themeToggle.innerText = currentTheme === 'dark' ? '☀️' : '🌙';
+
+    themeToggle.addEventListener('click', () => {
+      const theme = htmlElement.getAttribute('data-theme');
+      const newTheme = theme === 'dark' ? 'light' : 'dark';
+      htmlElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      themeToggle.innerText = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+
     let audioContext;
     let analyser;
     let microphone;
     let speakingStartTime = null;
     let totalSpeakingTime = 0;
-    let totalListenerTime = 0;
     let isSpeaking = false;
     let lastTranscript = "";  
     let isRecording = false;
+    let animationFrameId = null;
 
-    let speakers = {};  // Sprecher ID-Tracking
-    let speakerCounter = 1;  // Zähler für Sprecher
-
-    // Web Speech API: Sprach-Erkennung starten
     let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'de-DE'; // Sprache auf Deutsch setzen
-    recognition.continuous = true;  // Kontinuierliche Erkennung
+    recognition.lang = 'de-DE';
+    recognition.continuous = true;
+    recognition.interimResults = true;
 
-    // Transkription der Sprache in Echtzeit
     recognition.onresult = (event) => {
-      let transcript = event.results[event.results.length - 1][0].transcript;
-      let speakerId = getSpeakerId();  // Identifiziere den Sprecher
+      let transcript = '';
+      for (let i = event.results.length - 1; i >= 0; i--) {
+        if (event.results[i].isFinal) {
+          transcript = event.results[i][0].transcript;
+          break;
+        }
+      }
 
-      // Anzeige des Transkripts mit Sprecher-ID
-      if (transcript !== lastTranscript) {
-        document.getElementById('transcript').innerText += `Sprecher ${speakerId}: ${transcript}\n`;
+      if (transcript !== lastTranscript && transcript) {
+        document.getElementById('transcript').innerText += `${transcript}\n`;
         lastTranscript = transcript;
       }
     };
 
-    // Wenn die Spracherkennung beginnt
     recognition.onstart = () => {
       console.log('Spracherkennung läuft...');
     };
 
-    // Wenn die Spracherkennung stoppt
     recognition.onend = () => {
       console.log('Spracherkennung gestoppt');
+      if (isRecording) {
+        setTimeout(() => recognition.start(), 100);
+      }
     };
 
-    // Wenn ein Fehler auftritt
     recognition.onerror = (event) => {
       console.error('Fehler bei der Spracherkennung:', event.error);
+      if (isRecording && event.error !== 'aborted') {
+        setTimeout(() => recognition.start(), 100);
+      }
     };
 
-    // Startet die Aufnahme und die Sprachtranskription
     function startRecording() {
-      if (isRecording) {
-        return; // Verhindert das erneute Starten, wenn bereits aufgenommen wird
-      }
+      if (isRecording) return;
 
-      // Setze den Status auf "Aufnahme läuft"
       isRecording = true;
       document.getElementById('startBtn').textContent = 'Stop Aufzeichnung';
+      document.getElementById('transcript').innerText = 'Sprach-Transkript: (Wird hier angezeigt)\n';
 
-      // Audio-Kontext für Lautstärkenerkennung
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
       analyser = audioContext.createAnalyser();
 
-      // Zugriff auf das Mikrofon
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
           microphone = audioContext.createMediaStreamSource(stream);
@@ -226,69 +305,64 @@ button:hover{
           analyser.fftSize = 256;
           monitorVolume();
         })
-        .catch(error => console.error("Fehler beim Zugreifen auf das Mikrofon:", error));
+        .catch(error => {
+          console.error("Fehler beim Zugreifen auf das Mikrofon:", error);
+          alert('Mikrofon-Zugriff verweigert');
+          isRecording = false;
+          document.getElementById('startBtn').textContent = 'Start Aufzeichnung';
+        });
 
-      // Starte die Spracherkennung
-      recognition.start(); // Startet die Spracherkennung
+      recognition.start();
     }
 
-    // Stoppt die Aufnahme und die Spracherkennung
     function stopRecording() {
-      recognition.stop();
+      recognition.abort();
       isRecording = false;
       document.getElementById('startBtn').textContent = 'Start Aufzeichnung';
+      if (isSpeaking) {
+        isSpeaking = false;
+        totalSpeakingTime += (Date.now() - speakingStartTime) / 1000;
+        document.getElementById('speechAnalysis').innerText = 'Du hast aufgehört zu sprechen.';
+        provideFeedback();
+      }
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
     }
 
-    // Funktion zur Lautstärkenerkennung
     function monitorVolume() {
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
 
-      function updateMeter() {
+      const updateMeter = () => {
         analyser.getByteFrequencyData(dataArray);
         const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
-        const volume = average / 255;  // Normalisieren
+        const volume = average / 255;
         document.getElementById('volume').style.width = `${volume * 100}%`;
 
         if (volume > 0.1) {
           if (!isSpeaking) {
             isSpeaking = true;
-            speakingStartTime = Date.now();  // Startzeit des Sprechens
+            speakingStartTime = Date.now();
             document.getElementById('speechAnalysis').innerText = 'Du sprichst...';
-            assignSpeaker();  // Weist einem Sprecher eine ID zu
           }
         } else {
           if (isSpeaking) {
             isSpeaking = false;
-            totalSpeakingTime += (Date.now() - speakingStartTime) / 1000;  // Umrechnung in Sekunden
+            totalSpeakingTime += (Date.now() - speakingStartTime) / 1000;
             document.getElementById('speechAnalysis').innerText = 'Du hast aufgehört zu sprechen.';
             provideFeedback();
           }
         }
 
-        requestAnimationFrame(updateMeter);
-      }
+        if (isRecording) {
+          animationFrameId = requestAnimationFrame(updateMeter);
+        }
+      };
 
       updateMeter();
     }
 
-    // Sprecher-ID zuweisen
-    function assignSpeaker() {
-      let speakerId = getSpeakerId();
-      if (!speakers[speakerId]) {
-        speakers[speakerId] = { id: speakerCounter, lastSpokenTime: Date.now() };
-        speakerCounter++;
-      }
-    }
-
-    // Gibt die Sprecher-ID zurück
-    function getSpeakerId() {
-      // Berechne basierend auf der Lautstärke, welcher Sprecher gerade spricht
-      // (Vereinfachung: Jedes Mal wird ein neuer Sprecher ID zugewiesen)
-      return speakerCounter;
-    }
-
-    // Feedback zur Kommunikation geben
     function provideFeedback() {
       let feedbackMessage = "Feedback: Deine Sprechzeit ist gut.";
       if (totalSpeakingTime > 10) {
@@ -297,17 +371,14 @@ button:hover{
 
       document.getElementById('feedback').innerText = feedbackMessage;
       document.getElementById('stats').innerText = `Gesamtsprechzeit: ${Math.round(totalSpeakingTime)} Sekunden`;
-      setTimeout(() => {
-        totalSpeakingTime = 0;
-      }, 30000);
+      totalSpeakingTime = 0;
     }
 
-    // Event Listener für den Button
     document.getElementById('startBtn').addEventListener('click', () => {
       if (isRecording) {
-        stopRecording(); // Stoppe, wenn bereits aufgenommen wird
+        stopRecording();
       } else {
-        startRecording(); // Starte, wenn noch nicht aufgenommen wird
+        startRecording();
       }
     });
   </script>
