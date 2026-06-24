@@ -5,71 +5,145 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sprach- und Lautstärketracker</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      height: 100vh;
-      background-color: #f4f4f4;
+:root{
+    --bg:#ffffff;
+    --card:rgba(255,255,255,.85);
+    --text:#111111;
+    --text-secondary:#666666;
+    --border:#eaeaea;
+    --accent:#ff7a00;
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Inter,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 20px;
+}
+
+.container{
+    width:100%;
+    max-width:900px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:40px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(20px);
+    text-align:center;
+}
+
+h1{
+    color:var(--accent);
+    font-size:clamp(2rem,4vw,3rem);
+    font-weight:800;
+    margin-bottom:30px;
+}
+
+button{
+    background:var(--accent);
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:14px 24px;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.25s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+#volumeMeter{
+    width:100%;
+    height:22px;
+    background:#f2f2f2;
+    border-radius:999px;
+    overflow:hidden;
+    margin-top:30px;
+    border:1px solid var(--border);
+}
+
+#volume{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#ff7a00,#ff9d3d);
+    border-radius:999px;
+    transition:.15s;
+}
+
+#speechAnalysis,
+#feedback,
+#stats{
+    margin-top:24px;
+    font-size:1rem;
+    color:var(--text-secondary);
+}
+
+#speechAnalysis{
+    font-size:1.1rem;
+    font-weight:600;
+}
+
+#feedback{
+    font-weight:600;
+}
+
+#transcript{
+    margin-top:30px;
+    min-height:180px;
+    max-height:300px;
+    overflow-y:auto;
+    text-align:left;
+    background:#fafafa;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:20px;
+    line-height:1.7;
+    color:var(--text);
+}
+
+#transcript::-webkit-scrollbar{
+    width:8px;
+}
+
+#transcript::-webkit-scrollbar-thumb{
+    background:#ddd;
+    border-radius:999px;
+}
+
+@media (prefers-color-scheme: dark){
+    :root{
+        --bg:#0f1115;
+        --card:#171a21;
+        --text:#ffffff;
+        --text-secondary:#bdbdbd;
+        --border:#2b2f38;
+        --shadow:none;
     }
-    .container {
-      text-align: center;
-      padding: 20px;
-      border-radius: 10px;
-      background-color: white;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      width: 80%;
-      max-width: 600px;
+
+    #volumeMeter{
+        background:#222;
     }
-    #volumeMeter {
-      width: 100%;
-      height: 20px;
-      background-color: #ddd;
-      border-radius: 5px;
-      margin-top: 20px;
+
+    #transcript{
+        background:#11151c;
     }
-    #volume {
-      height: 100%;
-      background-color: #007bff;
-      border-radius: 5px;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #feedback {
-      margin-top: 20px;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-    #speechAnalysis {
-      margin-top: 20px;
-      font-size: 1.1rem;
-    }
-    #stats {
-      margin-top: 20px;
-      font-size: 1rem;
-      color: #666;
-    }
-    #transcript {
-      margin-top: 20px;
-      font-size: 1rem;
-      background-color: #f0f0f0;
-      padding: 10px;
-      border-radius: 5px;
-      min-height: 100px;
-      overflow-y: auto;
-    }
-  </style>
+}
+</style>
 </head>
 <body>
   <div class="container">
