@@ -1,772 +1,775 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>lamacOs — Live Kamera</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lamacOs — Live Kamera</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --accent: #ff7a00;
-      --light-bg: #ffffff;
-      --light-text: #111111;
-      --light-muted: #666666;
-      --light-card: #ffffff;
-      --light-border: #eaeaea;
-      
-      --dark-bg: #0f1115;
-      --dark-text: #ffffff;
-      --dark-muted: #bdbdbd;
-      --dark-card: #171a21;
-      --dark-border: #2b2f38;
+  <style>
+    :root {
+      --accent: #ff7a00;
+      --light-bg: #ffffff;
+      --light-text: #111111;
+      --light-muted: #666666;
+      --light-card: #ffffff;
+      --light-border: #eaeaea;
 
-      --bg: var(--light-bg);
-      --text: var(--light-text);
-      --muted: var(--light-muted);
-      --card-bg: var(--dark-card);
-      --border: var(--light-border);
-    }
+      --dark-bg: #0f1115;
+      --dark-text: #ffffff;
+      --dark-muted: #bdbdbd;
+      --dark-card: #171a21;
+      --dark-border: #2b2f38;
 
-    [data-theme="dark"] {
-      --bg: var(--dark-bg);
-      --text: var(--dark-text);
-      --muted: var(--dark-muted);
-      --card-bg: var(--dark-card);
-      --border: var(--dark-border);
-    }
+      --bg: var(--light-bg);
+      --text: var(--light-text);
+      --muted: var(--light-muted);
+      --card-bg: var(--light-card);
+      --border: var(--light-border);
+    }
 
-    * {
-      box-sizing: border-box;
-    }
+    [data-theme="dark"] {
+      --bg: var(--dark-bg);
+      --text: var(--dark-text);
+      --muted: var(--dark-muted);
+      --card-bg: var(--dark-card);
+      --border: var(--dark-border);
+    }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, sans-serif;
-      transition: background 0.3s ease, color 0.3s ease;
-      -webkit-font-smoothing: antialiased;
-    }
+    * {
+      box-sizing: border-box;
+    }
 
-    h1, h2, h3, h4 {
-      color: var(--accent);
-      margin: 0;
-    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
+      -webkit-font-smoothing: antialiased;
+    }
 
-    h1 {
-      font-size: clamp(2.2rem, 5vw, 3.5rem);
-      font-weight: 800;
-    }
+    h1, h2, h3, h4 {
+      color: var(--accent);
+      margin: 0;
+    }
 
-    h2 {
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+    }
 
-    h3 {
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
 
-    /* NAVBAR */
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      transition: all 0.3s ease;
-    }
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
 
-    [data-theme="dark"] .navbar {
-      background: rgba(15, 17, 21, 0.7);
-    }
+    /* NAVBAR */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
 
-    .navbar-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    [data-theme="dark"] .navbar {
+      background: rgba(15, 17, 21, 0.7);
+    }
 
-    .navbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-    .navbar-logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-    }
+    .navbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-    .navbar-title {
-      font-weight: 800;
-      font-size: 16px;
-      color: #111111;
-    }
+    .navbar-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
 
-    [data-theme="dark"] .navbar-title {
-      color: #ffffff;
-    }
+    .navbar-title {
+      font-weight: 800;
+      font-size: 16px;
+      color: #111111;
+    }
 
-    .navbar-right {
-      display: flex;
-      gap: 8px;
-    }
+    [data-theme="dark"] .navbar-title {
+      color: #ffffff;
+    }
 
-    /* MAIN CONTAINER */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 60px 24px;
-      min-height: calc(100vh - 80px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
+    .navbar-right {
+      display: flex;
+      gap: 8px;
+    }
 
-    /* SECTIONS */
-    .section {
-      text-align: center;
-      display: none;
-    }
+    /* MAIN CONTAINER */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 24px;
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
 
-    .section.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
+    /* SECTIONS */
+    .section {
+      text-align: center;
+      display: none;
+      width: 100%;
+    }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .section.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
 
-    /* MENU */
-    #menuSection {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      align-items: center;
-    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    #menuSection h1 {
-      margin-bottom: 16px;
-    }
+    /* MENU */
+    #menuSection h1 {
+      margin-bottom: 16px;
+    }
 
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-width: 300px;
-    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 300px;
+    }
 
-    /* BUTTONS */
-    .btn {
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 16px 32px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: Inter, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
+    /* BUTTONS */
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 32px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: Inter, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(255, 122, 0, 0.3);
-    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 122, 0, 0.3);
+    }
 
-    .btn:active {
-      transform: translateY(0);
-    }
+    .btn:active {
+      transform: translateY(0);
+    }
 
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
-    .btn-secondary:hover {
-      background: var(--card-bg);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
 
-    /* VIDEO SECTIONS */
-    .video-section {
-      width: 100%;
-      max-width: 800px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-      align-items: center;
-    }
+    .btn-secondary:hover {
+      background: var(--card-bg);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
 
-    .video-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      width: 100%;
-    }
+    /* VIDEO SECTIONS */
+    .video-section {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      align-items: center;
+    }
 
-    [data-theme="dark"] .video-card {
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
+    .video-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+    }
 
-    .video-card video {
-      width: 100%;
-      display: block;
-      background: #000;
-    }
+    [data-theme="dark"] .video-card {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
 
-    .video-info {
-      padding: 24px;
-    }
+    .video-card video {
+      width: 100%;
+      display: block;
+      background: #000;
+    }
 
-    .video-info h3 {
-      margin-bottom: 8px;
-    }
+    .video-info {
+      padding: 24px;
+    }
 
-    .code-display {
-      background: linear-gradient(135deg, rgba(255, 122, 0, 0.1), rgba(255, 122, 0, 0.05));
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      padding: 24px;
-      margin: 24px 0;
-      text-align: center;
-    }
+    .video-info h3 {
+      margin-bottom: 8px;
+    }
 
-    .code-display p {
-      color: var(--muted);
-      margin: 0 0 8px 0;
-      font-size: 0.9rem;
-    }
+    .code-display {
+      background: linear-gradient(135deg, rgba(255, 122, 0, 0.1), rgba(255, 122, 0, 0.05));
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      text-align: center;
+      width: 100%;
+    }
 
-    .code-display h2 {
-      margin: 0;
-      font-size: 2.5rem;
-      letter-spacing: 3px;
-      font-family: 'Courier New', monospace;
-      font-weight: 800;
-    }
+    .code-display p {
+      color: var(--muted);
+      margin: 0 0 8px 0;
+      font-size: 0.9rem;
+    }
 
-    /* INPUT FIELDS */
-    input {
-      width: 100%;
-      padding: 16px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--card-bg);
-      color: var(--text);
-      font-family: Inter, sans-serif;
-      font-size: 1rem;
-      text-align: center;
-      letter-spacing: 2px;
-      font-weight: 600;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-    }
+    .code-display h2 {
+      margin: 0;
+      font-size: 2.5rem;
+      letter-spacing: 3px;
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+    }
 
-    input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
-    }
+    /* INPUT FIELDS */
+    input {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      color: var(--text);
+      font-family: Inter, sans-serif;
+      font-size: 1rem;
+      text-align: center;
+      letter-spacing: 2px;
+      font-weight: 600;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
 
-    input::placeholder {
-      color: var(--muted);
-    }
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
+    }
 
-    /* CONTROL BUTTONS */
-    .control-buttons {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-      flex-direction: column;
-    }
+    input::placeholder {
+      color: var(--muted);
+    }
 
-    .control-buttons .btn {
-      flex: 1;
-    }
+    /* CONTROL BUTTONS */
+    .control-buttons {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      flex-direction: column;
+    }
 
-    /* LOADING INDICATOR */
-    .loader {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 0.8s linear infinite;
-    }
+    .control-buttons .btn {
+      flex: 1;
+    }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    /* STATUS */
+    .status {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+      width: 100%;
+    }
 
-    /* STATUS */
-    .status {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--card-bg);
-      border-radius: 8px;
-      border-left: 3px solid var(--accent);
-    }
+    .status.connecting {
+      color: #f59e0b;
+    }
 
-    .status.connecting {
-      color: #f59e0b;
-    }
+    .status.connected {
+      color: #10b981;
+    }
 
-    .status.connected {
-      color: #10b981;
-    }
+    .status.error {
+      color: #ef4444;
+      border-left-color: #ef4444;
+    }
 
-    .status.error {
-      color: #ef4444;
-      border-left-color: #ef4444;
-    }
+    /* THEME TOGGLE */
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
 
-    /* THEME TOGGLE */
-    .theme-toggle {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      transition: all 0.3s ease;
-    }
+    .theme-toggle:hover {
+      background: var(--card-bg);
+    }
 
-    .theme-toggle:hover {
-      background: var(--card-bg);
-    }
+    /* FOOTER */
+    footer {
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: auto;
+    }
 
-    /* FOOTER */
-    footer {
-      background: var(--card-bg);
-      border-top: 1px solid var(--border);
-      padding: 24px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-top: auto;
-    }
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .container {
+        padding: 40px 16px;
+      }
 
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      .container {
-        padding: 40px 16px;
-      }
+      .button-group {
+        min-width: 100%;
+      }
 
-      .button-group {
-        min-width: 100%;
-      }
+      .btn {
+        padding: 14px 24px;
+        font-size: 0.95rem;
+      }
 
-      .btn {
-        padding: 14px 24px;
-        font-size: 0.95rem;
-      }
-
-      .code-display h2 {
-        font-size: 2rem;
-      }
-    }
-  </style>
+      .code-display h2 {
+        font-size: 2rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <div class="navbar-left">
-        <img class="navbar-logo" src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png" alt="lamacOs Logo">
-        <h1 class="navbar-title">lamacOs Live</h1>
-      </div>
-      <div class="navbar-right">
-        <button class="theme-toggle" id="themeToggle" title="Theme umschalten">🌗</button>
-      </div>
-    </div>
-  </nav>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-left">
+        <img class="navbar-logo" src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png" alt="lamacOs Logo">
+        <h1 class="navbar-title">lamacOs Live</h1>
+      </div>
+      <div class="navbar-right">
+        <button class="theme-toggle" id="themeToggle" title="Theme umschalten">🌗</button>
+      </div>
+    </div>
+  </nav>
 
-  <!-- MAIN CONTENT -->
-  <div class="container">
+  <!-- MAIN CONTENT -->
+  <div class="container">
 
-    <!-- MENU SECTION -->
-    <section id="menuSection" class="section active">
-      <h1>Live Kamera System</h1>
-      <p style="color: var(--muted); font-size: 1.1rem; margin-bottom: 32px;">Teile deinen Bildschirm oder deine Kamera in Echtzeit</p>
-      <div class="button-group">
-        <button class="btn" onclick="startSender()">
-          <span>📤</span>
-          <span>Hosten (Kamera teilen)</span>
-        </button>
-        <button class="btn btn-secondary" onclick="showJoin()">
-          <span>📥</span>
-          <span>Empfangen (Code eingeben)</span>
-        </button>
-      </div>
-    </section>
+    <!-- MENU SECTION -->
+    <section id="menuSection" class="section active">
+      <h1>Live Kamera System</h1>
+      <p style="color: var(--muted); font-size: 1.1rem; margin-bottom: 32px;">Teile deinen Bildschirm oder deine Kamera in Echtzeit</p>
+      <div class="button-group">
+        <button class="btn" onclick="startSender()">
+          <span>📤</span>
+          <span>Hosten (Kamera teilen)</span>
+        </button>
+        <button class="btn btn-secondary" onclick="showJoin()">
+          <span>📥</span>
+          <span>Empfangen (Code eingeben)</span>
+        </button>
+      </div>
+    </section>
 
-    <!-- SENDER SECTION -->
-    <section id="senderSection" class="section">
-      <div class="video-section">
-        <h2>📤 Sender aktiv</h2>
-        
-        <div class="video-card">
-          <video id="localVideo" autoplay muted playsinline></video>
-        </div>
+    <!-- SENDER SECTION -->
+    <section id="senderSection" class="section">
+      <div class="video-section">
+        <h2>📤 Sender aktiv</h2>
 
-        <div class="code-display">
-          <p>Teile diesen Code mit dem Empfänger:</p>
-          <h2 id="code">—</h2>
-          <p style="margin-top: 12px; font-size: 0.85rem;">Dieser Code ist 30 Minuten lang gültig</p>
-        </div>
+        <div class="video-card">
+          <video id="localVideo" autoplay muted playsinline></video>
+        </div>
 
-        <div class="status connected">
-          ✓ Verbindung aktiv und stabil
-        </div>
+        <div class="code-display">
+          <p>Teile diesen Code mit dem Empfänger:</p>
+          <h2 id="code">—</h2>
+          <p style="margin-top: 12px; font-size: 0.85rem;">Dieser Code ist 30 Minuten lang gültig</p>
+        </div>
 
-        <div class="control-buttons">
-          <button class="btn" onclick="copyCod()">📋 Code kopieren</button>
-          <button class="btn btn-secondary" onclick="goBack()">← Zurück zum Menü</button>
-        </div>
-      </div>
-    </section>
+        <div id="senderStatus" class="status connecting">
+          🔄 Warte auf Empfänger...
+        </div>
 
-    <!-- RECEIVER SECTION -->
-    <section id="receiverSection" class="section">
-      <div class="video-section">
-        <h2>📥 Empfänger</h2>
-        
-        <p style="color: var(--muted); margin-bottom: 24px;">Gib den Code ein, um die Kamera zu sehen</p>
+        <div class="control-buttons">
+          <button class="btn" onclick="copyCode()">📋 Code kopieren</button>
+          <button class="btn btn-secondary" onclick="goBack()">← Zurück zum Menü</button>
+        </div>
+      </div>
+    </section>
 
-        <input id="inputCode" placeholder="CODE EINGEBEN" maxlength="6">
-        
-        <button class="btn" onclick="join()" style="width: 100%; margin-top: 16px;">
-          <span id="joinButtonText">Start</span>
-        </button>
+    <!-- RECEIVER SECTION -->
+    <section id="receiverSection" class="section">
+      <div class="video-section">
+        <h2>📥 Empfänger</h2>
 
-        <div id="receiverStatus" class="status" style="display: none;"></div>
+        <p style="color: var(--muted); margin-bottom: 24px;">Gib den Code ein, um die Kamera zu sehen</p>
 
-        <div class="video-card" id="videoCardContainer" style="display: none; margin-top: 24px;">
-          <video id="remoteVideo" autoplay playsinline></video>
-        </div>
+        <input id="inputCode" placeholder="CODE EINGEBEN" maxlength="6">
 
-        <div class="control-buttons" style="margin-top: 24px;">
-          <button class="btn btn-secondary" onclick="goBack()">← Zurück zum Menü</button>
-        </div>
-      </div>
-    </section>
+        <button class="btn" id="joinBtn" onclick="join()" style="width: 100%; margin-top: 16px;">
+          <span id="joinButtonText">Start</span>
+        </button>
 
-  </div>
+        <div id="receiverStatus" class="status" style="display: none;"></div>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2026 lamacHub — Live Kamera System</p>
-  </footer>
+        <div class="video-card" id="videoCardContainer" style="display: none; margin-top: 24px;">
+          <video id="remoteVideo" autoplay playsinline></video>
+        </div>
 
-  <!-- Firebase Scripts -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import {
-      getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, deleteDoc, collection
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        <div class="control-buttons" style="margin-top: 24px;">
+          <button class="btn btn-secondary" onclick="goBack()">← Zurück zum Menü</button>
+        </div>
+      </div>
+    </section>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDa3M2CdooyC6rhan-IH1wrS_fFCsqd9l4",
-      authDomain: "lamacoslivecam.firebaseapp.com",
-      projectId: "lamacoslivecam",
-      storageBucket: "lamacoslivecam.firebasestorage.app",
-      messagingSenderId: "907480106804",
-      appId: "1:907480106804:web:b25a8091943f255e518761"
-    };
+  </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 lamacHub — Live Kamera System</p>
+  </footer>
 
-    let pc;
-    let code;
-    let currentRole; // 'sender' or 'receiver'
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, deleteDoc, collection
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const servers = {
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
-        { urls: "stun:stun2.l.google.com:19302" }
-      ]
-    };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDa3M2CdooyC6rhan-IH1wrS_fFCsqd9l4",
+      authDomain: "lamacoslivecam.firebaseapp.com",
+      projectId: "lamacoslivecam",
+      storageBucket: "lamacoslivecam.firebasestorage.app",
+      messagingSenderId: "907480106804",
+      appId: "1:907480106804:web:b25a8091943f255e518761"
+    };
 
-    // ===== Theme Toggle =====
-    function initTheme() {
-      const saved = localStorage.getItem('livecam-theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', saved);
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') || 'dark';
-      const newTheme = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('livecam-theme', newTheme);
-    });
+    let pc = null;
+    let localStream = null;
+    let code = null;
+    let currentRole = null; // 'sender' or 'receiver'
+    let unsubCallDoc = null;
+    let unsubCandidates = null;
 
-    // ===== UI Helpers =====
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
+    const servers = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" }
+      ]
+    };
 
-    function updateStatus(element, text, type) {
-      if (!element) return;
-      element.textContent = text;
-      element.className = `status ${type}`;
-      element.style.display = 'block';
-    }
+    // ===== Theme Toggle =====
+    function initTheme() {
+      const saved = localStorage.getItem('livecam-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+    }
 
-    // ===== SENDER LOGIC =====
-    window.startSender = async function () {
-      currentRole = 'sender';
-      showSection('senderSection');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const newTheme = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('livecam-theme', newTheme);
+    });
 
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            frameRate: { ideal: 30, max: 60 }
-          },
-          audio: true
-        });
+    // ===== UI Helpers =====
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
 
-        document.getElementById('localVideo').srcObject = stream;
+    function updateStatus(element, text, type) {
+      if (!element) return;
+      element.textContent = text;
+      element.className = `status ${type}`;
+      element.style.display = 'block';
+    }
 
-        pc = new RTCPeerConnection(servers);
+    function cleanupConnection() {
+      if (unsubCallDoc) { unsubCallDoc(); unsubCallDoc = null; }
+      if (unsubCandidates) { unsubCandidates(); unsubCandidates = null; }
+      if (pc) { pc.close(); pc = null; }
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+        localStream = null;
+      }
+    }
 
-        stream.getTracks().forEach(track => {
-          pc.addTrack(track, stream);
-        });
+    // ===== SENDER LOGIC =====
+    window.startSender = async function () {
+      currentRole = 'sender';
+      showSection('senderSection');
 
-        code = Math.random().toString(36).substring(2, 8).toUpperCase();
-        document.getElementById('code').innerText = code;
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 30, max: 60 }
+          },
+          audio: true
+        });
 
-        const callDoc = doc(db, "calls", code);
-        const offerCandidates = collection(db, "calls", code, "offerCandidates");
-        const answerCandidates = collection(db, "calls", code, "answerCandidates");
+        document.getElementById('localVideo').srcObject = localStream;
 
-        // Handle ICE candidates
-        pc.onicecandidate = async (event) => {
-          if (event.candidate) {
-            try {
-              await setDoc(doc(offerCandidates, Date.now().toString()), event.candidate.toJSON());
-            } catch (e) {
-              console.warn('ICE candidate error:', e);
-            }
-          }
-        };
+        pc = new RTCPeerConnection(servers);
 
-        pc.onconnectionstatechange = () => {
-          console.log('Connection state:', pc.connectionState);
-        };
+        localStream.getTracks().forEach(track => {
+          pc.addTrack(track, localStream);
+        });
 
-        // Create offer
-        const offer = await pc.createOffer({
-          offerToReceiveVideo: false,
-          offerToReceiveAudio: false
-        });
+        code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        document.getElementById('code').innerText = code;
 
-        await pc.setLocalDescription(offer);
+        const callDoc = doc(db, "calls", code);
+        const offerCandidates = collection(db, "calls", code, "offerCandidates");
+        const answerCandidates = collection(db, "calls", code, "answerCandidates");
 
-        await setDoc(callDoc, {
-          offer: { sdp: offer.sdp, type: offer.type },
-          createdAt: new Date()
-        });
+        // ICE-Kandidaten des Senders speichern
+        pc.onicecandidate = async (event) => {
+          if (event.candidate) {
+            try {
+              await setDoc(doc(offerCandidates, Date.now().toString()), event.candidate.toJSON());
+            } catch (e) {
+              console.warn('ICE candidate error:', e);
+            }
+          }
+        };
 
-        // Listen for answer
-        onSnapshot(callDoc, (snap) => {
-          const data = snap.data();
-          if (data?.answer && pc.signalingState === 'stable') {
-            try {
-              pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-            } catch (e) {
-              console.warn('Remote description error:', e);
-            }
-          }
-        });
+        pc.onconnectionstatechange = () => {
+          console.log('Connection state:', pc.connectionState);
+          const statusEl = document.getElementById('senderStatus');
+          if (pc.connectionState === 'connected') {
+            updateStatus(statusEl, '✓ Verbindung aktiv und stabil', 'connected');
+          } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+            updateStatus(statusEl, '❌ Verbindung getrennt', 'error');
+          }
+        };
 
-        // Listen for answer ICE candidates
-        onSnapshot(answerCandidates, (snap) => {
-          snap.docChanges().forEach(change => {
-            if (change.type === 'added') {
-              const candidate = change.doc.data();
-              if (pc && pc.remoteDescription) {
-                try {
-                  pc.addIceCandidate(new RTCIceCandidate(candidate));
-                } catch (e) {
-                  console.warn('Add ICE candidate error:', e);
-                }
-              }
-            }
-          });
-        });
+        // Offer erstellen
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
 
-        localStorage.setItem('lastCode', code);
+        await setDoc(callDoc, {
+          offer: { sdp: offer.sdp, type: offer.type },
+          createdAt: new Date()
+        });
 
-        // Auto-cleanup after 30 minutes
-        setTimeout(() => {
-          if (currentRole === 'sender') {
-            stream.getTracks().forEach(track => track.stop());
-            pc?.close();
-          }
-        }, 30 * 60 * 1000);
+        // Auf Antwort des Empfängers warten
+        // WICHTIG: pc.signalingState ist nach setLocalDescription(offer)
+        // "have-local-offer", NICHT "stable". Die alte Prüfung auf 'stable'
+        // hat verhindert, dass die Antwort jemals verarbeitet wurde.
+        unsubCallDoc = onSnapshot(callDoc, (snap) => {
+          const data = snap.data();
+          if (data?.answer && pc && !pc.currentRemoteDescription) {
+            pc.setRemoteDescription(new RTCSessionDescription(data.answer))
+              .catch(e => console.warn('Remote description error:', e));
+          }
+        });
 
-      } catch (err) {
-        alert('Fehler beim Zugriff auf die Kamera:\n' + err.message);
-        goBack();
-      }
-    };
+        // Auf ICE-Kandidaten des Empfängers hören
+        unsubCandidates = onSnapshot(answerCandidates, (snap) => {
+          snap.docChanges().forEach(change => {
+            if (change.type === 'added') {
+              const candidate = change.doc.data();
+              if (pc) {
+                pc.addIceCandidate(new RTCIceCandidate(candidate))
+                  .catch(e => console.warn('Add ICE candidate error:', e));
+              }
+            }
+          });
+        });
 
-    window.copyCod = function () {
-      const codeText = document.getElementById('code').innerText;
-      navigator.clipboard.writeText(codeText).then(() => {
-        alert('Code kopiert: ' + codeText);
-      });
-    };
+        localStorage.setItem('lastCode', code);
 
-    // ===== RECEIVER LOGIC =====
-    window.showJoin = function () {
-      showSection('receiverSection');
-      const lastCode = localStorage.getItem('lastCode');
-      if (lastCode) {
-        document.getElementById('inputCode').value = lastCode;
-      }
-    };
+        // Automatisches Aufräumen nach 30 Minuten
+        setTimeout(() => {
+          if (currentRole === 'sender' && code) {
+            cleanupConnection();
+            deleteDoc(callDoc).catch(() => {});
+          }
+        }, 30 * 60 * 1000);
 
-    window.join = async function () {
-      const inputCode = document.getElementById('inputCode').value.trim().toUpperCase();
-      if (!inputCode) {
-        updateStatus(document.getElementById('receiverStatus'), '⚠ Bitte gib einen Code ein', 'error');
-        return;
-      }
+      } catch (err) {
+        alert('Fehler beim Zugriff auf die Kamera:\n' + err.message);
+        goBack();
+      }
+    };
 
-      currentRole = 'receiver';
-      updateStatus(document.getElementById('receiverStatus'), '🔄 Verbinde...', 'connecting');
-      document.getElementById('joinButtonText').textContent = 'Verbinde...';
-      document.getElementById('joinButtonText').disabled = true;
+    window.copyCode = function () {
+      const codeText = document.getElementById('code').innerText;
+      navigator.clipboard.writeText(codeText).then(() => {
+        alert('Code kopiert: ' + codeText);
+      }).catch(() => {
+        alert('Code: ' + codeText);
+      });
+    };
 
-      try {
-        const callDoc = doc(db, "calls", inputCode);
-        const data = (await getDoc(callDoc)).data();
+    // ===== RECEIVER LOGIC =====
+    window.showJoin = function () {
+      showSection('receiverSection');
+      const lastCode = localStorage.getItem('lastCode');
+      if (lastCode) {
+        document.getElementById('inputCode').value = lastCode;
+      }
+    };
 
-        if (!data?.offer) {
-          updateStatus(document.getElementById('receiverStatus'), '❌ Code nicht gefunden oder abgelaufen', 'error');
-          document.getElementById('joinButtonText').textContent = 'Start';
-          document.getElementById('joinButtonText').disabled = false;
-          return;
-        }
+    window.join = async function () {
+      const inputCode = document.getElementById('inputCode').value.trim().toUpperCase();
+      const joinBtn = document.getElementById('joinBtn');
+      const joinBtnText = document.getElementById('joinButtonText');
 
-        pc = new RTCPeerConnection(servers);
+      if (!inputCode) {
+        updateStatus(document.getElementById('receiverStatus'), '⚠ Bitte gib einen Code ein', 'error');
+        return;
+      }
 
-        // Handle incoming tracks
-        pc.ontrack = (event) => {
-          console.log('Received track:', event.track.kind);
-          document.getElementById('remoteVideo').srcObject = event.streams[0];
-          document.getElementById('videoCardContainer').style.display = 'block';
-          updateStatus(document.getElementById('receiverStatus'), '✓ Verbindung hergestellt', 'connected');
-        };
+      currentRole = 'receiver';
+      updateStatus(document.getElementById('receiverStatus'), '🔄 Verbinde...', 'connecting');
+      joinBtnText.textContent = 'Verbinde...';
+      joinBtn.disabled = true;
 
-        pc.onconnectionstatechange = () => {
-          console.log('Receiver connection state:', pc.connectionState);
-          if (pc.connectionState === 'failed') {
-            updateStatus(document.getElementById('receiverStatus'), '❌ Verbindung fehlgeschlagen', 'error');
-          }
-        };
+      try {
+        const callDoc = doc(db, "calls", inputCode);
+        const data = (await getDoc(callDoc)).data();
 
-        const answerCandidates = collection(db, "calls", inputCode, "answerCandidates");
+        if (!data?.offer) {
+          updateStatus(document.getElementById('receiverStatus'), '❌ Code nicht gefunden oder abgelaufen', 'error');
+          joinBtnText.textContent = 'Start';
+          joinBtn.disabled = false;
+          return;
+        }
 
-        pc.onicecandidate = async (event) => {
-          if (event.candidate) {
-            try {
-              await setDoc(doc(answerCandidates, Date.now().toString()), event.candidate.toJSON());
-            } catch (e) {
-              console.warn('Answer ICE candidate error:', e);
-            }
-          }
-        };
+        pc = new RTCPeerConnection(servers);
 
-        // Set remote description
-        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+        // Eingehende Tracks anzeigen
+        pc.ontrack = (event) => {
+          console.log('Received track:', event.track.kind);
+          document.getElementById('remoteVideo').srcObject = event.streams[0];
+          document.getElementById('videoCardContainer').style.display = 'block';
+          updateStatus(document.getElementById('receiverStatus'), '✓ Verbindung hergestellt', 'connected');
+        };
 
-        // Create answer
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
+        pc.onconnectionstatechange = () => {
+          console.log('Receiver connection state:', pc.connectionState);
+          if (pc.connectionState === 'failed') {
+            updateStatus(document.getElementById('receiverStatus'), '❌ Verbindung fehlgeschlagen', 'error');
+          }
+        };
 
-        await updateDoc(callDoc, {
-          answer: { sdp: answer.sdp, type: answer.type }
-        });
+        const answerCandidates = collection(db, "calls", inputCode, "answerCandidates");
 
-        // Listen for offer ICE candidates
-        const offerCandidates = collection(db, "calls", inputCode, "offerCandidates");
-        onSnapshot(offerCandidates, (snap) => {
-          snap.docChanges().forEach(change => {
-            if (change.type === 'added') {
-              const candidate = change.doc.data();
-              if (pc && pc.remoteDescription) {
-                try {
-                  pc.addIceCandidate(new RTCIceCandidate(candidate));
-                } catch (e) {
-                  console.warn('Add ICE candidate error:', e);
-                }
-              }
-            }
-          });
-        });
+        pc.onicecandidate = async (event) => {
+          if (event.candidate) {
+            try {
+              await setDoc(doc(answerCandidates, Date.now().toString()), event.candidate.toJSON());
+            } catch (e) {
+              console.warn('Answer ICE candidate error:', e);
+            }
+          }
+        };
 
-        document.getElementById('joinButtonText').textContent = 'Verbunden';
+        // Remote Description setzen
+        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
 
-      } catch (err) {
-        console.error('Join error:', err);
-        updateStatus(document.getElementById('receiverStatus'), '❌ Fehler: ' + (err.message || 'Unbekannt'), 'error');
-        document.getElementById('joinButtonText').textContent = 'Start';
-        document.getElementById('joinButtonText').disabled = false;
-      }
-    };
+        // Antwort erstellen
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
 
-    window.goBack = function () {
-      if (pc) {
-        pc.close();
-      }
-      if (currentRole === 'sender') {
-        document.getElementById('localVideo').srcObject?.getTracks().forEach(t => t.stop());
-      }
-      currentRole = null;
-      document.getElementById('receiverStatus').style.display = 'none';
-      document.getElementById('videoCardContainer').style.display = 'none';
-      document.getElementById('joinButtonText').textContent = 'Start';
-      showSection('menuSection');
-    };
+        await updateDoc(callDoc, {
+          answer: { sdp: answer.sdp, type: answer.type }
+        });
 
-    // Initialize
-    initTheme();
-  </script>
+        // Auf ICE-Kandidaten des Senders hören
+        const offerCandidates = collection(db, "calls", inputCode, "offerCandidates");
+        unsubCandidates = onSnapshot(offerCandidates, (snap) => {
+          snap.docChanges().forEach(change => {
+            if (change.type === 'added') {
+              const candidate = change.doc.data();
+              if (pc) {
+                pc.addIceCandidate(new RTCIceCandidate(candidate))
+                  .catch(e => console.warn('Add ICE candidate error:', e));
+              }
+            }
+          });
+        });
+
+        joinBtnText.textContent = 'Verbunden';
+
+      } catch (err) {
+        console.error('Join error:', err);
+        updateStatus(document.getElementById('receiverStatus'), '❌ Fehler: ' + (err.message || 'Unbekannt'), 'error');
+        joinBtnText.textContent = 'Start';
+        joinBtn.disabled = false;
+      }
+    };
+
+    window.goBack = function () {
+      cleanupConnection();
+      document.getElementById('localVideo').srcObject = null;
+      document.getElementById('remoteVideo').srcObject = null;
+      currentRole = null;
+      code = null;
+      document.getElementById('receiverStatus').style.display = 'none';
+      document.getElementById('videoCardContainer').style.display = 'none';
+      document.getElementById('joinButtonText').textContent = 'Start';
+      document.getElementById('joinBtn').disabled = false;
+      showSection('menuSection');
+    };
+
+    // Initialisieren
+    initTheme();
+  </script>
 
 </body>
 </html>
