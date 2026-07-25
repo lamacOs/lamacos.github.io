@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Design1 - Alben</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --panel:#0b1220;
+      --accent:#1e90ff;
+      --muted:#94a3b8;
+      --card:#0f1a2b;
+      --glass: rgba(255,255,255,0.03);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:
+      linear-gradient(180deg,#08101a 0%, #071226 100%);color:#e6eef8}
+    .app{
+      display:grid;
+      grid-template-columns:320px 1fr;
+      gap:18px;
+      height:100vh;
+      padding:20px;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      background:linear-gradient(180deg,var(--panel), #071224);
+      border-radius:12px;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      min-height:0;
+    }
+    .logo{font-weight:700;font-size:18px;color:var(--accent);display:flex;align-items:center;gap:10px}
+    .logo .dot{width:12px;height:12px;background:var(--accent);border-radius:3px;box-shadow:0 0 8px var(--accent)}
+    .albums{overflow:auto;padding-right:6px}
+    .album{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:10px;border-radius:8px;cursor:pointer;
+      background:transparent;border:1px solid transparent;
+      transition:all .15s;
+    }
+    .album:hover{background:var(--glass);border-color:rgba(255,255,255,0.02)}
+    .album.active{background:linear-gradient(90deg, rgba(30,144,255,0.08), rgba(30,144,255,0.03));border-color:rgba(30,144,255,0.12)}
+    .album .name{font-weight:600}
+    .meta{font-size:12px;color:var(--muted)}
+
+    .new-album{
+      display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;
+    }
+    .new-album input[type="text"], .password-input{
+      background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:inherit;
+    }
+    .btn{
+      background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:600;
+      box-shadow:0 6px 14px rgba(30,144,255,0.12);
+    }
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);box-shadow:none}
+    .footer-note{font-size:12px;color:var(--muted);margin-top:auto}
+
+    /* Main area */
+    .main{
+      min-height:0;display:flex;flex-direction:column;gap:12px;
+    }
+    .toolbar{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);
+      padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);
+    }
+    .controls{display:flex;gap:8px;align-items:center}
+    .uploader{display:flex;gap:8px;align-items:center}
+    .uploader input[type="file"]{display:none}
+    .thumb-grid{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;overflow:auto;padding:8px;border-radius:10px;
+    }
+    .thumb{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:8px;align-items:center;cursor:pointer;border:1px solid rgba(255,255,255,0.02);
+      transition:transform .12s;
+    }
+    .thumb img{width:100%;height:120px;object-fit:cover;border-radius:6px;}
+    .thumb:hover{transform:translateY(-6px)}
+
+    /* Empty state */
+    .empty{
+      height:calc(100% - 80px);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;
+      border-radius:10px;border:1px dashed rgba(255,255,255,0.02);padding:24px;
+    }
+
+    /* Fullscreen viewer */
+    .viewer{
+      position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.9));z-index:1000;
+      touch-action:none;overflow:hidden;
+    }
+    .viewer.show{display:flex}
+    .viewer .slide{
+      max-width:95vw;max-height:95vh;border-radius:10px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;
+    }
+    .viewer img{max-width:100%;max-height:100%;display:block;user-select:none;-webkit-user-drag:none;}
+    .viewer .close{
+      position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.06);color:#fff;padding:8px;border-radius:8px;cursor:pointer;
+    }
+    .viewer .nav{
+      position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;pointer-events:none;
+    }
+    .viewer .nav button{pointer-events:auto;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.04);color:#fff;padding:8px;border-radius:8px;cursor:pointer}
+    .viewer .caption{position:absolute;left:12px;bottom:18px;color:var(--muted);font-size:14px}
+
+    /* small screens */
+    @media(max-width:800px){
+      .app{grid-template-columns:1fr;grid-template-rows:auto 1fr;padding:12px}
+      .sidebar{order:2;height:220px}
+      .main{order:1}
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar" aria-labelledby="logo">
+      <div class="logo" id="logo"><span class="dot"></span> Design1 - Alben</div>
+
+      <div>
+        <div style="display:flex;gap:8px;margin-top:8px" class="new-album">
+          <input id="albumName" type="text" placeholder="Album-Name" />
+          <button id="createAlbumBtn" class="btn">Erstellen</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="albumPassword" class="password-input" type="password" placeholder="Album Passwort" />
+        </div>
+      </div>
+
+      <div style="margin-top:8px;font-size:13px;color:var(--muted)">Alben</div>
+      <div class="albums" id="albumsList" role="list" aria-label="Alben Liste"></div>
+
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="exportBtn" class="btn ghost">Export (JSON)</button>
+        <button id="importBtn" class="btn ghost">Import</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none" />
+      </div>
+
+      <div class="footer-note">Daten lokal im Browser gespeichert. Nicht sicher für sensible Bilder.</div>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <div>
+          <div style="font-weight:700" id="currentAlbumTitle">Kein Album ausgewählt</div>
+          <div class="meta" id="currentAlbumMeta">Wähle ein Album aus der linken Leiste.</div>
+        </div>
+
+        <div class="controls">
+          <label class="uploader btn" for="fileInput">Upload</label>
+          <input type="file" id="fileInput" multiple accept="image/*" />
+          <input id="linkInput" type="text" placeholder="Bild-Link hinzufügen (https://...)" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit" />
+          <button id="addLinkBtn" class="btn">Hinzufügen</button>
+          <button id="deleteAlbumBtn" class="btn ghost">Album löschen</button>
+        </div>
+      </div>
+
+      <div id="galleryArea" style="flex:1;min-height:0">
+        <div id="thumbGrid" class="thumb-grid"></div>
+        <div id="emptyState" class="empty" style="display:none">Noch keine Fotos in diesem Album. Verwende "Upload" oder füge einen Link hinzu.</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Fullscreen viewer -->
+  <div id="viewer" class="viewer" aria-hidden="true">
+    <div class="slide" id="slide">
+      <button class="close" id="closeViewer">Schließen ✕</button>
+      <div class="nav">
+        <button id="prevBtn" aria-label="Vorheriges">⟨</button>
+        <button id="nextBtn" aria-label="Nächstes">⟩</button>
+      </div>
+      <img id="viewerImg" src="" alt="Foto" draggable="false" />
+      <div class="caption" id="viewerCaption"></div>
+    </div>
+  </div>
+
+  <script>
+    // Design1: Alben mit Passwort, Fotos per Upload/Link, Touch gestures for viewer.
+    (function(){
+      // Utilities
+      const STORAGE_KEY = 'design1_albums_v1';
+      const albumsListEl = document.getElementById('albumsList');
+      const albumNameInput = document.getElementById('albumName');
+      const albumPasswordInput = document.getElementById('albumPassword');
+      const createAlbumBtn = document.getElementById('createAlbumBtn');
+      const fileInput = document.getElementById('fileInput');
+      const linkInput = document.getElementById('linkInput');
+      const addLinkBtn = document.getElementById('addLinkBtn');
+      const thumbGrid = document.getElementById('thumbGrid');
+      const emptyState = document.getElementById('emptyState');
+      const currentAlbumTitle = document.getElementById('currentAlbumTitle');
+      const currentAlbumMeta = document.getElementById('currentAlbumMeta');
+      const deleteAlbumBtn = document.getElementById('deleteAlbumBtn');
+      const exportBtn = document.getElementById('exportBtn');
+      const importBtn = document.getElementById('importBtn');
+      const importFile = document.getElementById('importFile');
+
+      const viewer = document.getElementById('viewer');
+      const viewerImg = document.getElementById('viewerImg');
+      const viewerCaption = document.getElementById('viewerCaption');
+      const closeViewer = document.getElementById('closeViewer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const slide = document.getElementById('slide');
+
+      let albums = loadAlbums();
+      let currentAlbumId = null;
+      let currentAlbumPasswordHash = null; // in-memory for session
+      let currentIndex = 0;
+
+      // ------------ Storage helpers ------------
+      function loadAlbums(){
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if(!raw) return [];
+          return JSON.parse(raw);
+        }catch(e){ console.warn('could not parse albums', e); return [] }
+      }
+      function saveAlbums(){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(albums));
+      }
+
+      // ------------ crypto helper ------------
+      async function hashPassword(password){
+        const enc = new TextEncoder();
+        const data = enc.encode(password + '::design1_salt_v1');
+        const hash = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+      }
+
+      // ------------ Album CRUD ------------
+      function renderAlbums(){
+        albumsListEl.innerHTML = '';
+        if(albums.length === 0){
+          albumsListEl.innerHTML = '<div class="meta" style="padding:8px;color:var(--muted)">Noch keine Alben</div>';
+          return;
+        }
+        albums.forEach(album=>{
+          const el = document.createElement('div');
+          el.className = 'album' + (album.id===currentAlbumId ? ' active' : '');
+          el.dataset.id = album.id;
+          el.tabIndex = 0;
+          el.innerHTML = `
+            <div>
+              <div class="name">${escapeHtml(album.name)}</div>
+              <div class="meta">${album.photos.length} Foto(s)</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn ghost openBtn">Öffnen</button>
+            </div>
+          `;
+          albumsListEl.appendChild(el);
+
+          el.querySelector('.openBtn').addEventListener('click', (ev)=>{
+            ev.stopPropagation();
+            openAlbum(album.id);
+          });
+          el.addEventListener('click', ()=>openAlbum(album.id));
+          el.addEventListener('keydown', (ev)=>{
+            if(ev.key === 'Enter') openAlbum(album.id);
+          });
+        });
+      }
+
+      async function createAlbum(){
+        const name = albumNameInput.value.trim();
+        const password = albumPasswordInput.value;
+        if(!name){ alert('Bitte einen Album-Namen eingeben.'); return; }
+        if(!password){ alert('Bitte ein Passwort eingeben.'); return; }
+
+        const id = 'alb_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+        const passHash = await hashPassword(password);
+        const album = {id, name, passHash, photos: []};
+        albums.unshift(album);
+        saveAlbums();
+        albumNameInput.value = '';
+        albumPasswordInput.value = '';
+        renderAlbums();
+        openAlbum(id, password); // auto-open using entered password
+      }
+
+      async function deleteAlbum(id){
+        const idx = albums.findIndex(a=>a.id===id);
+        if(idx === -1) return;
+        const pw = prompt('Zum Löschen Album-Passwort eingeben:');
+        if(pw === null) return;
+        const h = await hashPassword(pw);
+        if(h !== albums[idx].passHash){ alert('Passwort falsch. Album nicht gelöscht.'); return; }
+        if(!confirm('Album wirklich löschen? Alle Fotos gehen verloren.')) return;
+        albums.splice(idx,1);
+        saveAlbums();
+        if(currentAlbumId === id){ currentAlbumId = null; currentAlbumPasswordHash = null; renderMain(); }
+        renderAlbums();
+      }
+
+      async function openAlbum(id, passwordCandidate){
+        const album = albums.find(a=>a.id===id);
+        if(!album) return;
+        // verify password
+        if(!passwordCandidate){
+          const pw = prompt('Album-Passwort eingeben:');
+          if(pw === null) return;
+          passwordCandidate = pw;
+        }
+        const h = await hashPassword(passwordCandidate);
+        if(h !== album.passHash){
+          alert('Falsches Passwort.');
+          return;
+        }
+        currentAlbumId = id;
+        currentAlbumPasswordHash = h;
+        renderAlbums();
+        renderMain();
+      }
+
+      // ------------ Main area ------------
+      function renderMain(){
+        const album = albums.find(a=>a.id===currentAlbumId);
+        if(!album){
+          currentAlbumTitle.textContent = 'Kein Album ausgewählt';
+          currentAlbumMeta.textContent = 'Wähle ein Album aus der linken Leiste.';
+          thumbGrid.innerHTML = '';
+          emptyState.style.display = 'block';
+          return;
+        }
+        currentAlbumTitle.textContent = album.name;
+        currentAlbumMeta.textContent = `${album.photos.length} Foto(s) • Passwort geschützt`;
+        // render thumbnails
+        thumbGrid.innerHTML = '';
+        if(album.photos.length === 0){
+          emptyState.style.display = 'block';
+        }else{
+          emptyState.style.display = 'none';
+          album.photos.forEach((p, i)=>{
+            const t = document.createElement('div');
+            t.className = 'thumb';
+            t.dataset.index = i;
+            t.innerHTML = `<img src="${escapeAttr(p.src)}" alt="${escapeAttr(p.title || '')}" /><div style="width:100%"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:600">${escapeHtml(p.title || ('Foto ' + (i+1)))}</div><div style="display:flex;gap:6px"><button class="btn ghost viewBtn">Ansehen</button><button class="btn ghost delBtn">✖</button></div></div></div>`;
+            thumbGrid.appendChild(t);
+
+            t.querySelector('.viewBtn').addEventListener('click', ()=>openViewerAt(i));
+            t.querySelector('.delBtn').addEventListener('click', ()=>deletePhoto(i));
+            t.addEventListener('click', (e)=>{
+              // open full view if clicking image area
+              if(e.target.tagName.toLowerCase() !== 'button') openViewerAt(i);
+            });
+          });
+        }
+      }
+
+      async function addFilesToAlbum(files){
+        const album = albums.find(a=>a.id===currentAlbumId);
+        if(!album){ alert('Kein Album ausgewählt'); return; }
+        // read files as data URLs
+        for(const f of files){
+          if(!f.type.startsWith('image/')) continue;
+          try{
+            const src = await fileToDataURL(f);
+            album.photos.push({id:'p_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6), src, title: f.name});
+          }catch(e){ console.warn('file read error', e) }
+        }
+        saveAlbums();
+        renderMain();
+      }
+
+      function fileToDataURL(file){
+        return new Promise((res, rej)=>{
+          const r = new FileReader();
+          r.onload = ()=>res(r.result);
+          r.onerror = ()=>rej(new Error('File read error'));
+          r.readAsDataURL(file);
+        });
+      }
+
+      function addLinkToAlbum(url){
+        const album = albums.find(a=>a.id===currentAlbumId);
+        if(!album){ alert('Kein Album ausgewählt'); return; }
+        if(!isValidHttpUrl(url)){ alert('Bitte eine gültige URL eingeben'); return; }
+        album.photos.push({id:'p_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6), src: url, title: url.split('/').pop() || 'Link'});
+        saveAlbums();
+        linkInput.value = '';
+        renderMain();
+      }
+
+      function deletePhoto(index){
+        const album = albums.find(a=>a.id===currentAlbumId);
+        if(!album) return;
+        if(!confirm('Foto wirklich löschen?')) return;
+        album.photos.splice(index,1);
+        saveAlbums();
+        renderMain();
+      }
+
+      // ------------ Viewer (touch gestures) ------------
+      function openViewerAt(index){
+        const album = albums.find(a=>a.id===currentAlbumId);
+        if(!album || album.photos.length === 0) return;
+        currentIndex = Math.max(0, Math.min(album.photos.length-1, index));
+        showViewer();
+        updateViewerImg();
+      }
+      function showViewer(){
+        viewer.classList.add('show');
+        viewer.setAttribute('aria-hidden','false');
+      }
+      function hideViewer(){
+        viewer.classList.remove('show');
+        viewer.setAttribute('aria-hidden','true');
+      }
+      function updateViewerImg(){
+        const album = albums.find(a=>a.id===currentAlbumId);
+        if(!album) return;
+        const p = album.photos[currentIndex];
+        viewerImg.src = p.src;
+        viewerCaption.textContent = p.title || (`Foto ${currentIndex+1} / ${album.photos.length}`);
+      }
+      function nextPhoto(){
+        const album = albums.find(a=>a.id===currentAlbumId); if(!album) return;
+        currentIndex = (currentIndex+1) % album.photos.length; updateViewerImg();
+      }
+      function prevPhoto(){
+        const album = albums.find(a=>a.id===currentAlbumId); if(!album) return;
+        currentIndex = (currentIndex-1+album.photos.length) % album.photos.length; updateViewerImg();
+      }
+
+      // Touch gesture handling for slides
+      let touchStartX=0, touchStartY=0, touchCurX=0, touchCurY=0, isDragging=false;
+      function onTouchStart(e){
+        isDragging = true;
+        const t = e.touches ? e.touches[0] : e;
+        touchStartX = touchCurX = t.clientX;
+        touchStartY = touchCurY = t.clientY;
+        slide.style.transition = 'none';
+      }
+      function onTouchMove(e){
+        if(!isDragging) return;
+        const t = e.touches ? e.touches[0] : e;
+        touchCurX = t.clientX;
+        touchCurY = t.clientY;
+        const dx = touchCurX - touchStartX;
+        const dy = touchCurY - touchStartY;
+        // move slide visually
+        slide.style.transform = `translate(${dx}px, ${dy}px)`;
+      }
+      function onTouchEnd(e){
+        if(!isDragging) return;
+        isDragging = false;
+        const dx = touchCurX - touchStartX;
+        const dy = touchCurY - touchStartY;
+        slide.style.transition = 'transform .25s ease';
+        slide.style.transform = '';
+        // thresholds
+        if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)){
+          if(dx < 0) nextPhoto(); else prevPhoto();
+        }else if(dy > 120 && Math.abs(dy) > Math.abs(dx)){
+          // downward swipe to close
+          hideViewer();
+        }else{
+          // tap could also toggle, but we keep it simple
+        }
+      }
+
+      // support mouse drag on desktop
+      let mouseDown = false;
+      function onMouseDown(e){
+        mouseDown = true;
+        onTouchStart(e);
+      }
+      function onMouseMove(e){
+        if(!mouseDown) return;
+        onTouchMove(e);
+      }
+      function onMouseUp(e){
+        if(!mouseDown) return;
+        mouseDown = false;
+        onTouchEnd(e);
+      }
+
+      // keyboard
+      function onKeyDown(e){
+        if(viewer.classList.contains('show')){
+          if(e.key === 'ArrowRight') nextPhoto();
+          if(e.key === 'ArrowLeft') prevPhoto();
+          if(e.key === 'Escape') hideViewer();
+        }
+      }
+
+      // ------------- Helpers -------------
+      function isValidHttpUrl(str) {
+        try {
+          const u = new URL(str);
+          return u.protocol === "http:" || u.protocol === "https:";
+        } catch (_) {
+          return false;
+        }
+      }
+      function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, (m)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+      function escapeAttr(s){ return (s+'').replace(/"/g,'&quot;'); }
+
+      // ------------ Event bindings ------------
+      createAlbumBtn.addEventListener('click', createAlbum);
+      albumPasswordInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') createAlbum() });
+      fileInput.addEventListener('change', (e)=>{ if(e.target.files && e.target.files.length) addFilesToAlbum(e.target.files); e.target.value = ''; });
+
+      addLinkBtn.addEventListener('click', ()=>{ addLinkToAlbum(linkInput.value.trim()) });
+      linkInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') addLinkToAlbum(linkInput.value.trim()) });
+
+      deleteAlbumBtn.addEventListener('click', async ()=>{
+        if(!currentAlbumId){ alert('Kein Album ausgewählt'); return; }
+        await deleteAlbum(currentAlbumId);
+      });
+
+      // viewer controls
+      closeViewer.addEventListener('click', hideViewer);
+      nextBtn.addEventListener('click', nextPhoto);
+      prevBtn.addEventListener('click', prevPhoto);
+
+      // touch/mouse listeners on slide/viewer
+      viewer.addEventListener('touchstart', onTouchStart, {passive:true});
+      viewer.addEventListener('touchmove', onTouchMove, {passive:true});
+      viewer.addEventListener('touchend', onTouchEnd);
+      slide.addEventListener('mousedown', onMouseDown);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+      window.addEventListener('keydown', onKeyDown);
+
+      // also close viewer by tapping background
+      viewer.addEventListener('click', (e)=>{
+        if(e.target === viewer) hideViewer();
+      });
+
+      // delete album via long-press on album entry? included delete button in main area already.
+      albumsListEl.addEventListener('click', (e)=>{
+        const albumEl = e.target.closest('.album');
+        if(!albumEl) return;
+        // clicking handled above
+      });
+
+      // export/import
+      exportBtn.addEventListener('click', ()=>{
+        const dataStr = JSON.stringify(albums, null, 2);
+        const blob = new Blob([dataStr], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'design1_albums_export.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+      importBtn.addEventListener('click', ()=>importFile.click());
+      importFile.addEventListener('change', async (e)=>{
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        try{
+          const text = await f.text();
+          const parsed = JSON.parse(text);
+          if(!Array.isArray(parsed)){ alert('Ungültiges Format'); return; }
+          if(!confirm('Importiert alle Alben aus Datei. Vorhandene Alben bleiben erhalten. Weiter?')) return;
+          // basic validation / merge
+          for(const a of parsed){
+            if(a.id && a.name && typeof a.photos !== 'undefined'){
+              // don't override existing with same id; append with new id
+              a.id = 'imp_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);
+              albums.push(a);
+            }
+          }
+          saveAlbums();
+          renderAlbums();
+          renderMain();
+          alert('Import fertig.');
+        }catch(e){ alert('Fehler beim Import: ' + (e.message || e)); }
+        e.target.value = '';
+      });
+
+      // helper to remember to update UI after create/delete
+      albumsListEl.addEventListener('click', (e)=>{
+        const openBtn = e.target.closest('.openBtn');
+        if(openBtn) return;
+        const albumEl = e.target.closest('.album');
+        if(!albumEl) return;
+        // already open on click
+      });
+
+      // Keep album deletion available from album list by context menu
+      albumsListEl.addEventListener('contextmenu', async (e)=>{
+        e.preventDefault();
+        const albumEl = e.target.closest('.album');
+        if(!albumEl) return;
+        const id = albumEl.dataset.id;
+        if(confirm('Album löschen?')) await deleteAlbum(id);
+      });
+
+      // init
+      renderAlbums();
+      renderMain();
+
+      // small UX: open last opened album if stored
+      (function tryOpenLast(){
+        const last = localStorage.getItem(STORAGE_KEY+'_lastOpen');
+        if(last){
+          const a = albums.find(x=>x.id===last);
+          if(a){
+            // request password
+            // don't auto-open silently for security, prompt user
+            // openAlbum will prompt for password
+            // openAlbum(a.id);
+          }
+        }
+      })();
+
+      // store last opened album id
+      window.addEventListener('beforeunload', ()=>{
+        if(currentAlbumId) localStorage.setItem(STORAGE_KEY+'_lastOpen', currentAlbumId);
+      });
+
+    })();
+  </script>
+</body>
+</html>
