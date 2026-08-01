@@ -3,123 +3,54 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lokale WhatsApp KI</title>
+  <title>LamaC Support</title>
   <style>
-    :root { --green:#00a884; --deep:#111b21; --paper:#f0f2f5; --bubble:#d9fdd3; --muted:#667781; }
+    :root { --green:#007e62; --deep:#11211d; --cream:#f7f5ef; --bubble:#d8f8e8; --muted:#61716b; }
     * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; font:15px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; color:var(--deep); background:linear-gradient(130deg,#e6fff6,#eef3ff); }
-    .app { width:min(1160px, calc(100% - 32px)); margin:32px auto; display:grid; grid-template-columns:360px 1fr; min-height:720px; overflow:hidden; border-radius:22px; background:white; box-shadow:0 22px 70px #1d55402b; }
-    .settings { padding:28px; background:#f8faf9; border-right:1px solid #e5e9e7; overflow:auto; }
-    h1 { margin:0 0 7px; font-size:25px; letter-spacing:-.7px; }
-    .intro { color:var(--muted); margin:0 0 25px; }
-    .eyebrow { color:var(--green); font-size:11px; font-weight:800; letter-spacing:1.3px; text-transform:uppercase; }
-    .group { margin:24px 0; }
-    .group h2 { margin:0 0 12px; font-size:14px; }
-    label { display:block; margin:11px 0 5px; font-size:13px; font-weight:650; }
-    input, select, textarea { width:100%; border:1px solid #d7dfda; border-radius:10px; background:white; padding:10px 11px; font:inherit; color:inherit; outline:none; }
-    input:focus,select:focus,textarea:focus { border-color:var(--green); box-shadow:0 0 0 3px #00a8841c; }
-    input[type=range] { padding:0; accent-color:var(--green); }
-    .range-line { display:flex; justify-content:space-between; color:var(--muted); font-size:12px; }
-    .switch { display:flex; align-items:center; gap:9px; font-size:13px; font-weight:500; cursor:pointer; }
-    .switch input { width:17px; accent-color:var(--green); }
-    .notice { padding:11px; background:#fff8d8; border-radius:10px; font-size:12px; color:#675b27; }
-    .save { width:100%; padding:12px; border:0; border-radius:10px; background:var(--green); color:white; cursor:pointer; font-weight:750; font-size:14px; }
-    .chat { display:flex; flex-direction:column; min-width:0; background:#efeae2; }
-    .chat-header { display:flex; align-items:center; gap:12px; padding:16px 22px; background:var(--deep); color:white; }
-    .avatar { display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#25d366,#00a884); font-size:20px; }
-    .status { color:#aebac1; font-size:12px; }
-    .number { margin-left:auto; color:#aebac1; font-size:13px; }
-    .messages { flex:1; padding:26px clamp(16px,4vw,48px); overflow:auto; background-color:#efeae2; background-image:radial-gradient(#d9d1c4 1px,transparent 1px); background-size:18px 18px; }
-    .day { width:max-content; margin:0 auto 20px; padding:5px 10px; border-radius:7px; color:#54656f; background:#fff; font-size:11px; box-shadow:0 1px 1px #0001; }
-    .message { max-width:min(78%,540px); margin:8px 0; padding:8px 10px 5px; border-radius:8px; background:white; box-shadow:0 1px 1px #00000014; white-space:pre-wrap; overflow-wrap:anywhere; }
-    .message.me { margin-left:auto; background:var(--bubble); border-top-right-radius:0; }
-    .message.ai { border-top-left-radius:0; }
-    .meta { display:block; margin-top:3px; text-align:right; color:#667781; font-size:10px; }
-    .typing { color:#667781; font-size:13px; font-style:italic; padding:8px; }
-    .composer { display:flex; gap:10px; padding:13px 18px; background:#f0f2f5; }
-    .composer input { border:0; border-radius:23px; padding:12px 16px; }
-    .send { width:46px; border:0; border-radius:50%; background:var(--green); color:white; font-size:19px; cursor:pointer; }
-    .empty { color:#667781; font-size:13px; text-align:center; padding:25px; }
-    @media (max-width:780px) { .app { width:100%; margin:0; min-height:100vh; border-radius:0; grid-template-columns:1fr; } .settings { border-right:0; border-bottom:1px solid #e5e9e7; } .chat { min-height:580px; } }
+    body { min-height:100vh; margin:0; color:var(--deep); font:15px/1.45 Inter,ui-sans-serif,system-ui,sans-serif; background:linear-gradient(135deg,#e9faf3,#f8f5ec); }
+    main { width:min(840px,calc(100% - 28px)); min-height:100vh; margin:auto; display:flex; flex-direction:column; box-shadow:0 0 50px #1a504020; background:#efeae2; }
+    header { display:flex; align-items:center; gap:12px; padding:17px 22px; color:white; background:var(--deep); }
+    .avatar { display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#00b884,#007e62); font-size:19px; font-weight:800; }
+    h1 { margin:0; font-size:17px; } .status { color:#b5c6bf; font-size:12px; }
+    .privacy { margin-left:auto; color:#b5c6bf; font-size:12px; text-align:right; }
+    #messages { flex:1; min-height:620px; padding:27px clamp(14px,5vw,60px); overflow:auto; background-image:radial-gradient(#d7d0c2 1px,transparent 1px); background-size:19px 19px; }
+    .day { width:max-content; margin:0 auto 22px; padding:5px 10px; border-radius:7px; background:#fff; color:#5c6b66; font-size:11px; box-shadow:0 1px 2px #0001; }
+    .msg { max-width:min(82%,570px); margin:9px 0; padding:9px 11px 6px; border-radius:9px; background:white; box-shadow:0 1px 1px #00000018; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .msg.me { margin-left:auto; border-top-right-radius:0; background:var(--bubble); }.msg.bot { border-top-left-radius:0; }
+    .time { display:block; margin-top:3px; color:#72817b; text-align:right; font-size:10px; }.notice { border-left:3px solid #e4ac2d; background:#fff9e7; color:#675d33; }
+    form { display:flex; gap:9px; padding:13px 18px; background:#f0f2f5; } input { flex:1; min-width:0; border:0; border-radius:24px; padding:12px 16px; outline:0; font:inherit; } button { width:47px; border:0; border-radius:50%; color:white; background:var(--green); cursor:pointer; font-size:18px; } button:disabled { opacity:.55; cursor:wait; }
+    footer { padding:0 18px 12px; background:#f0f2f5; color:var(--muted); text-align:center; font-size:11px; }
+    @media (max-width:600px) { main { width:100%; } #messages { min-height:calc(100vh - 145px); } .privacy { display:none; } }
   </style>
 </head>
 <body>
-  <main class="app">
-    <aside class="settings">
-      <div class="eyebrow">100 % lokal · Demo</div>
-      <h1>Deine WhatsApp KI</h1>
-      <p class="intro">Konfiguriere einen Offline-Chat. Alle Einstellungen bleiben nur in diesem Browser gespeichert.</p>
-
-      <section class="group">
-        <h2>Kontakt</h2>
-        <label for="phone">Deine Telefonnummer</label>
-        <input id="phone" type="tel" placeholder="+49 170 1234567" autocomplete="tel">
-        <label for="name">Name der KI</label>
-        <input id="name" value="Mira" maxlength="30">
-        <label for="model">Lokales Ollama-Modell</label>
-        <input id="model" value="gemma3" placeholder="z. B. gemma3">
-      </section>
-
-      <section class="group">
-        <h2>Verhalten</h2>
-        <label for="role">Rolle</label>
-        <select id="role"><option value="hilfreiche Assistentin">Hilfreiche Assistentin</option><option value="Lerncoach">Lerncoach</option><option value="kreative Ideengeberin">Kreative Ideengeberin</option><option value="freundlicher Kundenservice">Kundenservice</option></select>
-        <label for="tone">Tonfall</label>
-        <select id="tone"><option value="freundlich und klar">Freundlich & klar</option><option value="kurz und direkt">Kurz & direkt</option><option value="locker und humorvoll">Locker & humorvoll</option><option value="professionell">Professionell</option></select>
-        <label for="creativity">Kreativität <span id="creativityValue">60</span>%</label>
-        <input id="creativity" type="range" min="0" max="100" value="60">
-        <div class="range-line"><span>Faktenorientiert</span><span>Kreativ</span></div>
-      </section>
-
-      <section class="group">
-        <h2>Optionen</h2>
-        <label class="switch"><input id="memory" type="checkbox" checked> Gesprächskontext merken</label>
-        <label class="switch"><input id="emoji" type="checkbox" checked> Emojis verwenden</label>
-        <label class="switch"><input id="time" type="checkbox" checked> Uhrzeit anzeigen</label>
-      </section>
-      <p class="notice">Die Website spricht ausschließlich mit Ollama auf diesem Gerät (<code>localhost:11434</code>). Installiere Ollama und lade das gewählte Modell, z. B. mit <code>ollama pull gemma3</code>.</p>
-      <p><button class="save" id="save">Einstellungen lokal speichern</button></p>
-    </aside>
-
-    <section class="chat">
-      <header class="chat-header"><div class="avatar">✦</div><div><strong id="headerName">Mira</strong><div class="status">lokale KI · online</div></div><div class="number" id="headerPhone">Kein Kontakt gewählt</div></header>
-      <div class="messages" id="messages"><div class="day">HEUTE</div><div class="message ai">Hallo! Ich bin deine lokale KI. Was möchtest du besprechen?<span class="meta">jetzt</span></div></div>
-      <form class="composer" id="form"><input id="message" placeholder="Nachricht schreiben" autocomplete="off"><button class="send" aria-label="Senden">➤</button></form>
-    </section>
+  <main>
+    <header><div class="avatar">LC</div><div><h1>LamaC Kundenservice</h1><div class="status">KI-gestützter Support</div></div><div class="privacy">Keine Notfallhilfe<br>Bitte keine sensiblen Daten senden</div></header>
+    <section id="messages" aria-live="polite"><div class="day">HEUTE</div><div class="msg bot">Hallo! Wie kann ich Ihnen zu LamaC weiterhelfen?<span class="time">jetzt</span></div></section>
+    <form id="chat"><input id="text" autocomplete="off" placeholder="Nachricht schreiben" maxlength="1800" aria-label="Nachricht"><button id="send" aria-label="Senden">➤</button></form>
+    <footer>Antworten werden KI-generiert und können Fehler enthalten.</footer>
   </main>
   <script>
-    const $ = id => document.getElementById(id);
-    const controls = ['phone','name','model','role','tone','creativity','memory','emoji','time'];
-    const messages = $('messages');
-    let history = [];
-    const stamp = () => $('time').checked ? new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
-    function add(text, kind) { const node=document.createElement('div'); node.className='message '+kind; node.textContent=text; const meta=document.createElement('span'); meta.className='meta'; meta.textContent=stamp(); node.append(meta); messages.append(node); messages.scrollTop=messages.scrollHeight; }
-    function systemPrompt() {
-      return `Du heißt ${$('name').value || 'Mira'} und bist eine ${$('role').value}. Antworte auf Deutsch, ${$('tone').value}. Kreativitätsgrad: ${$('creativity').value} von 100. ${$('emoji').checked ? 'Du darfst sparsam Emojis verwenden.' : 'Verwende keine Emojis.'}`;
-    }
-    async function askOllama(text) {
-      const previous = $('memory').checked ? history : [];
-      const body = { model: $('model').value.trim() || 'gemma3', stream: false, messages: [
-        { role: 'system', content: systemPrompt() }, ...previous, { role: 'user', content: text }
-      ]};
-      const reply = await fetch('http://localhost:11434/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-      if (!reply.ok) throw new Error(await reply.text());
-      const data = await reply.json();
-      if (!data.message?.content) throw new Error('Ollama hat keine Antwort geliefert.');
-      return data.message.content;
-    }
-    function sync() { $('headerName').textContent=$('name').value || 'KI'; $('headerPhone').textContent=$('phone').value || 'Kein Kontakt gewählt'; $('creativityValue').textContent=$('creativity').value; }
-    controls.forEach(id => $(id).addEventListener('input',sync)); sync();
-    $('form').addEventListener('submit', async event => {
-      event.preventDefault(); const text=$('message').value.trim(); if(!text) return;
-      add(text,'me'); $('message').value=''; const typing=document.createElement('div');
-      typing.className='typing'; typing.textContent=($('name').value || 'KI')+' schreibt …'; messages.append(typing); messages.scrollTop=messages.scrollHeight;
-      try { const answer=await askOllama(text); history.push({role:'user',content:text},{role:'assistant',content:answer}); add(answer,'ai'); }
-      catch (error) { add('Keine Verbindung zu Ollama. Prüfe: Ist Ollama geöffnet? Existiert das Modell „'+($('model').value || 'gemma3')+'“? Bei GitHub Pages muss Ollama außerdem diese Website als Browser-Herkunft erlauben.\n\nTechnischer Hinweis: '+error.message,'ai'); }
-      finally { typing.remove(); }
+    // Nach dem Veröffentlichen des Cloudflare Workers diese Adresse ersetzen.
+    const WORKER_URL = 'https://lamacai.oslamu.workers.dev/chat';
+    const messages = document.querySelector('#messages'), input = document.querySelector('#text'), form = document.querySelector('#chat'), send = document.querySelector('#send');
+    let history = [], sentCount = 0, warningShown = false;
+    const now = () => new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    function add(text, kind, extra='') { const el=document.createElement('div'); el.className='msg '+kind+' '+extra; el.textContent=text; const time=document.createElement('span'); time.className='time'; time.textContent=now(); el.append(time); messages.append(el); messages.scrollTop=messages.scrollHeight; return el; }
+    function showWarning() { if (!warningShown && sentCount === 15) { warningShown=true; add('Hinweis: Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen. So kann unser Support schneller helfen.','bot','notice'); } }
+    form.addEventListener('submit', async event => {
+      event.preventDefault(); const text=input.value.trim(); if (!text || send.disabled) return;
+      if (WORKER_URL.includes('DEIN-WORKER')) { add('Der Kundenservice wird noch eingerichtet. Bitte später erneut versuchen.','bot','notice'); return; }
+      add(text,'me'); input.value=''; sentCount++; showWarning(); send.disabled=true;
+      const typing=document.createElement('div'); typing.className='msg bot'; typing.textContent='Support antwortet …'; messages.append(typing); messages.scrollTop=messages.scrollHeight;
+      try {
+        const response=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history})});
+        const data=await response.json().catch(()=>({})); if(!response.ok) throw new Error(data.error || 'Der Support ist momentan nicht erreichbar.');
+        add(data.reply,'bot'); history.push({role:'user',content:text},{role:'assistant',content:data.reply});
+        if(history.length>12) history=history.slice(-12);
+      } catch(error) { add(error.message || 'Verbindung fehlgeschlagen. Bitte versuchen Sie es später erneut.','bot','notice'); }
+      finally { typing.remove(); send.disabled=false; input.focus(); }
     });
-    $('save').addEventListener('click',()=>{ const values=Object.fromEntries(controls.map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value])); localStorage.setItem('localWhatsappAi',JSON.stringify(values)); $('save').textContent='Gespeichert ✓'; setTimeout(()=> $('save').textContent='Einstellungen lokal speichern',1400); });
-    try { const saved=JSON.parse(localStorage.getItem('localWhatsappAi')); if(saved) controls.forEach(id=>{if(id in saved) $(id).type==='checkbox'?$(id).checked=saved[id]:$(id).value=saved[id];}); sync(); } catch(e) {}
   </script>
 </body>
 </html>
