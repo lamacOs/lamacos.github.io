@@ -191,7 +191,129 @@ footer{
 }
 </style>
 </head>
+<div id="lamac-ai">
+  <button id="lamac-ai-open" aria-label="Kundensupport öffnen">💬</button>
 
+  <section id="lamac-ai-window" aria-label="lamachub Kundensupport">
+    <header>
+      <div>
+        <strong>lamachub Kundenservice</strong>
+        <small>KI-gestützter Support</small>
+      </div>
+      <button id="lamac-ai-close" aria-label="Chat schließen">×</button>
+    </header>
+
+    <div id="lamac-ai-messages">
+      <div class="lamac-bot">Hallo! Wie kann ich Ihnen weiterhelfen?</div>
+    </div>
+
+    <form id="lamac-ai-form">
+      <input id="lamac-ai-input" placeholder="Nachricht schreiben" maxlength="1800">
+      <button aria-label="Senden">➤</button>
+    </form>
+  </section>
+</div>
+
+<style>
+  #lamac-ai { font-family:Arial,sans-serif; }
+  #lamac-ai-open {
+    position:fixed; right:24px; bottom:24px; z-index:9999;
+    width:58px; height:58px; border:0; border-radius:50%;
+    background:#007e62; color:#fff; font-size:25px; cursor:pointer;
+    box-shadow:0 8px 24px #0004;
+  }
+  #lamac-ai-window {
+    display:none; position:fixed; right:24px; bottom:94px; z-index:9999;
+    width:min(370px,calc(100vw - 32px)); height:520px;
+    overflow:hidden; border-radius:16px; background:#efeae2;
+    box-shadow:0 12px 40px #0004;
+  }
+  #lamac-ai-window.open { display:flex; flex-direction:column; }
+  #lamac-ai-window header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:15px; color:#fff; background:#11211d;
+  }
+  #lamac-ai-window small { display:block; margin-top:2px; color:#b5c6bf; font-size:11px; }
+  #lamac-ai-close { border:0; background:transparent; color:#fff; font-size:27px; cursor:pointer; }
+  #lamac-ai-messages { flex:1; overflow:auto; padding:15px; }
+  .lamac-bot, .lamac-user {
+    max-width:82%; margin:8px 0; padding:10px; border-radius:10px;
+    white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px;
+  }
+  .lamac-bot { background:#fff; }
+  .lamac-user { margin-left:auto; background:#d8f8e8; }
+  #lamac-ai-form { display:flex; gap:8px; padding:11px; background:#f0f2f5; }
+  #lamac-ai-input { flex:1; min-width:0; border:0; border-radius:20px; padding:11px; }
+  #lamac-ai-form button { width:42px; border:0; border-radius:50%; background:#007e62; color:#fff; cursor:pointer; }
+</style>
+
+<script>
+  const WORKER_URL = "https://lamacai.oslamu.workers.dev/chat";
+
+  const chatWindow = document.querySelector("#lamac-ai-window");
+  const chatMessages = document.querySelector("#lamac-ai-messages");
+  const chatInput = document.querySelector("#lamac-ai-input");
+  let history = [];
+  let messageCount = 0;
+
+  document.querySelector("#lamac-ai-open").onclick = () => {
+    chatWindow.classList.add("open");
+    chatInput.focus();
+  };
+
+  document.querySelector("#lamac-ai-close").onclick = () => {
+    chatWindow.classList.remove("open");
+  };
+
+  function addMessage(text, type) {
+    const item = document.createElement("div");
+    item.className = type;
+    item.textContent = text;
+    chatMessages.appendChild(item);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  document.querySelector("#lamac-ai-form").onsubmit = async event => {
+    event.preventDefault();
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    addMessage(text, "lamac-user");
+    chatInput.value = "";
+    messageCount++;
+
+    if (messageCount === 15) {
+      addMessage(
+        "Hinweis: Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.",
+        "lamac-bot"
+      );
+    }
+
+    try {
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, history })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+
+      addMessage(data.reply, "lamac-bot");
+      history.push(
+        { role: "user", content: text },
+        { role: "assistant", content: data.reply }
+      );
+
+      history = history.slice(-12);
+    } catch {
+      addMessage(
+        "Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.",
+        "lamac-bot"
+      );
+    }
+  };
+</script>
 <body>
 
 <nav class="navbar">
