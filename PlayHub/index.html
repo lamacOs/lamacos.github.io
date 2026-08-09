@@ -4,6 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>lamacOs PlayHub</title>
+<script>
+function toggleTheme(){
+  const r=document.documentElement;
+  r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";
+}
+</script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -171,180 +177,277 @@ iframe{
   <button class="toggle" onclick="toggleTheme()">🌙 / ☀️</button>
 </div>
 
-<!-- LOGIN -->
-<div class="container" id="auth">
-  <div class="card">
-    <h2>Login</h2>
-    <input id="email" type="email" placeholder="E-Mail">
-    <input id="password" type="password" placeholder="Passwort">
-    <button onclick="login()">Login</button>
-    <button onclick="showRegister()">Registrieren</button>
-  </div>
-</div>
+<!-- (old login UI removed; replaced by LamacAuth widget) -->
 
-<!-- REGISTER -->
-<div class="container" id="register" style="display:none;">
-  <div class="card">
-    <h3>Registrieren</h3>
-    <input id="reg-email" type="email" placeholder="E-Mail">
-    <input id="reg-password" type="password" placeholder="Passwort">
-    <button onclick="register()">Account erstellen</button>
-    <button onclick="hideRegister()">Abbrechen</button>
-  </div>
-</div>
+<style>
+  :root {
+    --fb-orange: #ff6a00;
+    --fb-orange-dark: #e85d00;
+    --fb-orange-soft: #fff1e6;
+    --fb-text: #2a2a2a;
+    --fb-muted: #6b6b6b;
+    --fb-white: #ffffff;
+    --fb-shadow: 0 12px 40px rgba(255, 106, 0, 0.25);
+  }
+  #fb-auth-widget { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
 
-<div class="container">
-  <p class="small">
-    Spiele stammen von scratch.mit.edu
-  </p>
-</div>
+  /* Button fest rechts oben, 1 cm Abstand */
+  #fb-auth-btn {
+    position: fixed;
+    top: 10mm;
+    right: 10mm;
+    background: var(--fb-orange);
+    color: var(--fb-white);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(255, 106, 0, 0.35);
+    transition: transform .15s ease, background .15s ease;
+    z-index: 10000;
+  }
+  #fb-auth-btn:hover  { background: var(--fb-orange-dark); transform: translateY(-1px); }
+  @media (max-width: 480px) {
+    #fb-auth-btn { top: 8mm; right: 8mm; padding: 8px 16px; font-size: 14px; }
+  }
 
-<!-- UPLOAD -->
-<div class="container" id="upload" style="display:none;">
-  <div class="card">
-    <h3>Spiel hochladen</h3>
-    <input id="game-name" placeholder="Spielname">
-    <input id="game-link" placeholder="Scratch Link">
-    <input id="game-cover" placeholder="Cover Bild URL (wird ignoriert)">
-    <button onclick="uploadGame()">Speichern</button>
-  </div>
-</div>
+  /* Modal */
+  .fb-modal {
+    position: fixed; inset: 0;
+    background: rgba(20, 20, 20, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+  }
+  .fb-modal.is-open { display: flex; }
+  .fb-modal-card {
+    background: var(--fb-white);
+    width: 100%;
+    max-width: 420px;
+    border-radius: 18px;
+    padding: 28px 28px 24px;
+    box-shadow: var(--fb-shadow);
+    position: relative;
+    animation: fb-pop .25s ease-out;
+    color: var(--fb-text);
+  }
+  @keyframes fb-pop {
+    from { opacity: 0; transform: translateY(20px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+  .fb-close {
+    position: absolute; top: 10px; right: 14px;
+    background: transparent; border: 0;
+    font-size: 26px; line-height: 1;
+    color: var(--fb-muted); cursor: pointer;
+  }
+  .fb-close:hover { color: var(--fb-orange); }
 
-<!-- GAMES -->
-<div class="container">
-  <div class="card">
-    <h3>Spiele</h3>
-    <div id="game-list"></div>
-  </div>
-</div>
+  /* Tabs */
+  .fb-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+  .fb-tab {
+    flex: 1;
+    background: var(--fb-orange-soft);
+    color: var(--fb-orange-dark);
+    border: none;
+    padding: 9px 0;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .fb-tab.is-active {
+    background: var(--fb-orange);
+    color: var(--fb-white);
+  }
+
+  .fb-form { display: none; }
+  .fb-form.is-active { display: block; }
+  .fb-form h2 {
+    margin: 4px 0 14px;
+    color: var(--fb-text);
+    font-size: 20px;
+  }
+  .fb-form label {
+    display: block;
+    font-size: 13px;
+    color: var(--fb-muted);
+    margin-bottom: 12px;
+  }
+  .fb-form input {
+    width: 100%;
+    margin-top: 4px;
+    padding: 10px 12px;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .fb-form input:focus {
+    border-color: var(--fb-orange);
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+  }
+  .fb-primary {
+    width: 100%;
+    background: var(--fb-orange);
+    color: var(--fb-white);
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background .15s ease;
+  }
+  .fb-primary:hover { background: var(--fb-orange-dark); }
+  .fb-primary:disabled { opacity: .6; cursor: not-allowed; }
+  .fb-msg { min-height: 18px; margin: 10px 0 0; font-size: 13px; color: #c0392b; }
+  .fb-msg.success { color: #1f8a4c; }
+
+  /* Logged-in Panel */
+  .fb-user { display: none; }
+  .fb-user.is-active { display: block; }
+  .fb-user h2 { margin: 4px 0 10px; font-size: 18px; }
+  .fb-meta { font-size: 13px; color: var(--fb-muted); margin-bottom: 14px; word-break: break-all; }
+  .hidden  { display: none !important; }
+</style>
+
+<!-- (old firebase module removed; replaced by LamacAuth widget) -->
+
 
 <script>
-function toggleTheme(){
-  const r=document.documentElement;
-  r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";
-}
+/* ===== PlayHub: Daten-Migration auf Firebase ===== */
+(function() {
+  const STORAGE_KEY = "playhub_games";
+  const SITE_KEY    = "playhub";
+
+  // Originale localStorage-Funktionen kapern, damit die Site weiter
+  // funktioniert, aber Daten unter dem Account gespeichert werden.
+  window.addEventListener('load', async () => {
+    // Warten bis Widget-Script geladen ist
+    const t = setInterval(async () => {
+      if (!window.LamacAuth) return;
+      clearInterval(t);
+
+      window.LamacAuth.onAuth(async (user) => {
+        if (!user) {
+          // Ausgeloggt -> localStorage lesen
+          const raw = localStorage.getItem(STORAGE_KEY);
+          window.__siteData = raw ? JSON.parse(raw) : {};
+          if (window.__render) window.__render();
+          return;
+        }
+
+        // Eingeloggt -> Cloud-Daten holen, ggf. localStorage migrieren
+        try {
+          let cloud = await window.LamacAuth.siteData();
+          if (!cloud) cloud = { data: {} };
+
+          // Wenn noch nichts in der Cloud, aber localStorage hat Daten: hochladen
+          if (cloud.data == null) {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              try {
+                cloud.data = JSON.parse(raw);
+                await window.LamacAuth.saveSite({ data: cloud.data, migratedAt: Date.now() });
+              } catch(e) { cloud.data = {}; }
+            } else {
+              cloud.data = {};
+              await window.LamacAuth.saveSite({ data: {} });
+            }
+          }
+
+          window.__siteData = cloud.data || {};
+          if (window.__render) window.__render();
+        } catch (err) {
+          console.warn("Cloud-Sync fehlgeschlagen:", err);
+        }
+      });
+
+      // Hilfsfunktion: Site-Daten speichern (lokal + cloud)
+      window.__saveSite = async (data) => {
+        window.__siteData = data;
+        if (window.LamacAuth && window.LamacAuth.user()) {
+          await window.LamacAuth.saveSite({ data, updatedAt: Date.now() });
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+      };
+    }, 50);
+  });
+})();
 </script>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-import {
-  getDatabase,
-  ref,
-  push,
-  onValue
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDT58qXz9yl16t3_uxSSVqbxGsXlbqNJiY",
-  authDomain: "poki2-263c6.firebaseapp.com",
-  databaseURL: "https://poki2-263c6-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "poki2-263c6",
-  storageBucket: "poki2-263c6.appspot.com",
-  messagingSenderId: "995713391414",
-  appId: "1:995713391414:web:8c9ccfed82a82f7d27f197"
-};
+<script>
+/* PlayHub: Games werden jetzt unter dem Account gespeichert */
+(function(){
+  window.addEventListener('load', () => {
+    const t = setInterval(() => {
+      if (!window.LamacAuth) return;
+      clearInterval(t);
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+      let games = [];
+      const gameList = document.getElementById('game-list');
+      const LOGO_URL = "https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png";
 
-const gameList=document.getElementById("game-list");
+      function render() {
+        if (!gameList) return;
+        gameList.innerHTML = '';
+        games.forEach((g, i) => {
+          const div = document.createElement('div');
+          div.className = 'game-card';
+          div.innerHTML = `
+            <img src="${LOGO_URL}">
+            <div style="padding:6px">${g.name}</div>
+          `;
+          div.onclick = () => window.playGame(g.link);
+          gameList.appendChild(div);
+        });
+      }
+      window.__render = render;
 
-const LOGO_URL =
-"https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png";
+      // Upload-Funktion überschreiben
+      window.uploadGame = async () => {
+        const name  = document.getElementById('game-name').value.trim();
+        const link  = document.getElementById('game-link').value.trim();
+        const cover = document.getElementById('game-cover').value.trim();
+        if (!name || !link) { alert("Name und Link benötigt."); return; }
+        if (!window.LamacAuth.user()) { alert("Bitte erst anmelden."); return; }
+        games.push({ name, link, cover });
+        await window.__saveSite({ games });
+        document.getElementById('game-name').value = '';
+        document.getElementById('game-link').value = '';
+        document.getElementById('game-cover').value = '';
+        render();
+      };
 
-/* AUTH */
-window.showRegister=()=>{
-  document.getElementById("auth").style.display="none";
-  document.getElementById("register").style.display="block";
-};
+      // Auth-State: Sichtbarkeit der UI
+      window.LamacAuth.onAuth((user) => {
+        const uploadBox = document.getElementById('upload');
+        if (uploadBox) uploadBox.style.display = user ? 'block' : 'none';
+        const authBox = document.getElementById('auth');
+        if (authBox) authBox.style.display = user ? 'none' : 'block';
 
-window.hideRegister=()=>{
-  document.getElementById("auth").style.display="block";
-  document.getElementById("register").style.display="none";
-};
-
-onAuthStateChanged(auth,u=>{
-  document.getElementById("upload").style.display = u ? "block" : "none";
-});
-
-/* LOGIN */
-window.login=async()=>{
-  await signInWithEmailAndPassword(
-    auth,
-    email.value,
-    password.value
-  );
-};
-
-/* REGISTER */
-window.register=async()=>{
-  await createUserWithEmailAndPassword(
-    auth,
-    reg-email.value,
-    reg-password.value
-  );
-};
-
-/* UPLOAD */
-window.uploadGame=async()=>{
-  await push(ref(db,"games"),{
-    name: document.getElementById("game-name").value,
-    link: document.getElementById("game-link").value,
-    cover: document.getElementById("game-cover").value
+        // Games vom Cloud-Account laden
+        if (user) {
+          window.LamacAuth.siteData().then(sd => {
+            games = (sd && sd.data && sd.data.games) || [];
+            render();
+          });
+        } else {
+          games = [];
+          render();
+        }
+      });
+    }, 50);
   });
-};
-
-/* LOAD GAMES */
-onValue(ref(db,"games"),snap=>{
-  gameList.innerHTML="";
-
-  snap.forEach(c=>{
-    const g=c.val();
-
-    const div=document.createElement("div");
-    div.className="game-card";
-
-    // 🔥 FIX: IMMER LOGO ALS COVER
-    div.innerHTML=`
-      <img src="${LOGO_URL}">
-      <div style="padding:6px">${g.name}</div>
-    `;
-
-    div.onclick=()=>playGame(g.link);
-    gameList.appendChild(div);
-  });
-});
-
-/* PLAY GAME */
-window.playGame=(link)=>{
-  const id=link.match(/projects\/(\d+)/)?.[1];
-  if(!id) return;
-
-  const iframe=document.createElement("iframe");
-  iframe.src=`https://scratch.mit.edu/projects/${id}/embed`;
-
-  const btn=document.createElement("button");
-  btn.innerText="Zurück";
-  btn.style.position="fixed";
-  btn.style.top="20px";
-  btn.style.left="20px";
-  btn.style.zIndex="1000";
-
-  btn.onclick=()=>{
-    iframe.remove();
-    btn.remove();
-  };
-
-  document.body.appendChild(iframe);
-  document.body.appendChild(btn);
-};
+})();
 </script>
 
 </body>
