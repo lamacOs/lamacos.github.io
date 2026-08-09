@@ -1102,11 +1102,17 @@ input, textarea, select { font: inherit; color: inherit; }
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js');
       // eslint-disable-next-line no-undef
-      firebase.initializeApp(firebaseConfig);
+      if (typeof firebase === 'undefined') throw new Error('Firebase SDK wurde nicht geladen (evtl. Netzwerk-Block zu gstatic.com).');
       // eslint-disable-next-line no-undef
-      const auth = firebase.auth(), db = firebase.database();
+      const app = firebase.initializeApp(firebaseConfig);
+      // eslint-disable-next-line no-undef
+      const auth = firebase.auth(app);
+      // eslint-disable-next-line no-undef
+      const db = firebase.database(app);
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       LK = { auth, db, demo: false };
+      // eslint-disable-next-line no-undef
+      console.log('Firebase initialisiert:', app.name);
       auth.onAuthStateChanged(async (user) => {
         if (user) {
           try { const snap = await db.ref('users/' + user.uid).once('value'); if (snap.val()) localStorage.setItem('lk-profile', JSON.stringify(snap.val())); } catch (e) {}
@@ -1114,9 +1120,23 @@ input, textarea, select { font: inherit; color: inherit; }
         updateNav();
       });
     } catch (e) {
-      console.warn('Firebase nicht erreichbar – fallback auf Demo-Modus.', e);
-      LK = { auth: MockAuth(), db: MockDB(), demo: true };
-      LK.auth.onAuthStateChanged(updateNav);
+      console.error('Firebase-Initialisierung fehlgeschlagen:', e);
+      // NICHT still auf Demo-Modus schalten - das ist die Verwirrung, die der User gerade erlebt!
+      // Stattdessen: KLAR machen, dass Firebase nicht erreichbar ist.
+      LK = { auth: MockAuth(), db: MockDB(), demo: true, firebaseError: e.message };
+      try { LK.auth.onAuthStateChanged(updateNav); } catch (e2) {}
+      // User sichtbar warnen
+      setTimeout(() => {
+        const msg = 'Firebase-Initialisierung fehlgeschlagen: ' + e.message +
+          '\n\nMögliche Ursachen:\n' +
+          '- Falsche API-Keys in firebaseConfig\n' +
+          '- CORS-Block auf gstatic.com (z.B. Offline / Ad-Blocker)\n' +
+          '- Firebase-Services im Projekt nicht aktiviert (Authentication + Realtime Database)\n' +
+          '\nDie App fällt auf einen Offline-Mock zurück, aber Veröffentlichen ist deaktiviert. ' +
+          'Bitte Firebase-Config prüfen oder in der Firebase-Konsole unter ' + firebaseConfig.projectId + ' Auth + RTDB aktivieren.';
+        console.warn(msg);
+        try { LKToast('Firebase nicht erreichbar - siehe Konsole (F12)', 'error', 8000); } catch (e3) {}
+      }, 500);
     }
   }
 
@@ -1283,13 +1303,13 @@ input, textarea, select { font: inherit; color: inherit; }
 
   // Hilfsfunktion: Lesen aller Produkte aus Firebase RTDB
   async function loadAllProducts() {
-    if (window.LK?.db) {
+    if (window.LK?.db && !window.LK?.firebaseError) {
       try {
         const snap = await LK.db.ref('products').once('value');
         const obj = snap.val() || {};
         PRODUCTS = Object.keys(obj).map(k => Object.assign({ id: k }, obj[k]));
       } catch (e) {
-        console.warn('Produkte aus RTDB laden fehlgeschlagen', e);
+        console.warn('Produkte aus RTDB laden fehlgeschlagen (Regel prüfen):', e);
         PRODUCTS = [];
       }
     } else {
@@ -1299,8 +1319,23 @@ input, textarea, select { font: inherit; color: inherit; }
 
   // Hilfsfunktion: Eigenes Produkt in Firebase speichern
   async function saveProduct(product) {
-    if (!window.LK?.db) throw new Error('Datenbank nicht verfügbar. Bitte Firebase-Config eintragen.');
-    await LK.db.ref('products/' + product.id).set(product);
+    if (!window.LK?.db) {
+      const e = new Error('Datenbank nicht verfügbar. Möglicherweise ist Firebase nicht initialisiert (siehe Konsole F12).');
+      console.error(e);
+      throw e;
+    }
+    if (window.LK?.firebaseError) {
+      const e = new Error('Firebase-Initialisierungsfehler: ' + window.LK.firebaseError);
+      console.error(e);
+      throw e;
+    }
+    try {
+      await LK.db.ref('products/' + product.id).set(product);
+    } catch (err) {
+      // Häufig: PERMISSION_DENIED, weil Realtime-DB-Regeln das Schreiben verbieten
+      console.error('Firebase-Schreibfehler:', err);
+      throw err;
+    }
   }
   async function deleteProduct(id) {
     if (!window.LK?.db) return;
@@ -1357,7 +1392,11 @@ input, textarea, select { font: inherit; color: inherit; }
     const { name, params } = parseHash();
     // Dashboard-Auth-Guard (im Demo-Modus toleranter)
     if (name === 'dashboard' || name === 'new-product' || name === 'analytics' || name === 'downloads' || name === 'versions' || name === 'changelog' || name === 'settings' || name === 'edit-product' || name === 'new-version') {
-      // Im Demo-Modus zeigen wir Demo-Inhalte; sonst Login erzwingen.
+      if (window.LK?.firebaseError) {
+        LKToast('Firebase ist nicht erreichbar. Veröffentlichen ist deaktiviert. Siehe Konsole (F12).', 'error', 6000);
+        showView('home');
+        return;
+      }
       if (!LKAuth.currentUser() && !LK?.demo) { go('#/auth?mode=login&redirect=' + encodeURIComponent('#/' + name)); return; }
     }
     showView(name);
@@ -2073,7 +2112,28 @@ input, textarea, select { font: inherit; color: inherit; }
     else { publishProduct(); }
   }
 
+  let _lkReadyPromise = null;
+  function waitForLK() {
+    if (!_lkReadyPromise) {
+      _lkReadyPromise = new Promise(resolve => {
+        const check = () => { if (window.LK !== null) resolve(true); else setTimeout(check, 50); };
+        check();
+      });
+    }
+    return _lkReadyPromise;
+  }
+
   async function publishProduct() {
+    await waitForLK();
+    if (LK && LK.firebaseError) {
+      LKToast('Firebase nicht erreichbar: ' + LK.firebaseError, 'error', 8000);
+      console.error('Vollständiger Fehler siehe oben in der Konsole.');
+      return;
+    }
+    if (!window.LK?.db) {
+      LKToast('Datenbank wird noch initialisiert. Bitte einen Moment warten und erneut versuchen.', 'error', 5000);
+      return;
+    }
     const u = LKAuth.currentUser();
     if (!u) { LKToast('Bitte melde dich an, um zu veröffentlichen.', 'error'); setTimeout(() => go('#/auth?mode=login&redirect=' + encodeURIComponent('#/new-product')), 600); return; }
     const id = (wizardState.name || 'produkt').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') + '-' + Date.now().toString(36);
@@ -2103,11 +2163,21 @@ input, textarea, select { font: inherit; color: inherit; }
       createdAt: Date.now()
     };
     try {
+      LKToast('Speichere in Firebase...', 'default', 1500);
       await saveProduct(product);
       LKToast('Produkt veröffentlicht: ' + product.name, 'success');
+      // Reset wizard
+      wizardState.step = 1;
+      wizardState.name = ''; wizardState.tagline = ''; wizardState.description = '';
+      wizardState.developer = ''; wizardState.category = '';
+      wizardState.platform = ''; wizardState.minRam = ''; wizardState.minCpu = ''; wizardState.minDisk = '';
+      wizardState.version = '1.0.0'; wizardState.channel = 'stable'; wizardState.size = '';
+      wizardState.notes = 'Erstveröffentlichung'; wizardState.downloadUrl = ''; wizardState.pendingFile = null;
+      wizardState.logoDataUrl = ''; wizardState.screensDataUrls = ['', '', '', '', '', ''];
       setTimeout(() => go('#/product?id=' + product.id), 800);
     } catch (e) {
-      LKToast('Fehler beim Veröffentlichen: ' + e.message, 'error');
+      LKToast('Fehler beim Veröffentlichen: ' + (e.message || String(e)), 'error', 8000);
+      console.error('Publish-Fehler:', e);
     }
   }
 
