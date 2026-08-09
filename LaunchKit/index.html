@@ -543,7 +543,6 @@ input, textarea, select { font: inherit; color: inherit; }
     <nav class="nav-links" id="navLinks">
       <a class="nav-link" data-route="products">Produkte</a>
       <a class="nav-link" data-route="features">Features</a>
-      <a class="nav-link" data-route="pricing">Preise</a>
       <a class="nav-link" data-route="docs">Dokumentation</a>
     </nav>
     <div class="nav-right">
@@ -560,7 +559,6 @@ input, textarea, select { font: inherit; color: inherit; }
 <div class="mobile-menu" id="mobileMenu">
   <a class="m-link" data-route="products">Produkte</a>
   <a class="m-link" data-route="features">Features</a>
-  <a class="m-link" data-route="pricing">Preise</a>
   <a class="m-link" data-route="docs">Dokumentation</a>
   <div class="m-actions">
     <a class="btn btn-secondary" style="flex:1" href="#/auth?mode=login" id="mLogin">Anmelden</a>
@@ -607,7 +605,7 @@ input, textarea, select { font: inherit; color: inherit; }
               <div class="kpi-row">
                 <div class="kpi"><div class="v">∞</div><div class="l">Möglichkeiten</div></div>
                 <div class="kpi"><div class="v">8</div><div class="l">Schritte zum Release</div></div>
-                <div class="kpi"><div class="v">0 €</div><div class="l">Kosten</div></div>
+                <div class="kpi"><div class="v">∞</div><div class="l">Platz</div></div>
               </div>
               <div>
                 <div class="muted" style="font-size:13px;margin-bottom:8px;">Plattform-Status</div>
@@ -657,7 +655,7 @@ input, textarea, select { font: inherit; color: inherit; }
             <div class="meta-strip">
               <span class="pill brand">LaunchKit</span>
               <span class="pill">Multi-User</span>
-              <span class="pill">v1.0</span>
+              <span class="pill">live</span>
             </div>
             <h2 class="h2 mt-3">Eine Plattform für alle.</h2>
             <p class="lede mt-3">Jede angemeldete Person kann ihre eigene Produktseite anlegen, eigene Versionen veröffentlichen und Changelogs pflegen – in unter 10 Minuten.</p>
@@ -672,7 +670,7 @@ input, textarea, select { font: inherit; color: inherit; }
               </div>
               <div style="padding:14px;border-radius:14px;background:var(--bg-3);border:1px solid var(--line);">
                 <div class="muted" style="font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;">Kosten</div>
-                <div style="font-size:22px;font-weight:600;letter-spacing:-0.02em;">0 € · für immer</div>
+                <div style="font-size:22px;font-weight:600;letter-spacing:-0.02em;">Multi-User</div>
               </div>
             </div>
           </div>
@@ -691,7 +689,7 @@ input, textarea, select { font: inherit; color: inherit; }
           <p class="lede mt-3" style="margin:14px auto 0;">Erstelle kostenlos dein erstes Produkt, richte Versionen und Changelog ein – LaunchKit kümmert sich um den Rest.</p>
           <div class="mt-6 row" style="justify-content:center;gap:10px;flex-wrap:wrap;">
             <a class="btn btn-primary btn-lg" href="#/auth?mode=register">Konto erstellen</a>
-            <a class="btn btn-secondary btn-lg" href="#/pricing">Tarife ansehen</a>
+            <a class="btn btn-secondary btn-lg" href="#/products">Produkte entdecken</a>
           </div>
         </div>
       </div>
@@ -741,68 +739,6 @@ input, textarea, select { font: inherit; color: inherit; }
             <button data-tab="docs">Dokumentation</button>
           </div>
           <div id="tabContent"></div>
-        </div>
-      </div>
-    </section>
-  </section>
-
-  <!-- PRICING -->
-  <section class="view" id="view-pricing">
-    <section class="page-hero">
-      <div class="container">
-        <span class="eyebrow">Tarife</span>
-        <h1 class="h1 mt-3">Faire Preise. <span class="brand-text">Echte Qualität.</span></h1>
-        <p class="lede mt-3">Wähle den Plan, der zu deinem Produkt passt – vom Solo-Maker bis zum Studio.</p>
-      </div>
-    </section>
-    <section class="section tight">
-      <div class="container">
-        <div class="pricing-grid">
-          <article class="plan reveal">
-            <h3>Free</h3><div class="price">0 € <small>/ dauerhaft</small></div>
-            <p class="muted">Perfekt, um ein einzelnes Produkt zu veröffentlichen.</p>
-            <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>1 Produkt</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Grundlegende Produktseite</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Bis zu 1 GB Download-Größe</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Begrenzte Analytics</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Community-Support</li>
-            </ul>
-            <a class="btn btn-secondary" href="#/auth?mode=register">Kostenlos starten</a>
-          </article>
-          <article class="plan featured reveal">
-            <h3>Pro</h3><div class="price">— <small>/ Monat</small></div>
-            <p class="muted">Für ambitionierte Creator mit mehreren Produkten.</p>
-            <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Mehrere Produkte</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Erweiterte Analytics</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Eigene Produktdomain</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Größere Dateien (bis 5 GB)</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Erweiterte Produktseiten</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>E-Mail-Support</li>
-            </ul>
-            <a class="btn btn-primary" href="#/auth?mode=register&plan=pro">Pro wählen</a>
-          </article>
-          <article class="plan reveal">
-            <h3>Business</h3><div class="price">— <small>/ Monat</small></div>
-            <p class="muted">Für Studios und Organisationen mit höchsten Ansprüchen.</p>
-            <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Mehrere Projekte & Teams</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Umfangreiche Analytics</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Erweiterte Anpassungen</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>SLA & Prioritätssupport</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>SSO & Audit-Logs</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Persönlicher Account Manager</li>
-            </ul>
-            <a class="btn btn-secondary" href="#/auth?mode=register&plan=business">Business wählen</a>
-          </article>
-        </div>
-        <div class="glass reveal mt-8" style="padding:30px;text-align:center;">
-          <h3 class="h3">Preise sind aktuell Platzhalter.</h3>
-          <p class="muted mt-2">Die finalen Tarife werden vor dem Launch veröffentlicht. Trag dich für Updates ein.</p>
-          <div class="mt-4 row" style="justify-content:center;">
-            <a class="btn btn-primary" href="#/auth?mode=register">Auf die Launch-Liste</a>
-          </div>
         </div>
       </div>
     </section>
@@ -859,7 +795,7 @@ input, textarea, select { font: inherit; color: inherit; }
           <h3 id="analytics">Analytics</h3>
           <p>Aufrufe, Downloads, beliebteste Versionen, Aufrufe pro Tag und Downloadraten.</p>
           <h3 id="domains">Eigene Domain</h3>
-          <p>Mit dem Pro-Plan verbindest du eine eigene Domain. Eine ausführliche Anleitung zu DNS-Einträgen findest du im Dashboard.</p>
+          <p>Du kannst eine eigene Domain verbinden. Eine ausführliche Anleitung zu DNS-Einträgen findest du im Dashboard.</p>
           <h3 id="api">API</h3>
           <p>REST-API mit OAuth2-Bearer-Tokens unter <code>/api/v1</code>.</p>
           <pre><code>curl -H "Authorization: Bearer $LK_TOKEN" \
@@ -900,7 +836,7 @@ input, textarea, select { font: inherit; color: inherit; }
         </div>
         <div class="auth-form" id="registerView" style="display:none;">
           <h1>Konto erstellen</h1>
-          <p class="lede">Starte kostenlos mit deinem ersten Produkt.</p>
+          <p class="lede">Starte mit deinem ersten Produkt.</p>
           <div class="alert error" id="regErr" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><span></span></div>
           <form id="registerForm">
             <div class="field"><label for="rname">Name</label><input type="text" id="rname" name="displayName" required autocomplete="name" /></div>
@@ -965,7 +901,7 @@ input, textarea, select { font: inherit; color: inherit; }
         <a class="brand" href="#/"><span class="brand-logo"><img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/logo.png" alt="lamacOs"/></span><span class="brand-name">lamacOs</span><span class="brand-sep">·</span><span class="brand-sub">LaunchKit</span></a>
         <p class="muted mt-4" style="font-size:14px;max-width:320px;">Die professionelle Plattform für dein digitales Produkt. Veröffentliche Software, Spiele, Apps und Open-Source-Projekte an einem Ort.</p>
       </div>
-      <div><h5>Produkt</h5><ul><li><a data-route="products">Produkte entdecken</a></li><li><a data-route="features">Features</a></li><li><a data-route="pricing">Preise</a></li><li><a data-route="docs">Dokumentation</a></li></ul></div>
+      <div><h5>Produkt</h5><ul><li><a data-route="products">Produkte entdecken</a></li><li><a data-route="features">Features</a></li><li><a data-route="docs">Dokumentation</a></li></ul></div>
       <div><h5>Rechtliches</h5><ul><li><a data-route="privacy">Datenschutz</a></li><li><a data-route="imprint">Impressum</a></li><li><a data-route="terms">Nutzungsbedingungen</a></li><li><a id="openSupport">Support</a></li></ul></div>
       <div><h5>Über uns</h5><ul><li><a href="https://lamacai.oslamu.workers.dev" target="_blank" rel="noopener">lamacHub KI</a></li><li><a data-route="dashboard">Dashboard</a></li><li><a data-route="auth?mode=register">Registrieren</a></li><li><a data-route="new-product">Produkt erstellen</a></li></ul></div>
     </div>
@@ -1344,16 +1280,18 @@ input, textarea, select { font: inherit; color: inherit; }
 
   function showView(name) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    const target = document.getElementById('view-' + name);
+    // Dashboard-Subroutinen zeigen das view-dashboard, da wir nicht für jede Unterseite ein separates VIEW haben
+    const dashboardSubviews = ['dashboard','new-product','analytics','downloads','versions','changelog','settings','edit-product','new-version'];
+    const target = document.getElementById('view-' + (dashboardSubviews.includes(name) ? 'dashboard' : name));
     if (target) target.classList.add('active');
     else document.getElementById('view-home').classList.add('active');
-    // Footer / Header auf Dashboard ausblenden für mehr Platz
-    const showChrome = ['home','products','product','pricing','docs','auth','imprint','privacy','terms'].includes(name);
+    // Footer / Header auf Dashboard-Subroutinen ausblenden
+    const showChrome = ['home','products','product','docs','auth','imprint','privacy','terms'].includes(name);
     document.getElementById('siteFooter').style.display = showChrome ? '' : 'none';
     document.querySelector('.site-header').style.display = showChrome ? '' : 'none';
     // active state in nav
     document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
-    const map = { home: null, products: 'products', pricing: 'pricing', docs: 'docs' };
+    const map = { home: null, products: 'products', docs: 'docs' };
     const k = map[name]; if (k) document.querySelector(`.nav-link[data-route="${k}"]`)?.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
@@ -1676,8 +1614,8 @@ input, textarea, select { font: inherit; color: inherit; }
         <div class="two-dash-grid">
           <div class="panel reveal visible"><div class="panel-head"><h3>Aufrufe · letzte 14 Tage</h3><span class="muted" style="font-size:13px;">Live-Daten</span></div><div class="chart-bars" id="chartViews"></div></div>
           <div class="panel reveal visible"><div class="panel-head"><h3>Top-Versionen</h3><span class="muted" style="font-size:13px;">nach Downloads</span></div>
-            <div class="donut"><svg width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="64" fill="none" stroke="var(--bg-3)" stroke-width="20"/><circle cx="80" cy="80" r="64" fill="none" stroke="var(--brand)" stroke-width="20" stroke-dasharray="220 402" stroke-dashoffset="0" stroke-linecap="round"/><circle cx="80" cy="80" r="64" fill="none" stroke="#ffb86b" stroke-width="20" stroke-dasharray="120 402" stroke-dashoffset="-220" stroke-linecap="round"/><circle cx="80" cy="80" r="64" fill="none" stroke="#d96300" stroke-width="20" stroke-dasharray="62 402" stroke-dashoffset="-340" stroke-linecap="round"/></svg><div class="center"><div><div class="v">12.842</div><div class="l">Downloads</div></div></div></div>
-            <div class="legend"><div class="li"><span class="sw" style="background:var(--brand);"></span>v2.4.0 · 7.412</div><div class="li"><span class="sw" style="background:#ffb86b);"></span>v2.3.0 · 4.020</div><div class="li"><span class="sw" style="background:#d96300;"></span>v2.2.0 · 1.410</div></div>
+            <div class="donut"><svg width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="64" fill="none" stroke="var(--bg-3)" stroke-width="20"/></svg><div class="center"><div><div class="v">—</div><div class="l">Downloads</div></div></div></div>
+            <div class="legend"><div class="li muted">Noch keine Versionen</div></div>
           </div>
         </div>
         <div class="panel reveal visible">
@@ -1743,22 +1681,22 @@ input, textarea, select { font: inherit; color: inherit; }
           <select style="background:var(--bg-3);border:1px solid var(--line);padding:10px 12px;border-radius:10px;font-size:13.5px;"><option>Letzte 14 Tage</option><option>Letzte 30 Tage</option><option>Letzte 90 Tage</option></select>
         </div>
         <div class="stat-grid">
-          <div class="stat-card reveal visible"><div class="l">Seitenaufrufe</div><div class="v">48.310</div><div class="d">+8.2%</div></div>
-          <div class="stat-card reveal visible"><div class="l">Downloads</div><div class="v">12.842</div><div class="d">+12.4%</div></div>
-          <div class="stat-card reveal visible"><div class="l">Downloadrate</div><div class="v">26.6%</div><div class="d">+1.1%</div></div>
-          <div class="stat-card reveal visible"><div class="l">Ø Verweildauer</div><div class="v">2:48</div><div class="d">+0:14</div></div>
-          <div class="stat-card reveal visible"><div class="l">Beliebteste Version</div><div class="v" style="font-size:18px;">v2.4.0</div><div class="d">7.412 Downloads</div></div>
+          <div class="stat-card reveal visible"><div class="l">Seitenaufrufe</div><div class="v">—</div><div class="d">noch keine Daten</div></div>
+          <div class="stat-card reveal visible"><div class="l">Downloads</div><div class="v">—</div><div class="d">noch keine Daten</div></div>
+          <div class="stat-card reveal visible"><div class="l">Downloadrate</div><div class="v">—</div><div class="d">noch keine Daten</div></div>
+          <div class="stat-card reveal visible"><div class="l">Verweildauer</div><div class="v">—</div><div class="d">noch keine Daten</div></div>
+          <div class="stat-card reveal visible"><div class="l">Beliebteste Version</div><div class="v" style="font-size:18px;">—</div><div class="d">noch nichts</div></div>
         </div>
         <div class="two-dash-grid">
           <div class="panel reveal visible"><div class="panel-head"><h3>Aufrufe pro Tag</h3><span class="muted" style="font-size:13px;">Live-Daten</span></div><div class="chart-bars" id="viewsChart"></div></div>
           <div class="panel reveal visible"><div class="panel-head"><h3>Downloads pro Version</h3></div>
-            <div class="donut"><svg width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="64" fill="none" stroke="var(--bg-3)" stroke-width="20"/><circle cx="80" cy="80" r="64" fill="none" stroke="var(--brand)" stroke-width="20" stroke-dasharray="220 402" stroke-dashoffset="0" stroke-linecap="round"/><circle cx="80" cy="80" r="64" fill="none" stroke="#ffb86b" stroke-width="20" stroke-dasharray="120 402" stroke-dashoffset="-220" stroke-linecap="round"/><circle cx="80" cy="80" r="64" fill="none" stroke="#d96300" stroke-width="20" stroke-dasharray="62 402" stroke-dashoffset="-340" stroke-linecap="round"/></svg><div class="center"><div><div class="v">12.842</div><div class="l">Downloads</div></div></div></div>
-            <div class="legend"><div class="li"><span class="sw" style="background:var(--brand);"></span>v2.4.0 · 7.412</div><div class="li"><span class="sw" style="background:#ffb86b;"></span>v2.3.0 · 4.020</div><div class="li"><span class="sw" style="background:#d96300;"></span>v2.2.0 · 1.410</div></div>
+            <div class="donut"><svg width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="64" fill="none" stroke="var(--bg-3)" stroke-width="20"/></svg><div class="center"><div><div class="v">—</div><div class="l">Downloads</div></div></div></div>
+            <div class="legend"><div class="li muted">Noch keine Top-Versionen</div></div>
           </div>
         </div>
         <div class="panel reveal visible"><div class="panel-head"><h3>Top-Produkte</h3></div>
           <table class="products-table"><thead><tr><th>Produkt</th><th>Aufrufe</th><th>Downloads</th><th>Rate</th></tr></thead><tbody>
-            <tr><td class="muted">Noch keine Daten — veröffentliche dein erstes Produkt.</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td class="muted" colspan="4">Noch keine Daten — veröffentliche dein erstes Produkt.</td></tr>
           </tbody></table>
         </div>`;
       chartBars(document.getElementById('viewsChart'), [310,240,180,260,410,530,480,360,290,220,340,470,590,510], ['Mo','Di','Mi','Do','Fr','Sa','So','Mo','Di','Mi','Do','Fr','Sa','So']);
@@ -1866,7 +1804,9 @@ input, textarea, select { font: inherit; color: inherit; }
   const wizardState = { step: 1, name: '', tagline: '', description: '', developer: '', category: '', platform: '', minRam: '', minCpu: '', minDisk: '', version: '1.0.0', channel: 'stable', size: '', notes: 'Erstveröffentlichung', downloadUrl: '', pendingFile: null };
 
   function renderNewProduct() {
+    // Beim ersten Aufruf nach Login/Page-Load den State zurücksetzen, damit der Wizard frisch startet
     renderSide('new');
+    wizardState.step = 1;
     const main = document.getElementById('dashMain');
     main.innerHTML = `
       <div class="dash-head reveal visible"><div><h1>Neues Produkt</h1><p>Wir führen dich in acht Schritten zu deiner eigenen Produktseite.</p></div><a class="btn btn-secondary" href="#/dashboard?sub=products">Abbrechen</a></div>
@@ -2188,6 +2128,21 @@ input, textarea, select { font: inherit; color: inherit; }
       go(target);
     });
   });
+
+  // Zusätzlich: alle internen href="#/..." Links abfangen, damit data-route Handler nicht nur für die Nav-Links funktioniert
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#/"]');
+    if (!a) return;
+    // Skip data-route (already handled)
+    if (a.hasAttribute('data-route')) return;
+    // Skip externe Links
+    const href = a.getAttribute('href');
+    if (!href || href === '#' || href.length < 3) return;
+    e.preventDefault();
+    document.getElementById('mobileMenu').classList.remove('open');
+    go(href);
+  });
+
   window.addEventListener('hashchange', render);
 
   // Docs sidebar smooth scroll
@@ -2210,8 +2165,9 @@ input, textarea, select { font: inherit; color: inherit; }
   loadChat();
   renderChat();
   initAuth().then(async () => {
+    updateNav();
     await loadAllProducts();
-    render(); updateNav();
+    render();
   });
   // Initial paint, falls Auth noch lädt
   render();
