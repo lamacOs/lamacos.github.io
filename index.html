@@ -426,6 +426,356 @@ function toggleMenu(){
     document.getElementById("nav").classList.toggle("show");
 }
 </script>
+<!-- ============================================================
+     Firebase Auth Widget – Orange/Weiß
+     Einbettbar in jede Webseite: einfach diesen ganzen <div id="fb-auth-widget">
+     (Button erscheint automatisch 1 cm vom oberen + rechten Bildschirmrand).
+     plus die zugehoerigen <style>/<script>-Bloecke einfuegen.
+     Voraussetzungen:
+       1) Firebase-Projekt "jump-and-run-f58e2" hat Email/Password-Login aktiviert.
+       2) Realtime-Database-Region europe-west1 ist aktiv.
+       3) Die unten stehenden Sicherheitsregeln sind gesetzt.
+     ============================================================ -->
 
+<!-- Container, in dem der Button + das Modal erscheinen -->
+<div id="fb-auth-widget">
+  <button id="fb-auth-btn" type="button">Anmelden</button>
+
+  <!-- Modal-Overlay (standardmaessig versteckt) -->
+  <div id="fb-auth-modal" class="fb-modal" aria-hidden="true">
+    <div class="fb-modal-card" role="dialog" aria-modal="true" aria-labelledby="fb-auth-title">
+      <button class="fb-close" id="fb-auth-close" type="button" aria-label="Schliessen">&times;</button>
+
+      <div class="fb-tabs">
+        <button class="fb-tab is-active" data-tab="login" type="button">Anmelden</button>
+        <button class="fb-tab" data-tab="register" type="button">Registrieren</button>
+      </div>
+
+      <!-- LOGIN -->
+      <form id="fb-login-form" class="fb-form is-active">
+        <h2 id="fb-auth-title">Willkommen zurueck</h2>
+        <label>E-Mail
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>Passwort
+          <input type="password" name="password" required autocomplete="current-password" />
+        </label>
+        <button class="fb-primary" type="submit">Einloggen</button>
+        <p class="fb-msg" data-for="login"></p>
+      </form>
+
+      <!-- REGISTER -->
+      <form id="fb-register-form" class="fb-form">
+        <h2>Konto erstellen</h2>
+        <label>Name
+          <input type="text" name="displayName" required autocomplete="name" />
+        </label>
+        <label>E-Mail
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>Passwort (min. 6 Zeichen)
+          <input type="password" name="password" required minlength="6" autocomplete="new-password" />
+        </label>
+        <button class="fb-primary" type="submit">Registrieren</button>
+        <p class="fb-msg" data-for="register"></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ---------- Orange / Weiss Theme ---------- */
+  :root {
+    --fb-orange: #ff6a00;
+    --fb-orange-dark: #e85d00;
+    --fb-orange-soft: #fff1e6;
+    --fb-text: #2a2a2a;
+    --fb-muted: #6b6b6b;
+    --fb-white: #ffffff;
+    --fb-shadow: 0 12px 40px rgba(255, 106, 0, 0.25);
+  }
+
+  #fb-auth-widget {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    /* Button ist fixed positioniert -> Container nimmt keinen Platz weg */
+  }
+  /* Auf sehr kleinen Screens etwas dichter, damit der Button nicht
+     an die Statusleiste stoesst. */
+  @media (max-width: 480px) {
+    #fb-auth-btn { top: 8mm; right: 8mm; padding: 8px 16px; font-size: 14px; }
+  }
+
+  /* Trigger-Button */
+  /* Button: fest rechts oben, 1 cm vom oberen + rechten Rand
+     (1 cm ≈ 37.795 px – auf hochauflösenden Screens via mm-Einheit
+     sogar noch exakter, daher position:fixed mit top/right in mm). */
+  #fb-auth-btn {
+    position: fixed;
+    top: 10mm;        /* 1 cm = 10 mm */
+    right: 10mm;      /* 1 cm vom rechten Rand */
+    background: var(--fb-orange);
+    color: var(--fb-white);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(255, 106, 0, 0.35);
+    transition: transform .15s ease, background .15s ease;
+    z-index: 10000;   /* ueber dem Modal liegt das Modal (9999) */
+  }
+  #fb-auth-btn:hover  { background: var(--fb-orange-dark); transform: translateY(-1px); }
+  #fb-auth-btn:active { transform: translateY(0); }
+
+  /* Modal-Overlay */
+  .fb-modal {
+    position: fixed; inset: 0;
+    background: rgba(20, 20, 20, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+  }
+  .fb-modal.is-open { display: flex; }
+
+  .fb-modal-card {
+    background: var(--fb-white);
+    width: 100%;
+    max-width: 420px;
+    border-radius: 18px;
+    padding: 28px 28px 24px;
+    box-shadow: var(--fb-shadow);
+    position: relative;
+    animation: fb-pop .25s ease-out;
+  }
+  @keyframes fb-pop {
+    from { opacity: 0; transform: translateY(20px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+
+  .fb-close {
+    position: absolute; top: 10px; right: 14px;
+    background: transparent; border: 0;
+    font-size: 26px; line-height: 1;
+    color: var(--fb-muted); cursor: pointer;
+  }
+  .fb-close:hover { color: var(--fb-orange); }
+
+  /* Tabs */
+  .fb-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+  .fb-tab {
+    flex: 1;
+    background: var(--fb-orange-soft);
+    color: var(--fb-orange-dark);
+    border: none;
+    padding: 9px 0;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .fb-tab.is-active {
+    background: var(--fb-orange);
+    color: var(--fb-white);
+  }
+
+  /* Forms */
+  .fb-form { display: none; }
+  .fb-form.is-active { display: block; }
+  .fb-form h2 {
+    margin: 4px 0 14px;
+    color: var(--fb-text);
+    font-size: 20px;
+  }
+  .fb-form label {
+    display: block;
+    font-size: 13px;
+    color: var(--fb-muted);
+    margin-bottom: 12px;
+  }
+  .fb-form input {
+    width: 100%;
+    margin-top: 4px;
+    padding: 10px 12px;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .fb-form input:focus {
+    border-color: var(--fb-orange);
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+  }
+
+  .fb-primary {
+    width: 100%;
+    background: var(--fb-orange);
+    color: var(--fb-white);
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background .15s ease;
+  }
+  .fb-primary:hover  { background: var(--fb-orange-dark); }
+  .fb-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+  .fb-msg { min-height: 18px; margin: 10px 0 0; font-size: 13px; color: #c0392b; }
+  .fb-msg.success { color: #1f8a4c; }
+</style>
+
+<!-- Firebase SDK (v9 modular, ueber CDN) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    updateProfile
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    set,
+    get,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+  // ---- Deine Firebase-Konfiguration ----
+  const firebaseConfig = {
+    apiKey: "AIzaSyArPBdSmaqqQpqITjs3iCKvY8hxDQg5qFQ",
+    authDomain: "jump-and-run-f58e2.firebaseapp.com",
+    databaseURL: "https://jump-and-run-f58e2-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "jump-and-run-f58e2",
+    storageBucket: "jump-and-run-f58e2.firebasestorage.app",
+    messagingSenderId: "1093030272732",
+    appId: "1:1093030272732:web:4939ea7a726c69ba78de19",
+    measurementId: "G-HM07HRVX34"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getDatabase(app);
+
+  // ---------- DOM ----------
+  const btn       = document.getElementById("fb-auth-btn");
+  const modal     = document.getElementById("fb-auth-modal");
+  const closeBtn  = document.getElementById("fb-auth-close");
+  const tabs      = document.querySelectorAll("#fb-auth-widget .fb-tab");
+  const loginForm = document.getElementById("fb-login-form");
+  const regForm   = document.getElementById("fb-register-form");
+  const loginMsg  = loginForm.querySelector(".fb-msg");
+  const regMsg    = regForm.querySelector(".fb-msg");
+
+  // ---------- Helpers ----------
+  const openModal  = () => { modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false"); };
+  const closeModal = () => { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); };
+
+  const setMsg = (el, text, ok = false) => {
+    el.textContent = text;
+    el.classList.toggle("success", !!ok);
+  };
+
+  // ---------- Button-Logik (Login/Logout) ----------
+  onAuthStateChanged(auth, (user) => {
+    btn.textContent = user ? "Abmelden" : "Anmelden";
+  });
+
+  btn.addEventListener("click", () => {
+    if (auth.currentUser) {
+      signOut(auth).then(() => closeModal());
+    } else {
+      openModal();
+    }
+  });
+
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+  // ---------- Tabs ----------
+  tabs.forEach(t => t.addEventListener("click", () => {
+    tabs.forEach(x => x.classList.remove("is-active"));
+    t.classList.add("is-active");
+    const isLogin = t.dataset.tab === "login";
+    loginForm.classList.toggle("is-active", isLogin);
+    regForm.classList.toggle("is-active",   !isLogin);
+  }));
+
+  // ---------- LOGIN ----------
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg(loginMsg, "");
+    const submit = loginForm.querySelector("button[type=submit]");
+    submit.disabled = true;
+
+    const email    = loginForm.email.value.trim();
+    const password = loginForm.password.value;
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+
+      // Profil aus DB nachladen (falls noetig)
+      const snap = await get(ref(db, `users/${cred.user.uid}/profile`));
+      if (!snap.exists()) {
+        await set(ref(db, `users/${cred.user.uid}/profile`), {
+          email: cred.user.email,
+          createdAt: serverTimestamp()
+        });
+      }
+
+      setMsg(loginMsg, "Erfolgreich angemeldet.", true);
+      loginForm.reset();
+      setTimeout(closeModal, 600);
+    } catch (err) {
+      setMsg(loginMsg, err.message);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  // ---------- REGISTER ----------
+  regForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg(regMsg, "");
+    const submit = regForm.querySelector("button[type=submit]");
+    submit.disabled = true;
+
+    const displayName = regForm.displayName.value.trim();
+    const email       = regForm.email.value.trim();
+    const password    = regForm.password.value;
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Auth-Profil-Name setzen
+      await updateProfile(cred.user, { displayName });
+
+      // Daten in der Realtime-Database ablegen
+      await set(ref(db, `users/${cred.user.uid}/profile`), {
+        displayName,
+        email,
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp()
+      });
+
+      setMsg(regMsg, "Konto erstellt – du bist eingeloggt.", true);
+      regForm.reset();
+      setTimeout(closeModal, 700);
+    } catch (err) {
+      setMsg(regMsg, err.message);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+</script>
 </body>
 </html>
