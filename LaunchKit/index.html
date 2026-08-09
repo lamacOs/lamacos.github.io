@@ -1301,20 +1301,77 @@ input, textarea, select { font: inherit; color: inherit; }
     throw new Error('Upload fehlgeschlagen: ' + errors.join(' · '));
   }
 
-  // Hilfsfunktion: Lesen aller Produkte aus Firebase RTDB
+  // Hilfsfunktion: Lesen aller öffentlichen Produkte aus Firebase RTDB
   async function loadAllProducts() {
-    if (window.LK?.db && !window.LK?.firebaseError) {
+    if (!window.LK?.db || window.LK?.firebaseError) { PRODUCTS = []; return; }
+    const map = new Map();
+    try {
+      // 1. publicProducts (laut Regel global lesbar)
       try {
-        const snap = await LK.db.ref('products').once('value');
+        const snap = await LK.db.ref('publicProducts').once('value');
         const obj = snap.val() || {};
-        PRODUCTS = Object.keys(obj).map(k => Object.assign({ id: k }, obj[k]));
-      } catch (e) {
-        console.warn('Produkte aus RTDB laden fehlgeschlagen (Regel prüfen):', e);
-        PRODUCTS = [];
+        Object.keys(obj).forEach(k => map.set(k, Object.assign({ id: k, _source: 'public' }, obj[k])));
+      } catch (e) { console.warn('publicProducts nicht lesbar:', e); }
+
+      // 2. Eigene Sites aus /users/{uid}/sites (IMMER laden, falls vorhanden)
+      const u = LKAuth.currentUser();
+      if (u) {
+        try {
+          const mySnap = await LK.db.ref('users/' + u.uid + '/sites').once('value');
+          const myObj = mySnap.val() || {};
+          Object.keys(myObj).forEach(k => {
+            if (!map.has(k)) {
+              const site = myObj[k] || {};
+              map.set(k, Object.assign({
+                id: k,
+                _source: 'sites',
+                name: site.meta?.siteName || (site.data?.name || k),
+                tagline: site.data?.tagline || '',
+                description: site.data?.description || '',
+                developer: site.data?.developer || '',
+                initials: site.data?.initials || '',
+                category: site.data?.category || '',
+                short: site.data?.short || '',
+                platform: site.data?.platform || '',
+                version: site.data?.version || '',
+                license: site.data?.license || '',
+                releasedAt: site.data?.releasedAt || '',
+                downloads: site.data?.downloads || 0,
+                views: site.data?.views || 0,
+                rating: site.data?.rating || 0,
+                size: site.data?.size || '',
+                downloadUrl: site.data?.downloadUrl || '',
+                logoDataUrl: site.data?.logoDataUrl || '',
+                screenshots: site.data?.screenshots || [],
+                requirements: site.data?.requirements || [],
+                features: site.data?.features || [],
+                versions: site.data?.versions || [],
+                tags: site.data?.tags || [],
+                authorUid: u.uid,
+                authorEmail: u.email,
+                createdAt: site.meta?.createdAt || Date.now()
+              }, site.data || {}));
+            }
+          });
+        } catch (e) { console.warn('eigene Sites nicht lesbar:', e); }
       }
-    } else {
+      PRODUCTS = Array.from(map.values());
+    } catch (e) {
+      console.warn('Produkte aus RTDB laden fehlgeschlagen:', e);
       PRODUCTS = [];
     }
+  }
+
+  // Hilfsfunktion: Lesen eigener Produkte (auch wenn publicProducts leer)
+  async function loadMyProducts() {
+    const u = LKAuth.currentUser();
+    if (!window.LK?.db || !u || window.LK?.firebaseError) return [];
+    try {
+      const snap = await LK.db.ref('users/' + u.uid + '/sites').once('value');
+      const obj = snap.val() || {};
+      const list = Object.keys(obj).map(k => Object.assign({ id: k, _source: 'sites' }, obj[k]?.data || obj[k]));
+      return list;
+    } catch (e) { return []; }
   }
 
   // Hilfsfunktion: Eigenes Produkt in Firebase speichern
@@ -1329,32 +1386,94 @@ input, textarea, select { font: inherit; color: inherit; }
       console.error(e);
       throw e;
     }
+    const u = LKAuth.currentUser();
+    if (!u) throw new Error('Nicht angemeldet.');
     try {
-      await LK.db.ref('products/' + product.id).set(product);
+      // 1. Profil unter /users/{uid}/profile (Multi-Account-System)
+      await LK.db.ref('users/' + u.uid + '/profile').update({
+        uid: u.uid,
+        email: u.email,
+        displayName: product.developer || (u.displayName || ''),
+        lastLogin: Date.now()
+      });
+
+      // 2. Sites-Struktur unter /users/{uid}/sites/{productId}
+      const siteKey = product.id;
+      const siteMeta = {
+        siteName: product.name,
+        createdAt: Date.now(),
+        lastSeen: Date.now()
+      };
+      // data-Knoten: alles AUSSER die wenigen Meta-Felder
+      const dataClean = Object.assign({}, product);
+      delete dataClean.id; // nicht in data (gehört in pid in publicProducts)
+      dataClean.updatedAt = Date.now();
+      await LK.db.ref('users/' + u.uid + '/sites/' + siteKey + '/meta').set(siteMeta);
+      await LK.db.ref('users/' + u.uid + '/sites/' + siteKey + '/data').set(dataClean);
+
+      // 3. Globaler /publicProducts/{pid} Knoten (laut deiner Regel global lesbar)
+      const pub = {
+        pid: product.id,
+        name: product.name,
+        tagline: product.tagline || '',
+        description: product.description || '',
+        developer: product.developer || '',
+        initials: product.initials || '',
+        category: product.category || 'Sonstiges',
+        tags: product.tags || '',
+        short: product.short || '',
+        platform: product.platform || '',
+        version: product.version || '',
+        versions: product.versions || '',
+        license: product.license || '',
+        releasedAt: product.releasedAt || '',
+        downloads: 0,
+        views: 0,
+        rating: 0,
+        size: product.size || '',
+        downloadUrl: product.downloadUrl || '',
+        logoDataUrl: product.logoDataUrl || '',
+        screenshots: product.screenshots || '',
+        requirements: product.requirements || '',
+        features: product.features || '',
+        authorUid: u.uid,
+        authorEmail: u.email,
+        createdAt: Date.now()
+      };
+      await LK.db.ref('publicProducts/' + product.id).set(pub);
+
+      LKToast('✓ Gespeichert in publicProducts + sites', 'success', 2500);
     } catch (err) {
-      // Häufig: PERMISSION_DENIED, weil Realtime-DB-Regeln das Schreiben verbieten
-      console.error('Firebase-Schreibfehler:', err);
+      const code = (err && err.code) || 'unbekannt';
+      console.error('%cFirebase-Schreibfehler [' + code + ']%c\n%o', 'background:#d32f2f;color:#fff;padding:4px 8px;border-radius:4px;font-weight:bold;', '', err);
       throw err;
     }
   }
+
   async function deleteProduct(id) {
     if (!window.LK?.db) return;
-    await LK.db.ref('products/' + id).remove();
+    const u = LKAuth.currentUser();
+    try {
+      await LK.db.ref('publicProducts/' + id).remove();
+      if (u) await LK.db.ref('users/' + u.uid + '/sites/' + id).remove();
+    } catch (e) {
+      console.warn('Löschen teilweise fehlgeschlagen:', e);
+    }
   }
 
-  // Hilfsfunktion: Download-Counter inkrementieren (best-effort, anonym)
+  // Hilfsfunktion: Download-Counter inkrementieren (anonym, in publicProducts)
   async function incrementDownloads(productId) {
     if (!window.LK?.db) return;
     try {
-      await LK.db.ref('products/' + productId + '/downloads').transaction(c => (c || 0) + 1);
+      await LK.db.ref('publicProducts/' + productId + '/downloads').transaction(c => (c || 0) + 1);
     } catch (e) {}
   }
 
-  // Hilfsfunktion: Aufrufe-Counter inkrementieren (best-effort, anonym)
+  // Hilfsfunktion: Aufrufe-Counter inkrementieren (anonym, in publicProducts)
   async function incrementViews(productId) {
     if (!window.LK?.db) return;
     try {
-      await LK.db.ref('products/' + productId + '/views').transaction(c => (c || 0) + 1);
+      await LK.db.ref('publicProducts/' + productId + '/views').transaction(c => (c || 0) + 1);
     } catch (e) {}
   }
 
@@ -1401,10 +1520,22 @@ input, textarea, select { font: inherit; color: inherit; }
     }
     showView(name);
 
-    if (name === 'products') { loadAllProducts().then(() => renderProducts(params)); }
+    if (name === 'products') {
+      loadAllProducts().then(async () => {
+        // Falls publicProducts leer: zeige eigene Produkte des Users
+        if (PRODUCTS.length === 0) {
+          const my = await loadMyProducts();
+          PRODUCTS = my;
+        }
+        renderProducts(params);
+      });
+    }
     else if (name === 'product') renderProduct(params.get('id'));
     else if (name === 'auth') renderAuth(params);
     else if (name === 'dashboard') { loadAllProducts().then(() => renderDashboard('overview')); }
+    else if (name === 'analytics' || name === 'downloads' || name === 'versions' || name === 'changelog') {
+      loadAllProducts().then(() => renderDashboard(name));
+    }
     else if (name === 'new-product') renderNewProduct();
     else if (name === 'analytics') renderDashboard('analytics');
     else if (name === 'downloads') renderDashboard('downloads');
@@ -2199,8 +2330,25 @@ input, textarea, select { font: inherit; color: inherit; }
       wizardState.logoDataUrl = ''; wizardState.screensDataUrls = ['', '', '', '', '', ''];
       setTimeout(() => go('#/product?id=' + product.id), 800);
     } catch (e) {
-      LKToast('Fehler beim Veröffentlichen: ' + (e.message || String(e)), 'error', 8000);
-      console.error('Publish-Fehler:', e);
+      const code = (e && e.code) || 'unbekannt';
+      const msg = (e && e.message) || String(e);
+
+      // PERMISSION_DENIED heisst: Realtime-DB-Regeln blockieren den Schreibvorgang
+      if (code === 'PERMISSION_DENIED') {
+        LKToast('PERMISSION_DENIED: Firebase-Regeln blockieren das Speichern. Bitte in Firebase Console → Realtime Database → Regeln die JSON-Regeln aus TROUBLESHOOTING.md setzen.', 'error', 12000);
+        console.error('%c✗ PERMISSION_DENIED%c\n\nDie Realtime-DB-Regeln verbieten anonsten Schreibvorgänge.\n\nLösung:\n1. Firebase Console öffnen\n2. Projekt jump-and-run-f58e2 wählen\n3. Realtime Database → Regeln\n4. Folgende JSON-Regeln einfügen + Veröffentlichen:\n\n{\n  "rules": {\n    "users": { "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } },\n    "products": { ".read": true, "$pid": { ".write": "auth != null && (!data.exists() || data.child(\"authorUid\").val() === auth.uid)" } }\n  }\n}\n\nDanach Seite neu laden (F5) und erneut versuchen.', 'background:#d32f2f;color:#fff;padding:4px 8px;border-radius:4px;font-weight:bold;', '');
+        return;
+      }
+
+      // DISCONNECTED / NETWORK
+      if (code === 'unavailable' || msg.toLowerCase().includes('network') || msg.toLowerCase().includes('offline')) {
+        LKToast('Keine Verbindung zu Firebase (Netzwerk-Problem). Bitte Internet prüfen.', 'error', 8000);
+        return;
+      }
+
+      // Generic
+      LKToast('Fehler [' + code + ']: ' + msg, 'error', 8000);
+      console.error('Publish-Fehler [' + code + ']:', e);
     }
   }
 
