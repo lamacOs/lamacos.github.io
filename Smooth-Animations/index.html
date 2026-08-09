@@ -811,5 +811,527 @@ h1 {
   });
 })();
 </script>
+<!-- ============================================================
+     Firebase Auth Widget – UNIVERSAL (Orange / Weiss)
+     Funktioniert in JEDER Website. Wird automatisch rechts oben
+     (1 cm vom oberen + rechten Rand) platziert.
+
+     Alle benutzeridentifizierten Daten werden unter dem Account
+     gespeichert (users/{uid}/profile). Andere Seiten nutzen
+     das gemeinsame Schema unter users/{uid}/sites/<siteKey>.
+
+     KONFIGURATION (eine Stelle):
+     Stelle firebaseConfig, SITE_KEY und SITE_NAME ein. Der
+     SITE_KEY ist der Name, unter dem die Site ihre Daten in der
+     Datenbank ablegt (z. B. "playhub", "pack-o-mat", "tickets").
+
+     Voraussetzungen:
+       1) Firebase Email/Password-Auth in der Console aktivieren.
+       2) Realtime Database Rules (siehe database-rules.json).
+     ============================================================ -->
+
+<div id="fb-auth-widget">
+  <button id="fb-auth-btn" type="button">Anmelden</button>
+
+  <div id="fb-auth-modal" class="fb-modal" aria-hidden="true">
+    <div class="fb-modal-card" role="dialog" aria-modal="true" aria-labelledby="fb-auth-title">
+      <button class="fb-close" id="fb-auth-close" type="button" aria-label="Schliessen">&times;</button>
+
+      <div class="fb-tabs">
+        <button class="fb-tab is-active" data-tab="login"    type="button">Anmelden</button>
+        <button class="fb-tab"            data-tab="register" type="button">Registrieren</button>
+      </div>
+
+      <form id="fb-login-form" class="fb-form is-active" autocomplete="on">
+        <h2 id="fb-auth-title">Willkommen zurueck</h2>
+        <label>E-Mail
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>Passwort
+          <input type="password" name="password" required autocomplete="current-password" />
+        </label>
+        <button class="fb-primary" type="submit">Einloggen</button>
+        <p class="fb-msg" data-for="login"></p>
+      </form>
+
+      <form id="fb-register-form" class="fb-form" autocomplete="on">
+        <h2>Konto erstellen</h2>
+        <label>Anzeigename
+          <input type="text" name="displayName" required autocomplete="name" maxlength="40" />
+        </label>
+        <label>E-Mail
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>Passwort (min. 6 Zeichen)
+          <input type="password" name="password" required minlength="6" autocomplete="new-password" />
+        </label>
+        <button class="fb-primary" type="submit">Registrieren</button>
+        <p class="fb-msg" data-for="register"></p>
+      </form>
+
+      <div id="fb-auth-user" class="fb-user hidden">
+        <h2>Eingeloggt als <span id="fb-auth-name"></span></h2>
+        <p id="fb-auth-meta" class="fb-meta"></p>
+        <button class="fb-primary" id="fb-auth-logout" type="button">Abmelden</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --fb-orange: #ff6a00;
+    --fb-orange-dark: #e85d00;
+    --fb-orange-soft: #fff1e6;
+    --fb-text: #2a2a2a;
+    --fb-muted: #6b6b6b;
+    --fb-white: #ffffff;
+    --fb-shadow: 0 12px 40px rgba(255, 106, 0, 0.25);
+  }
+  #fb-auth-widget { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+
+  /* Button fest rechts oben, 1 cm Abstand */
+  #fb-auth-btn {
+    position: fixed;
+    top: 10mm;
+    right: 10mm;
+    background: var(--fb-orange);
+    color: var(--fb-white);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(255, 106, 0, 0.35);
+    transition: transform .15s ease, background .15s ease;
+    z-index: 10000;
+  }
+  #fb-auth-btn:hover  { background: var(--fb-orange-dark); transform: translateY(-1px); }
+  @media (max-width: 480px) {
+    #fb-auth-btn { top: 8mm; right: 8mm; padding: 8px 16px; font-size: 14px; }
+  }
+
+  /* Modal */
+  .fb-modal {
+    position: fixed; inset: 0;
+    background: rgba(20, 20, 20, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+  }
+  .fb-modal.is-open { display: flex; }
+  .fb-modal-card {
+    background: var(--fb-white);
+    width: 100%;
+    max-width: 420px;
+    border-radius: 18px;
+    padding: 28px 28px 24px;
+    box-shadow: var(--fb-shadow);
+    position: relative;
+    animation: fb-pop .25s ease-out;
+    color: var(--fb-text);
+  }
+  @keyframes fb-pop {
+    from { opacity: 0; transform: translateY(20px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+  .fb-close {
+    position: absolute; top: 10px; right: 14px;
+    background: transparent; border: 0;
+    font-size: 26px; line-height: 1;
+    color: var(--fb-muted); cursor: pointer;
+  }
+  .fb-close:hover { color: var(--fb-orange); }
+
+  /* Tabs */
+  .fb-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+  .fb-tab {
+    flex: 1;
+    background: var(--fb-orange-soft);
+    color: var(--fb-orange-dark);
+    border: none;
+    padding: 9px 0;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .fb-tab.is-active {
+    background: var(--fb-orange);
+    color: var(--fb-white);
+  }
+
+  .fb-form { display: none; }
+  .fb-form.is-active { display: block; }
+  .fb-form h2 {
+    margin: 4px 0 14px;
+    color: var(--fb-text);
+    font-size: 20px;
+  }
+  .fb-form label {
+    display: block;
+    font-size: 13px;
+    color: var(--fb-muted);
+    margin-bottom: 12px;
+  }
+  .fb-form input {
+    width: 100%;
+    margin-top: 4px;
+    padding: 10px 12px;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .fb-form input:focus {
+    border-color: var(--fb-orange);
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+  }
+  .fb-primary {
+    width: 100%;
+    background: var(--fb-orange);
+    color: var(--fb-white);
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background .15s ease;
+  }
+  .fb-primary:hover { background: var(--fb-orange-dark); }
+  .fb-primary:disabled { opacity: .6; cursor: not-allowed; }
+  .fb-msg { min-height: 18px; margin: 10px 0 0; font-size: 13px; color: #c0392b; }
+  .fb-msg.success { color: #1f8a4c; }
+
+  /* Logged-in Panel */
+  .fb-user { display: none; }
+  .fb-user.is-active { display: block; }
+  .fb-user h2 { margin: 4px 0 10px; font-size: 18px; }
+  .fb-meta { font-size: 13px; color: var(--fb-muted); margin-bottom: 14px; word-break: break-all; }
+  .hidden  { display: none !important; }
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    updateProfile,
+    setPersistence,
+    browserLocalPersistence
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    set,
+    get,
+    update,
+    serverTimestamp,
+    onDisconnect
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+  // ============================================================
+  // KONFIGURATION – HIER ANPASSEN
+  // ============================================================
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyArPBdSmaqqQpqITjs3iCKvY8hxDQg5qFQ",
+    authDomain: "jump-and-run-f58e2.firebaseapp.com",
+    databaseURL: "https://jump-and-run-f58e2-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "jump-and-run-f58e2",
+    storageBucket: "jump-and-run-f58e2.firebasestorage.app",
+    messagingSenderId: "1093030272732",
+    appId: "1:1093030272732:web:4939ea7a726c69ba78de19",
+    measurementId: "G-HM07HRVX34"
+  };
+
+  // Welche Site ist das? Wird als Namespace in der DB benutzt:
+  //   users/{uid}/sites/{SITE_KEY}/...
+  const SITE_KEY  = "animationen";            // z.B. "playhub", "pack-o-mat", "tickets"
+  const SITE_NAME = "50 Animationen";     // nur Anzeige
+
+  // ============================================================
+
+  const app = initializeApp(FIREBASE_CONFIG);
+  const auth = getAuth(app);
+  const db   = getDatabase(app);
+  await setPersistence(auth, browserLocalPersistence);
+
+  // ---------- DOM ----------
+  const btn         = document.getElementById("fb-auth-btn");
+  const modal       = document.getElementById("fb-auth-modal");
+  const closeBtn    = document.getElementById("fb-auth-close");
+  const tabs        = document.querySelectorAll("#fb-auth-widget .fb-tab");
+  const loginForm   = document.getElementById("fb-login-form");
+  const regForm     = document.getElementById("fb-register-form");
+  const loginMsg    = loginForm.querySelector(".fb-msg");
+  const regMsg      = regForm.querySelector(".fb-msg");
+  const userPanel   = document.getElementById("fb-auth-user");
+  const userName    = document.getElementById("fb-auth-name");
+  const userMeta    = document.getElementById("fb-auth-meta");
+  const logoutBtn   = document.getElementById("fb-auth-logout");
+
+  // ---------- Helpers ----------
+  const openModal  = () => { modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false"); };
+  const closeModal = () => { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); };
+  const setMsg     = (el, text, ok = false) => { el.textContent = text; el.classList.toggle("success", !!ok); };
+
+  // ---------- Public API fuer die Seite ----------
+  // Andere Scripts koennen mit window.LamacAuth auf Daten zugreifen:
+  //   await window.LamacAuth.user()       -> aktueller User oder null
+  //   await window.LamacAuth.siteData()   -> site-spezifische Daten
+  //   await window.LamacAuth.saveSite(p)  -> site-Daten speichern (merge)
+  //   window.LamacAuth.onAuth(cb)         -> Callback bei Login/Logout
+  let authListeners = [];
+  window.LamacAuth = {
+    onAuth(cb){ authListeners.push(cb); if (auth.currentUser) cb(auth.currentUser); },
+    user(){ return auth.currentUser; },
+    async siteData(){
+      const u = auth.currentUser;
+      if (!u) return null;
+      const snap = await get(ref(db, `users/${u.uid}/sites/${SITE_KEY}`));
+      return snap.exists() ? snap.val() : null;
+    },
+    async saveSite(partial){
+      const u = auth.currentUser;
+      if (!u) throw new Error("Nicht eingeloggt");
+      await update(ref(db, `users/${u.uid}/sites/${SITE_KEY}`), partial);
+    }
+  };
+
+  // ---------- UI-State ----------
+  function applyAuthUI(user){
+    if (user) {
+      btn.textContent = "Account";
+      btn.dataset.state = "in";
+      userPanel.classList.add("is-active");
+      loginForm.classList.remove("is-active");
+      regForm.classList.remove("is-active");
+      userName.textContent = user.displayName || user.email;
+      userMeta.textContent = user.email;
+    } else {
+      btn.textContent = "Anmelden";
+      btn.dataset.state = "out";
+      userPanel.classList.remove("is-active");
+      loginForm.classList.add("is-active");
+      tabs.forEach(t => t.classList.toggle("is-active", t.dataset.tab === "login"));
+    }
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    applyAuthUI(user);
+    authListeners.forEach(cb => cb(user));
+
+    // lastLogin / lastSeen aktualisieren (sehr klein)
+    if (user) {
+      const uRef = ref(db, `users/${user.uid}/profile/lastLogin`);
+      set(uRef, serverTimestamp()).catch(() => {});
+
+      // site-spezifische Meta
+      const sRef = ref(db, `users/${user.uid}/sites/${SITE_KEY}/meta`);
+      set(sRef, { lastSeen: serverTimestamp(), siteName: SITE_NAME })
+        .catch(() => {});
+
+      // Präsenz
+      const presenceRef = ref(db, `users/${user.uid}/presence`);
+      set(presenceRef, { online: true, since: serverTimestamp() });
+      onDisconnect(presenceRef).set({ online: false, since: serverTimestamp() });
+    }
+  });
+
+  // ---------- Button-Klick ----------
+  btn.addEventListener("click", () => openModal());
+
+  // ---------- Modal-Steuerung ----------
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+  tabs.forEach(t => t.addEventListener("click", () => {
+    tabs.forEach(x => x.classList.remove("is-active"));
+    t.classList.add("is-active");
+    const isLogin = t.dataset.tab === "login";
+    loginForm.classList.toggle("is-active", isLogin);
+    regForm.classList.toggle("is-active",   !isLogin);
+    userPanel.classList.remove("is-active");
+  }));
+
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    closeModal();
+  });
+
+  // ---------- LOGIN ----------
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg(loginMsg, "");
+    const submit = loginForm.querySelector("button[type=submit]");
+    submit.disabled = true;
+
+    const email    = loginForm.email.value.trim();
+    const password = loginForm.password.value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      setMsg(loginMsg, "Erfolgreich angemeldet.", true);
+      loginForm.reset();
+      setTimeout(closeModal, 600);
+    } catch (err) {
+      setMsg(loginMsg, err.message);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  // ---------- REGISTER ----------
+  regForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg(regMsg, "");
+    const submit = regForm.querySelector("button[type=submit]");
+    submit.disabled = true;
+
+    const displayName = regForm.displayName.value.trim();
+    const email       = regForm.email.value.trim();
+    const password    = regForm.password.value;
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, { displayName });
+
+      // Profil + site-Meta in EINEM Schreibvorgang (klein!)
+      await update(ref(db, `users/${cred.user.uid}`), {
+        profile: {
+          uid: cred.user.uid,
+          email,
+          displayName,
+          createdAt: serverTimestamp()
+        },
+        [`sites/${SITE_KEY}/meta`]: {
+          siteName: SITE_NAME,
+          createdAt: serverTimestamp()
+        }
+      });
+
+      setMsg(regMsg, "Konto erstellt – du bist eingeloggt.", true);
+      regForm.reset();
+      setTimeout(closeModal, 700);
+    } catch (err) {
+      setMsg(regMsg, err.message);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+</script>
+
+
+<script>
+/* ===== 50 Animationen: Daten-Migration auf Firebase ===== */
+(function() {
+  const STORAGE_KEY = "favAnims";
+  const SITE_KEY    = "animationen";
+
+  // Originale localStorage-Funktionen kapern, damit die Site weiter
+  // funktioniert, aber Daten unter dem Account gespeichert werden.
+  window.addEventListener('load', async () => {
+    // Warten bis Widget-Script geladen ist
+    const t = setInterval(async () => {
+      if (!window.LamacAuth) return;
+      clearInterval(t);
+
+      window.LamacAuth.onAuth(async (user) => {
+        if (!user) {
+          // Ausgeloggt -> localStorage lesen
+          const raw = localStorage.getItem(STORAGE_KEY);
+          window.__siteData = raw ? JSON.parse(raw) : {};
+          if (window.__render) window.__render();
+          return;
+        }
+
+        // Eingeloggt -> Cloud-Daten holen, ggf. localStorage migrieren
+        try {
+          let cloud = await window.LamacAuth.siteData();
+          if (!cloud) cloud = { data: {} };
+
+          // Wenn noch nichts in der Cloud, aber localStorage hat Daten: hochladen
+          if (cloud.data == null) {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              try {
+                cloud.data = JSON.parse(raw);
+                await window.LamacAuth.saveSite({ data: cloud.data, migratedAt: Date.now() });
+              } catch(e) { cloud.data = {}; }
+            } else {
+              cloud.data = {};
+              await window.LamacAuth.saveSite({ data: {} });
+            }
+          }
+
+          window.__siteData = cloud.data || {};
+          if (window.__render) window.__render();
+        } catch (err) {
+          console.warn("Cloud-Sync fehlgeschlagen:", err);
+        }
+      });
+
+      // Hilfsfunktion: Site-Daten speichern (lokal + cloud)
+      window.__saveSite = async (data) => {
+        window.__siteData = data;
+        if (window.LamacAuth && window.LamacAuth.user()) {
+          await window.LamacAuth.saveSite({ data, updatedAt: Date.now() });
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+      };
+    }, 50);
+  });
+})();
+</script>
+
+
+<script>
+/* 50 Animationen: Favoriten unter Account speichern */
+(function(){
+  window.addEventListener('load', () => {
+    const t = setInterval(() => {
+      if (!window.LamacAuth) return;
+      clearInterval(t);
+
+      window.LamacAuth.onAuth(async (user) => {
+        if (user) {
+          const sd = await window.LamacAuth.siteData();
+          const favs = (sd && sd.data && sd.data.favs) || [];
+          localStorage.setItem("favAnims", JSON.stringify(favs));
+          if (typeof window.renderFavs === 'function') window.renderFavs();
+        } else {
+          localStorage.removeItem("favAnims");
+        }
+      });
+
+      // toggleFavorite überschreiben
+      if (typeof window.toggleFavorite === 'function') {
+        const orig = window.toggleFavorite;
+        window.toggleFavorite = async function(i, el) {
+          let favs = JSON.parse(localStorage.getItem("favAnims") || "[]");
+          if (favs.includes(i)) favs = favs.filter(x => x !== i);
+          else favs.push(i);
+          localStorage.setItem("favAnims", JSON.stringify(favs));
+          if (window.LamacAuth.user()) {
+            await window.LamacAuth.saveSite({ data: { favs } });
+          }
+          orig(i, el);
+        };
+      }
+    }, 50);
+  });
+})();
+</script>
+
 </body>
 </html>
