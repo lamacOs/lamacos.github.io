@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meine Site</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+      :root { --brand: #3b82f6; --brand-deep: #1d4ed8; --brand-soft: #93c5fd; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Poppins', 'Inter', -apple-system, sans-serif; background: #f7f7f8; color: #0d0f12; line-height: 1.6; min-height: 100vh; }
+      .container { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
+      h1, h2, h3 { letter-spacing: -0.02em; line-height: 1.15; }
+      h1 { font-size: 36px; font-weight: 600; margin: 24px 0 12px; }
+      h2 { font-size: 26px; font-weight: 600; margin: 20px 0 10px; }
+      h3 { font-size: 20px; font-weight: 600; margin: 16px 0 8px; }
+      p { margin-bottom: 14px; color: inherit; }
+      a { color: var(--brand); }
+      img { max-width: 100%; border-radius: 14px; }
+      pre { background: #fafafa; padding: 16px; border-radius: 10px; overflow-x: auto; margin: 14px 0; border: 1px solid rgba(0,0,0,0.06); }
+      code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; }
+      pre code { background: transparent; padding: 0; }
+      blockquote { border-left: 3px solid var(--brand); padding-left: 14px; opacity: 0.85; margin: 12px 0; }
+      ul, ol { padding-left: 22px; margin-bottom: 14px; }
+      .hero { text-align: center; padding: 60px 20px; }
+      .hero img { max-height: 320px; margin-bottom: 24px; box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+      .hero h1 { font-size: 42px; margin: 0 0 12px; }
+      .hero p { font-size: 18px; opacity: 0.7; }
+      .cta { display: inline-block; padding: 14px 24px; background: linear-gradient(180deg, var(--brand), var(--brand-deep)); color: #fff; border-radius: 12px; font-weight: 500; text-decoration: none; box-shadow: 0 6px 20px rgba(255,122,0,0.35); margin-top: 12px; }
+      .img-cap { text-align: center; font-size: 14px; opacity: 0.6; margin-top: 8px; }
+      .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+      .gallery img { aspect-ratio: 4/3; object-fit: cover; }
+      .divider { height: 1px; background: rgba(0,0,0,0.08); margin: 30px auto; max-width: 80%; }
+      [data-theme="dark"] .divider { background: rgba(255,255,255,0.08); }
+      .video-wrap iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 14px; }
+      .footer { text-align: center; padding: 30px; opacity: 0.5; font-size: 13px; }
+    </style>
+</head>
+<body>
+  <div class="container"><section class="hero"><h1>Dein Titel</h1><p>Eine kurze, prägnante Beschreibung.</p></section><section style="text-align:center;"><a class="cta" href="https://example.com">Mehr erfahren</a></section><div class="footer">Erstellt mit cw/ Builder</div></div>
+  
+</body>
+</html>
