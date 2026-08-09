@@ -968,6 +968,14 @@ input, textarea, select { font: inherit; color: inherit; }
     return 'U';
   }
   function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+  function fileToDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = () => reject(new Error('FileReader-Fehler'));
+      r.readAsDataURL(file);
+    });
+  }
 
   // -------------------- Theme --------------------
   (function initTheme() {
@@ -1157,71 +1165,120 @@ input, textarea, select { font: inherit; color: inherit; }
   }
 
   // -------------------- File Storage (anonyme Filehosts) --------------------
-  // Strategie: Wir versuchen mehrere anonyme Filehosts ohne Login/Kreditkarte.
-  // Reihenfolge = Priorität. Erstes Erfolg zählt.
-  //   1. catbox.moe    – bis 200 MB pro Datei, Direktlink
-  //   2. file.io       – bis 2 GB, Direktlink (gültig für 1 Download)
-  //   3. 0x0.st        – bis 512 MB, Direktlink
-  // Alle bleiben im kostenlosen Plan, ohne dass man Kreditkarten-Daten angeben muss.
+  // Strategie: Wir probieren mehrere anonyme Filehosts. Erstes Erfolg zählt.
+  // Alle ohne Login, ohne Kreditkarte, im kostenlosen Free-Plan.
+  //
+  // Strategie bei CORS-Problemen: Manche Browser blocken Cross-Origin Uploads,
+  // wenn der Server keinen 'Access-Control-Allow-Origin: *' Header mitschickt.
+  // Wir versuchen deshalb mehrere Anbieter und detaillierte Fehlermeldungen.
+  //
+  // Anbieter (Reihenfolge = Priorität):
+  //   1. litterbox.catbox.moe – bis 1 GB, speichert 1 Stunde, dann weg
+  //      (gut als Test / sofortiger Download ohne Persistenz)
+  //   2. catbox.moe           – bis 200 MB, permanent
+  //   3. file.io              – bis 2 GB, gültig für 1 Download
+  //   4. 0x0.st               – bis 512 MB, permanent
+  //   5. tmpfiles.org         – bis 100 MB, permanent
+  //
+  // Falls die alle nicht gehen (CORS, Browser-Block, Netzwerk),
+  // bekommt der User eine klare Fehlermeldung mit Hinweis auf manuelles Hochladen.
+
+  async function fetchWithTimeout(url, opts, timeoutMs) {
+    return Promise.race([
+      fetch(url, opts),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout (' + timeoutMs + 'ms)')), timeoutMs))
+    ]);
+  }
+
   const FILE_HOSTS = [
     {
-      name: 'catbox',
+      name: 'litterbox.catbox.moe',
+      maxSize: 1024 * 1024 * 1024,
+      async upload(file, onProgress) {
+        const fd = new FormData();
+        fd.append('reqtype', 'fileupload');
+        fd.append('time', '1h');
+        fd.append('fileToUpload', file);
+        const resp = await fetchWithTimeout('https://litterbox.catbox.moe/resources/internals/api.php', { method: 'POST', body: fd }, 60000);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const url = (await resp.text()).trim();
+        if (!/^https?:\/\//.test(url)) throw new Error('unerwartete Antwort: ' + url.slice(0, 80));
+        return url;
+      }
+    },
+    {
+      name: 'catbox.moe',
       maxSize: 200 * 1024 * 1024,
       async upload(file, onProgress) {
         const fd = new FormData();
         fd.append('reqtype', 'fileupload');
         fd.append('fileToUpload', file);
-        const resp = await fetch('https://catbox.moe/user/api.php', { method: 'POST', body: fd });
-        if (!resp.ok) throw new Error('catbox HTTP ' + resp.status);
+        const resp = await fetchWithTimeout('https://catbox.moe/user/api.php', { method: 'POST', body: fd }, 60000);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const url = (await resp.text()).trim();
-        if (!url.startsWith('https://')) throw new Error('catbox bad response');
+        if (!/^https?:\/\//.test(url)) throw new Error('unerwartete Antwort: ' + url.slice(0, 80));
         return url;
       }
     },
     {
       name: 'file.io',
       maxSize: 2 * 1024 * 1024 * 1024,
-      async upload(file) {
+      async upload(file, onProgress) {
         const fd = new FormData();
         fd.append('file', file);
         fd.append('expires', '1d');
-        const resp = await fetch('https://file.io', { method: 'POST', body: fd });
-        if (!resp.ok) throw new Error('file.io HTTP ' + resp.status);
-        const j = await resp.json();
-        if (!j.link) throw new Error('file.io no link');
+        const resp = await fetchWithTimeout('https://file.io/?expires=1d', { method: 'POST', body: fd }, 60000);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const j = await resp.json().catch(() => null);
+        if (!j || !j.link) throw new Error('file.io Antwort unvollständig');
         return j.link;
       }
     },
     {
       name: '0x0.st',
       maxSize: 512 * 1024 * 1024,
-      async upload(file) {
+      async upload(file, onProgress) {
         const fd = new FormData();
         fd.append('file', file);
-        const resp = await fetch('https://0x0.st', { method: 'POST', body: fd });
-        if (!resp.ok) throw new Error('0x0.st HTTP ' + resp.status);
+        const resp = await fetchWithTimeout('https://0x0.st', { method: 'POST', body: fd }, 60000);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const url = (await resp.text()).trim();
-        if (!url.startsWith('https://')) throw new Error('0x0.st bad response');
+        if (!/^https?:\/\//.test(url)) throw new Error('unerwartete Antwort: ' + url.slice(0, 80));
         return url;
+      }
+    },
+    {
+      name: 'tmpfiles.org',
+      maxSize: 100 * 1024 * 1024,
+      async upload(file, onProgress) {
+        const fd = new FormData();
+        fd.append('file', file);
+        const resp = await fetchWithTimeout('https://tmpfiles.org/api/v1/upload', { method: 'POST', body: fd }, 60000);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const j = await resp.json().catch(() => null);
+        if (!j || !j.data || !j.data.url) throw new Error('tmpfiles Antwort unvollständig');
+        return j.data.url;
       }
     }
   ];
 
-  async function uploadToFileHost(file) {
+  async function uploadToFileHost(file, onProgress) {
     const errors = [];
     for (const host of FILE_HOSTS) {
       if (file.size > host.maxSize) {
-        errors.push(host.name + ': Datei zu groß für diesen Anbieter (max ' + (host.maxSize / 1024 / 1024) + ' MB)');
+        errors.push(host.name + ': Datei zu groß für diesen Anbieter (max ' + Math.round(host.maxSize / 1024 / 1024) + ' MB)');
         continue;
       }
       try {
-        const url = await host.upload(file);
+        if (onProgress) onProgress('⏳ Versuche ' + host.name + ' ...');
+        const url = await host.upload(file, onProgress);
+        if (onProgress) onProgress('✓ Hochgeladen via ' + host.name);
         return { host: host.name, url };
       } catch (e) {
         errors.push(host.name + ': ' + e.message);
       }
     }
-    throw new Error('Alle Filehosts fehlgeschlagen. ' + errors.join(' · '));
+    throw new Error('Upload fehlgeschlagen: ' + errors.join(' · '));
   }
 
   // Hilfsfunktion: Lesen aller Produkte aus Firebase RTDB
@@ -1356,7 +1413,7 @@ input, textarea, select { font: inherit; color: inherit; }
       empty.style.display = 'none';
       list.forEach(p => {
         const card = el(`<a class="product-card" href="#/product?id=${p.id}">
-          <div class="head"><div class="logo">${p.initials}</div><div class="meta"><div class="t">${p.name}</div><div class="s">${p.developer}</div></div></div>
+          <div class="head"><div class="logo">${p.logoDataUrl ? '<img src="' + p.logoDataUrl + '" style="width:100%;height:100%;object-fit:contain;border-radius:14px;" />' : p.initials}</div><div class="meta"><div class="t">${p.name}</div><div class="s">${p.developer}</div></div></div>
           <div class="desc">${p.short}</div>
           <div class="tags"><span class="tag brand">${p.category}</span>${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
           <div class="foot"><span class="ver">v${p.version} · ${fmtNum(p.downloads)} Downloads</span><span class="btn btn-primary btn-sm">Öffnen</span></div>
@@ -1378,7 +1435,7 @@ input, textarea, select { font: inherit; color: inherit; }
     const hero = document.getElementById('productHero');
     hero.className = 'product-hero reveal';
     hero.innerHTML = `
-      <div class="logo">${p.initials}</div>
+      <div class="logo">${p.logoDataUrl ? '<img src="' + p.logoDataUrl + '" style="width:100%;height:100%;object-fit:contain;border-radius:22px;" />' : p.initials}</div>
       <div>
         <h1>${p.name}</h1>
         <p class="muted">${p.short}</p>
@@ -1414,8 +1471,9 @@ input, textarea, select { font: inherit; color: inherit; }
         <h2>Über ${p.name}</h2>
         <p class="lede" style="margin-bottom:24px;">${p.description}</p>
         <div class="gallery">
-          <div class="shot"></div><div class="shot alt1"></div><div class="shot alt2"></div>
-          <div class="shot alt3"></div><div class="shot alt4"></div><div class="shot alt5"></div>
+          ${(p.screenshots && p.screenshots.length)
+            ? (p.screenshots.slice(0, 6).map((u, i) => '<div class="shot" style="background:url(' + u + ') center/cover no-repeat, var(--bg-3);"></div>').join(''))
+            : '<div class="shot"></div><div class="shot alt1"></div><div class="shot alt2"></div><div class="shot alt3"></div><div class="shot alt4"></div><div class="shot alt5"></div>' }
         </div>
         <div class="two-col mt-8">
           <div class="panel"><div class="panel-head"><h3>Highlights</h3></div>
@@ -1801,7 +1859,7 @@ input, textarea, select { font: inherit; color: inherit; }
     { t: 'Vorschau', s: 'So wird deine Produktseite aussehen.', body: 'preview' },
     { t: 'Veröffentlichen', s: 'Alles bereit? Schalte dein Produkt live.', body: 'publish' }
   ];
-  const wizardState = { step: 1, name: '', tagline: '', description: '', developer: '', category: '', platform: '', minRam: '', minCpu: '', minDisk: '', version: '1.0.0', channel: 'stable', size: '', notes: 'Erstveröffentlichung', downloadUrl: '', pendingFile: null };
+  const wizardState = { step: 1, name: '', tagline: '', description: '', developer: '', category: '', platform: '', minRam: '', minCpu: '', minDisk: '', version: '1.0.0', channel: 'stable', size: '', notes: 'Erstveröffentlichung', downloadUrl: '', pendingFile: null, logoDataUrl: '', screensDataUrls: ['', '', '', '', '', ''] };
 
   function renderNewProduct() {
     // Beim ersten Aufruf nach Login/Page-Load den State zurücksetzen, damit der Wizard frisch startet
@@ -1848,16 +1906,32 @@ input, textarea, select { font: inherit; color: inherit; }
       <div class="field"><label>Kurzbeschreibung</label><input id="pTag" type="text" placeholder="Ein-Satz-Beschreibung" value="${wizardState.tagline}" /></div>
       <div class="field"><label>Entwickler / Studio</label><input id="pDev" type="text" placeholder="z. B. lamacStudios" value="${wizardState.developer}" /></div>
       <div class="field"><label>Beschreibung</label><textarea id="pDesc" rows="5" placeholder="Ausführliche Beschreibung">${wizardState.description}</textarea></div>`;
-    else if (def.body === 'media') inner = `<h2>Logo & Screenshots</h2><p class="lede">Lade ein Logo und bis zu 6 Screenshots hoch.</p>
-      <h3 class="h4">Logo</h3><div class="upload-grid mt-3" style="grid-template-columns:repeat(1,160px);"><button type="button" class="upload-card filled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button></div>
-      <h3 class="h4 mt-6">Screenshots</h3><div class="upload-grid mt-3">
-        <button type="button" class="upload-card filled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button>
-        <button type="button" class="upload-card filled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button>
-        <button type="button" class="upload-card filled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button>
-        <button type="button" class="upload-card filled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button>
-        <button type="button" class="upload-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
-        <button type="button" class="upload-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
-      </div><p class="muted mt-3" style="font-size:13px;">Demo-Modus: Platzhalter. In Produktion werden echte Dateien per Drag & Drop hochgeladen.</p>`;
+    else if (def.body === 'media') inner = `<h2>Logo & Screenshots</h2><p class="lede">Lade ein Logo (Pflicht) und bis zu 6 Screenshots hoch. Die Bilder werden lokal in deinem Browser gespeichert - es findet kein Upload statt.</p>
+      <h3 class="h4">Logo</h3>
+      <div class="mt-3" style="display:flex;gap:14px;align-items:center;">
+        <div id="logoPreview" style="width:120px;height:120px;border-radius:18px;border:2px dashed var(--line);display:grid;place-items:center;color:var(--ink-mute);background:var(--bg-3);overflow:hidden;">
+          ${wizardState.logoDataUrl ? '<img src="' + wizardState.logoDataUrl + '" style="width:100%;height:100%;object-fit:contain;" />' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>'}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <input type="file" id="logoInput" accept="image/*" style="display:none" />
+          <button type="button" class="btn btn-secondary btn-sm" id="logoUploadBtn">Bild auswählen</button>
+          ${wizardState.logoDataUrl ? '<button type="button" class="btn btn-sm" style="background:rgba(255,60,60,0.1);color:#d32f2f;border:1px solid rgba(255,60,60,0.25);" id="logoClearBtn">Entfernen</button>' : ''}
+        </div>
+      </div>
+
+      <h3 class="h4 mt-6">Screenshots</h3>
+      <p class="muted" style="font-size:13px;">Optional - bis zu 6 Bilder.</p>
+      <div class="upload-grid mt-3" id="screensGrid">
+        ${Array.from({length: 6}).map((_, i) => {
+          const url = wizardState.screensDataUrls[i];
+          return '<button type="button" class="upload-card" data-screen-idx="' + i + '" style="aspect-ratio:1;">' +
+            (url ? '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" />' :
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>') +
+            '</button>';
+        }).join('')}
+      </div>
+      <input type="file" id="screenInput" accept="image/*" style="display:none" />
+      <div id="screenStatus" class="muted mt-3" style="font-size:12.5px;">${wizardState.screensDataUrls.filter(Boolean).length} / 6 Screenshots</div>`;
     else if (def.body === 'category') inner = `<h2>Kategorie</h2><p class="lede">Wähle die passende Kategorie.</p>
       <div class="cat-grid mt-3">${cats.map(c => `<button type="button" class="cat-card ${wizardState.category === c.k ? 'selected' : ''}" data-cat="${c.k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h12"/></svg><div class="t">${c.k}</div><div class="s">${c.d}</div></button>`).join('')}</div>`;
     else if (def.body === 'specs') inner = `<h2>Systemanforderungen</h2><p class="lede">Lege fest, auf welchen Systemen dein Produkt läuft.</p>
@@ -1921,6 +1995,44 @@ input, textarea, select { font: inherit; color: inherit; }
     const chan = document.getElementById('chan'); if (chan) chan.onchange = e => wizardState.channel = e.target.value;
     panel.querySelectorAll('.cat-card').forEach(c => c.onclick = () => { wizardState.category = c.dataset.cat; paintWizard(); });
 
+    // Logo-Upload (Schritt 2)
+    const logoInput = document.getElementById('logoInput');
+    const logoBtn = document.getElementById('logoUploadBtn');
+    const logoClear = document.getElementById('logoClearBtn');
+    if (logoBtn) logoBtn.onclick = () => logoInput.click();
+    if (logoClear) logoClear.onclick = () => { wizardState.logoDataUrl = ''; paintWizard(); };
+    if (logoInput) logoInput.onchange = async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { LKToast('Logo zu groß (max 5 MB).', 'error'); return; }
+      try {
+        wizardState.logoDataUrl = await fileToDataURL(file);
+        paintWizard();
+      } catch (err) { LKToast('Logo konnte nicht gelesen werden.', 'error'); }
+    };
+
+    // Screenshot-Upload (Schritt 2)
+    const screenInput = document.getElementById('screenInput');
+    let screenTarget = -1;
+    document.querySelectorAll('[data-screen-idx]').forEach((btn) => {
+      btn.onclick = () => {
+        screenTarget = +btn.dataset.screenIdx;
+        screenInput.click();
+      };
+    });
+    if (screenInput) screenInput.onchange = async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file || screenTarget < 0) return;
+      if (file.size > 5 * 1024 * 1024) { LKToast('Screenshot zu groß (max 5 MB).', 'error'); return; }
+      try {
+        const url = await fileToDataURL(file);
+        wizardState.screensDataUrls[screenTarget] = url;
+        paintWizard();
+      } catch (err) { LKToast('Screenshot konnte nicht gelesen werden.', 'error'); }
+      screenTarget = -1;
+      e.target.value = '';
+    };
+
     // File-Upload-Wiring (Schritt 5)
     const fileCard = document.getElementById('fileUploadCard');
     const fileInput = document.getElementById('fileInput');
@@ -1936,14 +2048,15 @@ input, textarea, select { font: inherit; color: inherit; }
         fileCard.classList.add('filled');
         const status = document.getElementById('uploadStatus');
         status.textContent = '⏳ Lade hoch …';
+        status.style.color = '';
         try {
-          const result = await uploadToFileHost(file);
+          const result = await uploadToFileHost(file, (msg) => { status.textContent = msg; });
           wizardState.downloadUrl = result.url;
           status.innerHTML = '✓ Hochgeladen via ' + result.host + ': <a href="' + result.url + '" target="_blank" rel="noopener" class="brand-text">' + result.url + '</a>';
           fileCard.style.background = 'linear-gradient(135deg, #d4f7d4, #2ea44f)';
           fileCard.style.color = '#fff';
         } catch (err) {
-          status.textContent = '⚠ Upload fehlgeschlagen: ' + err.message;
+          status.textContent = '⚠ ' + err.message;
           status.style.color = '#d32f2f';
           fileCard.classList.remove('filled');
         }
@@ -1953,6 +2066,7 @@ input, textarea, select { font: inherit; color: inherit; }
   function onNextWizard() {
     const def = STEPS[wizardState.step - 1];
     if (def.body === 'name-desc' && !wizardState.name.trim()) return LKToast('Bitte einen Produktnamen angeben.', 'error');
+    if (def.body === 'media' && !wizardState.logoDataUrl) return LKToast('Bitte lade ein Logo hoch (Pflicht).', 'error');
     if (def.body === 'category' && !wizardState.category) return LKToast('Bitte eine Kategorie wählen.', 'error');
     if (def.body === 'version' && !wizardState.downloadUrl) return LKToast('Bitte lade eine Download-Datei hoch.', 'error');
     if (wizardState.step < STEPS.length) { wizardState.step++; paintWizard(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
