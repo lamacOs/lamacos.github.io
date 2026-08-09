@@ -1021,7 +1021,7 @@ input, textarea, select { font: inherit; color: inherit; }
     measurementId: "G-HM07HRVX34"
   };
   const isDemo = firebaseConfig.apiKey === "DEMO_API_KEY";
-  let LK = null;
+  var LK = window.LK = null;  // LK und window.LK zeigen auf dasselbe Object (Alias)
 
   function mapErr(e) {
     const code = (e && e.code) || 'auth/error';
@@ -1096,7 +1096,7 @@ input, textarea, select { font: inherit; color: inherit; }
     });
   }
   async function initAuth() {
-    if (isDemo) { LK = { auth: MockAuth(), db: MockDB(), demo: true }; LK.auth.onAuthStateChanged(updateNav); return; }
+    if (isDemo) { LK = window.LK = { auth: MockAuth(), db: MockDB(), demo: true }; LK.auth.onAuthStateChanged(updateNav); return; }
     try {
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
@@ -1110,7 +1110,7 @@ input, textarea, select { font: inherit; color: inherit; }
       // eslint-disable-next-line no-undef
       const db = firebase.database(app);
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-      LK = { auth, db, demo: false };
+      LK = window.LK = { auth, db, demo: false };
       // eslint-disable-next-line no-undef
       console.log('Firebase initialisiert:', app.name);
       auth.onAuthStateChanged(async (user) => {
@@ -1123,7 +1123,7 @@ input, textarea, select { font: inherit; color: inherit; }
       console.error('Firebase-Initialisierung fehlgeschlagen:', e);
       // NICHT still auf Demo-Modus schalten - das ist die Verwirrung, die der User gerade erlebt!
       // Stattdessen: KLAR machen, dass Firebase nicht erreichbar ist.
-      LK = { auth: MockAuth(), db: MockDB(), demo: true, firebaseError: e.message };
+      LK = window.LK = { auth: MockAuth(), db: MockDB(), demo: true, firebaseError: e.message };
       try { LK.auth.onAuthStateChanged(updateNav); } catch (e2) {}
       // User sichtbar warnen
       setTimeout(() => {
@@ -2115,8 +2115,31 @@ input, textarea, select { font: inherit; color: inherit; }
   let _lkReadyPromise = null;
   function waitForLK() {
     if (!_lkReadyPromise) {
-      _lkReadyPromise = new Promise(resolve => {
-        const check = () => { if (window.LK !== null) resolve(true); else setTimeout(check, 50); };
+      _lkReadyPromise = new Promise((resolve) => {
+        const start = Date.now();
+        const TIMEOUT_MS = 30000;
+        const check = () => {
+          if (window.LK !== null) {
+            if (window.LK.firebaseError) {
+              resolve({ ok: false, error: window.LK.firebaseError });
+            } else if (window.LK.db) {
+              resolve({ ok: true });
+            } else {
+              // LK gesetzt, aber kein db (z.B. firebase läuft noch)
+              if (Date.now() - start > TIMEOUT_MS) {
+                resolve({ ok: false, error: 'Timeout beim Warten auf Firebase-Datenbank' });
+              } else {
+                setTimeout(check, 100);
+              }
+            }
+          } else {
+            if (Date.now() - start > TIMEOUT_MS) {
+              resolve({ ok: false, error: 'Firebase wurde nicht initialisiert' });
+            } else {
+              setTimeout(check, 50);
+            }
+          }
+        };
         check();
       });
     }
@@ -2125,7 +2148,7 @@ input, textarea, select { font: inherit; color: inherit; }
 
   async function publishProduct() {
     await waitForLK();
-    if (LK && LK.firebaseError) {
+    if (LK && LK.firebaseError) {  // LK ist alias zu window.LK
       LKToast('Firebase nicht erreichbar: ' + LK.firebaseError, 'error', 8000);
       console.error('Vollständiger Fehler siehe oben in der Konsole.');
       return;
