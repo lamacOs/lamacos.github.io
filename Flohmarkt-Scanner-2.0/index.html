@@ -486,6 +486,67 @@ function stopScan(){
 <footer style="text-align:center;opacity:0.6;margin-top:20px;">
   © 2026 lamacHub
 </footer>
+<script>
+(function () {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
+  // 1) Nur anzeigen, wenn der Referrer exakt https://www.lamachub.de ist
+  let referrer = '';
+  try { referrer = new URL(document.referrer); } catch (e) {}
+  if (
+    referrer.protocol !== 'https:' ||
+    referrer.hostname.toLowerCase() !== 'www.lamachub.de'
+  ) return;
+
+  // 2) Container in Shadow DOM, damit die Styles der Host-Seite nicht stören
+  const root = document.createElement('div');
+  root.setAttribute('data-lamachub-back', '');
+  Object.assign(root.style, {
+    all: 'initial',
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    zIndex: '2147483647',
+    pointerEvents: 'none'
+  });
+  document.documentElement.appendChild(root);
+
+  const shadow = root.attachShadow({ mode: 'open' });
+  shadow.innerHTML = `
+    <style>
+      :host { all: initial; }
+      button {
+        pointer-events: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 12px;
+        padding: 10px 16px;
+        background: #ff6a00;
+        color: #fff;
+        font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        border: 0;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        transition: background .15s ease, transform .1s ease;
+      }
+      button:hover  { background: #e65f00; }
+      button:active { transform: scale(.97); }
+      button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+      .arrow { font-size: 16px; line-height: 1; }
+    </style>
+    <button type="button" aria-label="Zurück zu lamachub.de">
+      <span class="arrow">←</span>
+      <span>Zurück</span>
+    </button>
+  `;
+
+  shadow.querySelector('button').addEventListener('click', () => {
+    // Navigation im selben Tab (window.top bricht ggf. aus iFrames aus)
+    window.top.location.href = 'https://www.lamachub.de/';
+  });
+})();
+</script>
 </body>
 </html>
