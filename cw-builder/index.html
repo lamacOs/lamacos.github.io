@@ -303,7 +303,7 @@
       <h2>GitHub Personal Access Token</h2>
       <p>Trag hier deinen GitHub-PAT ein. Er wird in LocalStorage gespeichert (nur lokal in deinem Browser, nie übertragen). Wird benötigt, um deine Site direkt ins Repo <code>lamacOs/lamacos.github.io</code> zu veröffentlichen.</p>
       <div class="field"><label>GitHub-PAT</label><input id="patInput" type="password" placeholder="ghp_… oder github_pat_…" /></div>
-      <p style="font-size:12.5px;color:var(--ink-mute);">So erstellst du einen PAT: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → Scope <code>repo</code> aktivieren → Generate. Token kopieren und hier einfügen.</p>
+      <p style="font-size:12.5px;color:var(--ink-mute);"><strong>Hinweis:</strong> Der GitHub-PAT wird bevorzugt aus Firebase Realtime DB unter <code>/patkey</code> geladen — so muss jeder User nichts eintragen. Fallback: hier eintragen.<br/><br/>So erstellst du einen PAT: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → Scope <code>repo</code> aktivieren → Generate. Token kopieren und in Firebase unter <code>/patkey</code> ablegen.</p>
       <div class="row">
         <button class="btn btn-secondary" id="closeSettingsBtn">Abbrechen</button>
         <button class="btn btn-primary" id="saveSettingsBtn">Speichern</button>
@@ -328,21 +328,73 @@
 
   <div class="toast-wrap" id="toastWrap"></div>
 
-<script>
-(function () {
+<script type="module">
   'use strict';
 
-  /* ============================================================
-     cw/ Builder — Konfiguration
-     ============================================================ */
-  // ⚠️ ÜBERGANG: PAT ist hier hartcodiert. Nur für lokales Testen.
-  // Für Produktion: PAT aus Settings-Modal holen und in LocalStorage speichern.
+  // ------------------------------------------------------------
+  // Firebase Realtime Database (PAT storage)
+  // ------------------------------------------------------------
+  // Only fill FIREBASE_CONFIG below. Everything else is ready.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyC3llqOYDV2GJrg5NAEThQe0tI8LDqQpD4",
+    authDomain: "lamacos-technolygies.firebaseapp.com",
+    databaseURL: "https://lamacos-technolygies-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "lamacos-technolygies",
+    storageBucket: "lamacos-technolygies.firebasestorage.app",
+    messagingSenderId: "487103867292",
+    appId: "1:487103867292:web:d47007df73b201d5f98059"
+  };
+  const RTDB_PAT_PATH = '/patkey';
+
+  let _fbApp = null;
+  let _fbDb = null;
+
+  function initFirebase() {
+    if (_fbApp) return true;
+    try {
+      // The databaseURL must be the Realtime DB URL in europe-west1 if you're using that region
+      _fbApp = initializeApp(FIREBASE_CONFIG);
+      _fbDb = getDatabase(_fbApp);
+      console.info('Firebase initialized.');
+      return true;
+    } catch (e) {
+      console.warn('Firebase init failed:', e);
+      return false;
+    }
+  }
+
+  async function fetchPatFromRealtime() {
+    try {
+      if (!initFirebase()) return '';
+      const snap = await get(ref(_fbDb, RTDB_PAT_PATH));
+      if (snap && snap.exists && snap.exists()) {
+        const val = snap.val();
+        if (val && typeof val === 'string') {
+          const tok = val.trim();
+          if (tok) {
+            // cache locally
+            try { localStorage.setItem('cw-pat', tok); } catch (e) {}
+            return tok;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('RTDB read failed:', e);
+    }
+    return '';
+  }
+
+  // ------------------------------------------------------------
+  // Builder configuration & state
+  // ------------------------------------------------------------
   const CONFIG = {
     githubOwner: 'lamacOs',
     githubRepo: 'lamacos.github.io',
     githubBranch: 'main',
-    // Setze hier deinen PAT (siehe README). Format: 'ghp_xxx...'
-    hardcodedPat: 'PAT-Token',
+    hardcodedPat: '' // do not put real tokens here
   };
 
   const ACCENTS = {
@@ -351,23 +403,19 @@
     green:  { brand: '#10b981', deep: '#047857', soft: '#6ee7b7' },
   };
 
-  // State
   const state = {
     siteName: '',
-    slots: [], // { id, type, data, ... }
-    theme: 'light', // light, dark, auto
+    slots: [],
+    theme: 'light',
     accent: 'orange',
     selectedId: null,
-    pat: localStorage.getItem('cw-pat') || '',
+    pat: (localStorage.getItem('cw-pat') || '').trim()
   };
 
-  /* ============================================================
-     Helpers
-     ============================================================ */
+  // Helpers
   function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
   function uid() { return 'sl_' + Math.random().toString(36).slice(2, 9); }
   function escapeAttr(s) { return escapeHtml(s).replace(/\n/g, ' '); }
-
   function ensureToastWrap() { let w = document.getElementById('toastWrap'); if (!w) { w = document.createElement('div'); w.id = 'toastWrap'; w.className = 'toast-wrap'; document.body.appendChild(w); } return w; }
   function toast(msg, type = 'default', timeout = 3000) {
     const w = ensureToastWrap();
@@ -380,21 +428,27 @@
   }
 
   function getCurrentPat() {
-    // Zuerst Settings-Modal-Wert, dann LocalStorage, dann hardcoded
-    if (state.pat) return state.pat;
-    const fromLs = localStorage.getItem('cw-pat');
+    if (state.pat && state.pat.trim()) return state.pat.trim();
+    const fromLs = (localStorage.getItem('cw-pat') || '').trim();
     if (fromLs) return fromLs;
-    if (CONFIG.hardcodedPat && CONFIG.hardcodedPat !== 'HIER_DEINEN_PAT_EINSETZEN') return CONFIG.hardcodedPat;
+    if (CONFIG.hardcodedPat && CONFIG.hardcodedPat !== '') return CONFIG.hardcodedPat.trim();
     return '';
   }
 
-  /* ============================================================
-     Theme
-     ============================================================ */
+  async function ensurePatLoaded() {
+    const cur = getCurrentPat();
+    if (cur) return cur;
+    const fromRtdb = await fetchPatFromRealtime();
+    if (fromRtdb) {
+      state.pat = fromRtdb;
+      return fromRtdb;
+    }
+    return '';
+  }
+
+  // Theme
   function applyTheme() {
-    const t = state.theme === 'auto'
-      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : state.theme;
+    const t = state.theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : state.theme;
     if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
     else document.documentElement.removeAttribute('data-theme');
   }
@@ -411,7 +465,6 @@
   });
   loadTheme();
 
-  // Accent
   function applyAccent() {
     const a = ACCENTS[state.accent] || ACCENTS.orange;
     document.documentElement.style.setProperty('--brand', a.brand);
@@ -425,9 +478,7 @@
   }
   loadAccent();
 
-  /* ============================================================
-     Slot Management
-     ============================================================ */
+  // Slot management & rendering (copied from your original, unchanged)
   const SLOT_DEFAULTS = {
     hero: { title: 'Dein Titel', subtitle: 'Eine kurze, prägnante Beschreibung.', image: '' },
     text: { markdown: '# Überschrift\n\nSchreib hier deinen Text. Unterstützt **Markdown**:\n\n- Listen\n- *kursiv*, **fett**\n- [Links](https://example.com)\n\n```js\nconst x = 42;\n```\n' },
@@ -473,9 +524,6 @@
     render();
   }
 
-  /* ============================================================
-     Slot Content Renderers (Preview / Live)
-     ============================================================ */
   function renderSlotContent(slot) {
     const d = slot.data || {};
     switch (slot.type) {
@@ -508,28 +556,20 @@
     }
   }
 
-  // Minimaler Markdown-Renderer (inline, ohne externe Lib)
   function renderMarkdown(md) {
     if (!md) return '';
     let html = escapeHtml(md);
-    // Code blocks
     html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (m, lang, code) => `<pre><code>${code.trim()}</code></pre>`);
-    // Headings
     html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
     html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
     html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-    // Bold / Italic / Inline code
     html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
     html = html.replace(/`(.+?)`/g, '<code>$1</code>');
-    // Links
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-    // Blockquotes
     html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-    // Lists (simple)
     html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
     html = html.replace(/(<li>(.|\n)*?<\/li>)/g, m => '<ul>' + m + '</ul>');
-    // Paragraphs (einfach: doppelte Newlines)
     html = html.split(/\n{2,}/).map(p => {
       if (/^<(h\d|ul|pre|blockquote)/.test(p.trim())) return p;
       return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
@@ -547,11 +587,7 @@
     return url;
   }
 
-  /* ============================================================
-     Renderers: Canvas + Sidebar
-     ============================================================ */
   function render() {
-    // Canvas
     const canvas = document.getElementById('canvas');
     if (state.slots.length === 0) {
       canvas.innerHTML = `<div class="canvas-empty">
@@ -574,7 +610,6 @@
             <button data-act="del" class="danger" title="Löschen">×</button>
           </div>
           ${renderSlotContent(s)}`;
-        // Toolbar handlers
         el.querySelectorAll('[data-act]').forEach(btn => {
           btn.addEventListener('click', e => {
             e.stopPropagation();
@@ -592,22 +627,10 @@
             }
           });
         });
-        // Select
-        el.addEventListener('click', () => {
-          state.selectedId = s.id;
-          render();
-        });
-        // Drag & Drop
-        el.addEventListener('dragstart', (e) => {
-          el.classList.add('dragging');
-          e.dataTransfer.setData('text/plain', s.id);
-          e.dataTransfer.effectAllowed = 'move';
-        });
+        el.addEventListener('click', () => { state.selectedId = s.id; render(); });
+        el.addEventListener('dragstart', (e) => { el.classList.add('dragging'); e.dataTransfer.setData('text/plain', s.id); e.dataTransfer.effectAllowed = 'move'; });
         el.addEventListener('dragend', () => el.classList.remove('dragging'));
-        el.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          el.classList.add('drop-above');
-        });
+        el.addEventListener('dragover', (e) => { e.preventDefault(); el.classList.add('drop-above'); });
         el.addEventListener('dragleave', () => el.classList.remove('drop-above'));
         el.addEventListener('drop', (e) => {
           e.preventDefault();
@@ -625,13 +648,8 @@
       });
     }
 
-    // Properties Panel
     renderProps();
-
-    // Site name input
     document.getElementById('siteName').value = state.siteName;
-
-    // Saved sites
     renderSavedSites();
   }
 
@@ -687,7 +705,6 @@
     }
     panel.innerHTML = html;
 
-    // Wire all data-prop inputs
     panel.querySelectorAll('[data-prop]').forEach(input => {
       input.addEventListener('input', (e) => {
         const prop = input.dataset.prop;
@@ -697,7 +714,7 @@
         updateSlotData(s.id, { [prop]: v });
       });
     });
-    // File upload for hero/image
+
     const pf = document.getElementById('propFile');
     if (pf) {
       pf.addEventListener('change', async (e) => {
@@ -744,14 +761,12 @@
     }));
   }
 
-  /* ============================================================
-     Drag & Drop from Picker (between slots)
-     ============================================================ */
+  // slot picker
   document.querySelectorAll('[data-add]').forEach(btn => {
     btn.addEventListener('click', () => addSlot(btn.dataset.add, state.selectedId));
   });
 
-  // Theme chooser
+  // theme chooser
   document.getElementById('themeChooser').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-theme-mode]');
     if (!btn) return;
@@ -760,7 +775,7 @@
     applyTheme();
     document.querySelectorAll('#themeChooser button').forEach(b => b.classList.toggle('active', b === btn));
   });
-  // Update theme chooser active state
+
   document.querySelectorAll('#themeChooser button').forEach(b => b.classList.toggle('active', b.dataset.themeMode === state.theme));
 
   document.getElementById('accentChooser').addEventListener('click', (e) => {
@@ -773,14 +788,9 @@
   });
   document.querySelectorAll('#accentChooser button').forEach(b => b.classList.toggle('active', b.dataset.accent === state.accent));
 
-  // Site name input
-  document.getElementById('siteName').addEventListener('input', (e) => {
-    state.siteName = e.target.value;
-  });
+  document.getElementById('siteName').addEventListener('input', (e) => { state.siteName = e.target.value; });
 
-  /* ============================================================
-     Drafts (LocalStorage)
-     ============================================================ */
+  // Drafts
   function saveDraft() {
     if (!state.siteName) { toast('Bitte zuerst einen Site-Namen eingeben.', 'warn'); return; }
     const drafts = JSON.parse(localStorage.getItem('cw-drafts') || '{}');
@@ -795,7 +805,6 @@
     toast('Entwurf gespeichert', 'success');
     renderSavedSites();
   }
-
   function loadDraft(name) {
     const drafts = JSON.parse(localStorage.getItem('cw-drafts') || '{}');
     const d = drafts[name];
@@ -810,12 +819,9 @@
     document.getElementById('siteName').value = state.siteName;
     render();
   }
-
   document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
 
-  /* ============================================================
-     Settings Modal (PAT)
-     ============================================================ */
+  // Settings modal
   document.getElementById('settingsBtn').addEventListener('click', () => {
     document.getElementById('patInput').value = state.pat || '';
     document.getElementById('settingsModal').classList.add('open');
@@ -825,16 +831,13 @@
   });
   document.getElementById('saveSettingsBtn').addEventListener('click', () => {
     state.pat = document.getElementById('patInput').value.trim();
-    localStorage.setItem('cw-pat', state.pat);
+    try { localStorage.setItem('cw-pat', state.pat); } catch (e) {}
     document.getElementById('settingsModal').classList.remove('open');
     toast(state.pat ? 'PAT gespeichert' : 'PAT entfernt', 'success');
   });
 
-  /* ============================================================
-     Publish: Build HTML + Push via GitHub Contents API
-     ============================================================ */
+  // Build output HTML
   function buildHtml() {
-    // Baue aus den Slots eine eigenständige HTML-Seite
     const accent = ACCENTS[state.accent] || ACCENTS.orange;
     const themeAuto = state.theme === 'auto';
     const themeInit = state.theme === 'dark' ? 'dark' : 'light';
@@ -921,63 +924,99 @@
 </html>`;
   }
 
+  function renderPublishError(statusEl, title, bodyText) {
+    statusEl.innerHTML = '<div class="alert error" style="background:rgba(255,60,60,0.08);color:#d32f2f;border:1px solid rgba(255,60,60,0.18);padding:14px;border-radius:10px;font-size:13.5px;white-space:pre-wrap;line-height:1.5;"><strong>' + escapeHtml(title) + '</strong><br/><br/>' + escapeHtml(bodyText) + '</div>';
+  }
+
   async function publishSite() {
+    const status = document.getElementById('publishStatus');
     const name = (state.siteName || document.getElementById('publishName').value || '').trim();
     if (!name) { toast('Site-Name fehlt', 'error'); return; }
     if (!/^[a-z0-9-]+$/i.test(name)) { toast('Site-Name darf nur a-z, 0-9 und - enthalten.', 'error'); return; }
-    const pat = getCurrentPat();
-    if (!pat) { toast('Kein GitHub-PAT. Bitte in den Einstellungen hinterlegen.', 'error'); document.getElementById('settingsBtn').click(); return; }
 
-    const status = document.getElementById('publishStatus');
+    status.innerHTML = '<div class="muted" style="font-size:13px;">⏳ Lade/prüfe PAT…</div>';
+    await ensurePatLoaded();
+    const pat = getCurrentPat();
+    if (!pat) {
+      renderPublishError(status, 'Kein PAT', 'Kein GitHub-PAT gefunden. Entweder in den Einstellungen eintragen oder unter /patkey in deiner Firebase Realtime Database ablegen.');
+      document.getElementById('settingsBtn').click();
+      return;
+    }
+    const cleanPat = pat.trim();
+
     status.innerHTML = '<div class="muted" style="font-size:13px;">⏳ Baue HTML…</div>';
     const html = buildHtml();
 
     status.innerHTML = '<div class="muted" style="font-size:13px;">⏳ Prüfe ob Site bereits existiert…</div>';
     const path = 'cw/' + name + '/index.html';
     const url = `https://api.github.com/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${path}`;
+
+    const headersForGet = {
+      'Authorization': 'token ' + cleanPat,
+      'Accept': 'application/vnd.github+json'
+    };
+
     let sha = null;
     try {
-      const r = await fetch(url + '?ref=' + CONFIG.githubBranch, { headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json' } });
-      if (r.ok) { const j = await r.json(); sha = j.sha; status.innerHTML += '<br/>✓ Existiert bereits — wird aktualisiert.'; }
-    } catch (e) {}
+      const r = await fetch(url + '?ref=' + CONFIG.githubBranch, { headers: headersForGet });
+      if (r.ok) {
+        const j = await r.json();
+        sha = j.sha;
+        status.innerHTML += '<br/>✓ Existiert bereits — wird aktualisiert.';
+      } else if (r.status === 401) {
+        renderPublishError(status, '401 Bad credentials', 'Dein GitHub-PAT ist ungültig oder nicht autorisiert.\n\nLösung: Token prüfen/neu erstellen, ggf. SSO autorisieren.');
+        return;
+      } else if (r.status === 404) {
+        // file not found is ok, we'll create it
+      } else {
+        // other statuses ignored here
+      }
+    } catch (e) {
+      console.warn('Check file failed', e);
+    }
 
     status.innerHTML = '<div class="muted" style="font-size:13px;">⏳ Schreibe in GitHub…</div>';
     const content = btoa(unescape(encodeURIComponent(html)));
     const msg = document.getElementById('publishMsg').value || ('Site ' + name + ' via cw/ Builder');
-    const body = {
-      message: msg,
-      content: content,
-      branch: CONFIG.githubBranch
-    };
+    const body = { message: msg, content: content, branch: CONFIG.githubBranch };
     if (sha) body.sha = sha;
 
     try {
       const resp = await fetch(url, {
         method: 'PUT',
-        headers: {
-          'Authorization': 'Bearer ' + pat,
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.github+json'
-        },
+        headers: Object.assign({}, {
+          'Authorization': 'token ' + cleanPat,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json'
+        }),
         body: JSON.stringify(body)
       });
       if (!resp.ok) {
-        const txt = await resp.text();
-        throw new Error('GitHub API ' + resp.status + ': ' + txt.slice(0, 300));
+        let details = '';
+        try { const j = await resp.json(); details = j.message || JSON.stringify(j); } catch (e) { details = await resp.text(); }
+        if (resp.status === 401) {
+          renderPublishError(status, '401 Bad credentials', 'Dein GitHub-PAT wurde abgelehnt.\n\nMögliche Ursachen:\n1) Token ist abgelaufen oder widerrufen\n2) Fehlende Scopes (benötigt: repo)\n3) Token muss für Org SSO autorisiert werden\n4) Token gehört zu anderem Account\n\nDetails: ' + details);
+          return;
+        } else if (resp.status === 404) {
+          renderPublishError(status, '404 Not Found', 'Repo nicht gefunden oder kein Zugriff: ' + details);
+          return;
+        } else {
+          throw new Error('GitHub API ' + resp.status + ': ' + details);
+        }
       }
       const j = await resp.json();
       status.innerHTML = `<div class="alert success" style="background:rgba(34,197,94,0.08);color:#16a34a;border:1px solid rgba(34,197,94,0.18);padding:12px 14px;border-radius:10px;font-size:13.5px;display:flex;gap:10px;align-items:flex-start;">
         <span>✓ Site veröffentlicht!<br/><a href="${j.content.html_url}" target="_blank" rel="noopener" style="color:#16a34a;">GitHub-Commit ansehen</a><br/>Erreichbar in ~30 Sekunden unter <code>https://lamachub.de/cw/${escapeHtml(name)}/</code></span>
       </div>`;
       toast('Site veröffentlicht: ' + name, 'success', 4000);
-      // Auto-close after 4s
       setTimeout(() => document.getElementById('publishModal').classList.remove('open'), 4500);
     } catch (e) {
       console.error(e);
-      status.innerHTML = `<div class="alert error" style="background:rgba(255,60,60,0.08);color:#d32f2f;border:1px solid rgba(255,60,60,0.18);padding:12px 14px;border-radius:10px;font-size:13.5px;">Fehler: ${escapeHtml(e.message || String(e))}</div>`;
+      renderPublishError(status, 'Fehler beim Veröffentlichen', String(e.message || e));
     }
   }
 
+  // publish modal wiring
   document.getElementById('publishBtn').addEventListener('click', () => {
     document.getElementById('publishName').value = state.siteName;
     const preview = document.getElementById('publishUrlPreview');
@@ -989,16 +1028,15 @@
     document.getElementById('publishModal').classList.remove('open');
   });
   document.getElementById('doPublishBtn').addEventListener('click', publishSite);
-
-  // Pat input live update of publishName preview
   document.getElementById('publishName').addEventListener('input', (e) => {
     const preview = document.getElementById('publishUrlPreview');
     preview.textContent = 'https://lamachub.de/cw/' + e.target.value + '/';
   });
 
-  // Initial paint
+  // initial
+  initFirebase();
   render();
-})();
+
 </script>
 </body>
 </html>
