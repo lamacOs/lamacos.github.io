@@ -717,34 +717,71 @@
       showToast('3D Text hinzugefügt!');
     }
 
+    // Helper: draw rounded rect with fallback if ctx.roundRect is not supported
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+      if (typeof ctx.roundRect === 'function') {
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, r);
+        ctx.closePath();
+        return;
+      }
+      const radius = typeof r === 'number' ? r : 12;
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + w - radius, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+      ctx.lineTo(x + w, y + h - radius);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      ctx.lineTo(x + radius, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    // Robust updateTextTexture with fallback and error handling
     function updateTextTexture(mesh) {
-      const ud = mesh.userData;
-      if (!ud || !ud.textCanvas) return;
+      try {
+        const ud = mesh.userData;
+        if (!ud || !ud.textCanvas) return;
 
-      const ctx = ud.textCanvas.getContext('2d');
-      ctx.clearRect(0, 0, 512, 128);
+        const ctx = ud.textCanvas.getContext('2d');
+        if (!ctx) return;
 
-      ctx.fillStyle = 'rgba(18, 20, 29, 0.85)';
-      ctx.strokeStyle = 'rgba(255, 122, 0, 0.8)';
-      ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.roundRect(8, 8, 496, 112, 24); ctx.fill(); ctx.stroke();
+        // Clear
+        ctx.clearRect(0, 0, ud.textCanvas.width, ud.textCanvas.height);
 
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString();
-      const dateStr = now.toLocaleDateString();
+        // Background box with rounded corners (use fallback if roundRect not available)
+        ctx.fillStyle = 'rgba(18, 20, 29, 0.85)';
+        ctx.strokeStyle = 'rgba(255, 122, 0, 0.8)';
+        ctx.lineWidth = 4;
+        drawRoundedRect(ctx, 8, 8, 496, 112, 24);
+        ctx.fill();
+        ctx.stroke();
 
-      let text = ud.templateText || 'Text';
-      text = text.replace('{time}', timeStr);
-      text = text.replace('{date}', dateStr);
-      text = text.replace('{counter}', state.counterVar);
+        // Prepare dynamic variables
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString();
+        const dateStr = now.toLocaleDateString();
 
-      ctx.font = '700 28px "Plus Jakarta Sans", sans-serif';
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(text, 256, 64);
+        let text = ud.templateText || 'Text';
+        text = text.replace('{time}', timeStr);
+        text = text.replace('{date}', dateStr);
+        text = text.replace('{counter}', state.counterVar);
 
-      ud.texture.needsUpdate = true;
+        // Draw text
+        ctx.font = '700 28px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, ud.textCanvas.width / 2, ud.textCanvas.height / 2);
+
+        // Mark texture for update
+        if (ud.texture) ud.texture.needsUpdate = true;
+      } catch (err) {
+        // Prevent any error here from breaking the whole app
+        console.warn('updateTextTexture error (ignored):', err);
+      }
     }
 
     // Live Camera 3D Monitor Panel
