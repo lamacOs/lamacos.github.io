@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Delightex VR/AR Experience Builder & Precision VR Tracker</title>
+  <title>Delightex VR/AR Experience Builder & Studio</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,6 +17,7 @@
       --accent: #ff7a00;
       --accent-glow: rgba(255, 122, 0, 0.45);
       --accent-cyan: #00f2fe;
+      --accent-green: #10b981;
       --text: #f3f4f6;
       --text-mute: #9ca3af;
       --border: rgba(255, 255, 255, 0.12);
@@ -35,7 +36,7 @@
     #webgl-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; display: block; touch-action: none; }
     #ar-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; display: none; }
 
-    /* Delightex Dual Lens VR Stereoscopic Overlay */
+    /* Dual Stereo VR Lens Overlay */
     #vr-lens-overlay {
       position: absolute; inset: 0; z-index: 10; pointer-events: none; display: none;
       background: radial-gradient(circle at 25% 50%, transparent 32%, rgba(0,0,0,0.96) 65%),
@@ -45,19 +46,18 @@
       position: absolute; top: 0; bottom: 0; left: 50%; width: 6px; background: #000;
       transform: translateX(-50%); z-index: 11; display: none; pointer-events: none;
     }
-    /* VR Crosshair Reticle */
     #vr-reticle-l {
       position: absolute; top: 50%; left: 25%; transform: translate(-50%, -50%);
-      width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.85); border-radius: 50%;
+      width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.9); border-radius: 50%;
       z-index: 12; display: none; pointer-events: none; box-shadow: 0 0 8px rgba(0,0,0,0.8);
     }
     #vr-reticle-r {
       position: absolute; top: 50%; left: 75%; transform: translate(-50%, -50%);
-      width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.85); border-radius: 50%;
+      width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.9); border-radius: 50%;
       z-index: 12; display: none; pointer-events: none; box-shadow: 0 0 8px rgba(0,0,0,0.8);
     }
 
-    /* Top Navigation Header */
+    /* Header Navigation */
     .app-header {
       position: absolute; top: 14px; left: 14px; right: 14px; z-index: 50;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -80,7 +80,7 @@
     /* Buttons */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 9px 16px; border-radius: 12px; font-weight: 600; font-size: 13px;
+      padding: 9px 15px; border-radius: 12px; font-weight: 600; font-size: 13px;
       background: var(--bg-glass); color: var(--text); border: 1px solid var(--border);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -90,14 +90,15 @@
     .btn-primary:hover { box-shadow: 0 8px 26px rgba(255,122,0,0.6); transform: translateY(-1px); }
     .btn-cyan { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; border: none; font-weight: 800; box-shadow: 0 6px 20px rgba(0,242,254,0.35); }
     .btn-cyan:hover { box-shadow: 0 8px 26px rgba(0,242,254,0.55); }
+    .btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; font-weight: 700; }
 
-    /* Builder Left Sidebar: Objects Catalog */
+    /* Builder Left Sidebar */
     .sidebar-left {
       position: absolute; top: 72px; left: 14px; bottom: 14px; width: 270px; z-index: 40;
       background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border); border-radius: var(--radius-l);
-      padding: 14px; display: flex; flex-direction: column; gap: 14px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.6); transition: transform 0.3s ease;
+      padding: 14px; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6); transition: transform 0.3s ease; overflow-y: auto;
     }
     .sidebar-left.collapsed { transform: translateX(-310px); }
 
@@ -110,36 +111,37 @@
       cursor: pointer; transition: all 0.2s ease; text-align: center; color: var(--text);
     }
     .cat-btn:hover { border-color: var(--accent); background: rgba(255, 122, 0, 0.12); transform: translateY(-2px); }
-    .cat-btn svg { width: 22px; height: 22px; color: var(--accent); }
-    .cat-btn span { font-size: 11.5px; font-weight: 700; }
+    .cat-btn svg { width: 20px; height: 20px; color: var(--accent); }
+    .cat-btn span { font-size: 11px; font-weight: 700; }
 
     /* Right Sidebar: Inspector */
     .sidebar-right {
-      position: absolute; top: 72px; right: 14px; bottom: 14px; width: 290px; z-index: 40;
+      position: absolute; top: 72px; right: 14px; bottom: 14px; width: 300px; z-index: 40;
       background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border); border-radius: var(--radius-l);
       padding: 14px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
       box-shadow: 0 16px 40px rgba(0,0,0,0.6); transition: transform 0.3s ease;
     }
-    .sidebar-right.collapsed { transform: translateX(330px); }
+    .sidebar-right.collapsed { transform: translateX(340px); }
 
     .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
     .field label { font-size: 11px; font-weight: 700; color: var(--text-mute); display: flex; justify-content: space-between; }
     .field label .val { color: var(--accent); font-family: var(--font-mono); }
     .field input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 100%; }
-    .field input[type="text"], .field select {
+    .field input[type="text"], .field textarea, .field select {
       padding: 8px 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-s);
       color: var(--text); font-size: 12px; font-family: inherit; width: 100%;
     }
+    .field textarea { font-family: var(--font-mono); min-height: 70px; resize: vertical; }
     .field input[type="color"] { width: 100%; height: 32px; padding: 2px; border-radius: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border); }
 
-    /* Scene Objects List */
+    /* Objects List */
     .obj-list { display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
     .obj-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; background: transparent; transition: background 0.15s; }
     .obj-item:hover { background: rgba(255,255,255,0.08); }
     .obj-item.selected { background: var(--accent); color: #fff; font-weight: 700; }
 
-    /* Floating VR Control HUD (In VR Mode) */
+    /* VR HUD Controls */
     #vr-hud {
       position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100;
       display: none; align-items: center; gap: 10px; background: rgba(0,0,0,0.88); backdrop-filter: blur(16px);
@@ -147,7 +149,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.9); flex-wrap: wrap; justify-content: center;
     }
 
-    /* On-Screen VR Navigation Touch D-Pad */
+    /* Touch Navigation D-Pad */
     #vr-touch-dpad {
       position: absolute; bottom: 80px; left: 24px; z-index: 100; display: none;
       grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px); gap: 4px;
@@ -155,9 +157,14 @@
     .dpad-btn {
       background: rgba(0,0,0,0.65); border: 1px solid var(--border); border-radius: 10px;
       color: #fff; font-size: 16px; display: grid; place-items: center; cursor: pointer;
-      backdrop-filter: blur(8px); active: scale(0.95);
+      backdrop-filter: blur(8px);
     }
     .dpad-btn:active { background: var(--accent); }
+
+    /* AR Fullscreen Overlay Exit */
+    #ar-hud {
+      position: absolute; top: 20px; right: 20px; z-index: 100; display: none;
+    }
 
     /* Modal for Sharing */
     .modal-bg {
@@ -185,7 +192,7 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
 
-    #model-input { display: none; }
+    #model-input, #image-file-input { display: none; }
 
     @media (max-width: 768px) {
       .sidebar-left { width: 230px; }
@@ -218,9 +225,8 @@
     </div>
     
     <div class="header-right">
-      <button class="btn" id="btn-ar-toggle" title="AR Kamera Hintergrund">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        AR Kamera
+      <button class="btn btn-green" id="btn-ar-fullscreen" title="Kamera Vollbild AR Modus">
+        📷 AR Vollbild
       </button>
 
       <button class="btn btn-cyan" id="btn-vr-mode" title="Stereo VR Linsen-Ansicht für Handybrillen">
@@ -262,6 +268,16 @@
         <span>Live Cam 3D</span>
       </button>
 
+      <button class="cat-btn" id="add-image-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>🖼️ Bild Upload</span>
+      </button>
+
+      <button class="cat-btn" id="add-text-var-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+        <span>🔤 Text + Var</span>
+      </button>
+
       <button class="cat-btn" id="add-model-btn" style="grid-column: span 2;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <span>📁 3D Modell (.glb / .gltf)</span>
@@ -290,8 +306,13 @@
   <div id="vr-hud">
     <span style="font-size:12px;font-weight:800;">🥽 VR Linsen-Modus</span>
     <button class="btn btn-cyan" id="btn-recalibrate-vr" style="padding:5px 12px;font-size:11.5px;">🎯 Blick Ausrichten</button>
-    <button class="btn" id="btn-request-gyro" style="padding:5px 10px;font-size:11px;">Gyro/Sensoren Aktivieren</button>
+    <button class="btn" id="btn-request-gyro" style="padding:5px 10px;font-size:11px;">Gyro Aktivieren</button>
     <button class="btn" id="btn-exit-vr" style="padding:5px 10px;font-size:11px;">Beenden</button>
+  </div>
+
+  <!-- AR Fullscreen HUD Exit -->
+  <div id="ar-hud">
+    <button class="btn btn-primary" id="btn-exit-ar">AR Beenden</button>
   </div>
 
   <!-- VR Touch Navigation D-Pad -->
@@ -320,8 +341,9 @@
   <div class="toast" id="toast-msg">Link kopiert!</div>
 
   <input type="file" id="model-input" accept=".glb,.gltf,.obj" />
+  <input type="file" id="image-file-input" accept="image/*" />
 
-  <!-- ES Modules Loading Three.js cleanly without CDN crashes -->
+  <!-- ES Modules Loading Three.js cleanly -->
   <script type="module">
     import * as THREE from 'https://unpkg.com/three@0.128.0/build/three.module.js';
     import { OrbitControls } from 'https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js';
@@ -340,28 +362,29 @@
       gyroActive: false,
       deviceOrientation: { alpha: 0, beta: 0, gamma: 0 },
       screenOrientation: window.orientation || 0,
-      alphaOffset: 0, // Calibration offset to align front direction
-      touchLook: { x: 0, y: 0, isDragging: false, previousX: 0, previousY: 0 },
-      moveSpeed: 0.12
+      alphaOffset: 0,
+      touchLook: { isDragging: false, previousX: 0, previousY: 0 },
+      moveSpeed: 0.12,
+      counterVar: 0
     };
 
     let scene, camera, renderer, orbitControls;
     let cameraL, cameraR;
     let raycaster, mouse;
-    let cameraRig; // Rig parent object for smooth walking movement in VR
+    let cameraRig;
 
     // Device Orientation math constants
     const zee = new THREE.Vector3(0, 0, 1);
     const euler = new THREE.Euler();
     const q0 = new THREE.Quaternion();
-    const q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // -90 deg around X
+    const q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
     function init() {
       // Scene
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x090a0f);
 
-      // Camera Rig for VR Navigation
+      // Camera Rig for VR Movement
       cameraRig = new THREE.Object3D();
       cameraRig.position.set(0, 1.6, 5);
       scene.add(cameraRig);
@@ -370,11 +393,9 @@
       camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
       cameraRig.add(camera);
 
-      // Stereo Cameras
+      // Separate Left & Right Eye Stereo Cameras
       cameraL = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
       cameraR = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
-      cameraRig.add(cameraL);
-      cameraRig.add(cameraR);
 
       // Renderer
       const canvas = document.getElementById('webgl-canvas');
@@ -383,28 +404,26 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
 
-      // Orbit Controls (Active in Editor Mode ONLY)
+      // Orbit Controls (Active ONLY when not in VR)
       orbitControls = new OrbitControls(camera, renderer.domElement);
       orbitControls.enableDamping = true;
       orbitControls.dampingFactor = 0.05;
       orbitControls.target.set(0, 1, 0);
 
-      // Raycaster & Mouse
+      // Raycaster
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
 
-      // Lights & Environment
+      // Lights & Starter VR Scene
       setupEnvironment();
 
-      // Event Listeners
+      // Events
       window.addEventListener('resize', onWindowResize);
       window.addEventListener('orientationchange', () => { state.screenOrientation = window.orientation || 0; });
       window.addEventListener('deviceorientation', handleOrientation);
       window.addEventListener('keydown', handleKeyboardMove);
 
       setupTouchAndMouseLook(canvas);
-
-      // Check Shared URL
       loadSceneFromUrl();
 
       // Start Render Loop
@@ -416,22 +435,28 @@
       grid.position.y = 0;
       scene.add(grid);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
       scene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.95);
       dirLight.position.set(8, 15, 10);
       dirLight.castShadow = true;
       scene.add(dirLight);
 
-      // Starter VR World Objects
+      // Starter VR Objects
       createObject('cube', null, { x: -1.5, y: 0.6, z: -1 }, 0xff7a00, 'Würfel');
       createObject('sphere', null, { x: 1.5, y: 0.8, z: -1 }, 0x00f2fe, 'Kugel');
       createObject('cylinder', null, { x: 0, y: 0.6, z: -3 }, 0x10b981, 'Zylinder');
+      createDynamicTextObject('Willkommen {time}', { x: 0, y: 2.2, z: -2.5 });
     }
+
+    let clock = new THREE.Clock();
 
     function animate() {
       requestAnimationFrame(animate);
+
+      const time = clock.getElapsedTime();
+      state.counterVar++;
 
       if (!state.isVR) {
         orbitControls.enabled = true;
@@ -444,6 +469,24 @@
         state.videoTexture.needsUpdate = true;
       }
 
+      // Execute Custom JavaScript Code & Update Variables on Objects
+      state.objects.forEach(objItem => {
+        const mesh = objItem.mesh;
+        
+        // Execute Custom User JS Code if specified
+        if (mesh.userData && mesh.userData.userCode) {
+          try {
+            const userFn = new Function('time', 'counter', mesh.userData.userCode);
+            userFn.call(mesh, time, state.counterVar);
+          } catch (e) {}
+        }
+
+        // Update Dynamic Variable Text Textures
+        if (mesh.userData && mesh.userData.isTextVar) {
+          updateTextTexture(mesh);
+        }
+      });
+
       if (state.isVR) {
         if (state.gyroActive) {
           applyDeviceOrientationTracking();
@@ -452,7 +495,7 @@
         const w = window.innerWidth / 2;
         const h = window.innerHeight;
 
-        // Position Left/Right Eye Stereo Cameras with IPD offset
+        // Position Left/Right Eye Cameras with IPD offset
         cameraL.position.copy(camera.position);
         cameraL.quaternion.copy(camera.quaternion);
         cameraL.translateX(-state.eyeSeparation / 2);
@@ -460,6 +503,9 @@
         cameraR.position.copy(camera.position);
         cameraR.quaternion.copy(camera.quaternion);
         cameraR.translateX(state.eyeSeparation / 2);
+
+        cameraL.updateMatrixWorld(true);
+        cameraR.updateMatrixWorld(true);
 
         renderer.setScissorTest(true);
 
@@ -491,9 +537,7 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    // ------------------------------------------------------------
-    // ACCURATE Cardboard / Delightex Head Tracking (Quaternion Math)
-    // ------------------------------------------------------------
+    // Motion Tracking Matrix Math
     function handleOrientation(e) {
       if (e.alpha !== null && e.beta !== null) {
         state.deviceOrientation.alpha = e.alpha;
@@ -511,11 +555,10 @@
 
       euler.set(beta, alpha, -gamma, 'YXZ');
       camera.quaternion.setFromEuler(euler);
-      camera.quaternion.multiply(q1); // Adjust for VR landscape orientation
-      camera.quaternion.multiply(q0.setFromAxisAngle(zee, -orient)); // Adjust for device screen rotation angle
+      camera.quaternion.multiply(q1);
+      camera.quaternion.multiply(q0.setFromAxisAngle(zee, -orient));
     }
 
-    // Recalibrate / Front Direction Alignment Button
     function recalibrateFrontDirection() {
       if (state.deviceOrientation.alpha) {
         state.alphaOffset = -THREE.MathUtils.degToRad(state.deviceOrientation.alpha);
@@ -526,9 +569,7 @@
       }
     }
 
-    // ------------------------------------------------------------
-    // Touch & Pointer Look Fallback (Desktop & Touch)
-    // ------------------------------------------------------------
+    // Touch & Pointer Look Fallback
     function setupTouchAndMouseLook(canvas) {
       canvas.addEventListener('pointerdown', (e) => {
         if (e.target.closest('#sidebar-left') || e.target.closest('#sidebar-right') || e.target.closest('#app-header')) return;
@@ -543,7 +584,6 @@
         const deltaY = e.clientY - state.touchLook.previousY;
 
         if (state.isVR && !state.gyroActive) {
-          // Touch drag look in VR mode if Gyro is unavailable
           camera.rotation.y -= deltaX * 0.004;
           camera.rotation.x -= deltaY * 0.004;
           camera.rotation.x = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, camera.rotation.x));
@@ -557,26 +597,20 @@
       canvas.addEventListener('click', onCanvasClick);
     }
 
-    // WASD & D-Pad Keyboard Navigation Movement
+    // WASD & D-Pad Navigation
     function handleKeyboardMove(e) {
       if (!state.isVR) return;
       const moveDist = state.moveSpeed;
       const dir = new THREE.Vector3();
       camera.getWorldDirection(dir);
-      dir.y = 0; // Keep movement on floor plane
+      dir.y = 0;
       dir.normalize();
-
       const side = new THREE.Vector3().crossVectors(camera.up, dir).normalize();
 
-      if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') {
-        cameraRig.position.addScaledVector(dir, moveDist);
-      } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
-        cameraRig.position.addScaledVector(dir, -moveDist);
-      } else if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') {
-        cameraRig.position.addScaledVector(side, moveDist);
-      } else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') {
-        cameraRig.position.addScaledVector(side, -moveDist);
-      }
+      if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') cameraRig.position.addScaledVector(dir, moveDist);
+      else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') cameraRig.position.addScaledVector(dir, -moveDist);
+      else if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') cameraRig.position.addScaledVector(side, moveDist);
+      else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') cameraRig.position.addScaledVector(side, -moveDist);
     }
 
     function moveRig(direction) {
@@ -594,7 +628,7 @@
     }
 
     // ------------------------------------------------------------
-    // Object Spawning & Management
+    // Object Spawning & Placement
     // ------------------------------------------------------------
     function createObject(type, customMesh = null, posOverride = null, colorOverride = null, customName = null) {
       let mesh = customMesh;
@@ -623,7 +657,7 @@
 
       mesh.castShadow = true;
       mesh.receiveShadow = true;
-      mesh.userData = { id, name, type };
+      mesh.userData = { id, name, type, isHeadlock: false, userCode: '' };
 
       scene.add(mesh);
       state.objects.push({ id, name, type, mesh });
@@ -632,7 +666,109 @@
       updateObjectList();
     }
 
-    // Live Camera 3D Monitor Panel
+    // Dynamic Text with Template Variables
+    function createDynamicTextObject(templateText = 'Hallo {time}', posOverride = null) {
+      const textCanvas = document.createElement('canvas');
+      textCanvas.width = 512; textCanvas.height = 128;
+      const texture = new THREE.CanvasTexture(textCanvas);
+
+      const geo = new THREE.PlaneGeometry(2.5, 0.625);
+      const mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+      const mesh = new THREE.Mesh(geo, mat);
+
+      mesh.userData = {
+        id: 'obj_text_' + Math.random().toString(36).substr(2, 7),
+        name: '3D Text + Variablen',
+        type: 'text-var',
+        templateText,
+        textCanvas,
+        texture,
+        isTextVar: true,
+        userCode: ''
+      };
+
+      if (posOverride) mesh.position.set(posOverride.x, posOverride.y, posOverride.z);
+      else {
+        const dir = new THREE.Vector3();
+        camera.getWorldDirection(dir);
+        mesh.position.copy(cameraRig.position).add(dir.multiplyScalar(2.5));
+      }
+
+      scene.add(mesh);
+      state.objects.push({ id: mesh.userData.id, name: '3D Text + Variablen', type: 'text-var', mesh });
+
+      updateTextTexture(mesh);
+      selectObject(mesh.userData.id);
+      updateObjectList();
+    }
+
+    function updateTextTexture(mesh) {
+      const ud = mesh.userData;
+      if (!ud || !ud.textCanvas) return;
+
+      const ctx = ud.textCanvas.getContext('2d');
+      ctx.clearRect(0, 0, 512, 128);
+
+      // Render dark pill background
+      ctx.fillStyle = 'rgba(18, 20, 29, 0.85)';
+      ctx.strokeStyle = 'rgba(255, 122, 0, 0.8)';
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.roundRect(8, 8, 496, 112, 24); ctx.fill(); ctx.stroke();
+
+      // Replace variables
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString();
+      const dateStr = now.toLocaleDateString();
+
+      let text = ud.templateText || 'Text';
+      text = text.replace('{time}', timeStr);
+      text = text.replace('{date}', dateStr);
+      text = text.replace('{counter}', state.counterVar);
+
+      ctx.font = '700 28px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 256, 64);
+
+      ud.texture.needsUpdate = true;
+    }
+
+    // Image Upload Feature
+    document.getElementById('add-image-btn').addEventListener('click', () => {
+      document.getElementById('image-file-input').click();
+    });
+
+    document.getElementById('image-file-input').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          const texture = new THREE.TextureLoader().load(evt.target.result);
+          const aspect = img.width / img.height;
+          const height = 1.5;
+          const width = height * aspect;
+
+          const geo = new THREE.PlaneGeometry(width, height);
+          const mat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+          const mesh = new THREE.Mesh(geo, mat);
+
+          createObject('image', mesh, null, null, 'Bild: ' + file.name);
+          showToast('Bild hochgeladen!');
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('add-text-var-btn').addEventListener('click', () => {
+      createDynamicTextObject('Live Zeit: {time}');
+    });
+
+    // Live Camera Panel
     async function createCameraPanel() {
       try {
         if (!state.arStream) {
@@ -655,15 +791,7 @@
         frame.position.z = -0.04;
         mesh.add(frame);
 
-        mesh.position.set(0, 1.8, -2.5);
-        const id = 'obj_cam_' + Math.random().toString(36).substr(2, 7);
-        mesh.userData = { id, name: 'Live Cam 3D Panel', type: 'camera-panel' };
-
-        scene.add(mesh);
-        state.objects.push({ id, name: 'Live Cam 3D Panel', type: 'camera-panel', mesh });
-
-        selectObject(id);
-        updateObjectList();
+        createObject('camera-panel', mesh, null, null, 'Live Cam 3D Panel');
         showToast('Live Kamera-Panel hinzugefügt!');
       } catch (err) {
         alert('Kamera-Zugriff fehlgeschlagen: ' + err.message);
@@ -712,7 +840,7 @@
       }
     });
 
-    // Object Selection
+    // Raycast Object Selection
     function onCanvasClick(e) {
       if (e.target.closest('#sidebar-left') || e.target.closest('#sidebar-right') || e.target.closest('#app-header') || e.target.closest('#vr-hud')) return;
 
@@ -774,14 +902,17 @@
       const idx = state.objects.findIndex(o => o.id === id);
       if (idx >= 0) {
         scene.remove(state.objects[idx].mesh);
+        camera.remove(state.objects[idx].mesh);
         state.objects.splice(idx, 1);
         if (state.selectedId === id) selectObject(null);
         updateObjectList();
       }
     }
 
+    // Inspector Panel (Headlock/Mitbewegen, Position, Scale, Color, Code, Variables)
     function renderInspector(objItem) {
       const mesh = objItem.mesh;
+      const ud = mesh.userData || {};
       const pos = mesh.position;
       const rot = mesh.rotation;
       const scale = mesh.scale;
@@ -791,8 +922,25 @@
         colorHex = '#' + mesh.material.color.getHexString();
       }
 
+      const isHeadlock = ud.isHeadlock || false;
+
       const panel = document.getElementById('inspector-content');
       panel.innerHTML = `
+        <div class="field">
+          <label>Verhalten bei AR / Bewegung</label>
+          <select id="input-headlock">
+            <option value="false" ${!isHeadlock ? 'selected' : ''}>📌 Im Raum fixiert (World)</option>
+            <option value="true" ${isHeadlock ? 'selected' : ''}>👀 Mitbewegen / HUD (Kamera)</option>
+          </select>
+        </div>
+
+        ${ud.isTextVar ? `
+        <div class="field">
+          <label>Text mit Variablen</label>
+          <input type="text" value="${escapeAttr(ud.templateText || '')}" id="input-template-text" />
+          <p style="font-size:10.5px;color:var(--text-mute);margin-top:2px;">Variablen: {time}, {date}, {counter}</p>
+        </div>` : ''}
+
         <div class="field">
           <label>Position X <span class="val" id="val-pos-x">${pos.x.toFixed(2)}</span></label>
           <input type="range" min="-10" max="10" step="0.1" value="${pos.x}" id="input-pos-x" />
@@ -813,12 +961,44 @@
           <label>Skalierung <span class="val" id="val-scale">${scale.x.toFixed(2)}x</span></label>
           <input type="range" min="0.1" max="4" step="0.1" value="${scale.x}" id="input-scale" />
         </div>
+
         ${mesh.material && mesh.material.color ? `
         <div class="field">
           <label>Farbe</label>
           <input type="color" value="${colorHex}" id="input-color" />
         </div>` : ''}
+
+        <div class="field">
+          <label>Eigener JS Code (Animation)</label>
+          <textarea id="input-user-code" placeholder="z. B. this.rotation.y += 0.02;">${escapeHtml(ud.userCode || '')}</textarea>
+          <p style="font-size:10.5px;color:var(--text-mute);">Verfügbar: this, time, counter</p>
+        </div>
       `;
+
+      // Headlock / Attach to Camera Toggle
+      document.getElementById('input-headlock').addEventListener('change', (e) => {
+        const headlock = e.target.value === 'true';
+        ud.isHeadlock = headlock;
+        if (headlock) {
+          scene.remove(mesh);
+          camera.add(mesh);
+          mesh.position.set(0, 0, -2);
+        } else {
+          camera.remove(mesh);
+          scene.add(mesh);
+          const dir = new THREE.Vector3();
+          camera.getWorldDirection(dir);
+          mesh.position.copy(cameraRig.position).add(dir.multiplyScalar(3));
+        }
+        showToast(headlock ? 'Mitbewegen (HUD) Aktiviert!' : 'Im Raum Fixiert!');
+      });
+
+      if (document.getElementById('input-template-text')) {
+        document.getElementById('input-template-text').addEventListener('input', (e) => {
+          ud.templateText = e.target.value;
+          updateTextTexture(mesh);
+        });
+      }
 
       document.getElementById('input-pos-x').addEventListener('input', (e) => {
         pos.x = parseFloat(e.target.value);
@@ -849,12 +1029,19 @@
           }
         });
       }
+      document.getElementById('input-user-code').addEventListener('input', (e) => {
+        ud.userCode = e.target.value;
+      });
     }
 
-    // VR & AR Toggles
+    function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+    function escapeAttr(s) { return escapeHtml(s).replace(/\n/g, ' '); }
+
+    // VR & AR Fullscreen Toggles
     function toggleVRMode(enable) {
       state.isVR = enable;
       if (enable) {
+        scene.background = new THREE.Color(0x090a0f);
         document.getElementById('vr-lens-overlay').style.display = 'block';
         document.getElementById('vr-divider').style.display = 'block';
         document.getElementById('vr-reticle-l').style.display = 'block';
@@ -889,20 +1076,27 @@
       }
     }
 
-    async function toggleARMode() {
-      state.isAR = !state.isAR;
-      const btn = document.getElementById('btn-ar-toggle');
+    async function toggleARFullscreen(enable) {
+      state.isAR = enable;
+      const btnHUD = document.getElementById('ar-hud');
 
-      if (state.isAR) {
+      if (enable) {
         try {
           if (!state.arStream) {
             state.arStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             document.getElementById('ar-video').srcObject = state.arStream;
           }
           document.getElementById('ar-video').style.display = 'block';
-          scene.background = null;
-          btn.classList.add('btn-primary');
-          showToast('AR Kamera-Modus aktiviert!');
+          scene.background = null; // Transparent background for AR overlay
+          document.getElementById('sidebar-left').classList.add('collapsed');
+          document.getElementById('sidebar-right').classList.add('collapsed');
+          document.getElementById('app-header').style.display = 'none';
+          btnHUD.style.display = 'block';
+
+          if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          }
+          showToast('Vollbild AR Kamera Gestartet!');
         } catch (err) {
           alert('Kamera-Zugriff fehlgeschlagen: ' + err.message);
           state.isAR = false;
@@ -910,7 +1104,14 @@
       } else {
         document.getElementById('ar-video').style.display = 'none';
         scene.background = new THREE.Color(0x090a0f);
-        btn.classList.remove('btn-primary');
+        document.getElementById('sidebar-left').classList.remove('collapsed');
+        document.getElementById('sidebar-right').classList.remove('collapsed');
+        document.getElementById('app-header').style.display = 'flex';
+        btnHUD.style.display = 'none';
+
+        if (document.exitFullscreen && document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
       }
     }
 
@@ -922,7 +1123,9 @@
         pos: [o.mesh.position.x, o.mesh.position.y, o.mesh.position.z],
         rot: [o.mesh.rotation.x, o.mesh.rotation.y, o.mesh.rotation.z],
         scale: [o.mesh.scale.x, o.mesh.scale.y, o.mesh.scale.z],
-        color: o.mesh.material && o.mesh.material.color ? '#' + o.mesh.material.color.getHexString() : null
+        color: o.mesh.material && o.mesh.material.color ? '#' + o.mesh.material.color.getHexString() : null,
+        isHeadlock: o.mesh.userData ? o.mesh.userData.isHeadlock : false,
+        userCode: o.mesh.userData ? o.mesh.userData.userCode : ''
       }));
 
       const jsonStr = JSON.stringify(sceneData);
@@ -947,6 +1150,8 @@
           sceneData.forEach(item => {
             if (item.type === 'cube' || item.type === 'sphere' || item.type === 'cylinder') {
               createObject(item.type, null, { x: item.pos[0], y: item.pos[1], z: item.pos[2] }, item.color ? parseInt(item.color.replace('#','0x')) : null, item.name);
+              const lastObj = state.objects[state.objects.length - 1];
+              if (lastObj && item.userCode) lastObj.mesh.userData.userCode = item.userCode;
             }
           });
 
@@ -964,7 +1169,7 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // UI Wire Events
+    // UI Buttons Wire
     document.getElementById('add-cube').addEventListener('click', () => createObject('cube'));
     document.getElementById('add-sphere').addEventListener('click', () => createObject('sphere'));
     document.getElementById('add-cylinder').addEventListener('click', () => createObject('cylinder'));
@@ -972,13 +1177,14 @@
 
     document.getElementById('btn-vr-mode').addEventListener('click', () => toggleVRMode(true));
     document.getElementById('btn-exit-vr').addEventListener('click', () => toggleVRMode(false));
-    document.getElementById('btn-ar-toggle').addEventListener('click', toggleARMode);
+    document.getElementById('btn-ar-fullscreen').addEventListener('click', () => toggleARFullscreen(true));
+    document.getElementById('btn-exit-ar').addEventListener('click', () => toggleARFullscreen(false));
     document.getElementById('btn-recalibrate-vr').addEventListener('click', recalibrateFrontDirection);
 
     document.getElementById('btn-request-gyro').addEventListener('click', () => {
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission().then(res => {
-          if (res === 'granted') showToast('Gyroscope Sensoren Aktiv!');
+          if (res === 'granted') showToast('Gyroscope Aktiv!');
           else alert('Gyroscope Zugriff abgelehnt');
         }).catch(err => alert('Error: ' + err));
       } else {
@@ -986,7 +1192,7 @@
       }
     });
 
-    // Touch D-Pad Events
+    // D-Pad Touch Movement
     document.getElementById('btn-move-fwd').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('fwd'); });
     document.getElementById('btn-move-back').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('back'); });
     document.getElementById('btn-move-left').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('left'); });
