@@ -161,7 +161,7 @@
     }
     .dpad-btn:active { background: var(--accent); }
 
-    /* AR Fullscreen Overlay Exit */
+    /* AR Fullscreen HUD Exit */
     #ar-hud {
       position: absolute; top: 20px; right: 20px; z-index: 100; display: none;
     }
@@ -424,6 +424,8 @@
       window.addEventListener('keydown', handleKeyboardMove);
 
       setupTouchAndMouseLook(canvas);
+      setupUIWiring();
+
       loadSceneFromUrl();
 
       // Start Render Loop
@@ -462,7 +464,7 @@
         orbitControls.enabled = true;
         orbitControls.update();
       } else {
-        orbitControls.enabled = false; // Pause OrbitControls in VR mode so it doesn't fight Gyro!
+        orbitControls.enabled = false;
       }
 
       if (state.videoTexture) {
@@ -473,7 +475,6 @@
       state.objects.forEach(objItem => {
         const mesh = objItem.mesh;
         
-        // Execute Custom User JS Code if specified
         if (mesh.userData && mesh.userData.userCode) {
           try {
             const userFn = new Function('time', 'counter', mesh.userData.userCode);
@@ -481,7 +482,6 @@
           } catch (e) {}
         }
 
-        // Update Dynamic Variable Text Textures
         if (mesh.userData && mesh.userData.isTextVar) {
           updateTextTexture(mesh);
         }
@@ -495,7 +495,6 @@
         const w = window.innerWidth / 2;
         const h = window.innerHeight;
 
-        // Position Left/Right Eye Cameras with IPD offset
         cameraL.position.copy(camera.position);
         cameraL.quaternion.copy(camera.quaternion);
         cameraL.translateX(-state.eyeSeparation / 2);
@@ -628,45 +627,57 @@
     }
 
     // ------------------------------------------------------------
-    // Object Spawning & Placement
+    // Object Spawning & Placement (100% Fail-Safe)
     // ------------------------------------------------------------
     function createObject(type, customMesh = null, posOverride = null, colorOverride = null, customName = null) {
-      let mesh = customMesh;
-      const id = 'obj_' + Math.random().toString(36).substr(2, 8);
-      const name = customName || (type.charAt(0).toUpperCase() + type.slice(1));
+      try {
+        let mesh = customMesh;
+        const id = 'obj_' + Math.random().toString(36).substr(2, 8);
+        const name = customName || (type.charAt(0).toUpperCase() + type.slice(1));
 
-      if (!mesh) {
-        let geo;
-        const color = colorOverride || 0xff7a00;
-        if (type === 'cube') geo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
-        else if (type === 'sphere') geo = new THREE.SphereGeometry(0.8, 32, 32);
-        else if (type === 'cylinder') geo = new THREE.CylinderGeometry(0.6, 0.6, 1.4, 32);
-        
-        const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.2 });
-        mesh = new THREE.Mesh(geo, mat);
+        if (!mesh) {
+          let geo;
+          const color = colorOverride !== null ? colorOverride : 0xff7a00;
+          
+          if (type === 'cube') geo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+          else if (type === 'sphere') geo = new THREE.SphereGeometry(0.8, 32, 32);
+          else if (type === 'cylinder') geo = new THREE.CylinderGeometry(0.6, 0.6, 1.4, 32);
+          else geo = new THREE.BoxGeometry(1.2, 1.2, 1.2); // Fallback geometry
+          
+          const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.2 });
+          mesh = new THREE.Mesh(geo, mat);
+        }
+
+        if (posOverride) {
+          mesh.position.set(posOverride.x, posOverride.y, posOverride.z);
+        } else {
+          // Calculate spawn position safely 2.5 meters in front of camera
+          const spawnDir = new THREE.Vector3();
+          camera.getWorldDirection(spawnDir);
+          
+          mesh.position.copy(cameraRig.position);
+          mesh.position.x += spawnDir.x * 2.5;
+          mesh.position.y = Math.max(0.6, cameraRig.position.y + spawnDir.y * 2.5);
+          mesh.position.z += spawnDir.z * 2.5;
+        }
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.userData = { id, name, type, isHeadlock: false, userCode: '' };
+
+        scene.add(mesh);
+        state.objects.push({ id, name, type, mesh });
+
+        selectObject(id);
+        updateObjectList();
+        showToast(name + ' hinzugefügt!');
+      } catch (err) {
+        console.error('Error creating object:', err);
+        alert('Fehler beim Hinzufügen: ' + err.message);
       }
-
-      if (posOverride) {
-        mesh.position.set(posOverride.x, posOverride.y, posOverride.z);
-      } else {
-        const dir = new THREE.Vector3();
-        camera.getWorldDirection(dir);
-        mesh.position.copy(cameraRig.position).add(dir.multiplyScalar(3));
-        mesh.position.y = Math.max(0.6, mesh.position.y);
-      }
-
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      mesh.userData = { id, name, type, isHeadlock: false, userCode: '' };
-
-      scene.add(mesh);
-      state.objects.push({ id, name, type, mesh });
-
-      selectObject(id);
-      updateObjectList();
     }
 
-    // Dynamic Text with Template Variables
+    // Dynamic Text Object
     function createDynamicTextObject(templateText = 'Hallo {time}', posOverride = null) {
       const textCanvas = document.createElement('canvas');
       textCanvas.width = 512; textCanvas.height = 128;
@@ -689,9 +700,12 @@
 
       if (posOverride) mesh.position.set(posOverride.x, posOverride.y, posOverride.z);
       else {
-        const dir = new THREE.Vector3();
-        camera.getWorldDirection(dir);
-        mesh.position.copy(cameraRig.position).add(dir.multiplyScalar(2.5));
+        const spawnDir = new THREE.Vector3();
+        camera.getWorldDirection(spawnDir);
+        mesh.position.copy(cameraRig.position);
+        mesh.position.x += spawnDir.x * 2.5;
+        mesh.position.y = cameraRig.position.y + 0.5;
+        mesh.position.z += spawnDir.z * 2.5;
       }
 
       scene.add(mesh);
@@ -700,6 +714,7 @@
       updateTextTexture(mesh);
       selectObject(mesh.userData.id);
       updateObjectList();
+      showToast('3D Text hinzugefügt!');
     }
 
     function updateTextTexture(mesh) {
@@ -709,13 +724,11 @@
       const ctx = ud.textCanvas.getContext('2d');
       ctx.clearRect(0, 0, 512, 128);
 
-      // Render dark pill background
       ctx.fillStyle = 'rgba(18, 20, 29, 0.85)';
       ctx.strokeStyle = 'rgba(255, 122, 0, 0.8)';
       ctx.lineWidth = 4;
       ctx.beginPath(); ctx.roundRect(8, 8, 496, 112, 24); ctx.fill(); ctx.stroke();
 
-      // Replace variables
       const now = new Date();
       const timeStr = now.toLocaleTimeString();
       const dateStr = now.toLocaleDateString();
@@ -734,41 +747,7 @@
       ud.texture.needsUpdate = true;
     }
 
-    // Image Upload Feature
-    document.getElementById('add-image-btn').addEventListener('click', () => {
-      document.getElementById('image-file-input').click();
-    });
-
-    document.getElementById('image-file-input').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const img = new Image();
-        img.onload = () => {
-          const texture = new THREE.TextureLoader().load(evt.target.result);
-          const aspect = img.width / img.height;
-          const height = 1.5;
-          const width = height * aspect;
-
-          const geo = new THREE.PlaneGeometry(width, height);
-          const mat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-          const mesh = new THREE.Mesh(geo, mat);
-
-          createObject('image', mesh, null, null, 'Bild: ' + file.name);
-          showToast('Bild hochgeladen!');
-        };
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById('add-text-var-btn').addEventListener('click', () => {
-      createDynamicTextObject('Live Zeit: {time}');
-    });
-
-    // Live Camera Panel
+    // Live Camera 3D Monitor Panel
     async function createCameraPanel() {
       try {
         if (!state.arStream) {
@@ -797,48 +776,6 @@
         alert('Kamera-Zugriff fehlgeschlagen: ' + err.message);
       }
     }
-
-    // 3D Model Upload (.glb / .gltf / .obj)
-    document.getElementById('add-model-btn').addEventListener('click', () => {
-      document.getElementById('model-input').click();
-    });
-
-    document.getElementById('model-input').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      const ext = file.name.split('.').pop().toLowerCase();
-
-      if (ext === 'glb' || ext === 'gltf') {
-        reader.onload = function (evt) {
-          const loader = new GLTFLoader();
-          loader.parse(evt.target.result, '', (gltf) => {
-            const model = gltf.scene;
-            
-            const box = new THREE.Box3().setFromObject(model);
-            const size = box.getSize(new THREE.Vector3());
-            const maxDim = Math.max(size.x, size.y, size.z);
-            if (maxDim > 0) {
-              const scaleFactor = 2.0 / maxDim;
-              model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-            }
-
-            createObject(file.name, model);
-            showToast('3D Modell geladen!');
-          }, (err) => alert('Fehler beim Laden des 3D Modells: ' + err));
-        };
-        reader.readAsArrayBuffer(file);
-      } else if (ext === 'obj') {
-        reader.onload = function (evt) {
-          const loader = new OBJLoader();
-          const obj = loader.parse(evt.target.responseText);
-          createObject(file.name, obj);
-          showToast('OBJ Modell geladen!');
-        };
-        reader.readAsText(file);
-      }
-    });
 
     // Raycast Object Selection
     function onCanvasClick(e) {
@@ -909,7 +846,7 @@
       }
     }
 
-    // Inspector Panel (Headlock/Mitbewegen, Position, Scale, Color, Code, Variables)
+    // Inspector Panel
     function renderInspector(objItem) {
       const mesh = objItem.mesh;
       const ud = mesh.userData || {};
@@ -975,7 +912,7 @@
         </div>
       `;
 
-      // Headlock / Attach to Camera Toggle
+      // Attach to Camera Toggle
       document.getElementById('input-headlock').addEventListener('change', (e) => {
         const headlock = e.target.value === 'true';
         ud.isHeadlock = headlock;
@@ -1087,7 +1024,7 @@
             document.getElementById('ar-video').srcObject = state.arStream;
           }
           document.getElementById('ar-video').style.display = 'block';
-          scene.background = null; // Transparent background for AR overlay
+          scene.background = null;
           document.getElementById('sidebar-left').classList.add('collapsed');
           document.getElementById('sidebar-right').classList.add('collapsed');
           document.getElementById('app-header').style.display = 'none';
@@ -1169,52 +1106,131 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // UI Buttons Wire
-    document.getElementById('add-cube').addEventListener('click', () => createObject('cube'));
-    document.getElementById('add-sphere').addEventListener('click', () => createObject('sphere'));
-    document.getElementById('add-cylinder').addEventListener('click', () => createObject('cylinder'));
-    document.getElementById('add-camera-panel').addEventListener('click', createCameraPanel);
+    // Setup UI Button Wiring (Invoked inside init to ensure 100% reliability)
+    function setupUIWiring() {
+      document.getElementById('add-cube').addEventListener('click', () => createObject('cube'));
+      document.getElementById('add-sphere').addEventListener('click', () => createObject('sphere'));
+      document.getElementById('add-cylinder').addEventListener('click', () => createObject('cylinder'));
+      document.getElementById('add-camera-panel').addEventListener('click', createCameraPanel);
 
-    document.getElementById('btn-vr-mode').addEventListener('click', () => toggleVRMode(true));
-    document.getElementById('btn-exit-vr').addEventListener('click', () => toggleVRMode(false));
-    document.getElementById('btn-ar-fullscreen').addEventListener('click', () => toggleARFullscreen(true));
-    document.getElementById('btn-exit-ar').addEventListener('click', () => toggleARFullscreen(false));
-    document.getElementById('btn-recalibrate-vr').addEventListener('click', recalibrateFrontDirection);
+      document.getElementById('add-image-btn').addEventListener('click', () => {
+        document.getElementById('image-file-input').click();
+      });
 
-    document.getElementById('btn-request-gyro').addEventListener('click', () => {
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission().then(res => {
-          if (res === 'granted') showToast('Gyroscope Aktiv!');
-          else alert('Gyroscope Zugriff abgelehnt');
-        }).catch(err => alert('Error: ' + err));
-      } else {
-        showToast('Gyroscope Aktiv!');
-      }
-    });
+      document.getElementById('image-file-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    // D-Pad Touch Movement
-    document.getElementById('btn-move-fwd').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('fwd'); });
-    document.getElementById('btn-move-back').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('back'); });
-    document.getElementById('btn-move-left').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('left'); });
-    document.getElementById('btn-move-right').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('right'); });
-    document.getElementById('btn-move-fwd').addEventListener('click', () => moveRig('fwd'));
-    document.getElementById('btn-move-back').addEventListener('click', () => moveRig('back'));
-    document.getElementById('btn-move-left').addEventListener('click', () => moveRig('left'));
-    document.getElementById('btn-move-right').addEventListener('click', () => moveRig('right'));
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const img = new Image();
+          img.onload = () => {
+            const texture = new THREE.TextureLoader().load(evt.target.result);
+            const aspect = img.width / img.height;
+            const height = 1.5;
+            const width = height * aspect;
 
-    document.getElementById('btn-share').addEventListener('click', generateShareUrl);
-    document.getElementById('btn-close-modal').addEventListener('click', () => {
-      document.getElementById('share-modal').classList.remove('open');
-    });
-    document.getElementById('btn-copy-link').addEventListener('click', () => {
-      const url = document.getElementById('share-url-text').textContent;
-      navigator.clipboard.writeText(url).then(() => {
-        showToast('Link kopiert!');
+            const geo = new THREE.PlaneGeometry(width, height);
+            const mat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+            const mesh = new THREE.Mesh(geo, mat);
+
+            createObject('image', mesh, null, null, 'Bild: ' + file.name);
+            showToast('Bild hochgeladen!');
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.getElementById('add-text-var-btn').addEventListener('click', () => {
+        createDynamicTextObject('Live Zeit: {time}');
+      });
+
+      document.getElementById('add-model-btn').addEventListener('click', () => {
+        document.getElementById('model-input').click();
+      });
+
+      document.getElementById('model-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (ext === 'glb' || ext === 'gltf') {
+          reader.onload = function (evt) {
+            const loader = new GLTFLoader();
+            loader.parse(evt.target.result, '', (gltf) => {
+              const model = gltf.scene;
+              const box = new THREE.Box3().setFromObject(model);
+              const size = box.getSize(new THREE.Vector3());
+              const maxDim = Math.max(size.x, size.y, size.z);
+              if (maxDim > 0) {
+                const scaleFactor = 2.0 / maxDim;
+                model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+              }
+              createObject(file.name, model);
+              showToast('3D Modell geladen!');
+            }, (err) => alert('Fehler beim Laden des 3D Modells: ' + err));
+          };
+          reader.readAsArrayBuffer(file);
+        } else if (ext === 'obj') {
+          reader.onload = function (evt) {
+            const loader = new OBJLoader();
+            const obj = loader.parse(evt.target.responseText);
+            createObject(file.name, obj);
+            showToast('OBJ Modell geladen!');
+          };
+          reader.readAsText(file);
+        }
+      });
+
+      document.getElementById('btn-vr-mode').addEventListener('click', () => toggleVRMode(true));
+      document.getElementById('btn-exit-vr').addEventListener('click', () => toggleVRMode(false));
+      document.getElementById('btn-ar-fullscreen').addEventListener('click', () => toggleARFullscreen(true));
+      document.getElementById('btn-exit-ar').addEventListener('click', () => toggleARFullscreen(false));
+      document.getElementById('btn-recalibrate-vr').addEventListener('click', recalibrateFrontDirection);
+
+      document.getElementById('btn-request-gyro').addEventListener('click', () => {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().then(res => {
+            if (res === 'granted') showToast('Gyroscope Aktiv!');
+            else alert('Gyroscope Zugriff abgelehnt');
+          }).catch(err => alert('Error: ' + err));
+        } else {
+          showToast('Gyroscope Aktiv!');
+        }
+      });
+
+      // D-Pad Touch Navigation
+      document.getElementById('btn-move-fwd').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('fwd'); });
+      document.getElementById('btn-move-back').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('back'); });
+      document.getElementById('btn-move-left').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('left'); });
+      document.getElementById('btn-move-right').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('right'); });
+      document.getElementById('btn-move-fwd').addEventListener('click', () => moveRig('fwd'));
+      document.getElementById('btn-move-back').addEventListener('click', () => moveRig('back'));
+      document.getElementById('btn-move-left').addEventListener('click', () => moveRig('left'));
+      document.getElementById('btn-move-right').addEventListener('click', () => moveRig('right'));
+
+      document.getElementById('btn-share').addEventListener('click', generateShareUrl);
+      document.getElementById('btn-close-modal').addEventListener('click', () => {
         document.getElementById('share-modal').classList.remove('open');
       });
-    });
+      document.getElementById('btn-copy-link').addEventListener('click', () => {
+        const url = document.getElementById('share-url-text').textContent;
+        navigator.clipboard.writeText(url).then(() => {
+          showToast('Link kopiert!');
+          document.getElementById('share-modal').classList.remove('open');
+        });
+      });
+    }
 
-    window.onload = init;
+    // Direct Safe Module Launcher (Works reliably across all browsers)
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      init();
+    } else {
+      window.addEventListener('DOMContentLoaded', init);
+    }
   </script>
 </body>
 </html>
