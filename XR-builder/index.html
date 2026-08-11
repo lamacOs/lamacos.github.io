@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Delightex VR/AR Experience Builder</title>
+  <title>Delightex VR/AR Experience Builder & Precision VR Tracker</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,8 +12,8 @@
   <style>
     :root {
       --bg: #090a0f;
-      --bg-glass: rgba(18, 20, 29, 0.82);
-      --bg-card: rgba(26, 29, 43, 0.9);
+      --bg-glass: rgba(18, 20, 29, 0.85);
+      --bg-card: rgba(26, 29, 43, 0.92);
       --accent: #ff7a00;
       --accent-glow: rgba(255, 122, 0, 0.45);
       --accent-cyan: #00f2fe;
@@ -46,15 +46,15 @@
       transform: translateX(-50%); z-index: 11; display: none; pointer-events: none;
     }
     /* VR Crosshair Reticle */
-    #vr-reticle {
+    #vr-reticle-l {
       position: absolute; top: 50%; left: 25%; transform: translate(-50%, -50%);
-      width: 10px; height: 10px; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%;
-      z-index: 12; display: none; pointer-events: none;
+      width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.85); border-radius: 50%;
+      z-index: 12; display: none; pointer-events: none; box-shadow: 0 0 8px rgba(0,0,0,0.8);
     }
     #vr-reticle-r {
       position: absolute; top: 50%; left: 75%; transform: translate(-50%, -50%);
-      width: 10px; height: 10px; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%;
-      z-index: 12; display: none; pointer-events: none;
+      width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.85); border-radius: 50%;
+      z-index: 12; display: none; pointer-events: none; box-shadow: 0 0 8px rgba(0,0,0,0.8);
     }
 
     /* Top Navigation Header */
@@ -113,7 +113,7 @@
     .cat-btn svg { width: 22px; height: 22px; color: var(--accent); }
     .cat-btn span { font-size: 11.5px; font-weight: 700; }
 
-    /* Right Sidebar: Inspector & Properties */
+    /* Right Sidebar: Inspector */
     .sidebar-right {
       position: absolute; top: 72px; right: 14px; bottom: 14px; width: 290px; z-index: 40;
       background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -134,18 +134,30 @@
     .field input[type="color"] { width: 100%; height: 32px; padding: 2px; border-radius: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border); }
 
     /* Scene Objects List */
-    .obj-list { display: flex; flex-direction: column; gap: 4px; max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+    .obj-list { display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
     .obj-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; background: transparent; transition: background 0.15s; }
     .obj-item:hover { background: rgba(255,255,255,0.08); }
     .obj-item.selected { background: var(--accent); color: #fff; font-weight: 700; }
 
     /* Floating VR Control HUD (In VR Mode) */
     #vr-hud {
-      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 100;
-      display: none; align-items: center; gap: 12px; background: rgba(0,0,0,0.85); backdrop-filter: blur(14px);
-      padding: 10px 20px; border-radius: 30px; border: 1px solid var(--border-accent);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100;
+      display: none; align-items: center; gap: 10px; background: rgba(0,0,0,0.88); backdrop-filter: blur(16px);
+      padding: 8px 16px; border-radius: 30px; border: 1px solid var(--border-accent);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9); flex-wrap: wrap; justify-content: center;
     }
+
+    /* On-Screen VR Navigation Touch D-Pad */
+    #vr-touch-dpad {
+      position: absolute; bottom: 80px; left: 24px; z-index: 100; display: none;
+      grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px); gap: 4px;
+    }
+    .dpad-btn {
+      background: rgba(0,0,0,0.65); border: 1px solid var(--border); border-radius: 10px;
+      color: #fff; font-size: 16px; display: grid; place-items: center; cursor: pointer;
+      backdrop-filter: blur(8px); active: scale(0.95);
+    }
+    .dpad-btn:active { background: var(--accent); }
 
     /* Modal for Sharing */
     .modal-bg {
@@ -173,13 +185,6 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
 
-    /* Status Log Banner for Debugging */
-    #status-banner {
-      position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 45;
-      background: rgba(0,0,0,0.7); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px;
-      font-size: 11px; font-family: var(--font-mono); color: var(--accent-cyan); display: none;
-    }
-
     #model-input { display: none; }
 
     @media (max-width: 768px) {
@@ -200,11 +205,8 @@
   <!-- Dual Stereo VR Overlay -->
   <div id="vr-lens-overlay"></div>
   <div id="vr-divider"></div>
-  <div id="vr-reticle"></div>
+  <div id="vr-reticle-l"></div>
   <div id="vr-reticle-r"></div>
-
-  <!-- Status Banner -->
-  <div id="status-banner">Bereit</div>
 
   <!-- Header Controls -->
   <header class="app-header" id="app-header">
@@ -280,15 +282,26 @@
     </div>
 
     <div id="inspector-content">
-      <div style="font-size:12px;color:var(--text-mute);text-align:center;padding:20px 0;">Klicke auf ein Objekt in der Szene, um es zu bearbeiten.</div>
+      <div style="font-size:12px;color:var(--text-mute);text-align:center;padding:20px 0;">Klicke auf ein Objekt in der Szene.</div>
     </div>
   </aside>
 
   <!-- VR HUD Controls -->
   <div id="vr-hud">
-    <span style="font-size:12.5px;font-weight:800;">🥽 VR Linsen-Modus</span>
-    <button class="btn btn-primary" id="btn-request-gyro" style="padding:5px 10px;font-size:11px;">Gyro/Bewegung aktivieren</button>
+    <span style="font-size:12px;font-weight:800;">🥽 VR Linsen-Modus</span>
+    <button class="btn btn-cyan" id="btn-recalibrate-vr" style="padding:5px 12px;font-size:11.5px;">🎯 Blick Ausrichten</button>
+    <button class="btn" id="btn-request-gyro" style="padding:5px 10px;font-size:11px;">Gyro/Sensoren Aktivieren</button>
     <button class="btn" id="btn-exit-vr" style="padding:5px 10px;font-size:11px;">Beenden</button>
+  </div>
+
+  <!-- VR Touch Navigation D-Pad -->
+  <div id="vr-touch-dpad">
+    <div></div>
+    <button class="dpad-btn" id="btn-move-fwd">▲</button>
+    <div></div>
+    <button class="dpad-btn" id="btn-move-left">◀</button>
+    <button class="dpad-btn" id="btn-move-back">▼</button>
+    <button class="dpad-btn" id="btn-move-right">▶</button>
   </div>
 
   <!-- Share Modal -->
@@ -325,32 +338,43 @@
       arStream: null,
       videoTexture: null,
       gyroActive: false,
-      deviceOrientation: { alpha: 0, beta: 0, gamma: 0 }
+      deviceOrientation: { alpha: 0, beta: 0, gamma: 0 },
+      screenOrientation: window.orientation || 0,
+      alphaOffset: 0, // Calibration offset to align front direction
+      touchLook: { x: 0, y: 0, isDragging: false, previousX: 0, previousY: 0 },
+      moveSpeed: 0.12
     };
 
-    let scene, camera, renderer, controls;
+    let scene, camera, renderer, orbitControls;
     let cameraL, cameraR;
     let raycaster, mouse;
+    let cameraRig; // Rig parent object for smooth walking movement in VR
 
-    const statusBanner = document.getElementById('status-banner');
-    function setStatus(msg) {
-      statusBanner.style.display = 'block';
-      statusBanner.textContent = msg;
-      setTimeout(() => { statusBanner.style.display = 'none'; }, 3500);
-    }
+    // Device Orientation math constants
+    const zee = new THREE.Vector3(0, 0, 1);
+    const euler = new THREE.Euler();
+    const q0 = new THREE.Quaternion();
+    const q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // -90 deg around X
 
     function init() {
       // Scene
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x090a0f);
 
-      // Camera
+      // Camera Rig for VR Navigation
+      cameraRig = new THREE.Object3D();
+      cameraRig.position.set(0, 1.6, 5);
+      scene.add(cameraRig);
+
+      // Main Camera
       camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 2.5, 6);
+      cameraRig.add(camera);
 
       // Stereo Cameras
       cameraL = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
       cameraR = new THREE.PerspectiveCamera(60, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
+      cameraRig.add(cameraL);
+      cameraRig.add(cameraR);
 
       // Renderer
       const canvas = document.getElementById('webgl-canvas');
@@ -359,38 +383,40 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
 
-      // Controls
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-      controls.maxPolarAngle = Math.PI / 2 + 0.1;
+      // Orbit Controls (Active in Editor Mode ONLY)
+      orbitControls = new OrbitControls(camera, renderer.domElement);
+      orbitControls.enableDamping = true;
+      orbitControls.dampingFactor = 0.05;
+      orbitControls.target.set(0, 1, 0);
 
-      // Raycaster
+      // Raycaster & Mouse
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
 
-      // Lights & Starter Delightex VR World
+      // Lights & Environment
       setupEnvironment();
 
-      // Events
+      // Event Listeners
       window.addEventListener('resize', onWindowResize);
+      window.addEventListener('orientationchange', () => { state.screenOrientation = window.orientation || 0; });
       window.addEventListener('deviceorientation', handleOrientation);
-      canvas.addEventListener('click', onCanvasClick);
+      window.addEventListener('keydown', handleKeyboardMove);
+
+      setupTouchAndMouseLook(canvas);
 
       // Check Shared URL
       loadSceneFromUrl();
 
       // Start Render Loop
       animate();
-      setStatus('Delightex VR Engine Bereit');
     }
 
     function setupEnvironment() {
       const grid = new THREE.GridHelper(30, 30, 0xff7a00, 0x222533);
-      grid.position.y = -0.01;
+      grid.position.y = 0;
       scene.add(grid);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
       scene.add(ambientLight);
 
       const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
@@ -398,8 +424,8 @@
       dirLight.castShadow = true;
       scene.add(dirLight);
 
-      // Starter 3D Objects in VR World
-      createObject('cube', null, { x: -1.5, y: 0.7, z: -1 }, 0xff7a00, 'Würfel');
+      // Starter VR World Objects
+      createObject('cube', null, { x: -1.5, y: 0.6, z: -1 }, 0xff7a00, 'Würfel');
       createObject('sphere', null, { x: 1.5, y: 0.8, z: -1 }, 0x00f2fe, 'Kugel');
       createObject('cylinder', null, { x: 0, y: 0.6, z: -3 }, 0x10b981, 'Zylinder');
     }
@@ -407,20 +433,26 @@
     function animate() {
       requestAnimationFrame(animate);
 
-      controls.update();
+      if (!state.isVR) {
+        orbitControls.enabled = true;
+        orbitControls.update();
+      } else {
+        orbitControls.enabled = false; // Pause OrbitControls in VR mode so it doesn't fight Gyro!
+      }
 
       if (state.videoTexture) {
         state.videoTexture.needsUpdate = true;
       }
 
-      if (state.isVR && state.gyroActive) {
-        applyGyro();
-      }
-
       if (state.isVR) {
+        if (state.gyroActive) {
+          applyDeviceOrientationTracking();
+        }
+
         const w = window.innerWidth / 2;
         const h = window.innerHeight;
 
+        // Position Left/Right Eye Stereo Cameras with IPD offset
         cameraL.position.copy(camera.position);
         cameraL.quaternion.copy(camera.quaternion);
         cameraL.translateX(-state.eyeSeparation / 2);
@@ -459,7 +491,9 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    // Motion Sensor / Gyroscope Handling
+    // ------------------------------------------------------------
+    // ACCURATE Cardboard / Delightex Head Tracking (Quaternion Math)
+    // ------------------------------------------------------------
     function handleOrientation(e) {
       if (e.alpha !== null && e.beta !== null) {
         state.deviceOrientation.alpha = e.alpha;
@@ -469,16 +503,99 @@
       }
     }
 
-    function applyGyro() {
-      const alpha = THREE.MathUtils.degToRad(state.deviceOrientation.alpha || 0);
-      const beta = THREE.MathUtils.degToRad(state.deviceOrientation.beta || 0);
-      const gamma = THREE.MathUtils.degToRad(state.deviceOrientation.gamma || 0);
+    function applyDeviceOrientationTracking() {
+      const alpha = state.deviceOrientation.alpha ? THREE.MathUtils.degToRad(state.deviceOrientation.alpha) + state.alphaOffset : 0;
+      const beta = state.deviceOrientation.beta ? THREE.MathUtils.degToRad(state.deviceOrientation.beta) : 0;
+      const gamma = state.deviceOrientation.gamma ? THREE.MathUtils.degToRad(state.deviceOrientation.gamma) : 0;
+      const orient = state.screenOrientation ? THREE.MathUtils.degToRad(state.screenOrientation) : 0;
 
-      const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
+      euler.set(beta, alpha, -gamma, 'YXZ');
       camera.quaternion.setFromEuler(euler);
+      camera.quaternion.multiply(q1); // Adjust for VR landscape orientation
+      camera.quaternion.multiply(q0.setFromAxisAngle(zee, -orient)); // Adjust for device screen rotation angle
     }
 
+    // Recalibrate / Front Direction Alignment Button
+    function recalibrateFrontDirection() {
+      if (state.deviceOrientation.alpha) {
+        state.alphaOffset = -THREE.MathUtils.degToRad(state.deviceOrientation.alpha);
+        showToast('Blick zentriert!');
+      } else {
+        camera.rotation.set(0, 0, 0);
+        showToast('Blick zurückgesetzt!');
+      }
+    }
+
+    // ------------------------------------------------------------
+    // Touch & Pointer Look Fallback (Desktop & Touch)
+    // ------------------------------------------------------------
+    function setupTouchAndMouseLook(canvas) {
+      canvas.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('#sidebar-left') || e.target.closest('#sidebar-right') || e.target.closest('#app-header')) return;
+        state.touchLook.isDragging = true;
+        state.touchLook.previousX = e.clientX;
+        state.touchLook.previousY = e.clientY;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!state.touchLook.isDragging) return;
+        const deltaX = e.clientX - state.touchLook.previousX;
+        const deltaY = e.clientY - state.touchLook.previousY;
+
+        if (state.isVR && !state.gyroActive) {
+          // Touch drag look in VR mode if Gyro is unavailable
+          camera.rotation.y -= deltaX * 0.004;
+          camera.rotation.x -= deltaY * 0.004;
+          camera.rotation.x = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, camera.rotation.x));
+        }
+
+        state.touchLook.previousX = e.clientX;
+        state.touchLook.previousY = e.clientY;
+      });
+
+      window.addEventListener('pointerup', () => { state.touchLook.isDragging = false; });
+      canvas.addEventListener('click', onCanvasClick);
+    }
+
+    // WASD & D-Pad Keyboard Navigation Movement
+    function handleKeyboardMove(e) {
+      if (!state.isVR) return;
+      const moveDist = state.moveSpeed;
+      const dir = new THREE.Vector3();
+      camera.getWorldDirection(dir);
+      dir.y = 0; // Keep movement on floor plane
+      dir.normalize();
+
+      const side = new THREE.Vector3().crossVectors(camera.up, dir).normalize();
+
+      if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') {
+        cameraRig.position.addScaledVector(dir, moveDist);
+      } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
+        cameraRig.position.addScaledVector(dir, -moveDist);
+      } else if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') {
+        cameraRig.position.addScaledVector(side, moveDist);
+      } else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') {
+        cameraRig.position.addScaledVector(side, -moveDist);
+      }
+    }
+
+    function moveRig(direction) {
+      const moveDist = state.moveSpeed * 1.5;
+      const dir = new THREE.Vector3();
+      camera.getWorldDirection(dir);
+      dir.y = 0;
+      dir.normalize();
+      const side = new THREE.Vector3().crossVectors(camera.up, dir).normalize();
+
+      if (direction === 'fwd') cameraRig.position.addScaledVector(dir, moveDist);
+      if (direction === 'back') cameraRig.position.addScaledVector(dir, -moveDist);
+      if (direction === 'left') cameraRig.position.addScaledVector(side, moveDist);
+      if (direction === 'right') cameraRig.position.addScaledVector(side, -moveDist);
+    }
+
+    // ------------------------------------------------------------
     // Object Spawning & Management
+    // ------------------------------------------------------------
     function createObject(type, customMesh = null, posOverride = null, colorOverride = null, customName = null) {
       let mesh = customMesh;
       const id = 'obj_' + Math.random().toString(36).substr(2, 8);
@@ -498,11 +615,10 @@
       if (posOverride) {
         mesh.position.set(posOverride.x, posOverride.y, posOverride.z);
       } else {
-        // Spawn 2 meters in front of camera view
         const dir = new THREE.Vector3();
         camera.getWorldDirection(dir);
-        mesh.position.copy(camera.position).add(dir.multiplyScalar(3));
-        mesh.position.y = Math.max(0.5, mesh.position.y);
+        mesh.position.copy(cameraRig.position).add(dir.multiplyScalar(3));
+        mesh.position.y = Math.max(0.6, mesh.position.y);
       }
 
       mesh.castShadow = true;
@@ -565,7 +681,6 @@
 
       const reader = new FileReader();
       const ext = file.name.split('.').pop().toLowerCase();
-      setStatus('Lade 3D Modell: ' + file.name);
 
       if (ext === 'glb' || ext === 'gltf') {
         reader.onload = function (evt) {
@@ -573,7 +688,6 @@
           loader.parse(evt.target.result, '', (gltf) => {
             const model = gltf.scene;
             
-            // Normalize bounding box scale
             const box = new THREE.Box3().setFromObject(model);
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
@@ -600,7 +714,7 @@
 
     // Object Selection
     function onCanvasClick(e) {
-      if (e.target.closest('#sidebar-left') || e.target.closest('#sidebar-right') || e.target.closest('#app-header')) return;
+      if (e.target.closest('#sidebar-left') || e.target.closest('#sidebar-right') || e.target.closest('#app-header') || e.target.closest('#vr-hud')) return;
 
       mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -743,13 +857,16 @@
       if (enable) {
         document.getElementById('vr-lens-overlay').style.display = 'block';
         document.getElementById('vr-divider').style.display = 'block';
-        document.getElementById('vr-reticle').style.display = 'block';
+        document.getElementById('vr-reticle-l').style.display = 'block';
         document.getElementById('vr-reticle-r').style.display = 'block';
+        document.getElementById('vr-touch-dpad').style.display = 'grid';
         
         document.getElementById('sidebar-left').classList.add('collapsed');
         document.getElementById('sidebar-right').classList.add('collapsed');
         document.getElementById('app-header').style.display = 'none';
         document.getElementById('vr-hud').style.display = 'flex';
+
+        recalibrateFrontDirection();
 
         if (document.documentElement.requestFullscreen) {
           document.documentElement.requestFullscreen().catch(() => {});
@@ -757,8 +874,9 @@
       } else {
         document.getElementById('vr-lens-overlay').style.display = 'none';
         document.getElementById('vr-divider').style.display = 'none';
-        document.getElementById('vr-reticle').style.display = 'none';
+        document.getElementById('vr-reticle-l').style.display = 'none';
         document.getElementById('vr-reticle-r').style.display = 'none';
+        document.getElementById('vr-touch-dpad').style.display = 'none';
 
         document.getElementById('sidebar-left').classList.remove('collapsed');
         document.getElementById('sidebar-right').classList.remove('collapsed');
@@ -823,7 +941,6 @@
           const jsonStr = decodeURIComponent(atob(b64));
           const sceneData = JSON.parse(jsonStr);
 
-          // Clear default starter items
           state.objects.forEach(o => scene.remove(o.mesh));
           state.objects = [];
 
@@ -856,17 +973,28 @@
     document.getElementById('btn-vr-mode').addEventListener('click', () => toggleVRMode(true));
     document.getElementById('btn-exit-vr').addEventListener('click', () => toggleVRMode(false));
     document.getElementById('btn-ar-toggle').addEventListener('click', toggleARMode);
+    document.getElementById('btn-recalibrate-vr').addEventListener('click', recalibrateFrontDirection);
 
     document.getElementById('btn-request-gyro').addEventListener('click', () => {
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission().then(res => {
-          if (res === 'granted') showToast('Gyroscope aktiviert!');
+          if (res === 'granted') showToast('Gyroscope Sensoren Aktiv!');
           else alert('Gyroscope Zugriff abgelehnt');
         }).catch(err => alert('Error: ' + err));
       } else {
         showToast('Gyroscope Aktiv!');
       }
     });
+
+    // Touch D-Pad Events
+    document.getElementById('btn-move-fwd').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('fwd'); });
+    document.getElementById('btn-move-back').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('back'); });
+    document.getElementById('btn-move-left').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('left'); });
+    document.getElementById('btn-move-right').addEventListener('touchstart', (e) => { e.preventDefault(); moveRig('right'); });
+    document.getElementById('btn-move-fwd').addEventListener('click', () => moveRig('fwd'));
+    document.getElementById('btn-move-back').addEventListener('click', () => moveRig('back'));
+    document.getElementById('btn-move-left').addEventListener('click', () => moveRig('left'));
+    document.getElementById('btn-move-right').addEventListener('click', () => moveRig('right'));
 
     document.getElementById('btn-share').addEventListener('click', generateShareUrl);
     document.getElementById('btn-close-modal').addEventListener('click', () => {
