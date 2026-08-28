@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>QR Studio – Custom QR Code Creator</title>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #080a0f;
+    --card: #11151d;
+    --card2: #181e28;
+    --border: #2a3240;
+    --text: #ffffff;
+    --muted: #9ca7b8;
+    --orange: #ff7900;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at top, #242b38 0%, #080a0f 50%);
+}
+
+header {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 20px 10px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+header p {
+    margin-top: 8px;
+    color: var(--muted);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto 50px;
+    padding: 0 20px;
+
+    display: grid;
+    grid-template-columns: 1fr 430px;
+    gap: 20px;
+}
+
+.card {
+    background: rgba(17, 21, 29, 0.95);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+.field {
+    margin-bottom: 18px;
+}
+
+textarea,
+input,
+select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #0b0e14;
+    color: white;
+    border-radius: 11px;
+    padding: 12px;
+    font-size: 15px;
+    outline: none;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+input[type="color"] {
+    height: 45px;
+    padding: 3px;
+    cursor: pointer;
+}
+
+input[type="range"] {
+    padding: 0;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Styles */
+
+.style-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.style-button {
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: white;
+    padding: 11px 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: .15s;
+}
+
+.style-button:hover {
+    transform: translateY(-2px);
+}
+
+.style-button.active {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 2px rgba(255,121,0,.2);
+}
+
+/* Buttons */
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    border-radius: 11px;
+    padding: 12px 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary {
+    background: var(--orange);
+    color: #111;
+}
+
+.secondary {
+    background: #252d39;
+    color: white;
+}
+
+button:hover {
+    filter: brightness(1.1);
+}
+
+/* Preview */
+
+.preview {
+    min-height: 570px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+    border: 1px dashed #3a4454;
+
+    background:
+        linear-gradient(145deg, #090b10, #171d27);
+}
+
+.qr-container {
+    width: min(100%, 370px);
+    aspect-ratio: 1;
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+#qrCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+#logo {
+    position: absolute;
+
+    display: none;
+
+    width: 22%;
+    height: 22%;
+
+    object-fit: contain;
+
+    background: white;
+
+    padding: 7px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 3px 15px rgba(0,0,0,.35);
+}
+
+.status {
+    margin-top: 12px;
+    color: #91e69f;
+    font-size: 13px;
+}
+
+.info {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Mobile */
+
+@media(max-width: 850px) {
+
+    .container {
+        grid-template-columns: 1fr;
+    }
+
+    .preview {
+        min-height: 400px;
+    }
+}
+
+@media(max-width: 500px) {
+
+    .style-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <h1>⚡ QR Studio</h1>
+
+    <p>
+        Custom QR-Code Creator mit 10 Styles, Farben,
+        Live-Vorschau und Logo-Funktion.
+    </p>
+
+</header>
+
+
+<div class="container">
+
+<!-- ========================= -->
+<!-- SETTINGS -->
+<!-- ========================= -->
+
+<section class="card">
+
+    <div class="field">
+
+        <label>🔗 Inhalt / URL</label>
+
+        <textarea id="text"
+            placeholder="https://example.com">https://example.com</textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>🎨 QR-Code Style</label>
+
+        <div class="style-grid" id="styles"></div>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="field">
+
+            <label>🟧 QR-Farbe</label>
+
+            <input
+                id="foreground"
+                type="color"
+                value="#111111">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>⬜ Hintergrund</label>
+
+            <input
+                id="background"
+                type="color"
+                value="#ffffff">
+
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="field">
+
+            <label>🖼️ Bild / Logo</label>
+
+            <input
+                id="logoFile"
+                type="file"
+                accept="image/*">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>📐 Logo-Größe</label>
+
+            <input
+                id="logoSize"
+                type="range"
+                min="10"
+                max="32"
+                value="22">
+
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="field">
+
+            <label>🛡️ Fehlerkorrektur</label>
+
+            <select id="errorCorrection">
+
+                <option value="L">
+                    L – Niedrig
+                </option>
+
+                <option value="M" selected>
+                    M – Standard
+                </option>
+
+                <option value="Q">
+                    Q – Hoch
+                </option>
+
+                <option value="H">
+                    H – Maximal
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>↔️ Rand</label>
+
+            <input
+                id="margin"
+                type="range"
+                min="0"
+                max="8"
+                value="4">
+
+        </div>
+
+    </div>
+
+
+    <div class="buttons">
+
+        <button
+            class="primary"
+            id="download">
+            ⬇️ PNG herunterladen
+        </button>
+
+        <button
+            class="secondary"
+            id="removeLogo">
+            🗑️ Bild entfernen
+        </button>
+
+    </div>
+
+
+    <div class="status" id="status">
+        ✓ Bereit
+    </div>
+
+
+    <p class="info">
+        Tipp: Wenn du ein Logo verwendest, ist
+        Fehlerkorrektur <b>H</b> empfehlenswert.
+    </p>
+
+</section>
+
+
+<!-- ========================= -->
+<!-- PREVIEW -->
+<!-- ========================= -->
+
+<section class="card">
+
+    <div class="preview">
+
+        <div class="qr-container">
+
+            <canvas id="qrCanvas"></canvas>
+
+            <img id="logo" alt="Logo">
+
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   ELEMENTE
+========================================= */
+
+const textInput =
+    document.getElementById("text");
+
+const foreground =
+    document.getElementById("foreground");
+
+const background =
+    document.getElementById("background");
+
+const logoFile =
+    document.getElementById("logoFile");
+
+const logo =
+    document.getElementById("logo");
+
+const logoSize =
+    document.getElementById("logoSize");
+
+const errorCorrection =
+    document.getElementById("errorCorrection");
+
+const marginInput =
+    document.getElementById("margin");
+
+const canvas =
+    document.getElementById("qrCanvas");
+
+const status =
+    document.getElementById("status");
+
+
+/* =========================================
+   10 STYLES
+========================================= */
+
+const styleNames = [
+
+    "Klassisch",
+    "Rund",
+    "Dots",
+    "Soft",
+    "Bold",
+    "Diamond",
+    "Squares",
+    "Minimal",
+    "Pixel",
+    "Neon"
+
+];
+
+let currentStyle = 0;
+
+
+/* =========================================
+   STYLE BUTTONS
+========================================= */
+
+const styleContainer =
+    document.getElementById("styles");
+
+
+styleNames.forEach((name, index) => {
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "style-button" +
+        (index === 0 ? " active" : "");
+
+    button.textContent = name;
+
+    button.addEventListener("click", () => {
+
+        currentStyle = index;
+
+        document
+            .querySelectorAll(".style-button")
+            .forEach(btn =>
+                btn.classList.remove("active")
+            );
+
+        button.classList.add("active");
+
+        renderQR();
+
+    });
+
+    styleContainer.appendChild(button);
+
+});
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+let logoData = null;
+
+
+logoFile.addEventListener("change", event => {
+
+    const file =
+        event.target.files[0];
+
+    if (!file)
+        return;
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = () => {
+
+        logoData = reader.result;
+
+        logo.src = logoData;
+
+        logo.style.display = "block";
+
+        renderQR();
+
+    };
+
+
+    reader.readAsDataURL(file);
+
+});
+
+
+document
+    .getElementById("removeLogo")
+    .addEventListener("click", () => {
+
+        logoData = null;
+
+        logo.src = "";
+
+        logo.style.display = "none";
+
+        logoFile.value = "";
+
+        renderQR();
+
+    });
+
+
+/* =========================================
+   EVENTS
+========================================= */
+
+[
+    textInput,
+    foreground,
+    background,
+    logoSize,
+    errorCorrection,
+    marginInput
+
+].forEach(element => {
+
+    element.addEventListener(
+        "input",
+        renderQR
+    );
+
+});
+
+
+/* =========================================
+   SHAPES
+========================================= */
+
+function roundedRect(
+    ctx,
+    x,
+    y,
+    width,
+    height,
+    radius
+) {
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        x,
+        y,
+        width,
+        height,
+        radius
+    );
+
+    ctx.fill();
+
+}
+
+
+/* =========================================
+   MODULE DRAWING
+========================================= */
+
+function drawModule(
+    ctx,
+    x,
+    y,
+    size,
+    style
+) {
+
+    switch(style) {
+
+        /* Classic */
+        case 0:
+
+            ctx.fillRect(
+                x,
+                y,
+                size,
+                size
+            );
+
+            break;
+
+
+        /* Round */
+        case 1:
+
+            roundedRect(
+                ctx,
+                x,
+                y,
+                size,
+                size,
+                size * .25
+            );
+
+            break;
+
+
+        /* Dots */
+        case 2:
+
+            ctx.beginPath();
+
+            ctx.arc(
+                x + size / 2,
+                y + size / 2,
+                size * .42,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+            break;
+
+
+        /* Soft */
+        case 3:
+
+            roundedRect(
+                ctx,
+                x,
+                y,
+                size,
+                size,
+                size * .45
+            );
+
+            break;
+
+
+        /* Bold */
+        case 4:
+
+            roundedRect(
+                ctx,
+                x - size * .04,
+                y - size * .04,
+                size * 1.08,
+                size * 1.08,
+                size * .08
+            );
+
+            break;
+
+
+        /* Diamond */
+        case 5:
+
+            ctx.save();
+
+            ctx.translate(
+                x + size / 2,
+                y + size / 2
+            );
+
+            ctx.rotate(
+                Math.PI / 4
+            );
+
+            ctx.fillRect(
+                -size * .35,
+                -size * .35,
+                size * .7,
+                size * .7
+            );
+
+            ctx.restore();
+
+            break;
+
+
+        /* Squares */
+        case 6:
+
+            ctx.fillRect(
+                x + size * .08,
+                y + size * .08,
+                size * .84,
+                size * .84
+            );
+
+            break;
+
+
+        /* Minimal */
+        case 7:
+
+            ctx.fillRect(
+                x + size * .22,
+                y + size * .22,
+                size * .56,
+                size * .56
+            );
+
+            break;
+
+
+        /* Pixel */
+        case 8:
+
+            ctx.fillRect(
+                x + size * .05,
+                y + size * .05,
+                size * .9,
+                size * .9
+            );
+
+            break;
+
+
+        /* Neon */
+        case 9:
+
+            ctx.shadowColor =
+                foreground.value;
+
+            ctx.shadowBlur =
+                size * .7;
+
+            ctx.fillRect(
+                x,
+                y,
+                size,
+                size
+            );
+
+            ctx.shadowBlur = 0;
+
+            break;
+
+    }
+
+}
+
+
+/* =========================================
+   FINDER PATTERN
+========================================= */
+
+function drawFinder(
+    ctx,
+    x,
+    y,
+    size,
+    fg,
+    bg
+) {
+
+    ctx.fillStyle = fg;
+
+    roundedRect(
+        ctx,
+        x,
+        y,
+        size,
+        size,
+        currentStyle === 0
+            ? 0
+            : size * .15
+    );
+
+
+    ctx.fillStyle = bg;
+
+    roundedRect(
+        ctx,
+        x + size * .16,
+        y + size * .16,
+        size * .68,
+        size * .68,
+        currentStyle === 0
+            ? 0
+            : size * .08
+    );
+
+
+    ctx.fillStyle = fg;
+
+    roundedRect(
+        ctx,
+        x + size * .31,
+        y + size * .31,
+        size * .38,
+        size * .38,
+        currentStyle === 0
+            ? 0
+            : size * .05
+    );
+
+}
+
+
+/* =========================================
+   QR GENERIEREN
+========================================= */
+
+function renderQR() {
+
+    const text =
+        textInput.value.trim() || " ";
+
+
+    const fg =
+        foreground.value;
+
+    const bg =
+        background.value;
+
+
+    const size = 1000;
+
+
+    canvas.width = size;
+    canvas.height = size;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    /* Background */
+
+    ctx.fillStyle = bg;
+
+    ctx.fillRect(
+        0,
+        0,
+        size,
+        size
+    );
+
+
+    try {
+
+        /* QR Library */
+
+        const qr =
+            qrcode(
+                0,
+                errorCorrection.value
+            );
+
+
+        qr.addData(text);
+
+        qr.make();
+
+
+        const modules =
+            qr.getModuleCount();
+
+
+        const margin =
+            Number(marginInput.value);
+
+
+        const total =
+            modules + margin * 2;
+
+
+        const cell =
+            size / total;
+
+
+        ctx.fillStyle = fg;
+
+
+        /* QR Modules */
+
+        for (
+            let row = 0;
+            row < modules;
+            row++
+        ) {
+
+            for (
+                let col = 0;
+                col < modules;
+                col++
+            ) {
+
+                if (
+                    qr.isDark(
+                        row,
+                        col
+                    )
+                ) {
+
+                    drawModule(
+                        ctx,
+                        (col + margin) * cell,
+                        (row + margin) * cell,
+                        cell,
+                        currentStyle
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        /* Finder Patterns */
+
+        drawFinder(
+            ctx,
+            margin * cell,
+            margin * cell,
+            7 * cell,
+            fg,
+            bg
+        );
+
+
+        drawFinder(
+            ctx,
+            (margin + modules - 7) * cell,
+            margin * cell,
+            7 * cell,
+            fg,
+            bg
+        );
+
+
+        drawFinder(
+            ctx,
+            margin * cell,
+            (margin + modules - 7) * cell,
+            7 * cell,
+            fg,
+            bg
+        );
+
+
+        /* Logo size */
+
+        logo.style.width =
+            logoSize.value + "%";
+
+        logo.style.height =
+            logoSize.value + "%";
+
+
+        status.textContent =
+            "✓ Vorschau aktualisiert";
+
+
+    } catch(error) {
+
+        status.textContent =
+            "⚠️ QR-Code konnte nicht erstellt werden.";
+
+    }
+
+}
+
+
+/* =========================================
+   PNG DOWNLOAD
+========================================= */
+
+document
+    .getElementById("download")
+    .addEventListener("click", () => {
+
+        const output =
+            document.createElement("canvas");
+
+
+        const size = 2000;
+
+        output.width = size;
+        output.height = size;
+
+
+        const ctx =
+            output.getContext("2d");
+
+
+        ctx.drawImage(
+            canvas,
+            0,
+            0,
+            size,
+            size
+        );
+
+
+        /* Logo */
+
+        if (logoData) {
+
+            const image =
+                new Image();
+
+
+            image.onload = () => {
+
+                const percentage =
+                    Number(logoSize.value) / 100;
+
+
+                const logoWidth =
+                    size * percentage;
+
+
+                const x =
+                    (size - logoWidth) / 2;
+
+
+                const y =
+                    (size - logoWidth) / 2;
+
+
+                /* White logo area */
+
+                ctx.fillStyle =
+                    background.value;
+
+
+                ctx.fillRect(
+                    x,
+                    y,
+                    logoWidth,
+                    logoWidth
+                );
+
+
+                ctx.drawImage(
+                    image,
+                    x + logoWidth * .04,
+                    y + logoWidth * .04,
+                    logoWidth * .92,
+                    logoWidth * .92
+                );
+
+
+                savePNG(output);
+
+            };
+
+
+            image.src =
+                logoData;
+
+
+        } else {
+
+            savePNG(output);
+
+        }
+
+    });
+
+
+/* =========================================
+   SAVE
+========================================= */
+
+function savePNG(canvas) {
+
+    const link =
+        document.createElement("a");
+
+
+    link.download =
+        "custom-qr-code.png";
+
+
+    link.href =
+        canvas.toDataURL(
+            "image/png"
+        );
+
+
+    link.click();
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+renderQR();
+
+</script>
+
+</body>
+</html>
