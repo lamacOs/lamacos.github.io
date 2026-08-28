@@ -257,7 +257,95 @@ button:hover {
         grid-template-columns: 1fr;
     }
 }
+/* =========================
+   QR TESTER
+========================= */
+
+.qr-tester {
+    margin: 0 auto 50px;
+    max-width: 1200px;
+}
+
+.qr-tester h2 {
+    margin-top: 0;
+    font-size: 24px;
+}
+
+.tester-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.upload-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #252d39;
+    color: white;
+
+    border-radius: 11px;
+    padding: 12px 17px;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.upload-button:hover {
+    filter: brightness(1.1);
+}
+
+#reader {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto 0;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.scan-result {
+    margin-top: 18px;
+    padding: 15px;
+
+    border: 1px solid var(--border);
+    background: #0b0e14;
+
+    border-radius: 12px;
+
+    color: var(--muted);
+    word-break: break-word;
+}
+
+.scan-success {
+    color: #91e69f;
+}
+
+.scan-error {
+    color: #ff7777;
+}
+
+.scan-link {
+    display: block;
+    margin-top: 8px;
+
+    color: var(--orange);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.scan-link:hover {
+    text-decoration: underline;
+}
+
+.copy-result {
+    margin-top: 12px;
+    background: #252d39;
+    color: white;
+}
 </style>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 
 <body>
@@ -456,7 +544,53 @@ button:hover {
 
 </div>
 
+<!-- ========================= -->
+<!-- QR CODE TESTER -->
+<!-- ========================= -->
 
+<section class="card qr-tester">
+
+    <h2>📷 QR-Code Tester</h2>
+
+    <p class="info">
+        Scanne einen QR-Code mit deiner Kamera oder lade ein QR-Code-Bild hoch,
+        um zu prüfen, ob er funktioniert.
+    </p>
+
+    <div class="tester-buttons">
+
+        <button class="primary" id="startScanner">
+            📷 Kamera starten
+        </button>
+
+        <button class="secondary" id="stopScanner">
+            ⏹️ Scanner stoppen
+        </button>
+
+        <label class="upload-button">
+            🖼️ QR-Bild hochladen
+            <input
+                type="file"
+                id="qrImage"
+                accept="image/*"
+                hidden
+            >
+        </label>
+
+    </div>
+
+    <div
+        id="reader"
+        style="display:none;">
+    </div>
+
+    <div
+        id="scanResult"
+        class="scan-result">
+        Noch kein QR-Code getestet.
+    </div>
+
+</section>
 <script>
 
 /* =========================================
@@ -1192,7 +1326,289 @@ function savePNG(canvas) {
 ========================================= */
 
 renderQR();
+/* =========================================
+   QR CODE TESTER
+========================================= */
 
+let html5QrCode = null;
+let scannerRunning = false;
+
+const startScanner =
+    document.getElementById("startScanner");
+
+const stopScanner =
+    document.getElementById("stopScanner");
+
+const qrImage =
+    document.getElementById("qrImage");
+
+const reader =
+    document.getElementById("reader");
+
+const scanResult =
+    document.getElementById("scanResult");
+
+
+function showScanResult(result) {
+
+    const value =
+        String(result).trim();
+
+    scanResult.className =
+        "scan-result scan-success";
+
+    scanResult.innerHTML = "";
+
+    const title =
+        document.createElement("strong");
+
+    title.textContent =
+        "✓ QR-Code erkannt!";
+
+    scanResult.appendChild(title);
+
+    const text =
+        document.createElement("div");
+
+    text.style.marginTop = "8px";
+    text.textContent = value;
+
+    scanResult.appendChild(text);
+
+
+    /* Link */
+
+    try {
+
+        const url =
+            new URL(value);
+
+        if (
+            url.protocol === "http:" ||
+            url.protocol === "https:"
+        ) {
+
+            const link =
+                document.createElement("a");
+
+            link.href = value;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+
+            link.className =
+                "scan-link";
+
+            link.textContent =
+                "🔗 Link öffnen";
+
+            scanResult.appendChild(link);
+
+        }
+
+    } catch {
+
+        /* Kein URL-Link */
+
+    }
+
+
+    /* Copy Button */
+
+    const copy =
+        document.createElement("button");
+
+    copy.className =
+        "copy-result";
+
+    copy.textContent =
+        "📋 Ergebnis kopieren";
+
+    copy.addEventListener("click", async () => {
+
+        try {
+
+            await navigator.clipboard.writeText(value);
+
+            copy.textContent =
+                "✓ Kopiert!";
+
+            setTimeout(() => {
+
+                copy.textContent =
+                    "📋 Ergebnis kopieren";
+
+            }, 1500);
+
+        } catch {
+
+            copy.textContent =
+                "⚠️ Kopieren nicht möglich";
+
+        }
+
+    });
+
+    scanResult.appendChild(copy);
+
+}
+
+
+/* =========================
+   KAMERA STARTEN
+========================= */
+
+startScanner.addEventListener("click", async () => {
+
+    if (scannerRunning)
+        return;
+
+    reader.style.display = "block";
+
+    html5QrCode =
+        new Html5Qrcode("reader");
+
+    try {
+
+        await html5QrCode.start(
+
+            {
+                facingMode: "environment"
+            },
+
+            {
+                fps: 10,
+                qrbox: {
+                    width: 250,
+                    height: 250
+                }
+            },
+
+            decodedText => {
+
+                showScanResult(decodedText);
+
+            },
+
+            errorMessage => {
+
+                /* Während des Scannens
+                   sind Fehlermeldungen normal. */
+
+            }
+
+        );
+
+        scannerRunning = true;
+
+        scanResult.className =
+            "scan-result";
+
+        scanResult.textContent =
+            "📷 Kamera läuft – halte einen QR-Code vor die Kamera.";
+
+    } catch(error) {
+
+        reader.style.display = "none";
+
+        scanResult.className =
+            "scan-result scan-error";
+
+        scanResult.textContent =
+            "⚠️ Kamera konnte nicht gestartet werden. Bitte erlaube den Kamerazugriff.";
+
+        console.error(error);
+
+    }
+
+});
+
+
+/* =========================
+   KAMERA STOPPEN
+========================= */
+
+stopScanner.addEventListener("click", async () => {
+
+    if (
+        html5QrCode &&
+        scannerRunning
+    ) {
+
+        try {
+
+            await html5QrCode.stop();
+
+        } catch(error) {
+
+            console.error(error);
+
+        }
+
+        html5QrCode = null;
+        scannerRunning = false;
+
+        reader.style.display = "none";
+
+        scanResult.className =
+            "scan-result";
+
+        scanResult.textContent =
+            "Scanner gestoppt.";
+
+    }
+
+});
+
+
+/* =========================
+   QR-BILD HOCHLADEN
+========================= */
+
+qrImage.addEventListener("change", async event => {
+
+    const file =
+        event.target.files[0];
+
+    if (!file)
+        return;
+
+
+    try {
+
+        const scanner =
+            new Html5Qrcode("reader");
+
+        reader.style.display = "block";
+
+
+        const result =
+            await scanner.scanFile(
+                file,
+                true
+            );
+
+
+        showScanResult(result);
+
+        reader.style.display = "none";
+
+
+    } catch(error) {
+
+        reader.style.display = "none";
+
+        scanResult.className =
+            "scan-result scan-error";
+
+        scanResult.textContent =
+            "❌ In diesem Bild wurde kein gültiger QR-Code gefunden.";
+
+    }
+
+
+    qrImage.value = "";
+
+});
 </script>
 
 </body>
