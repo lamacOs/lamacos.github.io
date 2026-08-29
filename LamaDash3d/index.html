@@ -1,0 +1,2362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,
+             initial-scale=1,
+             maximum-scale=1,
+             user-scalable=no"
+>
+
+<title>Lama Dash 3D</title>
+
+<script src="https://game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>
+
+<style>
+
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+
+    user-select:none;
+    -webkit-user-select:none;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body {
+
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+
+    background:#080a0e;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+body {
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+}
+
+#game {
+
+    position:relative;
+
+    width:100vw;
+    height:100vh;
+
+    overflow:hidden;
+
+    background:#080a0e;
+}
+
+canvas {
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    display:block;
+}
+
+#ui {
+
+    position:absolute;
+
+    inset:0;
+
+    color:white;
+
+    pointer-events:none;
+}
+
+.screen {
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    flex-direction:column;
+
+    text-align:center;
+
+    background:
+        linear-gradient(
+            rgba(3,5,9,.72),
+            rgba(3,5,9,.86)
+        );
+
+    backdrop-filter:blur(8px);
+
+    pointer-events:auto;
+
+    padding:25px;
+}
+
+.hidden {
+    display:none !important;
+}
+
+.logo {
+
+    font-size:
+        clamp(48px,9vw,110px);
+
+    font-weight:1000;
+
+    letter-spacing:-6px;
+
+    text-shadow:
+        0 10px 40px rgba(0,0,0,.7);
+}
+
+.orange {
+    color:#ff7418;
+}
+
+.subtitle {
+
+    margin-top:8px;
+
+    color:rgba(255,255,255,.7);
+
+    font-size:
+        clamp(14px,2vw,21px);
+}
+
+button {
+
+    border:0;
+
+    border-radius:15px;
+
+    padding:16px 35px;
+
+    min-width:210px;
+
+    margin-top:22px;
+
+    color:white;
+
+    background:#ff7418;
+
+    font-size:20px;
+
+    font-weight:900;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 10px 30px
+        rgba(255,116,24,.25);
+}
+
+button:active {
+    transform:scale(.96);
+}
+
+.secondary {
+    background:#272d38;
+}
+
+.danger {
+    background:#742a2a;
+}
+
+#hud {
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+}
+
+#score {
+
+    position:absolute;
+
+    top:18px;
+    left:20px;
+
+    font-size:
+        clamp(20px,3vw,34px);
+
+    font-weight:1000;
+
+    text-shadow:
+        0 3px 10px #000;
+}
+
+#coins {
+
+    position:absolute;
+
+    top:18px;
+    right:20px;
+
+    color:#ffd34e;
+
+    font-size:
+        clamp(20px,3vw,34px);
+
+    font-weight:1000;
+
+    text-shadow:
+        0 3px 10px #000;
+}
+
+#speed {
+
+    position:absolute;
+
+    top:62px;
+    left:22px;
+
+    color:rgba(255,255,255,.65);
+
+    font-size:14px;
+}
+
+#lives {
+
+    position:absolute;
+
+    top:62px;
+    right:22px;
+
+    font-size:17px;
+}
+
+#touch {
+
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:20px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:12px;
+
+    pointer-events:none;
+}
+
+.touch {
+
+    pointer-events:auto;
+
+    width:72px;
+    height:58px;
+
+    min-width:0;
+
+    margin:0;
+
+    padding:0;
+
+    background:
+        rgba(255,255,255,.14);
+
+    backdrop-filter:blur(8px);
+}
+
+.shop {
+
+    width:min(900px,95vw);
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    padding:25px;
+
+    border-radius:25px;
+
+    background:
+        rgba(12,15,21,.92);
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+}
+
+.shopTitle {
+
+    font-size:38px;
+
+    font-weight:1000;
+}
+
+.shopCoins {
+
+    margin-top:8px;
+
+    color:#ffd34e;
+
+    font-weight:900;
+}
+
+.items {
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(170px,1fr)
+        );
+
+    gap:15px;
+
+    margin-top:25px;
+}
+
+.item {
+
+    padding:18px;
+
+    border-radius:18px;
+
+    background:#1a1f28;
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+}
+
+.itemPreview {
+
+    height:100px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:65px;
+}
+
+.itemName {
+
+    font-size:18px;
+
+    font-weight:900;
+}
+
+.itemPrice {
+
+    margin-top:5px;
+
+    color:#ffd34e;
+
+    font-size:14px;
+}
+
+.item button {
+
+    width:100%;
+
+    min-width:0;
+
+    margin-top:12px;
+
+    padding:11px;
+
+    font-size:14px;
+}
+
+#loading {
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:100;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    background:#080a0e;
+
+    color:white;
+
+    font-size:26px;
+
+    font-weight:1000;
+}
+
+@media
+(hover:hover)
+and
+(pointer:fine) {
+
+    #touch {
+        display:none;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<canvas id="canvas"></canvas>
+
+<div id="loading">
+    LAMA DASH 3D
+</div>
+
+<div id="ui">
+
+<!-- HUD -->
+
+<div id="hud">
+
+    <div id="score">
+        Score: 0
+    </div>
+
+    <div id="coins">
+        🪙 0
+    </div>
+
+    <div id="speed">
+        Geschwindigkeit: 0%
+    </div>
+
+    <div id="lives">
+        ❤️❤️❤️
+    </div>
+
+</div>
+
+
+<!-- MAIN MENU -->
+
+<div id="menu" class="screen hidden">
+
+    <div class="logo">
+        <span class="orange">LAMA</span>
+        DASH
+    </div>
+
+    <div class="subtitle">
+        3D Endless Runner
+    </div>
+
+    <div class="subtitle">
+        🪙 <span id="menuCoins">0</span>
+        &nbsp; | &nbsp;
+        🏆 <span id="menuBest">0</span>
+    </div>
+
+    <button id="playButton">
+        ▶ SPIELEN
+    </button>
+
+    <button
+        id="shopButton"
+        class="secondary"
+    >
+        🛒 SHOP
+    </button>
+
+</div>
+
+
+<!-- SHOP -->
+
+<div id="shopScreen"
+     class="screen hidden">
+
+    <div class="shop">
+
+        <div class="shopTitle">
+            🛒 LAMA SHOP
+        </div>
+
+        <div class="shopCoins">
+            🪙
+            <span id="shopCoins">
+                0
+            </span>
+        </div>
+
+        <div
+            class="items"
+            id="shopItems">
+        </div>
+
+        <button
+            id="closeShop"
+            class="secondary">
+            ZURÜCK
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- GAME OVER -->
+
+<div id="gameOver"
+     class="screen hidden">
+
+    <div class="logo">
+        GAME OVER
+    </div>
+
+    <div class="subtitle">
+
+        Score:
+        <b id="finalScore">
+            0
+        </b>
+
+    </div>
+
+    <div class="subtitle">
+
+        Best:
+        <b id="finalBest">
+            0
+        </b>
+
+    </div>
+
+    <div class="subtitle">
+
+        🪙
+        <b id="finalCoins">
+            0
+        </b>
+
+    </div>
+
+    <button id="reviveButton">
+        🎬 WIEDERBELEBEN
+    </button>
+
+    <button id="restartButton">
+        ↻ NOCHMAL
+    </button>
+
+    <button
+        id="menuButton"
+        class="secondary">
+
+        🏠 MENÜ
+
+    </button>
+
+</div>
+
+
+<!-- TOUCH -->
+
+<div id="touch">
+
+    <button
+        class="touch"
+        id="left">
+        ←
+    </button>
+
+    <button
+        class="touch"
+        id="jump">
+        ↑
+    </button>
+
+    <button
+        class="touch"
+        id="right">
+        →
+    </button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script type="module">
+
+/*
+=========================================================
+LAMA DASH 3D
+=========================================================
+
+Modelle:
+
+models/lama.glb
+models/lama_orange.glb
+models/lama_cyber.glb
+models/lama_galaxy.glb
+models/lama_lava.glb
+models/cactus.glb
+models/rock.glb
+models/coin.glb
+
+=========================================================
+*/
+
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
+
+import {
+    GLTFLoader
+} from
+"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/loaders/GLTFLoader.js";
+
+
+/* =====================================================
+   POKI
+===================================================== */
+
+let pokiReady = false;
+
+function initPoki(){
+
+    if(!window.PokiSDK){
+
+        finishLoading();
+
+        return;
+    }
+
+    PokiSDK.init()
+
+    .then(()=>{
+
+        pokiReady = true;
+
+        try{
+            PokiSDK.gameLoadingFinished();
+        }catch(e){}
+
+        finishLoading();
+
+    })
+
+    .catch(()=>{
+
+        finishLoading();
+
+    });
+}
+
+function finishLoading(){
+
+    document
+        .getElementById("loading")
+        .classList.add("hidden");
+
+    document
+        .getElementById("menu")
+        .classList.remove("hidden");
+
+    updateAllUI();
+}
+
+function gameplayStart(){
+
+    if(!pokiReady) return;
+
+    try{
+        PokiSDK.gameplayStart();
+    }catch(e){}
+
+}
+
+function gameplayStop(){
+
+    if(!pokiReady) return;
+
+    try{
+        PokiSDK.gameplayStop();
+    }catch(e){}
+
+}
+
+function showAd(callback){
+
+    if(!pokiReady){
+
+        callback();
+
+        return;
+    }
+
+    try{
+
+        PokiSDK.commercialBreak(
+            ()=>{
+                gamePaused = true;
+            }
+        )
+
+        .then(()=>{
+
+            gamePaused = false;
+
+            callback();
+
+        });
+
+    }catch(e){
+
+        callback();
+
+    }
+
+}
+
+function rewardedAd(){
+
+    if(!pokiReady){
+
+        return;
+
+    }
+
+    gameplayStop();
+
+    try{
+
+        PokiSDK.rewardedBreak(
+            ()=>{
+                gamePaused = true;
+            }
+        )
+
+        .then(success=>{
+
+            gamePaused = false;
+
+            if(success){
+
+                revivePlayer();
+
+            }else{
+
+                showGameOver();
+
+            }
+
+        });
+
+    }catch(e){
+
+        showGameOver();
+
+    }
+
+}
+
+
+/* =====================================================
+   SAVE SYSTEM
+=====================================================
+
+   Wichtig:
+
+   localStorage = zuverlässiger lokaler Spielstand.
+
+   Poki stellt nicht automatisch einen frei nutzbaren
+   Account-Cloud-Speicher für beliebige Spieldaten bereit.
+
+   Deshalb wird hier NICHT behauptet, Daten würden
+   automatisch in einem Poki-Konto gespeichert.
+
+   Sollte Poki für dein Spiel eine entsprechende
+   Cloud-Speicher-Funktion freischalten, kann die
+   Funktion saveCloud() dafür erweitert werden.
+===================================================== */
+
+const SAVE_KEY =
+    "lamaDash3D_save_v1";
+
+const defaultSave = {
+
+    coins:0,
+
+    best:0,
+
+    selectedSkin:"lama",
+
+    ownedSkins:[
+        "lama"
+    ]
+
+};
+
+let save = loadSave();
+
+function loadSave(){
+
+    try{
+
+        const raw =
+            localStorage.getItem(
+                SAVE_KEY
+            );
+
+        if(!raw)
+            return structuredClone(defaultSave);
+
+        const data =
+            JSON.parse(raw);
+
+        return {
+
+            ...structuredClone(defaultSave),
+            ...data
+
+        };
+
+    }catch(e){
+
+        return structuredClone(defaultSave);
+
+    }
+
+}
+
+function saveGame(){
+
+    try{
+
+        localStorage.setItem(
+            SAVE_KEY,
+            JSON.stringify(save)
+        );
+
+    }catch(e){}
+
+    saveCloud();
+
+    updateAllUI();
+
+}
+
+
+/*
+   Platzhalter für eine von Poki explizit
+   unterstützte Cloud-Save-API.
+
+   NICHT selbst irgendeine Poki-Account-API
+   erfinden oder fremde Endpunkte ansprechen.
+*/
+
+function saveCloud(){
+
+    /*
+      Wenn Poki für deinen konkreten Titel
+      eine offizielle Cloud-Save-API bereitstellt,
+      wird diese Funktion entsprechend
+      der offiziellen Dokumentation ergänzt.
+    */
+
+}
+
+
+/* =====================================================
+   SHOP
+===================================================== */
+
+const skins = [
+
+    {
+        id:"lama",
+        name:"Classic Lama",
+        price:0,
+        model:"models/lama.glb",
+        emoji:"🦙"
+    },
+
+    {
+        id:"orange",
+        name:"Orange Lama",
+        price:500,
+        model:"models/lama_orange.glb",
+        emoji:"🟠"
+    },
+
+    {
+        id:"cyber",
+        name:"Cyber Lama",
+        price:1500,
+        model:"models/lama_cyber.glb",
+        emoji:"🤖"
+    },
+
+    {
+        id:"galaxy",
+        name:"Galaxy Lama",
+        price:3000,
+        model:"models/lama_galaxy.glb",
+        emoji:"🌌"
+    },
+
+    {
+        id:"lava",
+        name:"Lava Lama",
+        price:5000,
+        model:"models/lama_lava.glb",
+        emoji:"🔥"
+    }
+
+];
+
+function renderShop(){
+
+    const container =
+        document.getElementById(
+            "shopItems"
+        );
+
+    container.innerHTML="";
+
+    for(const skin of skins){
+
+        const item =
+            document.createElement("div");
+
+        item.className="item";
+
+        const owned =
+            save.ownedSkins
+                .includes(skin.id);
+
+        const selected =
+            save.selectedSkin === skin.id;
+
+        let action="";
+
+        if(selected){
+
+            action="AUSGERÜSTET";
+
+        }else if(owned){
+
+            action="AUSRÜSTEN";
+
+        }else{
+
+            action=
+                "KAUFEN · 🪙 "+
+                skin.price;
+
+        }
+
+        item.innerHTML=`
+
+            <div class="itemPreview">
+                ${skin.emoji}
+            </div>
+
+            <div class="itemName">
+                ${skin.name}
+            </div>
+
+            <div class="itemPrice">
+                ${
+                    owned
+                    ? "Bereits freigeschaltet"
+                    : "🪙 "+skin.price
+                }
+            </div>
+
+            <button>
+                ${action}
+            </button>
+
+        `;
+
+        const button =
+            item.querySelector("button");
+
+        button.onclick=()=>{
+
+            if(selected)
+                return;
+
+            if(owned){
+
+                save.selectedSkin =
+                    skin.id;
+
+                saveGame();
+
+                renderShop();
+
+                return;
+
+            }
+
+            if(save.coins >= skin.price){
+
+                save.coins -= skin.price;
+
+                save.ownedSkins.push(
+                    skin.id
+                );
+
+                save.selectedSkin =
+                    skin.id;
+
+                saveGame();
+
+                renderShop();
+
+                loadPlayerModel();
+
+            }
+
+        };
+
+        container.appendChild(item);
+
+    }
+
+}
+
+
+/* =====================================================
+   THREE.JS
+===================================================== */
+
+const renderer =
+    new THREE.WebGLRenderer({
+        canvas:
+            document.getElementById(
+                "canvas"
+            ),
+        antialias:true,
+        powerPreference:
+            "high-performance"
+    });
+
+renderer.setPixelRatio(
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    )
+);
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+renderer.shadowMap.enabled=true;
+
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
+
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(
+        0x10182a
+    );
+
+scene.fog =
+    new THREE.Fog(
+        0x10182a,
+        30,
+        130
+    );
+
+
+const camera =
+    new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth /
+        window.innerHeight,
+        .1,
+        200
+    );
+
+camera.position.set(
+    0,
+    4.2,
+    8
+);
+
+
+/* =====================================================
+   LIGHT
+===================================================== */
+
+const hemi =
+    new THREE.HemisphereLight(
+        0xbfd8ff,
+        0x17200f,
+        2
+    );
+
+scene.add(hemi);
+
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffffff,
+        3
+    );
+
+sun.position.set(
+    -15,
+    25,
+    10
+);
+
+sun.castShadow=true;
+
+sun.shadow.mapSize.width=2048;
+sun.shadow.mapSize.height=2048;
+
+scene.add(sun);
+
+
+/* =====================================================
+   WORLD
+===================================================== */
+
+const roadGeometry =
+    new THREE.BoxGeometry(
+        12,
+        .35,
+        200
+    );
+
+const roadMaterial =
+    new THREE.MeshStandardMaterial({
+        color:0x252a31,
+        roughness:.9
+    });
+
+const road =
+    new THREE.Mesh(
+        roadGeometry,
+        roadMaterial
+    );
+
+road.position.set(
+    0,
+    -.35,
+    -60
+);
+
+road.receiveShadow=true;
+
+scene.add(road);
+
+
+const groundGeometry =
+    new THREE.BoxGeometry(
+        100,
+        .25,
+        200
+    );
+
+const groundMaterial =
+    new THREE.MeshStandardMaterial({
+        color:0x15241b
+    });
+
+const ground =
+    new THREE.Mesh(
+        groundGeometry,
+        groundMaterial
+    );
+
+ground.position.set(
+    0,
+    -.55,
+    -60
+);
+
+ground.receiveShadow=true;
+
+scene.add(ground);
+
+
+/* =====================================================
+   ROAD LINES
+===================================================== */
+
+const roadLines=[];
+
+for(
+    let i=0;
+    i<35;
+    i++
+){
+
+    const geometry =
+        new THREE.BoxGeometry(
+            .12,
+            .03,
+            4
+        );
+
+    const material =
+        new THREE.MeshBasicMaterial({
+            color:0xffd37a
+        });
+
+    const line =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    line.position.set(
+        0,
+        -.15,
+        -i*7
+    );
+
+    scene.add(line);
+
+    roadLines.push(line);
+
+}
+
+
+/* =====================================================
+   MODEL LOADER
+===================================================== */
+
+const loader =
+    new GLTFLoader();
+
+const modelCache =
+    new Map();
+
+function loadModel(path){
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            if(modelCache.has(path)){
+
+                resolve(
+                    modelCache.get(path)
+                        .clone(true)
+                );
+
+                return;
+
+            }
+
+            loader.load(
+                path,
+
+                gltf=>{
+
+                    const model =
+                        gltf.scene;
+
+                    model.traverse(
+                        object=>{
+
+                            if(object.isMesh){
+
+                                object.castShadow=true;
+                                object.receiveShadow=true;
+
+                            }
+
+                        }
+                    );
+
+                    modelCache.set(
+                        path,
+                        model
+                    );
+
+                    resolve(
+                        model.clone(true)
+                    );
+
+                },
+
+                undefined,
+
+                reject
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   PLAYER
+===================================================== */
+
+let playerModel=null;
+
+const player = {
+
+    x:0,
+
+    y:0,
+
+    targetX:0,
+
+    jump:0,
+
+    jumpVelocity:0,
+
+    lives:3
+
+};
+
+
+async function loadPlayerModel(){
+
+    if(playerModel){
+
+        scene.remove(
+            playerModel
+        );
+
+        playerModel=null;
+
+    }
+
+    const skin =
+        skins.find(
+            s =>
+                s.id ===
+                save.selectedSkin
+        );
+
+    try{
+
+        playerModel =
+            await loadModel(
+                skin.model
+            );
+
+        playerModel.scale.set(
+            1.4,
+            1.4,
+            1.4
+        );
+
+        playerModel.position.set(
+            player.x,
+            player.jump,
+            2
+        );
+
+        scene.add(
+            playerModel
+        );
+
+    }catch(e){
+
+        /*
+          Wenn das Modell fehlt,
+          bleibt das Spiel trotzdem
+          grundsätzlich funktionsfähig.
+        */
+
+        const fallback =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    1.2,
+                    1.8,
+                    .8
+                ),
+                new THREE.MeshStandardMaterial({
+                    color:0xe5d1b8
+                })
+            );
+
+        fallback.position.set(
+            player.x,
+            0.9,
+            2
+        );
+
+        scene.add(fallback);
+
+        playerModel=fallback;
+
+    }
+
+}
+
+
+/* =====================================================
+   OBJECTS
+===================================================== */
+
+const objects=[];
+
+async function createObstacle(){
+
+    const type =
+        Math.random()<.5
+        ? "models/cactus.glb"
+        : "models/rock.glb";
+
+    try{
+
+        const model =
+            await loadModel(type);
+
+        model.scale.setScalar(
+            .8+
+            Math.random()*.35
+        );
+
+        model.position.set(
+            [-3.3,0,3.3]
+                [Math.floor(
+                    Math.random()*3
+                )],
+            0,
+            -70
+        );
+
+        scene.add(model);
+
+        objects.push({
+
+            type:"obstacle",
+
+            mesh:model,
+
+            hit:false
+
+        });
+
+    }catch(e){}
+
+}
+
+
+async function createCoin(){
+
+    try{
+
+        const model =
+            await loadModel(
+                "models/coin.glb"
+            );
+
+        model.scale.setScalar(
+            .65
+        );
+
+        model.position.set(
+            [-3.3,0,3.3]
+                [Math.floor(
+                    Math.random()*3
+                )],
+            1.2,
+            -70
+        );
+
+        scene.add(model);
+
+        objects.push({
+
+            type:"coin",
+
+            mesh:model,
+
+            collected:false
+
+        });
+
+    }catch(e){}
+
+}
+
+
+/* =====================================================
+   GAME VARIABLES
+===================================================== */
+
+let running=false;
+
+let gamePaused=false;
+
+let score=0;
+
+let distance=0;
+
+let gameCoins=0;
+
+let speed=.055;
+
+let spawnTimer=0;
+
+let coinTimer=.5;
+
+let currentLane=0;
+
+let lastTime=
+    performance.now();
+
+
+/*
+   Sehr langsamer Start.
+   Beschleunigt kontinuierlich.
+*/
+
+const START_SPEED=.055;
+
+const MAX_SPEED=.32;
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+function left(){
+
+    if(!running)return;
+
+    currentLane =
+        Math.max(
+            -1,
+            currentLane-1
+        );
+
+}
+
+function right(){
+
+    if(!running)return;
+
+    currentLane =
+        Math.min(
+            1,
+            currentLane+1
+        );
+
+}
+
+function jump(){
+
+    if(!running)return;
+
+    if(player.jump<=.01){
+
+        player.jumpVelocity=.25;
+
+    }
+
+}
+
+
+window.addEventListener(
+    "keydown",
+    e=>{
+
+        const key =
+            e.key.toLowerCase();
+
+        if(
+            key==="arrowleft" ||
+            key==="a"
+        ){
+            left();
+        }
+
+        if(
+            key==="arrowright" ||
+            key==="d"
+        ){
+            right();
+        }
+
+        if(
+            key==="arrowup" ||
+            key==="w" ||
+            key===" "
+        ){
+            jump();
+        }
+
+    }
+);
+
+
+/* =====================================================
+   TOUCH
+===================================================== */
+
+function touch(
+    id,
+    callback
+){
+
+    const el =
+        document.getElementById(id);
+
+    el.addEventListener(
+        "pointerdown",
+        e=>{
+
+            e.preventDefault();
+
+            callback();
+
+        }
+    );
+
+}
+
+touch("left",left);
+touch("right",right);
+touch("jump",jump);
+
+
+/* =====================================================
+   START GAME
+===================================================== */
+
+async function startGame(){
+
+    score=0;
+
+    distance=0;
+
+    gameCoins=0;
+
+    speed=START_SPEED;
+
+    currentLane=0;
+
+    player.jump=0;
+
+    player.jumpVelocity=0;
+
+    player.lives=3;
+
+    spawnTimer=.8;
+
+    coinTimer=.4;
+
+    for(
+        const object
+        of objects
+    ){
+
+        scene.remove(
+            object.mesh
+        );
+
+    }
+
+    objects.length=0;
+
+    await loadPlayerModel();
+
+    document
+        .getElementById("menu")
+        .classList.add("hidden");
+
+    document
+        .getElementById("gameOver")
+        .classList.add("hidden");
+
+    running=true;
+
+    gameplayStart();
+
+    lastTime =
+        performance.now();
+
+}
+
+
+/* =====================================================
+   UPDATE
+===================================================== */
+
+function update(dt){
+
+    if(
+        !running ||
+        gamePaused
+    ){
+        return;
+    }
+
+    /*
+       Langsames, stetiges Beschleunigen.
+    */
+
+    speed +=
+        .000018 * dt;
+
+    speed =
+        Math.min(
+            speed,
+            MAX_SPEED
+        );
+
+    distance +=
+        speed * dt;
+
+    score =
+        Math.floor(
+            distance * 10
+        );
+
+
+    /*
+       Lane movement
+    */
+
+    const targetX =
+        currentLane*3.3;
+
+    player.x +=
+        (
+            targetX-player.x
+        ) *
+        Math.min(
+            1,
+            dt*.12
+        );
+
+
+    /*
+       Jump physics
+    */
+
+    if(
+        player.jump>0 ||
+        player.jumpVelocity>0
+    ){
+
+        player.jump +=
+            player.jumpVelocity*dt;
+
+        player.jumpVelocity -=
+            .012*dt;
+
+        if(player.jump<0){
+
+            player.jump=0;
+
+            player.jumpVelocity=0;
+
+        }
+
+    }
+
+
+    /*
+       Player model
+    */
+
+    if(playerModel){
+
+        playerModel.position.x =
+            player.x;
+
+        playerModel.position.y =
+            player.jump;
+
+        playerModel.position.z=2;
+
+        /*
+           kleine Laufbewegung
+        */
+
+        if(
+            player.jump===0
+        ){
+
+            playerModel.rotation.y =
+                Math.sin(
+                    distance*35
+                )*.04;
+
+        }
+
+    }
+
+
+    /*
+       Spawn obstacles
+    */
+
+    spawnTimer-=dt/60;
+
+    if(spawnTimer<=0){
+
+        createObstacle();
+
+        spawnTimer =
+            Math.max(
+                .55,
+                1.25 -
+                speed*1.2
+            ) +
+            Math.random()*.65;
+
+    }
+
+
+    /*
+       Spawn coins
+    */
+
+    coinTimer-=dt/60;
+
+    if(coinTimer<=0){
+
+        createCoin();
+
+        coinTimer =
+            .4+
+            Math.random()*.7;
+
+    }
+
+
+    /*
+       Move world objects
+    */
+
+    for(
+        let i=objects.length-1;
+        i>=0;
+        i--
+    ){
+
+        const object =
+            objects[i];
+
+        object.mesh.position.z +=
+            speed*dt*10;
+
+
+        /*
+           Coin animation
+        */
+
+        if(
+            object.type==="coin"
+        ){
+
+            object.mesh.rotation.y +=
+                .08*dt;
+
+        }
+
+
+        /*
+           Remove
+        */
+
+        if(
+            object.mesh.position.z>10
+        ){
+
+            scene.remove(
+                object.mesh
+            );
+
+            objects.splice(
+                i,
+                1
+            );
+
+            continue;
+
+        }
+
+
+        /*
+           Collision
+        */
+
+        const dz =
+            Math.abs(
+                object.mesh.position.z-2
+            );
+
+        const dx =
+            Math.abs(
+                object.mesh.position.x-player.x
+            );
+
+
+        if(
+            dz<1.5 &&
+            dx<1.4
+        ){
+
+            if(
+                object.type==="coin"
+            ){
+
+                if(
+                    !object.collected
+                ){
+
+                    object.collected=true;
+
+                    gameCoins++;
+
+                    scene.remove(
+                        object.mesh
+                    );
+
+                    objects.splice(
+                        i,
+                        1
+                    );
+
+                }
+
+            }
+
+
+            if(
+                object.type==="obstacle" &&
+                !object.hit
+            ){
+
+                /*
+                   Springen über Hindernis
+                */
+
+                if(player.jump<1.3){
+
+                    object.hit=true;
+
+                    player.lives--;
+
+                    if(
+                        player.lives<=0
+                    ){
+
+                        endGame();
+
+                        return;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    /*
+       Road movement
+    */
+
+    for(
+        const line
+        of roadLines
+    ){
+
+        line.position.z +=
+            speed*dt*10;
+
+        if(
+            line.position.z>10
+        ){
+
+            line.position.z-=245;
+
+        }
+
+    }
+
+
+    updateAllUI();
+
+}
+
+
+/* =====================================================
+   END GAME
+===================================================== */
+
+function endGame(){
+
+    running=false;
+
+    gameplayStop();
+
+    save.coins +=
+        gameCoins;
+
+    if(
+        score>save.best
+    ){
+
+        save.best=score;
+
+    }
+
+    saveGame();
+
+    document
+        .getElementById("finalScore")
+        .textContent=score;
+
+    document
+        .getElementById("finalBest")
+        .textContent=save.best;
+
+    document
+        .getElementById("finalCoins")
+        .textContent=gameCoins;
+
+    document
+        .getElementById("gameOver")
+        .classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   REVIVE
+===================================================== */
+
+function revivePlayer(){
+
+    for(
+        const object
+        of objects
+    ){
+
+        scene.remove(
+            object.mesh
+        );
+
+    }
+
+    objects.length=0;
+
+    player.lives=1;
+
+    player.jump=0;
+
+    player.jumpVelocity=0;
+
+    document
+        .getElementById("gameOver")
+        .classList.add("hidden");
+
+    running=true;
+
+    gameplayStart();
+
+}
+
+
+/* =====================================================
+   MENU
+===================================================== */
+
+function openShop(){
+
+    renderShop();
+
+    document
+        .getElementById("menu")
+        .classList.add("hidden");
+
+    document
+        .getElementById("shopScreen")
+        .classList.remove("hidden");
+
+}
+
+function closeShop(){
+
+    document
+        .getElementById("shopScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("menu")
+        .classList.remove("hidden");
+
+    updateAllUI();
+
+}
+
+function returnMenu(){
+
+    running=false;
+
+    gameplayStop();
+
+    document
+        .getElementById("gameOver")
+        .classList.add("hidden");
+
+    document
+        .getElementById("menu")
+        .classList.remove("hidden");
+
+    updateAllUI();
+
+}
+
+
+/* =====================================================
+   UI
+===================================================== */
+
+function updateAllUI(){
+
+    document
+        .getElementById("score")
+        .textContent =
+        "Score: "+score;
+
+    document
+        .getElementById("coins")
+        .textContent =
+        "🪙 "+save.coins;
+
+    document
+        .getElementById("speed")
+        .textContent =
+        "Geschwindigkeit: "+
+        Math.round(
+            speed/MAX_SPEED*100
+        )+
+        "%";
+
+    document
+        .getElementById("lives")
+        .textContent =
+        "❤️".repeat(
+            Math.max(
+                0,
+                player.lives
+            )
+        );
+
+    document
+        .getElementById("menuCoins")
+        .textContent =
+        save.coins;
+
+    document
+        .getElementById("menuBest")
+        .textContent =
+        save.best;
+
+    document
+        .getElementById("shopCoins")
+        .textContent =
+        save.coins;
+
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document
+    .getElementById("playButton")
+    .onclick=()=>{
+
+        startGame();
+
+    };
+
+
+document
+    .getElementById("shopButton")
+    .onclick=()=>{
+
+        openShop();
+
+    };
+
+
+document
+    .getElementById("closeShop")
+    .onclick=()=>{
+
+        closeShop();
+
+    };
+
+
+document
+    .getElementById("restartButton")
+    .onclick=()=>{
+
+        showAd(
+            ()=>{
+                startGame();
+            }
+        );
+
+    };
+
+
+document
+    .getElementById("reviveButton")
+    .onclick=()=>{
+
+        rewardedAd();
+
+    };
+
+
+document
+    .getElementById("menuButton")
+    .onclick=()=>{
+
+        returnMenu();
+
+    };
+
+
+/* =====================================================
+   RESIZE
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+);
+
+
+/* =====================================================
+   RENDER LOOP
+===================================================== */
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const now =
+        performance.now();
+
+    const dt =
+        Math.min(
+            (now-lastTime)/16.67,
+            2
+        );
+
+    lastTime=now;
+
+    update(dt);
+
+    /*
+       Smooth camera
+    */
+
+    camera.position.x +=
+        (
+            player.x*.22 -
+            camera.position.x
+        )*.05;
+
+    camera.position.y +=
+        (
+            4.2 +
+            player.jump*.15 -
+            camera.position.y
+        )*.05;
+
+    camera.lookAt(
+        player.x*.15,
+        1.1+player.jump*.15,
+        -12
+    );
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+renderShop();
+
+initPoki();
+
+animate();
+
+</script>
+
+</body>
+</html>
