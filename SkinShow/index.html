@@ -2,78 +2,56 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-<title>lamacHub — Minecraft Skin Viewer</title>
-
-<meta name="description" content="Interaktiver Minecraft Skin Viewer mit 3D-Modell.">
-
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ff7a00">
+<title>lamacOs Skin Viewer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-
 <style>
-:root {
-    --accent: #ff7a00;
-    --accent-hover: #ff8b1f;
-
-    --bg: #f5f5f7;
-    --glass: rgba(255,255,255,.68);
-    --glass-strong: rgba(255,255,255,.86);
-
-    --text: #171717;
-    --muted: #77777d;
-
-    --border: rgba(0,0,0,.08);
-
+:root{
+    --accent:#ff7a00;
+    --accent2:#ff8c22;
+    --bg:#f5f5f7;
+    --glass:rgba(255,255,255,.68);
+    --glass2:rgba(255,255,255,.88);
+    --text:#171717;
+    --muted:#77777f;
+    --border:rgba(0,0,0,.08);
     --shadow:
-        0 25px 80px rgba(0,0,0,.08),
-        0 3px 15px rgba(0,0,0,.04);
-
-    --radius-xl: 28px;
-    --radius-lg: 20px;
-    --radius-md: 14px;
+        0 25px 80px rgba(0,0,0,.09),
+        0 4px 20px rgba(0,0,0,.04);
 }
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #08090b;
-        --glass: rgba(24,25,29,.66);
-        --glass-strong: rgba(31,32,37,.86);
-
-        --text: #f5f5f7;
-        --muted: #9999a1;
-
-        --border: rgba(255,255,255,.09);
-
+@media(prefers-color-scheme:dark){
+    :root{
+        --bg:#08090b;
+        --glass:rgba(24,25,29,.68);
+        --glass2:rgba(31,32,37,.9);
+        --text:#f5f5f7;
+        --muted:#9999a2;
+        --border:rgba(255,255,255,.09);
         --shadow:
-            0 25px 90px rgba(0,0,0,.42),
-            0 3px 15px rgba(0,0,0,.25);
+            0 25px 90px rgba(0,0,0,.45),
+            0 4px 20px rgba(0,0,0,.25);
     }
 }
-
-* {
-    box-sizing: border-box;
+*{
+    box-sizing:border-box;
 }
-
 html,
-body {
-    width: 100%;
-    min-height: 100%;
-    margin: 0;
+body{
+    margin:0;
+    width:100%;
+    min-height:100%;
 }
-
-body {
-    min-height: 100svh;
-
-    color: var(--text);
+body{
+    min-height:100svh;
     background:
         radial-gradient(
-            circle at 12% 8%,
+            circle at 10% 5%,
             rgba(255,122,0,.13),
-            transparent 27%
+            transparent 28%
         ),
         radial-gradient(
             circle at 90% 90%,
@@ -81,978 +59,636 @@ body {
             transparent 30%
         ),
         var(--bg);
-
-    font-family: Inter, sans-serif;
+    color:var(--text);
+    font-family:Inter,sans-serif;
 }
-
 button,
-input {
-    font-family: inherit;
+input{
+    font:inherit;
 }
-
-button {
-    cursor: pointer;
+button{
+    cursor:pointer;
 }
-
-.app {
-    min-height: 100svh;
-
+.app{
+    min-height:100svh;
     padding:
-        max(12px, env(safe-area-inset-top))
-        max(12px, env(safe-area-inset-right))
-        max(12px, env(safe-area-inset-bottom))
-        max(12px, env(safe-area-inset-left));
+        max(10px,env(safe-area-inset-top))
+        max(10px,env(safe-area-inset-right))
+        max(10px,env(safe-area-inset-bottom))
+        max(10px,env(safe-area-inset-left));
 }
-
-
-/* =========================================================
-   NAVBAR
-========================================================= */
-
-.navbar {
-    width: min(1500px, 100%);
-    height: 64px;
-
-    margin: 0 auto 16px;
-
-    padding: 0 16px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    background: var(--glass);
-
-    border: 1px solid var(--border);
-    border-radius: 20px;
-
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-
-    box-shadow: var(--shadow);
+/* NAVBAR */
+.navbar{
+    width:min(1500px,100%);
+    height:64px;
+    margin:0 auto 14px;
+    padding:0 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border:1px solid var(--border);
+    border-radius:20px;
+    background:var(--glass);
+    backdrop-filter:blur(30px);
+    -webkit-backdrop-filter:blur(30px);
+    box-shadow:var(--shadow);
 }
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    font-family: Poppins, sans-serif;
-    font-size: 18px;
-    font-weight: 700;
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:Poppins,sans-serif;
+    font-size:18px;
+    font-weight:700;
 }
-
-.brand-icon {
-    width: 38px;
-    height: 38px;
-
-    display: grid;
-    place-items: center;
-
-    color: white;
-
-    border-radius: 12px;
-
-    background: var(--accent);
-
+.logo{
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    background:var(--accent);
+    color:white;
     box-shadow:
-        0 8px 25px rgba(255,122,0,.28);
+        0 8px 25px rgba(255,122,0,.3);
 }
-
-.nav-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    padding: 8px 12px;
-
-    border: 1px solid var(--border);
-    border-radius: 999px;
-
-    background: var(--glass-strong);
-
-    color: var(--muted);
-
-    font-size: 11px;
-    font-weight: 600;
+.nav-pill{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border:1px solid var(--border);
+    border-radius:999px;
+    background:var(--glass2);
+    color:var(--muted);
+    font-size:11px;
+    font-weight:600;
 }
-
-.status-dot {
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: #44d483;
-
-    box-shadow:
-        0 0 12px rgba(68,212,131,.75);
+.dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#43d483;
+    box-shadow:0 0 12px rgba(67,212,131,.8);
 }
-
-
-/* =========================================================
-   MAIN
-========================================================= */
-
-.layout {
-    width: min(1500px, 100%);
-    min-height: calc(100svh - 96px);
-
-    margin: 0 auto;
-
-    display: grid;
-    grid-template-columns: 350px minmax(0,1fr);
-
-    gap: 16px;
+/* LAYOUT */
+.layout{
+    width:min(1500px,100%);
+    min-height:calc(100svh - 92px);
+    margin:auto;
+    display:grid;
+    grid-template-columns:350px minmax(0,1fr);
+    gap:14px;
 }
-
-
-/* =========================================================
-   GLASS PANEL
-========================================================= */
-
-.panel,
-.viewer {
-    border: 1px solid var(--border);
-
-    background: var(--glass);
-
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-
-    box-shadow: var(--shadow);
+/* SIDEBAR */
+.sidebar{
+    padding:26px;
+    border:1px solid var(--border);
+    border-radius:28px;
+    background:var(--glass);
+    backdrop-filter:blur(30px);
+    -webkit-backdrop-filter:blur(30px);
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
 }
-
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-.panel {
-    padding: 26px;
-
-    border-radius: var(--radius-xl);
-
-    display: flex;
-    flex-direction: column;
+.eyebrow{
+    margin-bottom:8px;
+    color:var(--accent);
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1.2px;
 }
-
-.eyebrow {
-    color: var(--accent);
-
-    font-size: 11px;
-    font-weight: 700;
-
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-
-    margin-bottom: 8px;
+h1{
+    margin:0;
+    font-family:Poppins,sans-serif;
+    font-size:35px;
+    line-height:1.02;
+    letter-spacing:-1.5px;
 }
-
-h1 {
-    margin: 0;
-
-    font-family: Poppins, sans-serif;
-
-    font-size: 34px;
-    line-height: 1.05;
-
-    letter-spacing: -1.5px;
+.subtitle{
+    margin:12px 0 24px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.55;
 }
-
-.subtitle {
-    margin: 12px 0 24px;
-
-    color: var(--muted);
-
-    font-size: 13px;
-    line-height: 1.55;
+/* SEARCH */
+.label{
+    margin-bottom:8px;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:600;
 }
-
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-.search-label {
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: var(--muted);
-
-    font-size: 12px;
-    font-weight: 600;
+.search{
+    display:flex;
+    gap:8px;
 }
-
-.search {
-    display: flex;
-    gap: 8px;
+.search input{
+    min-width:0;
+    flex:1;
+    height:48px;
+    padding:0 14px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    outline:none;
+    background:var(--glass2);
+    color:var(--text);
+    transition:.2s;
 }
-
-.search input {
-    min-width: 0;
-    flex: 1;
-
-    height: 48px;
-
-    padding: 0 14px;
-
-    color: var(--text);
-
-    background: var(--glass-strong);
-
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-
-    outline: none;
-
-    transition: .2s ease;
-}
-
-.search input:focus {
-    border-color: rgba(255,122,0,.6);
-
+.search input:focus{
+    border-color:rgba(255,122,0,.6);
     box-shadow:
         0 0 0 4px rgba(255,122,0,.1);
 }
-
-.search input::placeholder {
-    color: var(--muted);
-}
-
-.search-button {
-    width: 48px;
-    height: 48px;
-
-    flex-shrink: 0;
-
-    border: 0;
-    border-radius: var(--radius-md);
-
-    color: white;
-
-    background: var(--accent);
-
+.search button{
+    width:48px;
+    height:48px;
+    flex-shrink:0;
+    border:0;
+    border-radius:14px;
+    color:white;
+    background:var(--accent);
+    font-size:20px;
     box-shadow:
-        0 8px 25px rgba(255,122,0,.22);
-
-    transition: .2s ease;
+        0 8px 25px rgba(255,122,0,.24);
+    transition:.2s;
 }
-
-.search-button:hover {
-    background: var(--accent-hover);
-    transform: translateY(-1px);
+.search button:hover{
+    background:var(--accent2);
+    transform:translateY(-1px);
 }
-
-.search-button:active {
-    transform: scale(.96);
+/* ERROR */
+.error{
+    display:none;
+    margin-top:12px;
+    padding:12px 14px;
+    border:1px solid rgba(255,70,70,.18);
+    border-radius:14px;
+    background:rgba(255,70,70,.08);
+    color:#ff7070;
+    font-size:12px;
+    line-height:1.45;
 }
-
-
-/* =========================================================
-   ERROR
-========================================================= */
-
-.error {
-    display: none;
-
-    margin-top: 12px;
-
-    padding: 12px 14px;
-
-    color: #ff7777;
-
-    background: rgba(255,70,70,.08);
-
-    border: 1px solid rgba(255,70,70,.15);
-
-    border-radius: 14px;
-
-    font-size: 12px;
-    line-height: 1.45;
+/* INFO */
+.info{
+    margin-top:20px;
+    padding:16px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    background:var(--glass2);
 }
-
-
-/* =========================================================
-   PLAYER CARD
-========================================================= */
-
-.player-card {
-    margin-top: 20px;
-
-    padding: 16px;
-
-    background: var(--glass-strong);
-
-    border: 1px solid var(--border);
-
-    border-radius: 18px;
+.info-title{
+    margin-bottom:10px;
+    font-family:Poppins,sans-serif;
+    font-size:13px;
 }
-
-.card-title {
-    margin-bottom: 12px;
-
-    font-family: Poppins, sans-serif;
-
-    font-size: 13px;
-    font-weight: 600;
+.row{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:7px 0;
+    font-size:12px;
 }
-
-.info-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 10px;
-
-    padding: 7px 0;
-
-    font-size: 12px;
+.row span:first-child{
+    color:var(--muted);
 }
-
-.info-row .label {
-    color: var(--muted);
+.row span:last-child{
+    max-width:190px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-weight:600;
 }
-
-.info-row .value {
-    max-width: 185px;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    font-weight: 600;
+/* BUTTONS */
+.buttons{
+    margin-top:auto;
+    padding-top:18px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
 }
-
-
-/* =========================================================
-   BUTTONS
-========================================================= */
-
-.controls {
-    margin-top: auto;
-    padding-top: 20px;
-
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-
-    gap: 8px;
+.btn{
+    min-height:43px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:var(--glass2);
+    color:var(--text);
+    font-size:12px;
+    font-weight:600;
+    transition:.2s;
 }
-
-.control {
-    min-height: 42px;
-
-    border: 1px solid var(--border);
-    border-radius: 13px;
-
-    color: var(--text);
-
-    background: var(--glass-strong);
-
-    font-size: 12px;
-    font-weight: 600;
-
-    transition: .2s ease;
+.btn:hover{
+    transform:translateY(-1px);
+    border-color:rgba(255,122,0,.3);
+    background:rgba(255,122,0,.07);
 }
-
-.control:hover {
-    transform: translateY(-1px);
-
-    background:
-        rgba(255,122,0,.07);
-
-    border-color:
-        rgba(255,122,0,.25);
+.btn.accent{
+    color:white;
+    background:var(--accent);
+    border-color:var(--accent);
 }
-
-.control.accent {
-    color: white;
-
-    background: var(--accent);
-
-    border-color: var(--accent);
-}
-
-
-/* =========================================================
-   VIEWER
-========================================================= */
-
-.viewer {
-    position: relative;
-
-    min-width: 0;
-    min-height: 600px;
-
-    overflow: hidden;
-
-    border-radius: var(--radius-xl);
-
+/* VIEWER */
+.viewer{
+    position:relative;
+    min-width:0;
+    min-height:600px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    border-radius:28px;
     background:
         radial-gradient(
-            circle at 50% 43%,
-            rgba(255,122,0,.12),
-            transparent 31%
+            circle at 50% 42%,
+            rgba(255,122,0,.14),
+            transparent 32%
         ),
         #0b0c0f;
+    box-shadow:var(--shadow);
 }
-
-#viewer {
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    touch-action: none;
+#canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    touch-action:none;
 }
-
-
-/* =========================================================
-   VIEWER BADGES
-========================================================= */
-
-.viewer-top {
-    position: absolute;
-
-    top: 16px;
-    left: 16px;
-    right: 16px;
-
-    display: flex;
-    justify-content: space-between;
-
-    pointer-events: none;
-
-    z-index: 5;
+/* VIEWER HEADER */
+.viewer-header{
+    position:absolute;
+    top:15px;
+    left:15px;
+    right:15px;
+    display:flex;
+    justify-content:space-between;
+    pointer-events:none;
+    z-index:5;
 }
-
-.badge {
-    padding: 9px 12px;
-
-    border: 1px solid rgba(255,255,255,.08);
-
-    border-radius: 999px;
-
-    background: rgba(20,20,23,.62);
-
-    backdrop-filter: blur(20px);
-
-    color: #aaa;
-
-    font-size: 11px;
-    font-weight: 600;
+.badge{
+    padding:9px 12px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:999px;
+    background:rgba(20,20,23,.65);
+    backdrop-filter:blur(18px);
+    color:#aaa;
+    font-size:11px;
+    font-weight:600;
 }
-
-.badge.player {
-    color: white;
+.badge.player{
+    color:white;
 }
-
-
-/* =========================================================
-   LOADING
-========================================================= */
-
-.loading {
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 10;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    flex-direction: column;
-
-    gap: 12px;
-
-    background:
-        rgba(5,5,7,.48);
-
-    backdrop-filter: blur(10px);
+/* LOADING */
+.loading{
+    position:absolute;
+    inset:0;
+    z-index:20;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:12px;
+    background:rgba(5,5,7,.5);
+    backdrop-filter:blur(10px);
 }
-
-.spinner {
-    width: 34px;
-    height: 34px;
-
-    border: 3px solid rgba(255,255,255,.12);
-
-    border-top-color:
-        var(--accent);
-
-    border-radius: 50%;
-
-    animation:
-        spin .8s linear infinite;
+.spinner{
+    width:34px;
+    height:34px;
+    border:3px solid rgba(255,255,255,.12);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
 }
-
-.loading-text {
-    color: #aaa;
-
-    font-size: 12px;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
     }
 }
-
-
-/* =========================================================
-   HINT
-========================================================= */
-
-.hint {
-    position: absolute;
-
-    left: 50%;
-    bottom: 18px;
-
-    transform: translateX(-50%);
-
-    padding: 9px 14px;
-
-    max-width: calc(100% - 30px);
-
-    border-radius: 999px;
-
-    background: rgba(20,20,23,.62);
-
-    border: 1px solid rgba(255,255,255,.08);
-
-    backdrop-filter: blur(20px);
-
-    color: #999;
-
-    font-size: 11px;
-
-    white-space: nowrap;
-
-    pointer-events: none;
+/* VIEWER CONTROLS */
+.viewer-controls{
+    position:absolute;
+    right:16px;
+    bottom:50px;
+    z-index:8;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
 }
-
-
-/* =========================================================
-   COPYRIGHT
-========================================================= */
-
-.copyright {
-    position: absolute;
-
-    right: 17px;
-    bottom: 17px;
-
-    color: rgba(255,255,255,.38);
-
-    font-size: 9px;
-
-    pointer-events: none;
+.viewer-button{
+    width:42px;
+    height:42px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:13px;
+    background:rgba(20,20,23,.68);
+    backdrop-filter:blur(18px);
+    color:white;
+    font-size:18px;
+    transition:.2s;
 }
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 900px) {
-
-    .layout {
-        grid-template-columns: 1fr;
-        min-height: auto;
+.viewer-button:hover{
+    background:rgba(255,122,0,.8);
+}
+/* HINT */
+.hint{
+    position:absolute;
+    left:50%;
+    bottom:16px;
+    transform:translateX(-50%);
+    padding:8px 13px;
+    max-width:calc(100% - 130px);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:999px;
+    background:rgba(20,20,23,.62);
+    backdrop-filter:blur(18px);
+    color:#999;
+    font-size:10px;
+    white-space:nowrap;
+    pointer-events:none;
+}
+/* COPYRIGHT */
+.copyright{
+    position:absolute;
+    right:16px;
+    bottom:16px;
+    color:rgba(255,255,255,.35);
+    font-size:9px;
+    pointer-events:none;
+}
+/* RESPONSIVE */
+@media(max-width:900px){
+    .layout{
+        grid-template-columns:1fr;
+        min-height:auto;
     }
-
-    .panel {
-        min-height: auto;
+    .viewer{
+        min-height:68svh;
     }
-
-    .viewer {
-        min-height: 65svh;
-    }
-
-    .controls {
-        margin-top: 18px;
+    .buttons{
+        margin-top:18px;
     }
 }
-
-
-@media (max-width: 600px) {
-
-    .app {
-        padding:
-            max(9px, env(safe-area-inset-top))
-            max(9px, env(safe-area-inset-right))
-            max(9px, env(safe-area-inset-bottom))
-            max(9px, env(safe-area-inset-left));
+@media(max-width:600px){
+    .navbar{
+        height:57px;
+        margin-bottom:9px;
+        border-radius:17px;
     }
-
-    .navbar {
-        height: 57px;
-        margin-bottom: 9px;
-
-        border-radius: 17px;
+    .nav-pill{
+        display:none;
     }
-
-    .brand {
-        font-size: 16px;
+    .logo{
+        width:34px;
+        height:34px;
     }
-
-    .brand-icon {
-        width: 34px;
-        height: 34px;
+    .sidebar{
+        padding:20px;
+        border-radius:22px;
     }
-
-    .nav-status {
-        display: none;
+    h1{
+        font-size:28px;
     }
-
-    .layout {
-        gap: 9px;
+    .viewer{
+        min-height:64svh;
+        border-radius:22px;
     }
-
-    .panel {
-        padding: 20px;
-        border-radius: 22px;
+    .viewer-header{
+        top:10px;
+        left:10px;
+        right:10px;
     }
-
-    h1 {
-        font-size: 27px;
+    .viewer-controls{
+        right:10px;
+        bottom:48px;
     }
-
-    .subtitle {
-        margin-bottom: 18px;
+    .hint{
+        left:10px;
+        right:65px;
+        max-width:none;
+        transform:none;
+        overflow:hidden;
+        text-overflow:ellipsis;
     }
-
-    .viewer {
-        min-height: 58svh;
-        border-radius: 22px;
-    }
-
-    .viewer-top {
-        top: 11px;
-        left: 11px;
-        right: 11px;
-    }
-
-    .hint {
-        bottom: 11px;
-    }
-
-    .copyright {
-        display: none;
+    .copyright{
+        display:none;
     }
 }
-
-
-@media (max-width: 390px) {
-
-    .controls {
-        grid-template-columns: 1fr;
+@media(max-width:390px){
+    .buttons{
+        grid-template-columns:1fr;
     }
-
-    .player-card {
-        display: none;
+    .info{
+        display:none;
     }
 }
 </style>
 </head>
-
 <body>
-
 <div class="app">
-
-    <header class="navbar">
-
-        <div class="brand">
-            <div class="brand-icon">🦙</div>
-            <span>lamacOs</span>
+<header class="navbar">
+    <div class="brand">
+        <div class="logo">🦙</div>
+        <span>lamacOs</span>
+    </div>
+    <div class="nav-pill">
+        <span class="dot"></span>
+        Minecraft Skin Viewer
+    </div>
+</header>
+<main class="layout">
+<aside class="sidebar">
+    <div class="eyebrow">
+        Minecraft Tool
+    </div>
+    <h1>
+        Skin<br>
+        Viewer
+    </h1>
+    <p class="subtitle">
+        Gib einen Minecraft-Spielernamen ein
+        und betrachte seinen aktuellen Skin
+        als interaktives 3D-Modell.
+    </p>
+    <div class="label">
+        Spielername
+    </div>
+    <div class="search">
+        <input
+            id="username"
+            type="text"
+            maxlength="16"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            placeholder="z. B. lamacOs"
+        >
+        <button
+            id="search"
+            aria-label="Spieler suchen"
+        >→</button>
+    </div>
+    <div
+        id="error"
+        class="error"
+    ></div>
+    <section class="info">
+        <div class="info-title">
+            Spielerdaten
         </div>
-
-        <div class="nav-status">
-            <span class="status-dot"></span>
-            Minecraft Skin Viewer
+        <div class="row">
+            <span>Name</span>
+            <span id="name">–</span>
         </div>
-
-    </header>
-
-
-    <main class="layout">
-
-
-        <!-- SIDEBAR -->
-
-        <aside class="panel">
-
-            <div class="eyebrow">
-                Minecraft Tool
-            </div>
-
-            <h1>
-                Skin<br>
-                Viewer
-            </h1>
-
-            <p class="subtitle">
-                Gib einen Minecraft-Spielernamen ein
-                und erkunde den aktuellen Skin als
-                interaktives 3D-Modell.
-            </p>
-
-
-            <label
-                class="search-label"
-                for="username"
-            >
-                Spielername
-            </label>
-
-            <div class="search">
-
-                <input
-                    id="username"
-                    type="text"
-                    maxlength="16"
-                    autocomplete="off"
-                    autocapitalize="none"
-                    spellcheck="false"
-                    placeholder="z. B. Notch"
-                >
-
-                <button
-                    id="searchButton"
-                    class="search-button"
-                    aria-label="Spieler suchen"
-                >
-                    →
-                </button>
-
-            </div>
-
-
-            <div
-                id="error"
-                class="error"
-            ></div>
-
-
-            <section class="player-card">
-
-                <div class="card-title">
-                    Spielerdaten
-                </div>
-
-                <div class="info-row">
-                    <span class="label">Name</span>
-                    <span
-                        class="value"
-                        id="nameValue"
-                    >–</span>
-                </div>
-
-                <div class="info-row">
-                    <span class="label">UUID</span>
-                    <span
-                        class="value"
-                        id="uuidValue"
-                    >–</span>
-                </div>
-
-                <div class="info-row">
-                    <span class="label">Modell</span>
-                    <span
-                        class="value"
-                        id="modelValue"
-                    >–</span>
-                </div>
-
-            </section>
-
-
-            <div class="controls">
-
-                <button
-                    id="resetButton"
-                    class="control"
-                >
-                    ↻ Zurücksetzen
-                </button>
-
-                <button
-                    id="frontButton"
-                    class="control"
-                >
-                    🧍 Front
-                </button>
-
-                <button
-                    id="exampleButton"
-                    class="control"
-                >
-                    🎲 Beispiel
-                </button>
-
-                <button
-                    id="skinButton"
-                    class="control accent"
-                >
-                    🖼 Skin öffnen
-                </button>
-
-            </div>
-
-        </aside>
-
-
-        <!-- VIEWER -->
-
-        <section class="viewer">
-
-            <canvas id="viewer"></canvas>
-
-
-            <div class="viewer-top">
-
-                <div
-                    id="viewerPlayer"
-                    class="badge player"
-                >
-                    Notch
-                </div>
-
-                <div class="badge">
-                    3D
-                </div>
-
-            </div>
-
-
-            <div
-                id="loading"
-                class="loading"
-            >
-
-                <div class="spinner"></div>
-
-                <div class="loading-text">
-                    Skin wird geladen…
-                </div>
-
-            </div>
-
-
-            <div class="hint">
-                Ziehen = drehen · Scrollen = zoomen · Touch unterstützt
-            </div>
-
-
-            <div class="copyright">
-                © 2026 lamacHub
-            </div>
-
-        </section>
-
-    </main>
-
+        <div class="row">
+            <span>UUID</span>
+            <span id="uuid">–</span>
+        </div>
+        <div class="row">
+            <span>Modell</span>
+            <span id="model">–</span>
+        </div>
+    </section>
+    <div class="buttons">
+        <button
+            class="btn"
+            id="reset"
+        >
+            ↻ Zurücksetzen
+        </button>
+        <button
+            class="btn"
+            id="front"
+        >
+            🧍 Front
+        </button>
+        <button
+            class="btn"
+            id="random"
+        >
+            🎲 Beispiel
+        </button>
+        <button
+            class="btn accent"
+            id="openSkin"
+        >
+            🖼 Skin öffnen
+        </button>
+    </div>
+</aside>
+<section class="viewer">
+    <canvas id="canvas"></canvas>
+    <div class="viewer-header">
+        <div
+            class="badge player"
+            id="viewerName"
+        >
+            lamacOs
+        </div>
+        <div class="badge">
+            3D
+        </div>
+    </div>
+    <div
+        id="loading"
+        class="loading"
+    >
+        <div class="spinner"></div>
+        <div>
+            Skin wird geladen…
+        </div>
+    </div>
+    <div class="viewer-controls">
+        <button
+            class="viewer-button"
+            id="zoomIn"
+            aria-label="Hineinzoomen"
+        >+</button>
+        <button
+            class="viewer-button"
+            id="zoomOut"
+            aria-label="Herauszoomen"
+        >−</button>
+        <button
+            class="viewer-button"
+            id="fullscreen"
+            aria-label="Vollbild"
+        >⛶</button>
+    </div>
+    <div class="hint">
+        Ziehen = drehen · Mausrad/Pinch = zoomen
+    </div>
+    <div class="copyright">
+        © 2026 lamacHub
+    </div>
+</section>
+</main>
 </div>
-
-
 <script>
 "use strict";
-
-
 /* =========================================================
-   API CONFIGURATION
+   API
 ========================================================= */
-
-/*
-    Primary:
-    Mojang username -> UUID
-    Mojang UUID -> session profile -> skin
-
-    Fallback:
-    Ashcon username -> everything
-
-    Ashcon's current API documents:
-    /mojang/v2/user/<username|uuid>
-
-    The Mojang API flow is:
-    /users/profiles/minecraft/<username>
-    /session/minecraft/profile/<uuid>
-*/
-
-const MOJANG_PROFILE_API =
+const MCSTATE =
+    "https://www.mcstate.net/api/player/";
+const MOJANG =
     "https://api.mojang.com/users/profiles/minecraft/";
-
-const MOJANG_SESSION_API =
+const SESSION =
     "https://sessionserver.mojang.com/session/minecraft/profile/";
-
-const ASHCON_API =
-    "https://api.ashcon.app/mojang/v2/user/";
-
-
 /* =========================================================
    DOM
 ========================================================= */
-
 const canvas =
-    document.getElementById("viewer");
-
-const usernameInput =
+    document.getElementById("canvas");
+const username =
     document.getElementById("username");
-
-const searchButton =
-    document.getElementById("searchButton");
-
-const resetButton =
-    document.getElementById("resetButton");
-
-const frontButton =
-    document.getElementById("frontButton");
-
-const exampleButton =
-    document.getElementById("exampleButton");
-
-const skinButton =
-    document.getElementById("skinButton");
-
-const errorElement =
+const search =
+    document.getElementById("search");
+const errorBox =
     document.getElementById("error");
-
-const loadingElement =
+const loading =
     document.getElementById("loading");
-
-const nameValue =
-    document.getElementById("nameValue");
-
-const uuidValue =
-    document.getElementById("uuidValue");
-
-const modelValue =
-    document.getElementById("modelValue");
-
-const viewerPlayer =
-    document.getElementById("viewerPlayer");
-
-
+const nameBox =
+    document.getElementById("name");
+const uuidBox =
+    document.getElementById("uuid");
+const modelBox =
+    document.getElementById("model");
+const viewerName =
+    document.getElementById("viewerName");
+const reset =
+    document.getElementById("reset");
+const front =
+    document.getElementById("front");
+const random =
+    document.getElementById("random");
+const openSkin =
+    document.getElementById("openSkin");
+const zoomIn =
+    document.getElementById("zoomIn");
+const zoomOut =
+    document.getElementById("zoomOut");
+const fullscreen =
+    document.getElementById("fullscreen");
 /* =========================================================
-   THREE.JS
+   STATE
 ========================================================= */
-
+let currentSkinURL = null;
+let player = null;
+let playerGroup = null;
+let rotationY = 0;
+let targetRotationY = 0;
+let rotationX = 0;
+let targetRotationX = 0;
+let zoom = 8;
+let targetZoom = 8;
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+/* =========================================================
+   THREE
+========================================================= */
 const scene =
     new THREE.Scene();
-
 scene.background =
     new THREE.Color(0x0b0c0f);
-
-
 const camera =
     new THREE.PerspectiveCamera(
         32,
@@ -1060,1728 +696,781 @@ const camera =
         .1,
         100
     );
-
 camera.position.set(
-    4.5,
-    2.3,
+    0,
+    1,
     8
 );
-
-
 const renderer =
     new THREE.WebGLRenderer({
         canvas,
-        antialias: true,
-        alpha: false
+        antialias:true
     });
-
 renderer.setPixelRatio(
     Math.min(
         window.devicePixelRatio || 1,
         2
     )
 );
-
 renderer.outputColorSpace =
     THREE.SRGBColorSpace;
-
-
-/* =========================================================
-   LIGHTS
-========================================================= */
-
-const hemi =
+/* LIGHTING */
+scene.add(
     new THREE.HemisphereLight(
         0xffffff,
         0x222222,
-        2.4
-    );
-
-scene.add(hemi);
-
-
-const key =
+        2.5
+    )
+);
+const keyLight =
     new THREE.DirectionalLight(
         0xffffff,
         3
     );
-
-key.position.set(
+keyLight.position.set(
     5,
     8,
     7
 );
-
-scene.add(key);
-
-
-const fill =
+scene.add(keyLight);
+const orangeLight =
     new THREE.PointLight(
         0xff7a00,
-        25,
-        14
+        22,
+        15
     );
-
-fill.position.set(
+orangeLight.position.set(
     -4,
     3,
     4
 );
-
-scene.add(fill);
-
-
-/* =========================================================
-   GROUND
-========================================================= */
-
-const ground =
+scene.add(orangeLight);
+/* FLOOR */
+const floor =
     new THREE.Mesh(
         new THREE.CircleGeometry(
-            2.7,
+            2.8,
             64
         ),
         new THREE.MeshBasicMaterial({
-            color: 0x15161a,
-            transparent: true,
-            opacity: .75
+            color:0x15161a,
+            transparent:true,
+            opacity:.8
         })
     );
-
-ground.rotation.x =
+floor.rotation.x =
     -Math.PI / 2;
-
-ground.position.y =
-    -3.3;
-
-scene.add(ground);
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let playerGroup = null;
-
-let currentPlayer = null;
-
-let currentSkinURL = null;
-
-let currentModel = "classic";
-
-let targetRotationY = 0;
-let currentRotationY = 0;
-
-let targetRotationX = 0;
-let currentRotationX = 0;
-
-let targetZoom = 8;
-let currentZoom = 8;
-
-let dragging = false;
-
-let pointerX = 0;
-let pointerY = 0;
-
-
+floor.position.y =
+    -3.2;
+scene.add(floor);
 /* =========================================================
    RESIZE
 ========================================================= */
-
-function resize() {
-
+function resize(){
     const rect =
         canvas.getBoundingClientRect();
-
-    const width =
-        Math.max(
-            rect.width,
-            1
-        );
-
-    const height =
-        Math.max(
-            rect.height,
-            1
-        );
-
+    const w =
+        Math.max(rect.width,1);
+    const h =
+        Math.max(rect.height,1);
     camera.aspect =
-        width / height;
-
+        w / h;
     camera.updateProjectionMatrix();
-
     renderer.setSize(
-        width,
-        height,
+        w,
+        h,
         false
     );
 }
-
 window.addEventListener(
     "resize",
     resize
 );
-
 resize();
-
-
 /* =========================================================
-   HELPERS
+   UI
 ========================================================= */
-
-function showLoading() {
-    loadingElement.style.display =
+function showLoading(){
+    loading.style.display =
         "flex";
 }
-
-
-function hideLoading() {
-    loadingElement.style.display =
+function hideLoading(){
+    loading.style.display =
         "none";
 }
-
-
-function showError(message) {
-
-    errorElement.textContent =
+function error(message){
+    errorBox.textContent =
         message;
-
-    errorElement.style.display =
+    errorBox.style.display =
         "block";
 }
-
-
-function hideError() {
-
-    errorElement.style.display =
+function clearError(){
+    errorBox.style.display =
         "none";
 }
-
-
-function cleanUsername(value) {
-
-    return value
-        .trim()
-        .replace(/\s+/g, "");
-}
-
-
-function uuidWithoutDashes(uuid) {
-
-    return uuid
-        .replace(/-/g, "")
-        .toLowerCase();
-}
-
-
 /* =========================================================
-   FETCH JSON
+   FETCH
 ========================================================= */
-
-async function fetchJSON(url) {
-
+async function getJSON(url){
     const response =
         await fetch(
             url,
             {
-                method: "GET",
-                cache: "no-store",
-                headers: {
-                    "Accept":
-                        "application/json"
+                method:"GET",
+                cache:"no-store",
+                headers:{
+                    Accept:"application/json"
                 }
             }
         );
-
-    if (!response.ok) {
-
+    if(!response.ok){
         throw new Error(
-            `HTTP ${response.status}`
+            "HTTP " +
+            response.status
         );
     }
-
     return response.json();
 }
-
-
 /* =========================================================
-   MOJANG LOOKUP
+   MCSTATE
 ========================================================= */
-
-async function lookupMojang(
-    username
-) {
-
-    /*
-        Step 1:
-        Username -> UUID
-    */
-
-    const profile =
-        await fetchJSON(
-            MOJANG_PROFILE_API +
-            encodeURIComponent(
-                username
-            )
-        );
-
-
-    if (
-        !profile ||
-        !profile.id
-    ) {
-
-        throw new Error(
-            "Mojang hat keinen Spieler gefunden."
-        );
-    }
-
-
-    /*
-        Step 2:
-        UUID -> session profile
-    */
-
-    const uuid =
-        profile.id;
-
-    const session =
-        await fetchJSON(
-            MOJANG_SESSION_API +
-            encodeURIComponent(
-                uuid
-            ) +
-            "?unsigned=false"
-        );
-
-
-    if (
-        !session ||
-        !Array.isArray(
-            session.properties
-        )
-    ) {
-
-        throw new Error(
-            "Das Mojang-Profil enthält keine Texturen."
-        );
-    }
-
-
-    const textureProperty =
-        session.properties.find(
-            property =>
-                property.name ===
-                "textures"
-        );
-
-
-    if (
-        !textureProperty ||
-        !textureProperty.value
-    ) {
-
-        throw new Error(
-            "Keine Skin-Textur gefunden."
-        );
-    }
-
-
-    /*
-        The texture property is
-        Base64 encoded JSON.
-    */
-
-    const textureJSON =
-        JSON.parse(
-            decodeBase64(
-                textureProperty.value
-            )
-        );
-
-
-    const skin =
-        textureJSON
-            ?.textures
-            ?.SKIN;
-
-
-    if (
-        !skin ||
-        !skin.url
-    ) {
-
-        throw new Error(
-            "Dieser Spieler hat keinen abrufbaren Skin."
-        );
-    }
-
-
-    /*
-        Model can be included by Mojang
-        as metadata.model = slim.
-    */
-
-    const metadata =
-        skin.metadata || {};
-
-    const model =
-        metadata.model === "slim"
-            ? "slim"
-            : "classic";
-
-
-    return {
-        uuid,
-        username:
-            session.name ||
-            profile.name ||
-            username,
-        skinURL:
-            skin.url.replace(
-                /^http:/,
-                "https:"
-            ),
-        model
-    };
-}
-
-
-/* =========================================================
-   BASE64 DECODER
-========================================================= */
-
-function decodeBase64(value) {
-
-    /*
-        Mojang's texture value is
-        normal Base64, but this implementation
-        also tolerates URL-safe Base64.
-    */
-
-    let normalized =
-        value
-            .replace(/-/g, "+")
-            .replace(/_/g, "/");
-
-    while (
-        normalized.length % 4 !== 0
-    ) {
-        normalized += "=";
-    }
-
-
-    const binary =
-        atob(normalized);
-
-    const bytes =
-        new Uint8Array(
-            binary.length
-        );
-
-    for (
-        let i = 0;
-        i < binary.length;
-        i++
-    ) {
-        bytes[i] =
-            binary.charCodeAt(i);
-    }
-
-
-    return new TextDecoder()
-        .decode(bytes);
-}
-
-
-/* =========================================================
-   ASHCON FALLBACK
-========================================================= */
-
-async function lookupAshcon(
-    username
-) {
-
+async function lookupMCState(name){
     const data =
-        await fetchJSON(
-            ASHCON_API +
-            encodeURIComponent(
-                username
-            )
+        await getJSON(
+            MCSTATE +
+            encodeURIComponent(name)
         );
-
-
-    if (
+    if(
         !data ||
         !data.uuid
-    ) {
-
+    ){
         throw new Error(
-            "Der Fallback-Dienst hat keinen Spieler gefunden."
+            "MCState konnte den Spieler nicht auflösen."
         );
     }
-
-
-    /*
-        Current Ashcon response uses:
-
-        textures.skin.url
-        textures.slim
-    */
-
-    const skinURL =
-        data
-            ?.textures
-            ?.skin
-            ?.url;
-
-
-    if (!skinURL) {
-
+    if(
+        !data.skinUrl
+    ){
         throw new Error(
-            "Der Spieler wurde gefunden, aber es wurde kein Skin geliefert."
+            "MCState hat den Spieler gefunden, aber keine Skin-URL geliefert."
         );
     }
-
-
-    const slim =
-        Boolean(
-            data
-                ?.textures
-                ?.slim
-        );
-
-
     return {
+        username:
+            data.name ||
+            data.username ||
+            name,
         uuid:
             data.uuid,
-
-        username:
-            data.username ||
-            username,
-
-        skinURL:
-            skinURL.replace(
-                /^http:/,
-                "https:"
-            ),
-
+        skin:
+            data.skinUrl,
         model:
-            slim
+            String(
+                data.variant ||
+                data.model ||
+                ""
+            ).toLowerCase() === "slim"
                 ? "slim"
                 : "classic"
     };
 }
-
-
 /* =========================================================
-   MAIN PLAYER LOOKUP
+   MOJANG FALLBACK
 ========================================================= */
-
-async function lookupPlayer(
-    username
-) {
-
-    let firstError =
-        null;
-
-
-    /*
-        Try Mojang first.
-    */
-
-    try {
-
-        return await lookupMojang(
-            username
+async function lookupMojang(name){
+    const profile =
+        await getJSON(
+            MOJANG +
+            encodeURIComponent(name)
         );
-
-    } catch (error) {
-
-        console.warn(
-            "Mojang lookup failed:",
-            error
-        );
-
-        firstError =
-            error;
-    }
-
-
-    /*
-        Fallback.
-    */
-
-    try {
-
-        return await lookupAshcon(
-            username
-        );
-
-    } catch (error) {
-
-        console.warn(
-            "Ashcon fallback failed:",
-            error
-        );
-
+    if(
+        !profile ||
+        !profile.id
+    ){
         throw new Error(
-            "Spieler nicht gefunden. Bitte überprüfe den Namen und versuche es erneut."
+            "Mojang hat keinen Spieler gefunden."
+        );
+    }
+    const session =
+        await getJSON(
+            SESSION +
+            encodeURIComponent(
+                profile.id
+            )
+        );
+    const property =
+        session?.properties?.find(
+            p =>
+                p.name ===
+                "textures"
+        );
+    if(
+        !property?.value
+    ){
+        throw new Error(
+            "Mojang hat keine Texturdaten geliefert."
+        );
+    }
+    const decoded =
+        JSON.parse(
+            new TextDecoder()
+                .decode(
+                    Uint8Array.from(
+                        atob(property.value),
+                        c => c.charCodeAt(0)
+                    )
+                )
+        );
+    const skin =
+        decoded?.textures?.SKIN;
+    if(
+        !skin?.url
+    ){
+        throw new Error(
+            "Mojang hat keinen Skin geliefert."
+        );
+    }
+    return {
+        username:
+            session.name ||
+            profile.name,
+        uuid:
+            profile.id,
+        skin:
+            skin.url.replace(
+                /^http:/,
+                "https:"
+            ),
+        model:
+            skin?.metadata?.model ===
+            "slim"
+                ? "slim"
+                : "classic"
+    };
+}
+/* =========================================================
+   PLAYER LOOKUP
+========================================================= */
+async function lookup(name){
+    let mcstateError = null;
+    try{
+        return await lookupMCState(
+            name
+        );
+    }catch(e){
+        console.warn(
+            "MCState:",
+            e
+        );
+        mcstateError = e;
+    }
+    try{
+        return await lookupMojang(
+            name
+        );
+    }catch(e){
+        console.warn(
+            "Mojang:",
+            e
+        );
+        throw new Error(
+            "Spieler „" +
+            name +
+            "“ konnte nicht gefunden werden. Beide Spieler-Dienste haben keine gültigen Profildaten geliefert."
         );
     }
 }
-
-
 /* =========================================================
-   TEXTURE LOADING
+   TEXTURE
 ========================================================= */
-
-function loadTexture(url) {
-
+function loadTexture(url){
     return new Promise(
-        (resolve, reject) => {
-
+        (resolve,reject)=>{
             const loader =
                 new THREE.TextureLoader();
-
             loader.setCrossOrigin(
                 "anonymous"
             );
-
             loader.load(
                 url,
-
-                texture => {
-
+                texture=>{
                     texture.colorSpace =
                         THREE.SRGBColorSpace;
-
                     texture.magFilter =
                         THREE.NearestFilter;
-
                     texture.minFilter =
                         THREE.NearestFilter;
-
                     texture.generateMipmaps =
                         false;
-
-                    texture.wrapS =
-                        THREE.ClampToEdgeWrapping;
-
-                    texture.wrapT =
-                        THREE.ClampToEdgeWrapping;
-
                     resolve(texture);
                 },
-
                 undefined,
-
-                error => {
-                    reject(error);
-                }
+                reject
             );
         }
     );
 }
-
-
 /* =========================================================
-   TEXTURE REGION
+   REGION
 ========================================================= */
-
-/*
-    Creates a separate texture view of
-    a rectangular region of the 64x64
-    Minecraft skin atlas.
-
-    This avoids the broken UV approach from
-    the previous version.
-*/
-
-function createRegionTexture(
-    source,
+function region(
+    texture,
     x,
     y,
-    width,
-    height
-) {
-
-    const texture =
-        source.clone();
-
-    texture.needsUpdate =
+    w,
+    h
+){
+    const t =
+        texture.clone();
+    t.needsUpdate =
         true;
-
-    texture.wrapS =
+    t.wrapS =
         THREE.ClampToEdgeWrapping;
-
-    texture.wrapT =
+    t.wrapT =
         THREE.ClampToEdgeWrapping;
-
-    texture.repeat.set(
-        width / 64,
-        height / 64
+    t.repeat.set(
+        w / 64,
+        h / 64
     );
-
-    texture.offset.set(
+    t.offset.set(
         x / 64,
         1 -
-        ((y + height) / 64)
+        (y + h) / 64
     );
-
-    texture.minFilter =
+    t.magFilter =
         THREE.NearestFilter;
-
-    texture.magFilter =
+    t.minFilter =
         THREE.NearestFilter;
-
-    texture.colorSpace =
-        THREE.SRGBColorSpace;
-
-    texture.generateMipmaps =
+    t.generateMipmaps =
         false;
-
-    return texture;
+    return t;
 }
-
-
-/* =========================================================
-   FACE MATERIALS
-========================================================= */
-
-function materialFor(
-    source,
-    region
-) {
-
+function mat(
+    texture,
+    r
+){
     return new THREE.MeshLambertMaterial({
-        map:
-            createRegionTexture(
-                source,
-                region.x,
-                region.y,
-                region.w,
-                region.h
-            ),
-
-        transparent: true,
-
-        alphaTest: .05
+        map:region(
+            texture,
+            r[0],
+            r[1],
+            r[2],
+            r[3]
+        ),
+        transparent:true,
+        alphaTest:.05
     });
 }
-
-
 /* =========================================================
-   CUBE WITH MINECRAFT UV
+   CUBE
 ========================================================= */
-
-function minecraftCube(
-    source,
+function cube(
+    texture,
     size,
-    position,
-    regions
-) {
-
+    pos,
+    r
+){
     const geometry =
         new THREE.BoxGeometry(
-            size.x,
-            size.y,
-            size.z
+            size[0],
+            size[1],
+            size[2]
         );
-
-
-    /*
-        BoxGeometry material order:
-
-        +X
-        -X
-        +Y
-        -Y
-        +Z
-        -Z
-    */
-
     const materials = [
-
-        materialFor(
-            source,
-            regions.right
-        ),
-
-        materialFor(
-            source,
-            regions.left
-        ),
-
-        materialFor(
-            source,
-            regions.top
-        ),
-
-        materialFor(
-            source,
-            regions.bottom
-        ),
-
-        materialFor(
-            source,
-            regions.front
-        ),
-
-        materialFor(
-            source,
-            regions.back
-        )
+        mat(texture,r.right),
+        mat(texture,r.left),
+        mat(texture,r.top),
+        mat(texture,r.bottom),
+        mat(texture,r.front),
+        mat(texture,r.back)
     ];
-
-
     const mesh =
         new THREE.Mesh(
             geometry,
             materials
         );
-
     mesh.position.set(
-        position.x,
-        position.y,
-        position.z
+        pos[0],
+        pos[1],
+        pos[2]
     );
-
-
     return mesh;
 }
-
-
 /* =========================================================
-   REGION HELPERS
+   HEAD
 ========================================================= */
-
-function R(
-    x,
-    y,
-    w,
-    h
-) {
-    return {
-        x,
-        y,
-        w,
-        h
-    };
-}
-
-
-/* =========================================================
-   BUILD HEAD
-========================================================= */
-
-function buildHead(
-    source,
+function head(
+    texture,
     group
-) {
-
-    const head =
-        minecraftCube(
-            source,
-
-            {
-                x: 2,
-                y: 2,
-                z: 2
-            },
-
-            {
-                x: 0,
-                y: 2.9,
-                z: 0
-            },
-
-            {
-                top:
-                    R(8,0,8,8),
-
-                bottom:
-                    R(16,0,8,8),
-
-                left:
-                    R(0,8,8,8),
-
-                front:
-                    R(8,8,8,8),
-
-                right:
-                    R(16,8,8,8),
-
-                back:
-                    R(24,8,8,8)
-            }
-        );
-
+){
     group.add(
-        head
+        cube(
+            texture,
+            [2,2,2],
+            [0,2.5,0],
+            {
+                top:[8,0,8,8],
+                bottom:[16,0,8,8],
+                left:[0,8,8,8],
+                front:[8,8,8,8],
+                right:[16,8,8,8],
+                back:[24,8,8,8]
+            }
+        )
     );
-
-
-    /*
-        Head outer layer / hat.
-        It is slightly larger and uses
-        the second-layer head UV region.
-    */
-
-    const hat =
-        minecraftCube(
-            source,
-
-            {
-                x: 2.12,
-                y: 2.12,
-                z: 2.12
-            },
-
-            {
-                x: 0,
-                y: 2.9,
-                z: 0
-            },
-
-            {
-                top:
-                    R(40,0,8,8),
-
-                bottom:
-                    R(48,0,8,8),
-
-                left:
-                    R(32,8,8,8),
-
-                front:
-                    R(40,8,8,8),
-
-                right:
-                    R(48,8,8,8),
-
-                back:
-                    R(56,8,8,8)
-            }
-        );
-
     group.add(
-        hat
+        cube(
+            texture,
+            [2.12,2.12,2.12],
+            [0,2.5,0],
+            {
+                top:[40,0,8,8],
+                bottom:[48,0,8,8],
+                left:[32,8,8,8],
+                front:[40,8,8,8],
+                right:[48,8,8,8],
+                back:[56,8,8,8]
+            }
+        )
     );
 }
-
-
 /* =========================================================
-   BUILD BODY
+   BODY
 ========================================================= */
-
-function buildBody(
-    source,
+function body(
+    texture,
     group
-) {
-
-    const body =
-        minecraftCube(
-            source,
-
-            {
-                x: 2,
-                y: 2.5,
-                z: 1
-            },
-
-            {
-                x: 0,
-                y: .55,
-                z: 0
-            },
-
-            {
-                top:
-                    R(20,16,8,4),
-
-                bottom:
-                    R(28,16,8,4),
-
-                left:
-                    R(16,20,4,12),
-
-                front:
-                    R(20,20,8,12),
-
-                right:
-                    R(28,20,4,12),
-
-                back:
-                    R(32,20,8,12)
-            }
-        );
-
+){
     group.add(
-        body
+        cube(
+            texture,
+            [2,2.5,1],
+            [0,.25,0],
+            {
+                top:[20,16,8,4],
+                bottom:[28,16,8,4],
+                left:[16,20,4,12],
+                front:[20,20,8,12],
+                right:[28,20,4,12],
+                back:[32,20,8,12]
+            }
+        )
     );
-
-
-    /*
-        Jacket outer layer.
-    */
-
-    const jacket =
-        minecraftCube(
-            source,
-
-            {
-                x: 2.12,
-                y: 2.62,
-                z: 1.12
-            },
-
-            {
-                x: 0,
-                y: .55,
-                z: 0
-            },
-
-            {
-                top:
-                    R(20,32,8,4),
-
-                bottom:
-                    R(28,32,8,4),
-
-                left:
-                    R(16,36,4,12),
-
-                front:
-                    R(20,36,8,12),
-
-                right:
-                    R(28,36,4,12),
-
-                back:
-                    R(32,36,8,12)
-            }
-        );
-
     group.add(
-        jacket
+        cube(
+            texture,
+            [2.12,2.62,1.12],
+            [0,.25,0],
+            {
+                top:[20,32,8,4],
+                bottom:[28,32,8,4],
+                left:[16,36,4,12],
+                front:[20,36,8,12],
+                right:[28,36,4,12],
+                back:[32,36,8,12]
+            }
+        )
     );
 }
-
-
 /* =========================================================
-   BUILD ARM
+   ARMS
 ========================================================= */
-
-function buildArm(
-    source,
+function arm(
+    texture,
     group,
     side,
     slim
-) {
-
+){
     const width =
-        slim ? 0.75 : 1;
-
-
+        slim ? .75 : 1;
     const x =
         side === "right"
             ? 1.5
             : -1.5;
-
-
-    /*
-        Character right arm:
-        x = 44..56
-
-        Character left arm:
-        x = 36..48, y = 52
-    */
-
-    let regions;
-
-
-    if (
+    const w =
+        slim ? 3 : 4;
+    let r;
+    if(
         side === "right"
-    ) {
-
-        const armW =
-            slim ? 3 : 4;
-
-        regions = {
-
-            top:
-                R(44,16,armW,4),
-
-            bottom:
-                R(48,16,armW,4),
-
-            left:
-                R(40,20,4,12),
-
-            front:
-                R(44,20,armW,12),
-
-            right:
-                R(
-                    44 + armW,
-                    20,
-                    4,
-                    12
-                ),
-
-            back:
-                R(
-                    48 + (slim ? -1 : 0),
-                    20,
-                    armW,
-                    12
-                )
+    ){
+        r = {
+            top:[44,16,w,4],
+            bottom:[48,16,w,4],
+            left:[40,20,4,12],
+            front:[44,20,w,12],
+            right:[44+w,20,4,12],
+            back:[48,20,w,12]
         };
-
-    } else {
-
-        const armW =
-            slim ? 3 : 4;
-
-
-        regions = {
-
-            top:
-                R(36,48,armW,4),
-
-            bottom:
-                R(
-                    40,
-                    48,
-                    armW,
-                    4
-                ),
-
-            left:
-                R(
-                    32,
-                    52,
-                    4,
-                    12
-                ),
-
-            front:
-                R(
-                    36,
-                    52,
-                    armW,
-                    12
-                ),
-
-            right:
-                R(
-                    36 + armW,
-                    52,
-                    4,
-                    12
-                ),
-
-            back:
-                R(
-                    40 + (slim ? -1 : 0),
-                    52,
-                    armW,
-                    12
-                )
+    }else{
+        r = {
+            top:[36,48,w,4],
+            bottom:[40,48,w,4],
+            left:[32,52,4,12],
+            front:[36,52,w,12],
+            right:[36+w,52,4,12],
+            back:[40,52,w,12]
         };
     }
-
-
-    const arm =
-        minecraftCube(
-            source,
-
-            {
-                x: width,
-                y: 2.5,
-                z: 1
-            },
-
-            {
-                x,
-                y: .55,
-                z: 0
-            },
-
-            regions
-        );
-
-
     group.add(
-        arm
-    );
-
-
-    /*
-        Sleeve layer.
-    */
-
-    let overlay;
-
-
-    if (
-        side === "right"
-    ) {
-
-        overlay = {
-
-            top:
-                R(44,36,4,4),
-
-            bottom:
-                R(48,36,4,4),
-
-            left:
-                R(40,36,4,12),
-
-            front:
-                R(44,36,4,12),
-
-            right:
-                R(48,36,4,12),
-
-            back:
-                R(52,36,4,12)
-        };
-
-    } else {
-
-        overlay = {
-
-            top:
-                R(52,48,4,4),
-
-            bottom:
-                R(56,48,4,4),
-
-            left:
-                R(48,52,4,12),
-
-            front:
-                R(52,52,4,12),
-
-            right:
-                R(56,52,4,12),
-
-            back:
-                R(60,52,4,12)
-        };
-    }
-
-
-    const sleeve =
-        minecraftCube(
-            source,
-
-            {
-                x:
-                    width + .12,
-
-                y:
-                    2.62,
-
-                z:
-                    1.12
-            },
-
-            {
-                x,
-                y: .55,
-                z: 0
-            },
-
-            overlay
-        );
-
-
-    group.add(
-        sleeve
+        cube(
+            texture,
+            [width,2.5,1],
+            [x,.25,0],
+            r
+        )
     );
 }
-
-
 /* =========================================================
-   BUILD LEG
+   LEGS
 ========================================================= */
-
-function buildLeg(
-    source,
+function leg(
+    texture,
     group,
     side
-) {
-
+){
     const x =
         side === "right"
             ? .5
             : -.5;
-
-
-    const baseX =
+    const bx =
         side === "right"
             ? 0
             : 16;
-
-
-    const leg =
-        minecraftCube(
-            source,
-
-            {
-                x: 1,
-                y: 2.5,
-                z: 1
-            },
-
-            {
-                x,
-                y: -1.95,
-                z: 0
-            },
-
-            {
-                top:
-                    R(
-                        baseX + 4,
-                        16,
-                        4,
-                        4
-                    ),
-
-                bottom:
-                    R(
-                        baseX + 8,
-                        16,
-                        4,
-                        4
-                    ),
-
-                left:
-                    R(
-                        baseX,
-                        20,
-                        4,
-                        12
-                    ),
-
-                front:
-                    R(
-                        baseX + 4,
-                        20,
-                        4,
-                        12
-                    ),
-
-                right:
-                    R(
-                        baseX + 8,
-                        20,
-                        4,
-                        12
-                    ),
-
-                back:
-                    R(
-                        baseX + 12,
-                        20,
-                        4,
-                        12
-                    )
-            }
-        );
-
     group.add(
-        leg
+        cube(
+            texture,
+            [1,2.5,1],
+            [x,-2.25,0],
+            {
+                top:[bx+4,16,4,4],
+                bottom:[bx+8,16,4,4],
+                left:[bx,20,4,12],
+                front:[bx+4,20,4,12],
+                right:[bx+8,20,4,12],
+                back:[bx+12,20,4,12]
+            }
+        )
     );
-
-
-    /*
-        Trouser / boot outer layer.
-    */
-
-    const overlayX =
-        side === "right"
-            ? 0
-            : 16;
-
-
-    const pants =
-        minecraftCube(
-            source,
-
-            {
-                x: 1.12,
-                y: 2.62,
-                z: 1.12
-            },
-
-            {
-                x,
-                y: -1.95,
-                z: 0
-            },
-
-            {
-                top:
-                    R(
-                        overlayX + 4,
-                        48,
-                        4,
-                        4
-                    ),
-
-                bottom:
-                    R(
-                        overlayX + 8,
-                        48,
-                        4,
-                        4
-                    ),
-
-                left:
-                    R(
-                        overlayX,
-                        36,
-                        4,
-                        12
-                    ),
-
-                front:
-                    R(
-                        overlayX + 4,
-                        36,
-                        4,
-                        12
-                    ),
-
-                right:
-                    R(
-                        overlayX + 8,
-                        36,
-                        4,
-                        12
-                    ),
-
-                back:
-                    R(
-                        overlayX + 12,
-                        36,
-                        4,
-                        12
-                    )
-            }
-        );
-
     group.add(
-        pants
+        cube(
+            texture,
+            [1.12,2.62,1.12],
+            [x,-2.25,0],
+            {
+                top:[bx+4,48,4,4],
+                bottom:[bx+8,48,4,4],
+                left:[bx,36,4,12],
+                front:[bx+4,36,4,12],
+                right:[bx+8,36,4,12],
+                back:[bx+12,36,4,12]
+            }
+        )
     );
 }
-
-
 /* =========================================================
-   BUILD COMPLETE PLAYER
+   BUILD
 ========================================================= */
-
-function buildPlayer(
+function build(
     texture,
     model
-) {
-
-    if (playerGroup) {
-
+){
+    if(playerGroup){
         scene.remove(
             playerGroup
         );
     }
-
-
     playerGroup =
         new THREE.Group();
-
-
     playerGroup.position.y =
-        .15;
-
-
+        .2;
     scene.add(
         playerGroup
     );
-
-
-    const slim =
-        model === "slim";
-
-
-    buildHead(
+    head(
         texture,
         playerGroup
     );
-
-
-    buildBody(
+    body(
         texture,
         playerGroup
     );
-
-
-    buildArm(
+    arm(
         texture,
         playerGroup,
         "right",
-        slim
+        model === "slim"
     );
-
-
-    buildArm(
+    arm(
         texture,
         playerGroup,
         "left",
-        slim
+        model === "slim"
     );
-
-
-    buildLeg(
+    leg(
         texture,
         playerGroup,
         "right"
     );
-
-
-    buildLeg(
+    leg(
         texture,
         playerGroup,
         "left"
     );
 }
-
-
 /* =========================================================
    LOAD PLAYER
 ========================================================= */
-
 async function loadPlayer(
-    username
-) {
-
-    const clean =
-        cleanUsername(
-            username
-        );
-
-
-    if (!clean) {
-
-        showError(
+    value
+){
+    const name =
+        value.trim();
+    if(!name){
+        error(
             "Bitte gib einen Minecraft-Spielernamen ein."
         );
-
         return;
     }
-
-
-    if (
+    if(
         !/^[A-Za-z0-9_]{1,16}$/.test(
-            clean
+            name
         )
-    ) {
-
-        showError(
-            "Minecraft-Namen dürfen nur Buchstaben, Zahlen und _ enthalten und maximal 16 Zeichen lang sein."
+    ){
+        error(
+            "Ungültiger Minecraft-Name. Erlaubt sind Buchstaben, Zahlen und _."
         );
-
         return;
     }
-
-
-    hideError();
-
+    clearError();
     showLoading();
-
-
-    try {
-
-        const player =
-            await lookupPlayer(
-                clean
-            );
-
-
+    try{
+        const data =
+            await lookup(name);
         const texture =
             await loadTexture(
-                player.skinURL
+                data.skin
             );
-
-
-        currentPlayer =
-            player;
-
+        player =
+            data;
         currentSkinURL =
-            player.skinURL;
-
-        currentModel =
-            player.model;
-
-
-        nameValue.textContent =
-            player.username;
-
-        uuidValue.textContent =
-            player.uuid;
-
-        modelValue.textContent =
-            player.model === "slim"
+            data.skin;
+        nameBox.textContent =
+            data.username;
+        uuidBox.textContent =
+            data.uuid;
+        modelBox.textContent =
+            data.model === "slim"
                 ? "Alex / Slim"
                 : "Steve / Classic";
-
-
-        viewerPlayer.textContent =
-            player.username;
-
-
-        buildPlayer(
+        viewerName.textContent =
+            data.username;
+        build(
             texture,
-            player.model
+            data.model
         );
-
-
         resetView();
-
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-        showError(
-            error.message ||
+    }catch(e){
+        console.error(e);
+        error(
+            e.message ||
             "Der Spieler konnte nicht geladen werden."
         );
-
-    } finally {
-
+    }finally{
         hideLoading();
     }
 }
-
-
 /* =========================================================
-   VIEW CONTROLS
+   VIEW
 ========================================================= */
-
-function resetView() {
-
+function resetView(){
     targetRotationY =
         0;
-
-    currentRotationY =
+    rotationY =
         0;
-
     targetRotationX =
         0;
-
-    currentRotationX =
+    rotationX =
         0;
-
     targetZoom =
         8;
-
-    currentZoom =
+    zoom =
         8;
 }
-
-
-searchButton.addEventListener(
-    "click",
-    () => {
-        loadPlayer(
-            usernameInput.value
+function changeZoom(
+    amount
+){
+    targetZoom +=
+        amount;
+    targetZoom =
+        THREE.MathUtils.clamp(
+            targetZoom,
+            4.5,
+            13
         );
-    }
+}
+/* =========================================================
+   BUTTONS
+========================================================= */
+search.addEventListener(
+    "click",
+    () =>
+        loadPlayer(
+            username.value
+        )
 );
-
-
-usernameInput.addEventListener(
+username.addEventListener(
     "keydown",
-    event => {
-
-        if (
-            event.key === "Enter"
-        ) {
-
+    e => {
+        if(
+            e.key === "Enter"
+        ){
             loadPlayer(
-                usernameInput.value
+                username.value
             );
         }
     }
 );
-
-
-resetButton.addEventListener(
+reset.addEventListener(
     "click",
     resetView
 );
-
-
-frontButton.addEventListener(
+front.addEventListener(
     "click",
     () => {
-
         targetRotationY =
             0;
-
         targetRotationX =
             0;
     }
 );
-
-
-exampleButton.addEventListener(
+random.addEventListener(
     "click",
     () => {
-
-        const examples = [
+        const names = [
             "Notch",
             "jeb_",
             "Dinnerbone",
             "Grumm",
-            "CaptainSparklez"
+            "Technoblade"
         ];
-
-
         const selected =
-            examples[
+            names[
                 Math.floor(
                     Math.random() *
-                    examples.length
+                    names.length
                 )
             ];
-
-
-        usernameInput.value =
+        username.value =
             selected;
-
-
         loadPlayer(
             selected
         );
     }
 );
-
-
-skinButton.addEventListener(
+openSkin.addEventListener(
     "click",
     () => {
-
-        if (
-            currentSkinURL
-        ) {
-
+        if(currentSkinURL){
             window.open(
                 currentSkinURL,
                 "_blank",
@@ -2790,189 +1479,238 @@ skinButton.addEventListener(
         }
     }
 );
-
-
+zoomIn.addEventListener(
+    "click",
+    () =>
+        changeZoom(-.7)
+);
+zoomOut.addEventListener(
+    "click",
+    () =>
+        changeZoom(.7)
+);
 /* =========================================================
-   MOUSE / TOUCH
+   FULLSCREEN
 ========================================================= */
-
-canvas.addEventListener(
-    "pointerdown",
-    event => {
-
-        dragging =
-            true;
-
-        pointerX =
-            event.clientX;
-
-        pointerY =
-            event.clientY;
-
-        canvas.setPointerCapture(
-            event.pointerId
+fullscreen.addEventListener(
+    "click",
+    async () => {
+        const viewer =
+            document.querySelector(
+                ".viewer"
+            );
+        try{
+            if(
+                document.fullscreenElement
+            ){
+                await document.exitFullscreen();
+            }else{
+                await viewer.requestFullscreen();
+            }
+        }catch(e){
+            console.warn(
+                "Fullscreen nicht verfügbar:",
+                e
+            );
+        }
+    }
+);
+document.addEventListener(
+    "fullscreenchange",
+    () => {
+        setTimeout(
+            resize,
+            50
         );
     }
 );
-
-
+/* =========================================================
+   POINTER ROTATION
+========================================================= */
+canvas.addEventListener(
+    "pointerdown",
+    e => {
+        dragging =
+            true;
+        lastX =
+            e.clientX;
+        lastY =
+            e.clientY;
+        canvas.setPointerCapture(
+            e.pointerId
+        );
+    }
+);
 canvas.addEventListener(
     "pointermove",
-    event => {
-
-        if (!dragging)
+    e => {
+        if(!dragging)
             return;
-
-
         const dx =
-            event.clientX -
-            pointerX;
-
+            e.clientX -
+            lastX;
         const dy =
-            event.clientY -
-            pointerY;
-
-
-        pointerX =
-            event.clientX;
-
-        pointerY =
-            event.clientY;
-
-
+            e.clientY -
+            lastY;
+        lastX =
+            e.clientX;
+        lastY =
+            e.clientY;
         targetRotationY +=
             dx * .012;
-
         targetRotationX +=
             dy * .006;
-
-
         targetRotationX =
             THREE.MathUtils.clamp(
                 targetRotationX,
-                -.55,
-                .55
+                -.65,
+                .65
             );
     }
 );
-
-
 canvas.addEventListener(
     "pointerup",
     () => {
-
-        dragging =
-            false;
+        dragging = false;
     }
 );
-
-
 canvas.addEventListener(
     "pointercancel",
     () => {
-
-        dragging =
-            false;
+        dragging = false;
     }
 );
-
-
+/* =========================================================
+   MOUSE WHEEL
+========================================================= */
 canvas.addEventListener(
     "wheel",
-    event => {
-
-        event.preventDefault();
-
-
-        targetZoom +=
-            event.deltaY * .008;
-
-
-        targetZoom =
-            THREE.MathUtils.clamp(
-                targetZoom,
-                4.5,
-                12
-            );
-
+    e => {
+        e.preventDefault();
+        changeZoom(
+            e.deltaY * .008
+        );
     },
     {
-        passive: false
+        passive:false
     }
 );
-
-
+/* =========================================================
+   PINCH ZOOM
+========================================================= */
+let pinchStart = null;
+canvas.addEventListener(
+    "touchstart",
+    e => {
+        if(
+            e.touches.length === 2
+        ){
+            const a =
+                e.touches[0];
+            const b =
+                e.touches[1];
+            pinchStart =
+                Math.hypot(
+                    a.clientX-b.clientX,
+                    a.clientY-b.clientY
+                );
+        }
+    },
+    {
+        passive:true
+    }
+);
+canvas.addEventListener(
+    "touchmove",
+    e => {
+        if(
+            e.touches.length !== 2 ||
+            pinchStart === null
+        )
+            return;
+        const a =
+            e.touches[0];
+        const b =
+            e.touches[1];
+        const distance =
+            Math.hypot(
+                a.clientX-b.clientX,
+                a.clientY-b.clientY
+            );
+        const difference =
+            distance -
+            pinchStart;
+        changeZoom(
+            -difference * .01
+        );
+        pinchStart =
+            distance;
+    },
+    {
+        passive:true
+    }
+);
+canvas.addEventListener(
+    "touchend",
+    () => {
+        pinchStart =
+            null;
+    },
+    {
+        passive:true
+    }
+);
 /* =========================================================
    ANIMATION
 ========================================================= */
-
-function animate() {
-
+function animate(){
     requestAnimationFrame(
         animate
     );
-
-
-    currentRotationY +=
+    rotationY +=
         (
             targetRotationY -
-            currentRotationY
+            rotationY
         ) * .12;
-
-
-    currentRotationX +=
+    rotationX +=
         (
             targetRotationX -
-            currentRotationX
+            rotationX
         ) * .12;
-
-
-    currentZoom +=
+    zoom +=
         (
             targetZoom -
-            currentZoom
-        ) * .1;
-
-
-    if (playerGroup) {
-
+            zoom
+        ) * .12;
+    if(playerGroup){
         playerGroup.rotation.y =
-            currentRotationY;
-
+            rotationY;
         playerGroup.rotation.x =
-            currentRotationX;
+            rotationX;
     }
-
-
     camera.position.z =
-        currentZoom;
-
-
+        zoom;
+    camera.position.y =
+        1;
     camera.lookAt(
         0,
         .15,
         0
     );
-
-
     renderer.render(
         scene,
         camera
     );
 }
-
-
 animate();
-
-
 /* =========================================================
    INITIAL PLAYER
 ========================================================= */
-
+username.value =
+    "lamacOs";
 loadPlayer(
-    "Notch"
+    "lamacOs"
 );
 </script>
-
 </body>
 </html>
