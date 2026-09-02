@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Random Typing Challenge</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        background: #111;
+        color: #fff;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: auto;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .stat {
+        background: #1d1d1d;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .stat span {
+        display: block;
+        color: #aaa;
+        font-size: 14px;
+    }
+
+    .stat strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 22px;
+    }
+
+    textarea {
+        width: 100%;
+        height: 350px;
+        padding: 15px;
+
+        resize: vertical;
+
+        background: #181818;
+        color: #ddd;
+
+        border: 1px solid #333;
+        border-radius: 12px;
+
+        font-family: monospace;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+    }
+
+    button {
+        border: none;
+        border-radius: 9px;
+        padding: 12px 18px;
+
+        font-size: 15px;
+        font-weight: bold;
+
+        cursor: pointer;
+    }
+
+    #start {
+        background: #ff8500;
+        color: white;
+    }
+
+    #stop {
+        background: #444;
+        color: white;
+    }
+
+    #copy {
+        background: #287cff;
+        color: white;
+    }
+
+    button:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    .panel {
+        margin-top: 15px;
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 18px;
+    }
+
+    .panel h2 {
+        margin-top: 0;
+    }
+
+    #words {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .word {
+        padding: 7px 10px;
+        border-radius: 7px;
+        background: #292929;
+        font-family: monospace;
+    }
+
+    .word.new {
+        background: #ff8500;
+    }
+
+    .status {
+        color: #aaa;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 700px) {
+        .stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        textarea {
+            height: 280px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎲 Random Typing Challenge</h1>
+
+    <div class="stats">
+
+        <div class="stat">
+            <span>Zeichen</span>
+            <strong id="count">0</strong>
+        </div>
+
+        <div class="stat">
+            <span>Zeit</span>
+            <strong id="time">00:00</strong>
+        </div>
+
+        <div class="stat">
+            <span>Geschwindigkeit</span>
+            <strong>50/s</strong>
+        </div>
+
+        <div class="stat">
+            <span>Gefundene Wörter</span>
+            <strong id="wordCount">0</strong>
+        </div>
+
+    </div>
+
+    <div class="buttons">
+
+        <button id="start">
+            ▶ Start
+        </button>
+
+        <button id="stop">
+            ■ Stop
+        </button>
+
+        <button id="copy">
+            📋 Kopieren
+        </button>
+
+    </div>
+
+    <textarea
+        id="output"
+        readonly
+        placeholder="Hier erscheint der Zufallstext..."
+    ></textarea>
+
+    <div class="panel">
+
+        <h2>🔎 Wörterbuch-Treffer</h2>
+
+        <div id="words"></div>
+
+        <div class="status" id="status">
+            Bereit.
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/*
+==================================================
+EINSTELLUNGEN
+==================================================
+*/
+
+const TARGET_RATE = 50;
+
+const DURATION =
+    10 * 60 * 1000;
+
+const TOTAL_CHARS =
+    TARGET_RATE * 600;
+
+
+/*
+==================================================
+ZUFALLSZEICHEN
+==================================================
+*/
+
+const alphabet =
+    "abcdefghijklmnopqrstuvwxyz" +
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "äöüÄÖÜ";
+
+
+/*
+==================================================
+ELEMENTE
+==================================================
+*/
+
+const output =
+    document.getElementById("output");
+
+const countElement =
+    document.getElementById("count");
+
+const timeElement =
+    document.getElementById("time");
+
+const wordCountElement =
+    document.getElementById("wordCount");
+
+const wordsElement =
+    document.getElementById("words");
+
+const statusElement =
+    document.getElementById("status");
+
+const startButton =
+    document.getElementById("start");
+
+const stopButton =
+    document.getElementById("stop");
+
+const copyButton =
+    document.getElementById("copy");
+
+
+/*
+==================================================
+VARIABLEN
+==================================================
+*/
+
+let text = "";
+
+let running = false;
+
+let startTime = 0;
+
+let animationFrame = null;
+
+
+/*
+==================================================
+API CACHE
+
+Damit dasselbe Wort nicht immer wieder
+an die API geschickt wird.
+==================================================
+*/
+
+const apiCache = new Map();
+
+
+/*
+==================================================
+GEFUNDENE WÖRTER
+==================================================
+*/
+
+const foundWords = new Map();
+
+
+/*
+==================================================
+ZUFALLSZEICHEN
+==================================================
+*/
+
+function randomCharacter() {
+
+    return alphabet[
+        Math.floor(
+            Math.random() * alphabet.length
+        )
+    ];
+
+}
+
+
+/*
+==================================================
+ZEIT FORMATIEREN
+==================================================
+*/
+
+function formatTime(ms) {
+
+    const seconds =
+        Math.floor(ms / 1000);
+
+    const minutes =
+        Math.floor(seconds / 60);
+
+    const remainingSeconds =
+        seconds % 60;
+
+    return (
+        String(minutes).padStart(2, "0")
+        + ":" +
+        String(remainingSeconds).padStart(2, "0")
+    );
+
+}
+
+
+/*
+==================================================
+NORMALISIERUNG
+
+Damit z.B. "Haus" und "haus"
+gleich behandelt werden.
+==================================================
+*/
+
+function normalizeWord(word) {
+
+    return word
+        .toLowerCase()
+        .trim();
+
+}
+
+
+/*
+==================================================
+WÖRTERBUCH-API
+
+Wiktionary REST API
+
+Es wird geprüft, ob der Begriff
+in Wiktionary vorhanden ist.
+
+Zusätzlich versuchen wir zu erkennen,
+ob es sich um einen deutschen Eintrag handelt.
+==================================================
+*/
+
+async function checkDictionary(word) {
+
+    word = normalizeWord(word);
+
+    /*
+        Mindestlänge
+    */
+
+    if (word.length < 3)
+        return false;
+
+
+    /*
+        Nur Buchstaben erlauben
+    */
+
+    if (!/^[a-zäöüß]+$/i.test(word))
+        return false;
+
+
+    /*
+        Cache benutzen
+    */
+
+    if (apiCache.has(word)) {
+
+        return apiCache.get(word);
+
+    }
+
+
+    const promise =
+        fetch(
+            "https://de.wiktionary.org/api/rest_v1/page/summary/"
+            + encodeURIComponent(word)
+        )
+        .then(async response => {
+
+            if (!response.ok)
+                return false;
+
+            const data =
+                await response.json();
+
+
+            /*
+                Wiktionary liefert bei gefundenen
+                Seiten normalerweise eine description
+                bzw. weitere Informationen.
+
+                Wir akzeptieren den Eintrag als Treffer.
+            */
+
+            return (
+                data &&
+                data.title &&
+                data.type !== "https://mediawiki.org/wiki/HyperSwitch/errors/not_found"
+            );
+
+        })
+        .catch(() => false);
+
+
+    apiCache.set(word, promise);
+
+    return promise;
+
+}
+
+
+/*
+==================================================
+NEUES WORT ANZEIGEN
+==================================================
+*/
+
+function displayWord(word, position) {
+
+    if (foundWords.has(word))
+        return;
+
+
+    foundWords.set(word, position);
+
+
+    const element =
+        document.createElement("span");
+
+    element.className =
+        "word new";
+
+    element.textContent =
+        word +
+        "  (" +
+        (position + 1) +
+        ")";
+
+
+    wordsElement.prepend(element);
+
+
+    wordCountElement.textContent =
+        foundWords.size;
+
+
+    setTimeout(() => {
+
+        element.classList.remove("new");
+
+    }, 1200);
+
+}
+
+
+/*
+==================================================
+WORTKANDIDATEN ERKENNEN
+
+Wichtig:
+
+Bei komplett zufälligem Text gibt es keine
+Leerzeichen.
+
+Deshalb testen wir Teilstrings.
+
+Wir suchen zuerst längere Wörter.
+==================================================
+*/
+
+async function scanRecentText() {
+
+    const lower =
+        text.toLowerCase();
+
+
+    /*
+        Nur den neu entstandenen Bereich
+        plus etwas Überlappung prüfen.
+    */
+
+    const start =
+        Math.max(
+            0,
+            lower.length - 40
+        );
+
+
+    const candidates = [];
+
+
+    /*
+        Wörter von 3 bis 20 Zeichen
+    */
+
+    for (
+        let length = 20;
+        length >= 3;
+        length--
+    ) {
+
+        for (
+            let i = start;
+            i + length <= lower.length;
+            i++
+        ) {
+
+            const candidate =
+                lower.substring(
+                    i,
+                    i + length
+                );
+
+
+            /*
+                Nur alphabetische Strings
+            */
+
+            if (
+                /^[a-zäöüß]+$/i.test(candidate)
+            ) {
+
+                candidates.push({
+                    word: candidate,
+                    position: i
+                });
+
+            }
+
+        }
+
+    }
+
+
+    /*
+        Längere Kandidaten zuerst prüfen.
+        Das reduziert unnötige API-Anfragen.
+    */
+
+    for (const item of candidates) {
+
+        /*
+            Bereits gefunden?
+        */
+
+        if (
+            foundWords.has(item.word)
+        ) {
+            continue;
+        }
+
+
+        const result =
+            await checkDictionary(
+                item.word
+            );
+
+
+        if (result) {
+
+            displayWord(
+                item.word,
+                item.position
+            );
+
+            statusElement.textContent =
+                "Gefunden: " +
+                item.word;
+
+        }
+
+    }
+
+}
+
+
+/*
+==================================================
+HAUPTSCHLEIFE
+==================================================
+*/
+
+let lastScannedLength = 0;
+
+function loop(now) {
+
+    if (!running)
+        return;
+
+
+    const elapsed =
+        now - startTime;
+
+
+    /*
+        Zielanzahl der Zeichen
+    */
+
+    const target =
+        Math.min(
+            TOTAL_CHARS,
+            Math.floor(
+                elapsed / 1000 *
+                TARGET_RATE
+            )
+        );
+
+
+    /*
+        Zeichen erzeugen
+    */
+
+    while (
+        text.length < target
+    ) {
+
+        text += randomCharacter();
+
+    }
+
+
+    /*
+        Anzeige aktualisieren
+    */
+
+    output.value =
+        text;
+
+    countElement.textContent =
+        text.length.toLocaleString("de-DE");
+
+    timeElement.textContent =
+        formatTime(elapsed);
+
+
+    /*
+        Wortprüfung nur auslösen,
+        wenn neue Zeichen vorhanden sind.
+    */
+
+    if (
+        text.length !==
+        lastScannedLength
+    ) {
+
+        lastScannedLength =
+            text.length;
+
+        /*
+            Nicht bei jedem einzelnen Zeichen
+            gleichzeitig hunderte Requests starten.
+        */
+
+        scanRecentText();
+
+    }
+
+
+    /*
+        Fertig?
+    */
+
+    if (
+        elapsed >= DURATION ||
+        text.length >= TOTAL_CHARS
+    ) {
+
+        finish();
+
+        return;
+
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(loop);
+
+}
+
+
+/*
+==================================================
+START
+==================================================
+*/
+
+function start() {
+
+    if (running)
+        return;
+
+
+    text = "";
+
+    foundWords.clear();
+
+    apiCache.clear();
+
+    wordsElement.innerHTML = "";
+
+    countElement.textContent =
+        "0";
+
+    wordCountElement.textContent =
+        "0";
+
+    timeElement.textContent =
+        "00:00";
+
+    statusElement.textContent =
+        "Generiere Zufallstext...";
+
+
+    lastScannedLength = 0;
+
+
+    running = true;
+
+    startTime =
+        performance.now();
+
+
+    startButton.disabled =
+        true;
+
+
+    animationFrame =
+        requestAnimationFrame(loop);
+
+}
+
+
+/*
+==================================================
+STOP
+==================================================
+*/
+
+function stop() {
+
+    running = false;
+
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+        animationFrame = null;
+
+    }
+
+
+    startButton.disabled =
+        false;
+
+
+    statusElement.textContent =
+        "Gestoppt.";
+
+}
+
+
+/*
+==================================================
+FERTIG
+==================================================
+*/
+
+async function finish() {
+
+    running = false;
+
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+        animationFrame = null;
+
+    }
+
+
+    /*
+        Falls durch Timing ein paar Zeichen
+        fehlen sollten, auf exakt 30.000 auffüllen.
+    */
+
+    while (
+        text.length < TOTAL_CHARS
+    ) {
+
+        text += randomCharacter();
+
+    }
+
+
+    output.value =
+        text;
+
+
+    countElement.textContent =
+        text.length.toLocaleString("de-DE");
+
+
+    startButton.disabled =
+        false;
+
+
+    statusElement.textContent =
+        "Fertig! Wörter werden noch geprüft...";
+
+
+    /*
+        Letzten Bereich prüfen.
+    */
+
+    await scanRecentText();
+
+
+    statusElement.textContent =
+        "Fertig! " +
+        foundWords.size +
+        " Wörter gefunden.";
+
+}
+
+
+/*
+==================================================
+KOPIEREN
+==================================================
+*/
+
+copyButton.addEventListener(
+    "click",
+    async () => {
+
+        if (!text) {
+
+            alert(
+                "Es gibt noch keinen Text zum Kopieren."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            await navigator.clipboard.writeText(
+                text
+            );
+
+            copyButton.textContent =
+                "✅ Kopiert!";
+
+
+            setTimeout(() => {
+
+                copyButton.textContent =
+                    "📋 Kopieren";
+
+            }, 1500);
+
+        }
+
+        catch (error) {
+
+            /*
+                Fallback für Browser,
+                die Clipboard API blockieren.
+            */
+
+            output.focus();
+
+            output.select();
+
+            document.execCommand(
+                "copy"
+            );
+
+            copyButton.textContent =
+                "✅ Kopiert!";
+
+
+            setTimeout(() => {
+
+                copyButton.textContent =
+                    "📋 Kopieren";
+
+            }, 1500);
+
+        }
+
+    }
+);
+
+
+/*
+==================================================
+BUTTONS
+==================================================
+*/
+
+startButton.addEventListener(
+    "click",
+    start
+);
+
+
+stopButton.addEventListener(
+    "click",
+    stop
+);
+
+</script>
+
+</body>
+</html>
