@@ -1,627 +1,886 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>404 – Seite nicht gefunden | lamacHub</title>
-
-<meta name="description" content="Diese Seite wurde auf lamacHub nicht gefunden.">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-
-<style>
-:root {
-    --accent: #ff7a00;
-    --bg: #07080a;
-    --text: #f5f5f7;
-    --muted: #9b9da4;
-    --glass: rgba(255,255,255,.055);
-    --glass-strong: rgba(255,255,255,.09);
-    --border: rgba(255,255,255,.11);
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-}
-
-body {
-    min-height: 100vh;
-    font-family: Inter, sans-serif;
-    color: var(--text);
-    background:
-        radial-gradient(
-            circle at 50% 35%,
-            rgba(255,122,0,.13),
-            transparent 32%
-        ),
-        radial-gradient(
-            circle at 15% 90%,
-            rgba(255,122,0,.06),
-            transparent 28%
-        ),
-        var(--bg);
-    overflow: hidden;
-}
-
-/* =========================
-   NAVBAR
-========================= */
-
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 20;
-
-    height: 74px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 0 32px;
-
-    background: rgba(7,8,10,.55);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-
-    border-bottom: 1px solid var(--border);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>404 – Seite nicht gefunden | lamacHub</title>
+
+    <meta name="theme-color" content="#0b0b0d">
+    <meta name="description"
+          content="Diese Seite wurde auf lamacHub nicht gefunden.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            min-height: 100%;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100%;
+            background:
+                radial-gradient(
+                    circle at 50% -10%,
+                    rgba(255, 122, 0, 0.14),
+                    transparent 38%
+                ),
+                #08080a;
+
+            color: #fff;
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* =========================
+           BACKGROUND
+        ========================= */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .orb {
+            position: absolute;
+            width: clamp(180px, 30vw, 420px);
+            height: clamp(180px, 30vw, 420px);
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(255, 122, 0, 0.13),
+                    transparent 70%
+                );
+
+            filter: blur(20px);
+            animation: float 10s ease-in-out infinite;
+        }
+
+        .orb.one {
+            top: -120px;
+            left: -100px;
+        }
+
+        .orb.two {
+            right: -150px;
+            bottom: -150px;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate3d(0, 0, 0);
+            }
+
+            50% {
+                transform: translate3d(20px, -25px, 0);
+            }
+        }
+
+        /* =========================
+           APP
+        ========================= */
 
-.logo {
-    font-family: Poppins, sans-serif;
-    font-size: 21px;
-    font-weight: 800;
-    letter-spacing: -.7px;
-}
-
-.logo span {
-    color: var(--accent);
-}
-
-.home-mini {
-    text-decoration: none;
-    color: var(--muted);
-
-    padding: 10px 15px;
-
-    border: 1px solid var(--border);
-    border-radius: 13px;
+        .page {
+            position: relative;
+            z-index: 1;
 
-    background: var(--glass);
-
-    font-size: 13px;
-    font-weight: 600;
+            min-height: 100dvh;
 
-    transition: .2s ease;
-}
+            display: flex;
+            flex-direction: column;
+        }
 
-.home-mini:hover {
-    color: var(--text);
-    border-color: rgba(255,122,0,.4);
-    background: var(--glass-strong);
-    transform: translateY(-1px);
-}
+        /* =========================
+           NAVBAR
+        ========================= */
 
-/* =========================
-   MAIN
-========================= */
+        .navbar {
+            width: 100%;
 
-main {
-    min-height: 100vh;
+            padding:
+                max(18px, env(safe-area-inset-top))
+                clamp(18px, 4vw, 50px)
+                18px
+                clamp(18px, 4vw, 50px);
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
 
-    padding: 100px 20px 40px;
-}
+            gap: 20px;
 
-.container {
-    width: min(850px, 100%);
-    text-align: center;
-}
+            position: sticky;
+            top: 0;
 
-/* =========================
-   ILLUSTRATION
-========================= */
+            z-index: 20;
 
-.visual {
-    position: relative;
+            background: rgba(8, 8, 10, 0.62);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
 
-    width: min(400px, 80vw);
-    height: 250px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
 
-    margin: 0 auto 15px;
-}
+        .logo {
+            color: #fff;
+            text-decoration: none;
 
-.glow {
-    position: absolute;
+            font-size: clamp(20px, 2vw, 25px);
+            font-weight: 700;
 
-    width: 260px;
-    height: 260px;
+            letter-spacing: -0.7px;
 
-    left: 50%;
-    top: 50%;
+            white-space: nowrap;
+        }
 
-    transform: translate(-50%, -50%);
+        .logo span {
+            color: #ff7a00;
+        }
 
-    background: rgba(255,122,0,.13);
-    filter: blur(65px);
+        .home-link {
+            color: rgba(255, 255, 255, 0.78);
+            text-decoration: none;
 
-    border-radius: 50%;
-}
+            padding: 11px 17px;
 
-.number {
-    position: absolute;
+            border-radius: 13px;
 
-    left: 50%;
-    top: 48%;
+            background: rgba(255, 255, 255, 0.055);
+            border: 1px solid rgba(255, 255, 255, 0.08);
 
-    transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: 600;
 
-    font-family: Poppins, sans-serif;
-    font-weight: 800;
-    font-size: clamp(115px, 20vw, 190px);
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease,
+                border-color 0.2s ease;
+        }
 
-    letter-spacing: -12px;
+        .home-link:hover {
+            background: rgba(255, 122, 0, 0.11);
+            border-color: rgba(255, 122, 0, 0.28);
+            transform: translateY(-1px);
+        }
 
-    line-height: 1;
+        .home-link:active {
+            transform: scale(0.97);
+        }
 
-    background:
-        linear-gradient(
-            135deg,
-            #ffffff 5%,
-            #b9bbc2 48%,
-            #ff7a00 100%
-        );
+        /* =========================
+           MAIN
+        ========================= */
 
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+        main {
+            width: 100%;
 
-    filter:
-        drop-shadow(0 25px 40px rgba(0,0,0,.45));
+            flex: 1;
 
-    animation: float 5s ease-in-out infinite;
-}
+            display: flex;
+            justify-content: center;
 
-.number::after {
-    content: "";
-    position: absolute;
+            padding:
+                clamp(45px, 8vw, 110px)
+                clamp(18px, 5vw, 60px)
+                clamp(70px, 9vw, 120px);
+        }
 
-    width: 18px;
-    height: 18px;
+        .content {
+            width: min(900px, 100%);
 
-    right: 19px;
-    top: 27px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
 
-    border-radius: 50%;
+            text-align: center;
+        }
 
-    background: var(--accent);
+        /* =========================
+           BADGE
+        ========================= */
 
-    box-shadow:
-        0 0 25px rgba(255,122,0,.7),
-        0 0 60px rgba(255,122,0,.35);
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
 
-    animation: blink 2.5s ease-in-out infinite;
-}
+            gap: 8px;
 
-.orbit {
-    position: absolute;
+            padding: 9px 14px;
 
-    left: 50%;
-    top: 50%;
+            border-radius: 999px;
 
-    width: 330px;
-    height: 110px;
+            background: rgba(255, 122, 0, 0.08);
+            border: 1px solid rgba(255, 122, 0, 0.18);
 
-    transform:
-        translate(-50%, -50%)
-        rotate(-13deg);
+            color: #ffb16d;
 
-    border: 1px solid rgba(255,122,0,.22);
+            font-size: 13px;
+            font-weight: 600;
 
-    border-radius: 50%;
+            margin-bottom: clamp(22px, 4vw, 35px);
+        }
 
-    animation: orbit 8s linear infinite;
-}
+        .badge-dot {
+            width: 7px;
+            height: 7px;
 
-.orbit::before {
-    content: "";
+            border-radius: 50%;
 
-    position: absolute;
+            background: #ff7a00;
 
-    width: 8px;
-    height: 8px;
+            box-shadow:
+                0 0 10px rgba(255, 122, 0, 0.8);
+        }
 
-    border-radius: 50%;
+        /* =========================
+           404 VISUAL
+        ========================= */
 
-    background: var(--accent);
+        .visual {
+            position: relative;
 
-    box-shadow:
-        0 0 15px rgba(255,122,0,.9);
+            width: min(620px, 100%);
 
-    left: 17px;
-    top: 7px;
-}
+            min-height: clamp(190px, 34vw, 320px);
 
-/* =========================
-   TEXT
-========================= */
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+            margin-bottom: clamp(30px, 6vw, 55px);
 
-    padding: 8px 12px;
+            overflow: hidden;
+        }
 
-    margin-bottom: 17px;
+        .error-number {
+            position: relative;
+            z-index: 2;
 
-    border: 1px solid rgba(255,122,0,.2);
-    border-radius: 999px;
+            font-size: clamp(120px, 25vw, 300px);
+            line-height: 0.8;
 
-    background: rgba(255,122,0,.07);
+            font-weight: 800;
 
-    color: var(--accent);
+            letter-spacing: clamp(-10px, -1vw, -4px);
 
-    font-size: 11px;
-    font-weight: 700;
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff 10%,
+                    #ff9a4a 48%,
+                    #ff7a00 90%
+                );
 
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-}
+            -webkit-background-clip: text;
+            background-clip: text;
 
-.badge-dot {
-    width: 6px;
-    height: 6px;
+            color: transparent;
 
-    border-radius: 50%;
+            filter:
+                drop-shadow(0 0 35px rgba(255, 122, 0, 0.18));
+        }
 
-    background: var(--accent);
+        .orbit {
+            position: absolute;
 
-    box-shadow:
-        0 0 10px rgba(255,122,0,.8);
-}
+            width: clamp(150px, 35vw, 330px);
+            height: clamp(80px, 18vw, 150px);
 
-h1 {
-    margin: 0;
+            border:
+                1px solid rgba(255, 122, 0, 0.28);
 
-    font-family: Poppins, sans-serif;
+            border-radius: 50%;
 
-    font-size: clamp(30px, 5vw, 50px);
+            transform: rotate(-20deg);
 
-    line-height: 1.1;
+            animation: orbit 8s linear infinite;
+        }
 
-    letter-spacing: -2px;
-}
+        .orbit::before {
+            content: "";
 
-.description {
-    max-width: 590px;
+            position: absolute;
 
-    margin: 18px auto 0;
+            width: 10px;
+            height: 10px;
 
-    color: var(--muted);
+            border-radius: 50%;
 
-    font-size: 16px;
-    line-height: 1.75;
-}
+            background: #ff7a00;
 
-/* =========================
-   BUTTONS
-========================= */
+            box-shadow:
+                0 0 18px rgba(255, 122, 0, 0.9);
 
-.actions {
-    display: flex;
+            top: -5px;
+            left: 50%;
+        }
 
-    justify-content: center;
+        @keyframes orbit {
+            from {
+                transform: rotate(-20deg) rotate(0deg);
+            }
 
-    gap: 10px;
+            to {
+                transform: rotate(-20deg) rotate(360deg);
+            }
+        }
 
-    margin-top: 30px;
+        /* =========================
+           TEXT
+        ========================= */
 
-    flex-wrap: wrap;
-}
+        h1 {
+            max-width: 780px;
 
-.btn {
-    min-height: 50px;
+            font-size: clamp(30px, 5vw, 58px);
+            line-height: 1.08;
 
-    padding: 0 21px;
+            letter-spacing: -2px;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
+            font-weight: 700;
 
-    border-radius: 14px;
+            margin-bottom: 20px;
+        }
 
-    text-decoration: none;
+        .description {
+            max-width: 650px;
 
-    font-size: 14px;
-    font-weight: 700;
+            color: rgba(255, 255, 255, 0.62);
 
-    transition: .2s ease;
-}
+            font-size: clamp(15px, 2vw, 18px);
+            line-height: 1.7;
 
-.primary {
-    color: white;
+            margin-bottom: clamp(30px, 5vw, 45px);
+        }
 
-    background: var(--accent);
+        /* =========================
+           BUTTONS
+        ========================= */
 
-    box-shadow:
-        0 12px 35px rgba(255,122,0,.18);
-}
+        .buttons {
+            width: 100%;
 
-.primary:hover {
-    transform: translateY(-2px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-    box-shadow:
-        0 18px 45px rgba(255,122,0,.28);
-}
+            gap: 12px;
 
-.secondary {
-    color: var(--text);
+            flex-wrap: wrap;
 
-    background: var(--glass);
+            margin-bottom: clamp(45px, 8vw, 75px);
+        }
 
-    border: 1px solid var(--border);
-}
+        .button {
+            min-height: 50px;
 
-.secondary:hover {
-    transform: translateY(-2px);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
 
-    background: var(--glass-strong);
+            padding: 13px 22px;
 
-    border-color: rgba(255,255,255,.18);
-}
+            border-radius: 15px;
 
-/* =========================
-   BOTTOM CARD
-========================= */
+            text-decoration: none;
 
-.info {
-    margin: 42px auto 0;
+            font-size: 14px;
+            font-weight: 600;
 
-    width: min(620px, 100%);
+            cursor: pointer;
 
-    padding: 17px 20px;
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
 
-    border: 1px solid var(--border);
-    border-radius: 17px;
+        .button.primary {
+            color: #fff;
 
-    background: var(--glass);
+            background: #ff7a00;
 
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 10px 30px rgba(255, 122, 0, 0.18);
+        }
 
-    color: var(--muted);
+        .button.primary:hover {
+            transform: translateY(-2px);
 
-    font-size: 12px;
+            box-shadow:
+                0 15px 38px rgba(255, 122, 0, 0.28);
+        }
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-}
+        .button.secondary {
+            color: rgba(255, 255, 255, 0.85);
 
-.info strong {
-    color: var(--text);
-}
+            background: rgba(255, 255, 255, 0.055);
 
-/* =========================
-   FOOTER
-========================= */
+            border: 1px solid rgba(255, 255, 255, 0.09);
+        }
 
-footer {
-    position: fixed;
+        .button.secondary:hover {
+            transform: translateY(-2px);
 
-    left: 0;
-    right: 0;
-    bottom: 17px;
+            background: rgba(255, 255, 255, 0.09);
+        }
 
-    text-align: center;
+        .button:active {
+            transform: scale(0.97);
+        }
 
-    color: rgba(155,157,164,.65);
+        /* =========================
+           INFO CARD
+        ========================= */
 
-    font-size: 11px;
+        .info-card {
+            width: min(600px, 100%);
 
-    pointer-events: none;
-}
+            padding: clamp(20px, 4vw, 28px);
 
-/* =========================
-   ANIMATIONS
-========================= */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
 
-@keyframes float {
-    0%,100% {
-        transform:
-            translate(-50%, -50%)
-            translateY(0);
-    }
+            gap: 20px;
 
-    50% {
-        transform:
-            translate(-50%, -50%)
-            translateY(-9px);
-    }
-}
+            text-align: left;
 
-@keyframes orbit {
-    from {
-        transform:
-            translate(-50%, -50%)
-            rotate(-13deg);
-    }
+            border-radius: 20px;
 
-    to {
-        transform:
-            translate(-50%, -50%)
-            rotate(347deg);
-    }
-}
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,0.065),
+                    rgba(255,255,255,0.025)
+                );
 
-@keyframes blink {
-    0%,100% {
-        opacity: .45;
-        transform: scale(.85);
-    }
+            border: 1px solid rgba(255,255,255,0.09);
 
-    50% {
-        opacity: 1;
-        transform: scale(1.15);
-    }
-}
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.04);
 
-/* =========================
-   MOBILE
-========================= */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
 
-@media (max-width: 600px) {
+        .info-left {
+            min-width: 0;
+        }
 
-    .navbar {
-        padding: 0 17px;
-        height: 65px;
-    }
+        .info-title {
+            font-size: 14px;
+            font-weight: 700;
 
-    .visual {
-        height: 205px;
-    }
+            margin-bottom: 5px;
+        }
 
-    .orbit {
-        width: 270px;
-        height: 90px;
-    }
+        .info-text {
+            font-size: 13px;
 
-    .number {
-        letter-spacing: -8px;
-    }
+            line-height: 1.5;
 
-    .description {
-        font-size: 15px;
-    }
+            color: rgba(255,255,255,0.48);
+        }
 
-    .info {
-        margin-top: 30px;
-    }
+        .error-code {
+            flex-shrink: 0;
 
-    footer {
-        bottom: 10px;
-    }
-}
-</style>
+            padding: 8px 11px;
+
+            border-radius: 10px;
+
+            background: rgba(255,122,0,0.09);
+            border: 1px solid rgba(255,122,0,0.16);
+
+            color: #ff9b50;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            width: 100%;
+
+            padding:
+                25px
+                clamp(18px, 5vw, 50px)
+                max(25px, env(safe-area-inset-bottom));
+
+            text-align: center;
+
+            color: rgba(255,255,255,0.32);
+
+            font-size: 12px;
+
+            border-top: 1px solid rgba(255,255,255,0.055);
+        }
+
+        /* =========================
+           TABLET
+        ========================= */
+
+        @media (max-width: 900px) {
+            .navbar {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+            main {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .navbar {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .home-link {
+                padding: 10px 13px;
+                font-size: 13px;
+            }
+
+            main {
+                padding:
+                    45px
+                    16px
+                    70px;
+            }
+
+            .visual {
+                min-height: 180px;
+            }
+
+            h1 {
+                letter-spacing: -1.2px;
+            }
+
+            .description {
+                line-height: 1.6;
+            }
+
+            .buttons {
+                flex-direction: column;
+
+                width: 100%;
+            }
+
+            .button {
+                width: 100%;
+                max-width: 360px;
+            }
+
+            .info-card {
+                align-items: flex-start;
+            }
+        }
+
+        /* =========================
+           VERY SMALL / FLIP PHONES
+        ========================= */
+
+        @media (max-width: 380px) {
+
+            .logo {
+                font-size: 19px;
+            }
+
+            .home-link {
+                font-size: 12px;
+                padding: 9px 11px;
+            }
+
+            main {
+                padding-top: 35px;
+            }
+
+            .badge {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .visual {
+                min-height: 145px;
+            }
+
+            .error-number {
+                font-size: clamp(100px, 32vw, 150px);
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            .description {
+                font-size: 14px;
+            }
+
+            .info-card {
+                flex-direction: column;
+            }
+
+            .error-code {
+                align-self: flex-start;
+            }
+        }
+
+        /* =========================
+           VERY NARROW FOLDABLES
+        ========================= */
+
+        @media (max-width: 300px) {
+
+            .navbar {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .home-link {
+                width: 100%;
+                text-align: center;
+            }
+
+            main {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .visual {
+                min-height: 120px;
+            }
+
+            .error-number {
+                font-size: 92px;
+            }
+
+            h1 {
+                font-size: 27px;
+            }
+
+            .description {
+                font-size: 13px;
+            }
+
+            .button {
+                font-size: 13px;
+            }
+        }
+
+        /* =========================
+           LANDSCAPE MOBILE
+        ========================= */
+
+        @media (max-height: 500px) and (orientation: landscape) {
+
+            main {
+                padding-top: 35px;
+                padding-bottom: 55px;
+            }
+
+            .visual {
+                min-height: 140px;
+                margin-bottom: 30px;
+            }
+
+            .error-number {
+                font-size: clamp(100px, 25vh, 180px);
+            }
+
+            h1 {
+                font-size: clamp(28px, 7vh, 42px);
+            }
+        }
+
+        /* =========================
+           REDUCED MOTION
+        ========================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<header class="navbar">
+<div class="background">
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+</div>
 
-    <div class="logo">
-        lamac<span>Hub</span>
-    </div>
+<div class="page">
 
-    <a href="/" class="home-mini">
-        Startseite
-    </a>
+    <!-- NAVIGATION -->
+    <nav class="navbar">
 
-</header>
+        <a href="/" class="logo">
+            lamac<span>Hub</span>
+        </a>
+
+        <a href="/" class="home-link">
+            Startseite
+        </a>
+
+    </nav>
 
 
-<main>
+    <!-- MAIN -->
+    <main>
 
-    <div class="container">
+        <section class="content">
 
-        <div class="visual">
-
-            <div class="glow"></div>
-
-            <div class="orbit"></div>
-
-            <div class="number">
-                404
+            <div class="badge">
+                <span class="badge-dot"></span>
+                Seite nicht gefunden
             </div>
 
-        </div>
+
+            <div class="visual" id="visual">
+
+                <div class="orbit"></div>
+
+                <div class="error-number">
+                    404
+                </div>
+
+            </div>
 
 
-        <div class="badge">
-            <span class="badge-dot"></span>
-            Seite nicht gefunden
-        </div>
+            <h1>
+                Diese Seite ist irgendwo
+                verloren gegangen.
+            </h1>
 
 
-        <h1>
-            Diese Seite ist<br>
-            irgendwo verloren gegangen.
-        </h1>
+            <p class="description">
+                Die angeforderte Seite existiert nicht,
+                wurde verschoben oder hat sich gerade
+                einen sehr guten Versteckplatz gesucht.
+                Keine Sorge – deine Startseite ist noch da.
+            </p>
 
 
-        <p class="description">
-            Die Adresse, die du aufgerufen hast, existiert auf
-            lamacHub nicht – oder sie hat sich gerade vor dir versteckt.
-            Keine Sorge: Deine Daten sind nicht verloren.
-        </p>
+            <div class="buttons">
+
+                <a href="/" class="button primary">
+                    ← Zur Startseite
+                </a>
+
+                <a href="javascript:history.back()"
+                   class="button secondary">
+                    Zurück
+                </a>
+
+            </div>
 
 
-        <div class="actions">
+            <div class="info-card">
 
-            <a href="/" class="btn primary">
-                ← Zur Startseite
-            </a>
+                <div class="info-left">
 
-            <a href="javascript:history.back()" class="btn secondary">
-                Zurück
-            </a>
+                    <div class="info-title">
+                        Fehler gefunden
+                    </div>
 
-        </div>
+                    <div class="info-text">
+                        Der Server konnte die angeforderte
+                        Ressource nicht finden.
+                    </div>
+
+                </div>
+
+                <div class="error-code">
+                    ERROR 404
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
 
 
-        <div class="info">
-            <span>Fehlercode:</span>
-            <strong>404</strong>
-            <span>·</span>
-            <span>Die gesuchte Seite wurde nicht gefunden.</span>
-        </div>
+    <!-- FOOTER -->
+    <footer>
+        © 2026 lamacHub
+    </footer>
 
-    </div>
-
-</main>
-
-
-<footer>
-    © 2026 lamacHub
-</footer>
+</div>
 
 
 <script>
+    /*
+        Desktop-Maus-Effekt.
+        Auf Touch-Geräten wird nichts gemacht.
+    */
 
-/* Kleine zufällige Bewegung des 404-Orbits */
+    const visual = document.getElementById("visual");
 
-const orbit = document.querySelector(".orbit");
+    if (window.matchMedia("(pointer: fine)").matches) {
 
-document.addEventListener("mousemove", (event) => {
+        document.addEventListener("mousemove", (event) => {
 
-    const x =
-        (event.clientX / window.innerWidth - .5) * 8;
+            const x =
+                (event.clientX / window.innerWidth - 0.5) * 10;
 
-    const y =
-        (event.clientY / window.innerHeight - .5) * 8;
+            const y =
+                (event.clientY / window.innerHeight - 0.5) * 10;
 
-    orbit.style.marginLeft = `${x}px`;
-    orbit.style.marginTop = `${y}px`;
+            visual.style.transform =
+                `translate(${x}px, ${y}px)`;
 
-});
+        });
 
+    }
 </script>
 
 </body>
