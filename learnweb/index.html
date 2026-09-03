@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ff7a00">
+<title>learningweb — von lamacOs</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+:root{
+    --orange:#ff7a00;
+    --orange2:#ff9a3d;
+    --orange3:#fff1e4;
+    --dark:#171717;
+    --gray:#666;
+    --light:#f7f7f7;
+    --white:#fff;
+    --border:#e8e8e8;
+    --success:#159447;
+    --danger:#d93636;
+    --shadow:0 12px 40px rgba(0,0,0,.08);
+    --radius:22px;
+}
+
+*{box-sizing:border-box}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:
+        radial-gradient(circle at 10% 0%,#fff2e7 0,transparent 28%),
+        radial-gradient(circle at 100% 20%,#fff5ec 0,transparent 25%),
+        var(--light);
+    color:var(--dark);
+}
+
+button,input,select,textarea{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.container{
+    width:min(1180px,calc(100% - 32px));
+    margin:auto;
+}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(0,0,0,.06);
+}
+
+.nav{
+    min-height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:900;
+    font-size:22px;
+    letter-spacing:-.7px;
+}
+
+.logoMark{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    background:var(--orange);
+    color:white;
+    display:grid;
+    place-items:center;
+    font-weight:1000;
+    box-shadow:0 8px 20px rgba(255,122,0,.25);
+}
+
+.navSmall{
+    color:#777;
+    font-size:13px;
+}
+
+main{
+    padding:42px 0 80px;
+}
+
+.hero{
+    text-align:center;
+    padding:48px 16px 38px;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:8px 13px;
+    border-radius:999px;
+    background:var(--orange3);
+    color:#c95b00;
+    font-weight:800;
+    font-size:13px;
+    margin-bottom:18px;
+}
+
+.hero h1{
+    font-size:clamp(42px,7vw,76px);
+    line-height:.95;
+    margin:0;
+    letter-spacing:-4px;
+}
+
+.hero h1 span{
+    color:var(--orange);
+}
+
+.hero p{
+    max-width:680px;
+    margin:22px auto 0;
+    color:#666;
+    font-size:18px;
+    line-height:1.6;
+}
+
+.tiles{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:28px;
+    max-width:850px;
+    margin:20px auto;
+}
+
+.tile{
+    border:1px solid var(--border);
+    background:white;
+    border-radius:var(--radius);
+    padding:32px;
+    min-height:260px;
+    text-align:left;
+    box-shadow:var(--shadow);
+    transition:.2s ease;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.tile:hover{
+    transform:translateY(-4px);
+    box-shadow:0 18px 55px rgba(0,0,0,.11);
+}
+
+.tileIcon{
+    font-size:42px;
+    margin-bottom:18px;
+}
+
+.tile h2{
+    margin:0 0 10px;
+    font-size:27px;
+}
+
+.tile p{
+    color:#6a6a6a;
+    line-height:1.55;
+    margin:0 0 25px;
+}
+
+.primary,.secondary,.danger{
+    border:0;
+    border-radius:14px;
+    padding:13px 18px;
+    font-weight:800;
+    transition:.15s;
+}
+
+.primary{
+    background:var(--orange);
+    color:white;
+    box-shadow:0 8px 20px rgba(255,122,0,.2);
+}
+
+.primary:hover{
+    background:#eb6900;
+    transform:translateY(-1px);
+}
+
+.secondary{
+    background:#f2f2f2;
+    color:#222;
+}
+
+.secondary:hover{
+    background:#e8e8e8;
+}
+
+.danger{
+    background:#ffe8e8;
+    color:#b82828;
+}
+
+.backBtn{
+    margin-bottom:22px;
+}
+
+.panel{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:clamp(20px,4vw,38px);
+    box-shadow:var(--shadow);
+}
+
+.panel h2{
+    margin-top:0;
+}
+
+.formGrid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:20px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.field.full{
+    grid-column:1/-1;
+}
+
+.field label{
+    font-weight:800;
+    font-size:14px;
+}
+
+.field small{
+    color:#777;
+}
+
+input,select,textarea{
+    width:100%;
+    border:1px solid #ddd;
+    background:#fff;
+    border-radius:13px;
+    padding:13px 14px;
+    outline:none;
+    transition:.15s;
+}
+
+textarea{
+    min-height:150px;
+    resize:vertical;
+}
+
+input:focus,select:focus,textarea:focus{
+    border-color:var(--orange);
+    box-shadow:0 0 0 4px var(--orange3);
+}
+
+.actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:25px;
+}
+
+.storyHeader{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    align-items:flex-start;
+    margin-bottom:24px;
+}
+
+.progressWrap{
+    min-width:210px;
+}
+
+.progressText{
+    font-size:13px;
+    color:#777;
+    margin-bottom:8px;
+    text-align:right;
+}
+
+.progress{
+    height:9px;
+    background:#eee;
+    border-radius:99px;
+    overflow:hidden;
+}
+
+.progressBar{
+    height:100%;
+    width:0;
+    background:var(--orange);
+    transition:.3s;
+}
+
+.chapter{
+    color:#c95b00;
+    font-weight:900;
+    text-transform:uppercase;
+    font-size:12px;
+    letter-spacing:1px;
+}
+
+.questionTitle{
+    font-size:clamp(26px,4vw,42px);
+    margin:8px 0 22px;
+    letter-spacing:-1px;
+}
+
+.story{
+    background:#fffaf6;
+    border-left:5px solid var(--orange);
+    padding:22px;
+    border-radius:0 16px 16px 0;
+    line-height:1.75;
+    color:#444;
+    margin-bottom:25px;
+}
+
+.answerArea{
+    max-width:700px;
+}
+
+.answerRow{
+    display:flex;
+    gap:10px;
+}
+
+.answerRow input{
+    flex:1;
+}
+
+.feedback{
+    margin-top:14px;
+    padding:13px 15px;
+    border-radius:12px;
+    font-weight:700;
+}
+
+.feedback.success{
+    background:#e9f8ef;
+    color:#11713a;
+}
+
+.feedback.error{
+    background:#fff0f0;
+    color:#b72e2e;
+}
+
+.hint{
+    margin-top:12px;
+    color:#7a5a00;
+    background:#fff7d9;
+    padding:13px 15px;
+    border-radius:12px;
+    line-height:1.5;
+}
+
+.imageBox{
+    margin:20px 0;
+    border-radius:18px;
+    overflow:hidden;
+    background:#eee;
+}
+
+.imageBox img{
+    width:100%;
+    max-height:340px;
+    object-fit:cover;
+    display:block;
+}
+
+.completion{
+    text-align:center;
+    padding:45px 20px;
+}
+
+.bigCheck{
+    font-size:70px;
+}
+
+.editorTop{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.questionList{
+    display:grid;
+    gap:14px;
+    margin-top:25px;
+}
+
+.qCard{
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:18px;
+    background:#fff;
+}
+
+.qCardTop{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.qNumber{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:var(--orange3);
+    color:#c95b00;
+    display:grid;
+    place-items:center;
+    font-weight:900;
+}
+
+.qCardTitle{
+    flex:1;
+    font-weight:800;
+}
+
+.editorQuestion{
+    margin-top:16px;
+    display:grid;
+    gap:15px;
+}
+
+.savedList{
+    margin-top:25px;
+    display:grid;
+    gap:12px;
+}
+
+.savedItem{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    align-items:center;
+    padding:15px;
+    border:1px solid var(--border);
+    border-radius:15px;
+}
+
+.savedInfo strong{
+    display:block;
+}
+
+.savedInfo small{
+    color:#777;
+}
+
+.qrArea{
+    margin-top:30px;
+    display:grid;
+    place-items:center;
+    text-align:center;
+}
+
+#qrcode{
+    padding:16px;
+    background:white;
+    border-radius:18px;
+    display:inline-block;
+}
+
+.qrStatus{
+    max-width:700px;
+    margin:15px auto;
+    padding:14px;
+    border-radius:13px;
+    background:#f5f5f5;
+}
+
+.scanner{
+    width:100%;
+    max-width:600px;
+    margin:auto;
+}
+
+video{
+    width:100%;
+    border-radius:18px;
+    background:#111;
+    aspect-ratio:4/3;
+    object-fit:cover;
+}
+
+.scanResult{
+    margin-top:15px;
+}
+
+.notice{
+    background:#fff7e9;
+    border:1px solid #ffdcae;
+    padding:16px;
+    border-radius:14px;
+    line-height:1.55;
+    margin:18px 0;
+}
+
+footer{
+    border-top:1px solid var(--border);
+    padding:30px 0 45px;
+    color:#777;
+    font-size:14px;
+}
+
+.footerInner{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.footerLinks button{
+    border:0;
+    background:none;
+    color:#777;
+    text-decoration:underline;
+    padding:0;
+}
+
+.imagePreview{
+    width:100%;
+    max-height:250px;
+    object-fit:cover;
+    border-radius:14px;
+    margin-top:10px;
+}
+
+@media(max-width:720px){
+    .tiles,.formGrid{
+        grid-template-columns:1fr;
+    }
+
+    .field.full{
+        grid-column:auto;
+    }
+
+    .storyHeader{
+        flex-direction:column;
+    }
+
+    .progressWrap{
+        width:100%;
+    }
+
+    .progressText{
+        text-align:left;
+    }
+
+    .answerRow{
+        flex-direction:column;
+    }
+
+    .hero{
+        padding-top:25px;
+    }
+
+    .hero h1{
+        letter-spacing:-2.5px;
+    }
+
+    .tile{
+        min-height:220px;
+        padding:24px;
+    }
+}
+
+@media(max-width:360px){
+    .container{
+        width:calc(100% - 20px);
+    }
+
+    main{
+        padding-top:20px;
+    }
+
+    .hero h1{
+        font-size:42px;
+    }
+
+    .panel{
+        padding:16px;
+        border-radius:17px;
+    }
+
+    .tile{
+        padding:18px;
+    }
+
+    .actions button{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="container nav">
+        <div class="logo">
+            <div class="logoMark">L</div>
+            <div>learningweb</div>
+        </div>
+        <div class="navSmall">von lamacOs / lamachub</div>
+    </div>
+</header>
+
+<main>
+<div class="container">
+
+    <!-- HOME -->
+    <section id="homeView">
+        <div class="hero">
+            <div class="badge">🧠 Lernen als Abenteuer</div>
+            <h1>learning<span>web</span></h1>
+            <p>
+                Geschichten lesen. Hinweise verbinden. Rätsel lösen.
+                Keine langweiligen Multiple-Choice-Fragen – du musst selbst denken.
+            </p>
+        </div>
+
+        <div class="tiles">
+            <div class="tile">
+                <div>
+                    <div class="tileIcon">🧑‍🎓</div>
+                    <h2>Ich bin Schüler</h2>
+                    <p>
+                        Starte eine persönliche 50-Fragen-Lernmission,
+                        angepasst an Klasse, Sprache und Land.
+                    </p>
+                </div>
+                <button class="primary" onclick="showView('studentSetup')">
+                    Abenteuer starten →
+                </button>
+            </div>
+
+            <div class="tile">
+                <div>
+                    <div class="tileIcon">👨‍🏫</div>
+                    <h2>Ich bin Lehrer</h2>
+                    <p>
+                        Erstelle deine eigenen Rätselgeschichten und teile
+                        sie direkt über einen QR-Code.
+                    </p>
+                </div>
+                <button class="secondary" onclick="showView('teacherView');loadTeacherHome()">
+                    Lehrerbereich öffnen →
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- STUDENT SETUP -->
+    <section id="studentSetup" class="hidden">
+        <button class="secondary backBtn" onclick="showView('homeView')">← Zurück</button>
+
+        <div class="panel">
+            <h2>Deine Lernmission</h2>
+            <p>Stell dein Abenteuer ein. Die Geschichte und Schwierigkeit passen sich daran an.</p>
+
+            <div class="formGrid">
+                <div class="field">
+                    <label for="studentGrade">Klasse</label>
+                    <select id="studentGrade">
+                        <option value="1">Klasse 1</option>
+                        <option value="2">Klasse 2</option>
+                        <option value="3">Klasse 3</option>
+                        <option value="4">Klasse 4</option>
+                        <option value="5">Klasse 5</option>
+                        <option value="6">Klasse 6</option>
+                        <option value="7">Klasse 7</option>
+                        <option value="8">Klasse 8</option>
+                        <option value="9">Klasse 9</option>
+                        <option value="10">Klasse 10</option>
+                        <option value="11">Klasse 11</option>
+                        <option value="12">Klasse 12</option>
+                        <option value="13">Klasse 13</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="studentLanguage">Sprache</label>
+                    <select id="studentLanguage">
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="it">Italiano</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="studentCountry">Land</label>
+                    <select id="studentCountry">
+                        <option value="DE">Deutschland</option>
+                        <option value="AT">Österreich</option>
+                        <option value="CH">Schweiz</option>
+                        <option value="FR">Frankreich</option>
+                        <option value="ES">Spanien</option>
+                        <option value="IT">Italien</option>
+                        <option value="GB">Vereinigtes Königreich</option>
+                        <option value="US">USA</option>
+                        <option value="JP">Japan</option>
+                        <option value="AU">Australien</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="notice">
+                💡 <strong>Wichtig:</strong> Deine Antworten sind kurz.
+                Die Geschichte enthält die Informationen, die du zum Lösen brauchst.
+                Bei einer falschen Antwort bleibst du bei der Frage und bekommst einen Hinweis.
+            </div>
+
+            <button class="primary" onclick="startGeneratedAdventure()">
+                50-Fragen-Mission erstellen 🚀
+            </button>
+        </div>
+    </section>
+
+    <!-- STUDENT GAME -->
+    <section id="studentGame" class="hidden">
+        <div class="panel">
+            <div class="storyHeader">
+                <div>
+                    <div id="gameChapter" class="chapter"></div>
+                    <h2 id="gameQuestionTitle" class="questionTitle"></h2>
+                </div>
+
+                <div class="progressWrap">
+                    <div id="gameProgressText" class="progressText"></div>
+                    <div class="progress">
+                        <div id="gameProgressBar" class="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gameStory" class="story"></div>
+
+            <div id="gameImage" class="imageBox hidden"></div>
+
+            <div class="answerArea">
+                <label for="gameAnswer"><strong>Deine Antwort</strong></label>
+
+                <div class="answerRow">
+                    <input
+                        id="gameAnswer"
+                        autocomplete="off"
+                        placeholder="Kurze Antwort eingeben…"
+                        onkeydown="if(event.key==='Enter')checkGameAnswer()"
+                    >
+                    <button class="primary" onclick="checkGameAnswer()">
+                        Prüfen
+                    </button>
+                </div>
+
+                <div id="gameFeedback"></div>
+                <div id="gameHint" class="hint hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPLETION -->
+    <section id="completionView" class="hidden">
+        <div class="panel completion">
+            <div class="bigCheck">🏆</div>
+            <h1>Mission geschafft!</h1>
+            <p>
+                Du hast alle 50 Fragen gelöst.
+                Das war keine kleine Runde – Respekt. 😎
+            </p>
+
+            <div class="actions" style="justify-content:center">
+                <button class="primary" onclick="showView('homeView')">
+                    Zur Startseite
+                </button>
+                <button class="secondary" onclick="restartLastAdventure()">
+                    Noch einmal
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEACHER HOME -->
+    <section id="teacherView" class="hidden">
+        <button class="secondary backBtn" onclick="showView('homeView')">← Startseite</button>
+
+        <div class="panel">
+            <div class="editorTop">
+                <div>
+                    <h2>Lehrerbereich</h2>
+                    <p>Erstelle ein eigenes Lernabenteuer und teile es per QR-Code.</p>
+                </div>
+                <button class="primary" onclick="newTeacherPuzzle()">＋ Neues Rätsel</button>
+            </div>
+
+            <div class="notice">
+                📷 <strong>QR-only:</strong> Es werden keine Puzzle-Links erzeugt.
+                Der Puzzle-Inhalt wird direkt in den QR-Code geschrieben.
+            </div>
+
+            <h3>Gespeicherte Rätsel</h3>
+            <div id="savedPuzzles" class="savedList"></div>
+        </div>
+    </section>
+
+    <!-- TEACHER EDITOR -->
+    <section id="teacherEditor" class="hidden">
+        <button class="secondary backBtn" onclick="showView('teacherView');loadTeacherHome()">← Zurück</button>
+
+        <div class="panel">
+            <h2>Rätsel erstellen</h2>
+
+            <div class="formGrid">
+                <div class="field">
+                    <label for="puzzleTitle">Titel</label>
+                    <input id="puzzleTitle" placeholder="z. B. Das Geheimnis der alten Station">
+                </div>
+
+                <div class="field">
+                    <label for="puzzleLanguage">Sprache</label>
+                    <select id="puzzleLanguage">
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="it">Italiano</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="puzzleGrade">Klassenstufe</label>
+                    <select id="puzzleGrade">
+                        <option value="1">Klasse 1</option>
+                        <option value="2">Klasse 2</option>
+                        <option value="3">Klasse 3</option>
+                        <option value="4">Klasse 4</option>
+                        <option value="5">Klasse 5</option>
+                        <option value="6">Klasse 6</option>
+                        <option value="7">Klasse 7</option>
+                        <option value="8">Klasse 8</option>
+                        <option value="9">Klasse 9</option>
+                        <option value="10">Klasse 10</option>
+                        <option value="11">Klasse 11</option>
+                        <option value="12">Klasse 12</option>
+                        <option value="13">Klasse 13</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="puzzleCountry">Land / Kontext</label>
+                    <select id="puzzleCountry">
+                        <option value="DE">Deutschland</option>
+                        <option value="AT">Österreich</option>
+                        <option value="CH">Schweiz</option>
+                        <option value="FR">Frankreich</option>
+                        <option value="ES">Spanien</option>
+                        <option value="IT">Italien</option>
+                        <option value="GB">Vereinigtes Königreich</option>
+                        <option value="US">USA</option>
+                        <option value="JP">Japan</option>
+                        <option value="AU">Australien</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="secondary" onclick="addTeacherQuestion()">
+                    ＋ Frage hinzufügen
+                </button>
+
+                <button class="secondary" onclick="generateTeacherTemplate()">
+                    ✨ 50-Fragen-Vorlage
+                </button>
+
+                <button class="primary" onclick="saveTeacherPuzzle()">
+                    💾 Speichern
+                </button>
+            </div>
+
+            <div id="teacherQuestions" class="questionList"></div>
+
+            <div class="actions">
+                <button class="primary" onclick="saveTeacherPuzzle();generateQR()">
+                    📷 Speichern & QR-Code erstellen
+                </button>
+            </div>
+
+            <div id="qrSection" class="qrArea hidden">
+                <h2>Dein QR-Code</h2>
+                <p>Der Puzzle-Inhalt steckt direkt im QR-Code.</p>
+
+                <div id="qrcode"></div>
+
+                <div id="qrStatus" class="qrStatus"></div>
+
+                <button class="secondary" onclick="downloadQR()">
+                    QR-Code als Bild speichern
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCANNER -->
+    <section id="scannerView" class="hidden">
+        <button class="secondary backBtn" onclick="showView('homeView')">← Zurück</button>
+
+        <div class="panel">
+            <h2>QR-Code scannen</h2>
+            <p>Scanne den QR-Code eines learningweb-Rätsels.</p>
+
+            <div class="scanner">
+                <video id="scannerVideo" playsinline></video>
+                <div id="scanResult" class="scanResult"></div>
+
+                <div class="actions">
+                    <button class="primary" onclick="startScanner()">Kamera starten</button>
+                    <button class="secondary" onclick="stopScanner()">Kamera stoppen</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- IMPRESSUM -->
+    <section id="impressumView" class="hidden">
+        <button class="secondary backBtn" onclick="showView('homeView')">← Zurück</button>
+
+        <div class="panel">
+            <h2>Impressum</h2>
+
+            <h3>Angaben gemäß den gesetzlichen Vorgaben</h3>
+
+            <p>
+                <strong>Verantwortlich für learningweb:</strong><br>
+                [Vollständiger Name des Verantwortlichen]<br>
+                [Straße und Hausnummer]<br>
+                [PLZ und Ort]<br>
+                [Land]
+            </p>
+
+            <h3>Kontakt</h3>
+
+            <p>
+                E-Mail:
+                <a href="mailto:contact.learnweb@lamachub.de">
+                    contact.learnweb@lamachub.de
+                </a>
+                <br>
+                Support:
+                <a href="mailto:support.learnweb@lamachub.de">
+                    support.learnweb@lamachub.de
+                </a>
+            </p>
+
+            <h3>Weitere Angaben, sofern zutreffend</h3>
+
+            <p>
+                Unternehmensname / Rechtsform: [falls vorhanden]<br>
+                Vertretungsberechtigte Person: [falls erforderlich]<br>
+                Handelsregister: [falls vorhanden]<br>
+                Registergericht: [falls vorhanden]<br>
+                Registernummer: [falls vorhanden]<br>
+                Umsatzsteuer-ID: [falls vorhanden]
+            </p>
+
+            <h3>Verantwortlichkeit für Inhalte</h3>
+
+            <p>
+                Verantwortliche Person für redaktionelle Inhalte:
+                [falls gesetzlich erforderlich: vollständiger Name und ladungsfähige Anschrift]
+            </p>
+
+            <div class="notice">
+                ⚠️ Die Platzhalter müssen vor einer tatsächlichen Veröffentlichung
+                mit den korrekten rechtlichen Angaben ersetzt werden.
+                Keine erfundenen Adress- oder Unternehmensdaten eintragen.
+            </div>
+        </div>
+    </section>
+
+</div>
+</main>
+
+<footer>
+    <div class="container footerInner">
+        <div>
+            © 2026 learningweb · von lamacOs / lamachub
+        </div>
+
+        <div class="footerLinks">
+            <button onclick="showView('impressumView')">Impressum</button>
+        </div>
+    </div>
+</footer>
+
+<script>
+/* =========================================================
+   LEARNINGWEB
+   Client-only learning platform
+   ========================================================= */
+
+const APP_VERSION = "2.0";
+
+let currentView = "homeView";
+let currentAdventure = null;
+let currentQuestionIndex = 0;
+let lastAdventure = null;
+let teacherPuzzle = null;
+let scannerStream = null;
+let scannerTimer = null;
+
+
+/* =========================================================
+   BASIC NAVIGATION
+   ========================================================= */
+
+function showView(id){
+    document.querySelectorAll("main section").forEach(section=>{
+        section.classList.add("hidden");
+    });
+
+    const target = document.getElementById(id);
+
+    if(target){
+        target.classList.remove("hidden");
+        currentView = id;
+        window.scrollTo({top:0,behavior:"smooth"});
+    }
+}
+
+
+/* =========================================================
+   COUNTRY DATA
+   ========================================================= */
+
+const countries = {
+    DE:{
+        name:"Deutschland",
+        capital:"Berlin",
+        currency:"Euro",
+        landmark:"Brandenburger Tor",
+        landscape:"Schwarzwald",
+        river:"Rhein",
+        city:"Hamburg",
+        northCity:"Kiel",
+        southCity:"München",
+        train:"ICE",
+        continent:"Europa",
+        climate:"gemäßigt"
+    },
+    AT:{
+        name:"Österreich",
+        capital:"Wien",
+        currency:"Euro",
+        landmark:"Schloss Schönbrunn",
+        landscape:"Alpen",
+        river:"Donau",
+        city:"Salzburg",
+        northCity:"Linz",
+        southCity:"Graz",
+        train:"Railjet",
+        continent:"Europa",
+        climate:"alpin und gemäßigt"
+    },
+    CH:{
+        name:"Schweiz",
+        capital:"Bern",
+        currency:"Schweizer Franken",
+        landmark:"Matterhorn",
+        landscape:"Alpen",
+        river:"Rhein",
+        city:"Zürich",
+        northCity:"Basel",
+        southCity:"Lugano",
+        train:"InterCity",
+        continent:"Europa",
+        climate:"alpin und gemäßigt"
+    },
+    FR:{
+        name:"Frankreich",
+        capital:"Paris",
+        currency:"Euro",
+        landmark:"Eiffelturm",
+        landscape:"Alpen",
+        river:"Loire",
+        city:"Lyon",
+        northCity:"Lille",
+        southCity:"Marseille",
+        train:"TGV",
+        continent:"Europa",
+        climate:"gemäßigt bis mediterran"
+    },
+    ES:{
+        name:"Spanien",
+        capital:"Madrid",
+        currency:"Euro",
+        landmark:"Sagrada Família",
+        landscape:"Pyrenäen",
+        river:"Ebro",
+        city:"Barcelona",
+        northCity:"Bilbao",
+        southCity:"Sevilla",
+        train:"AVE",
+        continent:"Europa",
+        climate:"mediterran bis trocken"
+    },
+    IT:{
+        name:"Italien",
+        capital:"Rom",
+        currency:"Euro",
+        landmark:"Kolosseum",
+        landscape:"Dolomiten",
+        river:"Po",
+        city:"Mailand",
+        northCity:"Venedig",
+        southCity:"Neapel",
+        train:"Frecciarossa",
+        continent:"Europa",
+        climate:"mediterran bis alpin"
+    },
+    GB:{
+        name:"Vereinigtes Königreich",
+        capital:"London",
+        currency:"Pfund",
+        landmark:"Tower Bridge",
+        landscape:"Scottish Highlands",
+        river:"Themse",
+        city:"Manchester",
+        northCity:"Edinburgh",
+        southCity:"Brighton",
+        train:"Intercity",
+        continent:"Europa",
+        climate:"gemäßigt und maritim"
+    },
+    US:{
+        name:"USA",
+        capital:"Washington, D.C.",
+        currency:"US-Dollar",
+        landmark:"Freiheitsstatue",
+        landscape:"Rocky Mountains",
+        river:"Mississippi",
+        city:"New York",
+        northCity:"Chicago",
+        southCity:"Miami",
+        train:"Amtrak",
+        continent:"Nordamerika",
+        climate:"sehr unterschiedlich"
+    },
+    JP:{
+        name:"Japan",
+        capital:"Tokio",
+        currency:"Yen",
+        landmark:"Fushimi-Inari-Schrein",
+        landscape:"Japanische Alpen",
+        river:"Shinano",
+        city:"Kyoto",
+        northCity:"Sapporo",
+        southCity:"Fukuoka",
+        train:"Shinkansen",
+        continent:"Asien",
+        climate:"von kühl bis subtropisch"
+    },
+    AU:{
+        name:"Australien",
+        capital:"Canberra",
+        currency:"Australischer Dollar",
+        landmark:"Sydney Opera House",
+        landscape:"Outback",
+        river:"Murray",
+        city:"Sydney",
+        northCity:"Darwin",
+        southCity:"Melbourne",
+        train:"The Ghan",
+        continent:"Ozeanien",
+        climate:"von tropisch bis gemäßigt"
+    }
+};
+
+
+/* =========================================================
+   LANGUAGE PACK
+   ========================================================= */
+
+const LANG = {
+
+de:{
+    mission:"Die große Reise",
+    intro:"Du erhältst eine verschlüsselte Nachricht. Sie führt dich durch verschiedene Orte und Hinweise. Jede Antwort bringt dich einen Schritt weiter.",
+    chapter:"Kapitel",
+    q:"Frage",
+    correct:"Richtig! Der nächste Hinweis wird freigeschaltet.",
+    wrong:"Noch nicht. Lies die Geschichte noch einmal genau und versuche es erneut.",
+    hint:"Hinweis:",
+    finished:"Du hast die Mission abgeschlossen."
+},
+
+en:{
+    mission:"The Great Journey",
+    intro:"You receive a mysterious message. It leads you through places and clues. Every answer unlocks the next step.",
+    chapter:"Chapter",
+    q:"Question",
+    correct:"Correct! The next clue is unlocked.",
+    wrong:"Not quite. Read the story carefully and try again.",
+    hint:"Hint:",
+    finished:"You completed the mission."
+},
+
+fr:{
+    mission:"Le grand voyage",
+    intro:"Tu reçois un message mystérieux. Il te conduit à travers différents lieux et indices. Chaque réponse débloque l'étape suivante.",
+    chapter:"Chapitre",
+    q:"Question",
+    correct:"Correct ! Le prochain indice est débloqué.",
+    wrong:"Pas encore. Relis attentivement l'histoire et réessaie.",
+    hint:"Indice :",
+    finished:"Tu as terminé la mission."
+},
+
+es:{
+    mission:"El gran viaje",
+    intro:"Recibes un mensaje misterioso. Te lleva por distintos lugares y pistas. Cada respuesta desbloquea el siguiente paso.",
+    chapter:"Capítulo",
+    q:"Pregunta",
+    correct:"¡Correcto! La siguiente pista está desbloqueada.",
+    wrong:"Todavía no. Lee la historia con atención e inténtalo otra vez.",
+    hint:"Pista:",
+    finished:"Has completado la misión."
+},
+
+it:{
+    mission:"Il grande viaggio",
+    intro:"Ricevi un messaggio misterioso. Ti conduce attraverso luoghi e indizi. Ogni risposta sblocca il passo successivo.",
+    chapter:"Capitolo",
+    q:"Domanda",
+    correct:"Corretto! Il prossimo indizio è sbloccato.",
+    wrong:"Non ancora. Rileggi attentamente la storia e riprova.",
+    hint:"Indizio:",
+    finished:"Hai completato la missione."
+}
+
+};
+
+
+/* =========================================================
+   TRANSLATION HELPERS
+   ========================================================= */
+
+function t(lang,key){
+    return (LANG[lang] && LANG[lang][key]) || LANG.de[key];
+}
+
+
+/* =========================================================
+   DIFFICULTY
+   ========================================================= */
+
+function difficultyBand(grade){
+    grade = Number(grade);
+
+    if(grade <= 2) return 1;
+    if(grade <= 4) return 2;
+    if(grade <= 6) return 3;
+    if(grade <= 8) return 4;
+    if(grade <= 10) return 5;
+    return 6;
+}
+
+function difficultyDescription(grade){
+    const band = difficultyBand(grade);
+
+    return [
+        "sehr einfach",
+        "einfach",
+        "mittel",
+        "anspruchsvoll",
+        "schwierig",
+        "sehr anspruchsvoll"
+    ][band-1];
+}
+
+
+/* =========================================================
+   SEEDED RANDOMNESS
+   ========================================================= */
+
+function hashString(str){
+    let h = 2166136261;
+
+    for(let i=0;i<str.length;i++){
+        h ^= str.charCodeAt(i);
+        h += (h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24);
+    }
+
+    return h >>> 0;
+}
+
+function seeded(seed){
+    let x = hashString(String(seed));
+
+    return function(){
+        x += 0x6D2B79F5;
+        let t = x;
+        t = Math.imul(t ^ t >>> 15,t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7,t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
+
+
+/* =========================================================
+   GENERATED 50 QUESTION ADVENTURE
+   ========================================================= */
+
+function generateAdventure(grade,lang,countryCode){
+    const c = countries[countryCode];
+    const random = seeded(`${grade}-${lang}-${countryCode}-learningweb-2026`);
+
+    const questions = [];
+
+    const band = difficultyBand(grade);
+
+    const names = {
+        de:["Mia","Noah","Lina","Jonas"],
+        en:["Mia","Noah","Lina","Alex"],
+        fr:["Mia","Noé","Lina","Louis"],
+        es:["Mía","Noah","Lina","Leo"],
+        it:["Mia","Noah","Lina","Luca"]
+    }[lang] || ["Mia","Noah","Lina","Alex"];
+
+    const hero = names[Math.floor(random()*names.length)];
+
+    function add(story,question,answers,hint="",chapter=1,image=""){
+        questions.push({
+            story,
+            question,
+            answers:Array.isArray(answers)?answers:[answers],
+            hint,
+            chapter,
+            image
+        });
+    }
+
+    /* ---- 1-5: THE MESSAGE ---- */
+
+    add(
+        localize(lang,`${hero} findet am Morgen eine Karte. Auf ihr steht, dass die Reise in ${c.name} beginnt. Als erster großer Hinweis ist die Hauptstadt genannt.`,`${hero} finds a map in the morning. It says the journey begins in ${c.name}. The first major clue is the capital city.`,`${hero} trouve une carte le matin. Elle indique que le voyage commence en ${c.name}. Le premier indice important est la capitale.`,`${hero} encuentra un mapa por la mañana. Dice que el viaje comienza en ${c.name}. La primera pista importante es la capital.`,`${hero} trova una mappa al mattino. Dice che il viaggio comincia in ${c.name}. Il primo grande indizio è la capitale.`),
+        localize(lang,"Wie heißt die Hauptstadt?", "What is the capital city?", "Quelle est la capitale ?", "¿Cuál es la capital?", "Qual è la capitale?"),
+        [c.capital],
+        localize(lang,"Die Hauptstadt steht direkt als erster großer Hinweis auf der Karte.","The capital is given directly as the first major clue.","La capitale est indiquée directement sur la carte.","La capital aparece directamente en el mapa.","La capitale è indicata direttamente sulla mappa."),
+        1
+    );
+
+    add(
+        localize(lang,`Auf der Karte ist außerdem die Währung des Landes notiert: ${c.currency}. ${hero} soll das Wort finden, das auf dem nächsten Umschlag fehlt.`,`${hero} also sees the country's currency written on the map: ${c.currency}. The next envelope has one missing word.`,`${hero} voit aussi la monnaie du pays : ${c.currency}. Un mot manque sur la prochaine enveloppe.`,`${hero} también ve la moneda del país: ${c.currency}. Falta una palabra en el siguiente sobre.`,`${hero} vede anche la valuta del paese: ${c.currency}. Sulla busta successiva manca una parola.`),
+        localize(lang,"Welche Währung gehört zum Land?","Which currency belongs to the country?","Quelle monnaie appartient au pays ?","¿Qué moneda corresponde al país?","Quale valuta appartiene al paese?"),
+        [c.currency],
+        "",
+        1
+    );
+
+    const numberA = band <= 2 ? 6 : band <= 4 ? 18 : 37;
+    const numberB = band <= 2 ? 4 : band <= 4 ? 7 : 13;
+
+    add(
+        localize(lang,
+            `Im Umschlag steht: „Du hast ${numberA} Schritte bis zum Tor gemacht und noch ${numberB} vor dir.“ Die beiden Zahlen gehören zusammen.`,
+            `The envelope says: “You walked ${numberA} steps to the gate and still have ${numberB} to go.” The two numbers belong together.`,
+            `L'enveloppe dit : « Tu as fait ${numberA} pas jusqu'au portail et il t'en reste ${numberB}. »`,
+            `El sobre dice: «Has caminado ${numberA} pasos hasta la puerta y todavía te quedan ${numberB}.»`,
+            `La busta dice: «Hai fatto ${numberA} passi fino al cancello e te ne restano ${numberB}.»`
+        ),
+        localize(lang,"Wie viele Schritte sind es insgesamt?","How many steps are there altogether?","Combien de pas y a-t-il au total ?","¿Cuántos pasos hay en total?","Quanti passi ci sono in totale?"),
+        [String(numberA+numberB)],
+        localize(lang,"Addiere die beiden Zahlen.","Add the two numbers.","Additionne les deux nombres.","Suma los dos números.","Somma i due numeri."),
+        1
+    );
+
+    add(
+        localize(lang,`Das nächste Symbol zeigt ${c.landscape}. Die Karte erklärt: „Dort findest du den höchsten Punkt dieser Etappe.“`,`The next symbol shows ${c.landscape}. The map says: “There you will find the highest point of this stage.”`,`Le symbole suivant montre ${c.landscape}. La carte dit : « Tu y trouveras le point le plus élevé de cette étape. »`,`El siguiente símbolo muestra ${c.landscape}. El mapa dice: «Allí encontrarás el punto más alto de esta etapa.»`,`Il simbolo successivo mostra ${c.landscape}. La mappa dice: «Lì troverai il punto più alto di questa tappa.»`),
+        localize(lang,"Welche Landschaft musst du aufsuchen?","Which landscape do you need to find?","Quel paysage dois-tu chercher ?","¿Qué paisaje debes buscar?","Quale paesaggio devi cercare?"),
+        [c.landscape],
+        "",
+        1
+    );
+
+    add(
+        localize(lang,`Am Rand der Karte steht ein kurzer Satz: „Wasser folgt dem Weg.“ Der nächste markierte Fluss ist ${c.river}.`, `At the edge of the map is a short sentence: “Water follows the route.” The marked river is ${c.river}.`,`Sur le bord de la carte, on lit : « L'eau suit le chemin. » Le fleuve indiqué est ${c.river}.`,`En el borde del mapa pone: «El agua sigue el camino». El río indicado es ${c.river}.`,`Sul bordo della mappa c'è scritto: «L'acqua segue il percorso». Il fiume indicato è ${c.river}.`),
+        localize(lang,"Wie heißt der markierte Fluss?","What is the marked river called?","Comment s'appelle le fleuve indiqué ?","¿Cómo se llama el río indicado?","Come si chiama il fiume indicato?"),
+        [c.river],
+        "",
+        1
+    );
+
+
+    /* ---- 6-10: TRAVEL ---- */
+
+    add(
+        localize(lang,`Die nächste Etappe führt in die Stadt ${c.city}. Ein Schild zeigt drei Möglichkeiten: ${c.city}, ${c.capital} oder ${c.southCity}. Der Hinweis sagt: „Wähle die Stadt, die in der Aufgabenbeschreibung als nächste Station genannt wurde.“`, `The next stage leads to ${c.city}. A sign shows three choices: ${c.city}, ${c.capital}, or ${c.southCity}. The clue says to choose the city named as the next station.`,`L'étape suivante mène à ${c.city}. Un panneau montre trois villes : ${c.city}, ${c.capital} et ${c.southCity}.`,`La siguiente etapa lleva a ${c.city}. Un cartel muestra tres ciudades: ${c.city}, ${c.capital} y ${c.southCity}.`,`La tappa successiva porta a ${c.city}. Un cartello mostra tre città: ${c.city}, ${c.capital} e ${c.southCity}.`),
+        localize(lang,"Welche Stadt ist die nächste Station?","Which city is the next station?","Quelle ville est la prochaine étape ?","¿Qué ciudad es la siguiente estación?","Quale città è la prossima tappa?"),
+        [c.city],
+        "",
+        2
+    );
+
+    const trainWord = c.train;
+
+    add(
+        localize(lang,`Auf dem Bahnsteig fährt ein Zug mit dem Namen ${trainWord}. Auf dem Ticket steht nur: „Nimm den Zug, dessen Name auf dem Bahnsteig steht.“`, `A train named ${trainWord} is waiting. The ticket says to take the train whose name is on the platform.`,`Sur le quai attend un train nommé ${trainWord}. Le billet indique de prendre le train dont le nom figure sur le quai.`,`En el andén espera un tren llamado ${trainWord}. El billete indica que hay que tomar el tren cuyo nombre aparece en el andén.`,`Sul binario aspetta un treno chiamato ${trainWord}. Il biglietto dice di prendere il treno il cui nome appare sul binario.`),
+        localize(lang,"Wie heißt der Zug?","What is the train called?","Comment s'appelle le train ?","¿Cómo se llama el tren?","Come si chiama il treno?"),
+        [trainWord],
+        "",
+        2
+    );
+
+    const baseDistance = band <= 2 ? 10 : band <= 4 ? 36 : 125;
+    const speed = band <= 2 ? 2 : band <= 4 ? 6 : 25;
+    const hours = Math.max(1,Math.floor(baseDistance/speed));
+
+    add(
+        localize(lang,`Die nächste Strecke ist ${baseDistance} Kilometer lang. Der Zug schafft ${speed} Kilometer pro Stunde. Die Karte verlangt eine ganze Zahl als ungefähre Fahrzeit.`, `The next route is ${baseDistance} kilometres long. The train travels ${speed} kilometres per hour. The map asks for an approximate whole-number travel time.`,`Le trajet suivant fait ${baseDistance} kilomètres. Le train roule à ${speed} kilomètres par heure. La carte demande une durée approximative en heures entières.`,`El siguiente trayecto tiene ${baseDistance} kilómetros. El tren recorre ${speed} kilómetros por hora. El mapa pide un tiempo aproximado en horas enteras.`,`Il prossimo percorso è lungo ${baseDistance} chilometri. Il treno viaggia a ${speed} chilometri all'ora. La mappa chiede una durata approssimativa in ore intere.`),
+        localize(lang,"Wie viele Stunden dauert die Strecke ungefähr?","About how many hours does the route take?","Environ combien d'heures dure le trajet ?","¿Cuántas horas dura aproximadamente el trayecto?","Quante ore dura circa il percorso?"),
+        [String(hours),String(Math.round(baseDistance/speed))],
+        localize(lang,"Teile die Entfernung durch die Geschwindigkeit.","Divide distance by speed.","Divise la distance par la vitesse.","Divide la distancia entre la velocidad.","Dividi la distanza per la velocità."),
+        2
+    );
+
+    add(
+        localize(lang,`Am Ziel hängt ein Schild: „Nur der nördliche Weg führt weiter.“ Zwei Städte stehen darauf: ${c.northCity} und ${c.southCity}.`, `At the destination a sign says: “Only the northern route continues.” Two cities are listed: ${c.northCity} and ${c.southCity}.`,`À destination, un panneau dit : « Seul le chemin du nord continue. » Deux villes sont indiquées : ${c.northCity} et ${c.southCity}.`,`Al llegar, un cartel dice: «Solo el camino del norte continúa». Aparecen dos ciudades: ${c.northCity} y ${c.southCity}.`,`Alla destinazione, un cartello dice: «Solo il percorso settentrionale continua». Sono indicate due città: ${c.northCity} e ${c.southCity}.`),
+        localize(lang,"Welche Stadt wählst du?","Which city do you choose?","Quelle ville choisis-tu ?","¿Qué ciudad eliges?","Quale città scegli?"),
+        [c.northCity],
+        localize(lang,"Nimm die Stadt aus der nördlichen Richtung.","Choose the city associated with north.","Choisis la ville située au nord.","Elige la ciudad del norte.","Scegli la città del nord."),
+        2
+    );
+
+    add(
+        localize(lang,`Die Karte zeigt vier Symbole: einen Zug, einen Fluss, einen Berg und ein Gebäude. Der Text sagt: „Nach der Fahrt folgt das Wasser.“`, `The map shows four symbols: a train, a river, a mountain and a building. The text says: “After the journey comes the water.”`,`La carte montre quatre symboles : un train, un fleuve, une montagne et un bâtiment.`,`El mapa muestra cuatro símbolos: un tren, un río, una montaña y un edificio.`,`La mappa mostra quattro simboli: un treno, un fiume, una montagna e un edificio.`),
+        localize(lang,"Welches Symbol ist als Nächstes gemeint?","Which symbol comes next?","Quel symbole vient ensuite ?","¿Qué símbolo viene después?","Quale simbolo viene dopo?"),
+        ["Fluss","river","fleuve","río","fiume"],
+        localize(lang,"Gesucht wird das Symbol für Wasser.","Look for the water symbol.","Cherche le symbole de l'eau.","Busca el símbolo del agua.","Cerca il simbolo dell'acqua."),
+        2
+    );
+
+
+    /* ---- 11-20: OBSERVATION AND CONNECTION ---- */
+
+    const landmark = c.landmark;
+
+    add(
+        localize(lang,`Vor dir erscheint ein Bildhinweis auf ${landmark}. Daneben steht: „Das Wahrzeichen gehört zum Zielort.“`, `A picture clue of ${landmark} appears. It says the landmark belongs to the destination.`,`Un indice montre ${landmark}. Il indique que ce monument appartient à la destination.`,`Aparece una pista con ${landmark}. Indica que el monumento pertenece al destino.`,`Compare un indizio con ${landmark}. Il monumento appartiene alla destinazione.`),
+        localize(lang,"Welches Wahrzeichen wurde gezeigt?","Which landmark was shown?","Quel monument a été montré ?","¿Qué monumento se mostró?","Quale monumento è stato mostrato?"),
+        [landmark],
+        "",
+        3
+    );
+
+    add(
+        localize(lang,`Auf dem nächsten Blatt stehen die Zahlen ${band<=3?"2, 4, 6":"7, 11, 15"}. Der Hinweis sagt: „Finde die Zahl, die nach demselben Muster kommt.“`, `The next page shows ${band<=3?"2, 4, 6":"7, 11, 15"}. The clue says: “Find the next number following the same pattern.”`,`La page suivante montre ${band<=3?"2, 4, 6":"7, 11, 15"}. L'indice demande le nombre suivant selon le même modèle.`,`La siguiente página muestra ${band<=3?"2, 4, 6":"7, 11, 15"}. La pista pide el siguiente número siguiendo el mismo patrón.`,`La pagina seguente mostra ${band<=3?"2, 4, 6":"7, 11, 15"}. L'indizio chiede il numero successivo secondo lo stesso schema.`),
+        localize(lang,"Welche Zahl kommt als Nächstes?","Which number comes next?","Quel nombre vient ensuite ?","¿Qué número viene después?","Quale numero viene dopo?"),
+        [String(band<=3?8:19)],
+        localize(lang,"Prüfe den Abstand zwischen den Zahlen.","Check the difference between the numbers.","Regarde l'écart entre les nombres.","Mira la diferencia entre los números.","Controlla la differenza tra i numeri."),
+        3
+    );
+
+    add(
+        localize(lang,`Ein Schlüssel liegt neben drei Karten. Karte A zeigt ${c.capital}, Karte B ${c.city}, Karte C ${c.landscape}. Die Anweisung lautet: „Wähle die Karte, die einen Ort und keine Landschaft beschreibt.“`, `A key lies beside three cards. Card A shows ${c.capital}, B shows ${c.city}, and C shows ${c.landscape}. Choose the card that describes a place rather than a landscape.`,`Une clé se trouve près de trois cartes. A montre ${c.capital}, B ${c.city}, C ${c.landscape}. Choisis celle qui indique un lieu et non un paysage.`,`Una llave está junto a tres tarjetas. A muestra ${c.capital}, B ${c.city}, C ${c.landscape}.`,`Una chiave è accanto a tre carte. A mostra ${c.capital}, B ${c.city}, C ${c.landscape}.`),
+        localize(lang,"Welche Karte wählst du?","Which card do you choose?","Quelle carte choisis-tu ?","¿Qué tarjeta eliges?","Quale carta scegli?"),
+        ["B"],
+        localize(lang,"Eine Hauptstadt und eine Stadt sind Orte. Der Hinweis sucht aber die konkrete zweite Karte.","A capital and a city are places; the clue asks for the second card.","La capitale et une ville sont des lieux ; l'indice demande la deuxième carte.","Una capital y una ciudad son lugares; la pista pide la segunda tarjeta.","Una capitale e una città sono luoghi; l'indizio chiede la seconda carta."),
+        3
+    );
+
+    const calcA = band<=2?5:band<=4?14:37;
+    const calcB = band<=2?2:band<=4?8:19;
+    const calcC = band<=2?3:band<=4?5:12;
+
+    add(
+        localize(lang,`Drei Zahlen stehen auf einem Schloss: ${calcA}, ${calcB} und ${calcC}. Die Nachricht sagt: „Addiere die erste und dritte Zahl und ziehe die zweite ab.“`, `Three numbers are written on a lock: ${calcA}, ${calcB} and ${calcC}. The message says: “Add the first and third number and subtract the second.”`,`Trois nombres sont écrits sur une serrure : ${calcA}, ${calcB} et ${calcC}. Le message demande d'additionner le premier et le troisième puis de soustraire le deuxième.`,`Tres números aparecen en una cerradura: ${calcA}, ${calcB} y ${calcC}. El mensaje pide sumar el primero y el tercero y restar el segundo.`,`Tre numeri sono scritti su una serratura: ${calcA}, ${calcB} e ${calcC}. Il messaggio chiede di sommare il primo e il terzo e sottrarre il secondo.`),
+        localize(lang,"Welche Zahl öffnet das Schloss?","Which number opens the lock?","Quel nombre ouvre la serrure ?","¿Qué número abre la cerradura?","Quale numero apre la serratura?"),
+        [String(calcA+calcC-calcB)],
+        "",
+        3
+    );
+
+    add(
+        localize(lang,`Eine Notiz beschreibt das Ziel mit drei Aussagen: Es liegt in ${c.continent}. Es gehört zu ${c.name}. Es ist nicht die Hauptstadt.`, `A note describes the destination with three statements: It is in ${c.continent}. It belongs to ${c.name}. It is not the capital.`,`Une note décrit la destination : elle est en ${c.continent}, appartient à ${c.name} et n'est pas la capitale.`,`Una nota describe el destino: está en ${c.continent}, pertenece a ${c.name} y no es la capital.`,`Una nota descrive la destinazione: si trova in ${c.continent}, appartiene a ${c.name} e non è la capitale.`),
+        localize(lang,"Welches Land ist gemeint?","Which country is meant?","Quel pays est concerné ?","¿Qué país se menciona?","Quale paese è indicato?"),
+        [c.name],
+        "",
+        3
+    );
+
+    /* Questions 16-20 */
+    for(let i=16;i<=20;i++){
+        const n=i-15;
+        const first=band<=3?n*3:n*7;
+        const second=band<=3?2:4;
+
+        add(
+            localize(lang,
+                `Ein weiterer Code besteht aus einer kleinen Zahlenfolge. Der erste Wert ist ${first}, danach wird jedes Mal ${second} addiert. Die Geschichte sagt, dass du den ${n+2}. Wert brauchst.`,
+                `Another code contains a number sequence. The first value is ${first}, and ${second} is added each time. You need the ${n+2}nd value.`,
+                `Un autre code contient une suite de nombres. Le premier nombre est ${first} et on ajoute ${second} à chaque fois. Il faut trouver le ${n+2}e nombre.`,
+                `Otro código contiene una sucesión. El primer valor es ${first} y se suma ${second} cada vez. Necesitas el valor número ${n+2}.`,
+                `Un altro codice contiene una sequenza. Il primo valore è ${first} e ogni volta si aggiunge ${second}. Serve il valore numero ${n+2}.`
+            ),
+            localize(lang,"Welche Zahl brauchst du?","Which number do you need?","Quel nombre te faut-il ?","¿Qué número necesitas?","Quale numero ti serve?"),
+            [String(first + (n+1)*second)],
+            localize(lang,"Multipliziere die Anzahl der Schritte mit dem Abstand und addiere den Startwert.","Use the number of steps times the difference, then add the starting value.","Utilise le nombre d'étapes multiplié par l'écart, puis ajoute le premier nombre.","Multiplica el número de pasos por la diferencia y suma el valor inicial.","Moltiplica il numero dei passi per la differenza e aggiungi il valore iniziale."),
+            4
+        );
+    }
+
+
+    /* ---- 21-30: LOGIC ---- */
+
+    for(let i=21;i<=30;i++){
+        const a=(i*3)+band;
+        const b=(i*2)+1;
+        const result=a-b;
+
+        add(
+            localize(lang,
+                `Im nächsten Raum findest du zwei Zahlen: ${a} und ${b}. Ein Schild sagt: „Der Türcode ist die Differenz zwischen der größeren und der kleineren Zahl.“`,
+                `In the next room you find two numbers: ${a} and ${b}. A sign says: “The door code is the difference between the larger and smaller number.”`,
+                `Dans la pièce suivante, tu trouves deux nombres : ${a} et ${b}. Le code est leur différence.`,
+                `En la siguiente sala encuentras dos números: ${a} y ${b}. El código es la diferencia entre ellos.`,
+                `Nella stanza successiva trovi due numeri: ${a} e ${b}. Il codice è la differenza tra i due.`
+            ),
+            localize(lang,"Wie lautet der Türcode?","What is the door code?","Quel est le code ?","¿Cuál es el código?","Qual è il codice?"),
+            [String(result)],
+            "",
+            5
+        );
+    }
+
+
+    /* ---- 31-40: MULTI-STEP ---- */
+
+    for(let i=31;i<=40;i++){
+        const start=band<=3?10+i:20+i*2;
+        const addValue=band<=3?3:7;
+        const subtract=band<=3?2:5;
+        const result=start+addValue-subtract;
+
+        add(
+            localize(lang,
+                `Die nächste Nachricht enthält einen mehrstufigen Hinweis. Starte mit ${start}. Addiere ${addValue}. Danach ziehe ${subtract} ab. Erst das Ergebnis ist der gesuchte Code.`,
+                `The next message contains a multi-step clue. Start with ${start}. Add ${addValue}. Then subtract ${subtract}. The result is the code.`,
+                `Le message suivant contient plusieurs étapes. Commence avec ${start}. Ajoute ${addValue}, puis enlève ${subtract}. Le résultat est le code.`,
+                `El siguiente mensaje tiene varios pasos. Empieza con ${start}. Suma ${addValue} y después resta ${subtract}. El resultado es el código.`,
+                `Il messaggio seguente contiene più passaggi. Parti da ${start}. Aggiungi ${addValue}, poi sottrai ${subtract}. Il risultato è il codice.`
+            ),
+            localize(lang,"Wie lautet der Code?","What is the code?","Quel est le code ?","¿Cuál es el código?","Qual è il codice?"),
+            [String(result)],
+            localize(lang,"Rechne in genau der angegebenen Reihenfolge.","Calculate in exactly the given order.","Calcule dans l'ordre indiqué.","Calcula en el orden indicado.","Calcola nell'ordine indicato."),
+            6
+        );
+    }
+
+
+    /* ---- 41-50: FINAL CHAPTER ---- */
+
+    for(let i=41;i<=50;i++){
+        const x=band<=3?i-30:i-25;
+        const y=band<=3?4:9;
+
+        let result;
+
+        if(band<=2){
+            result=x+y;
+        }else if(band<=4){
+            result=(x*y)-y;
+        }else{
+            result=(x*y)+x-y;
+        }
+
+        add(
+            localize(lang,
+                `Die letzte Tür besitzt ein Zahlenschloss. Die Karte sagt: „Nimm die Zahl ${x}. ${band<=2?"Addiere":"Multipliziere"} sie mit ${y}. ${band<=4?"Ziehe anschließend "+y+" ab.":"Addiere anschließend "+x+" und ziehe "+y+" ab."}.“`,
+                `The final door has a number lock. The map says: “Take ${x}. ${band<=2?"Add":"Multiply"} it ${band<=2?"to":"by"} ${y}. ${band<=4?"Then subtract "+y+".":"Then add "+x+" and subtract "+y+"."}`,
+                `La dernière porte possède un code numérique. La carte dit : « Prends ${x}. ${band<=2?"Ajoute":"Multiplie"} ${band<=2?"avec":"par"} ${y}. ${band<=4?"Puis enlève "+y+".":"Puis ajoute "+x+" et enlève "+y+"."}`,
+                `La última puerta tiene un código numérico. El mapa dice: «Toma ${x}. ${band<=2?"Suma":"Multiplica"} ${band<=2?"con":"por"} ${y}. ${band<=4?"Después resta "+y+".":"Después suma "+x+" y resta "+y+"."}`,
+                `L'ultima porta ha un codice numerico. La mappa dice: «Prendi ${x}. ${band<=2?"Aggiungi":"Moltiplica"} ${band<=2?"con":"per"} ${y}. ${band<=4?"Poi sottrai "+y+".":"Poi aggiungi "+x+" e sottrai "+y+"."}`
+            ),
+            localize(lang,"Welche Zahl öffnet die Tür?","Which number opens the door?","Quel nombre ouvre la porte ?","¿Qué número abre la puerta?","Quale numero apre la porta?"),
+            [String(result)],
+            localize(lang,"Arbeite Schritt für Schritt und beachte alle Rechenzeichen.","Work step by step and use every operation.","Travaille étape par étape.","Trabaja paso a paso.","Procedi un passaggio alla volta."),
+            7
+        );
+    }
+
+    return {
+        version:APP_VERSION,
+        title:t(lang,"mission"),
+        grade:Number(grade),
+        language:lang,
+        country:countryCode,
+        difficulty:difficultyDescription(grade),
+        intro:t(lang,"intro"),
+        questions
+    };
+}
+
+
+/* =========================================================
+   NATURAL LANGUAGE STORY HELPER
+   ========================================================= */
+
+function localize(lang,de,en,fr,es,it){
+    return ({
+        de,
+        en,
+        fr,
+        es,
+        it
+    })[lang] || de;
+}
+
+
+/* =========================================================
+   STUDENT GAME
+   ========================================================= */
+
+function startGeneratedAdventure(){
+    const grade=document.getElementById("studentGrade").value;
+    const lang=document.getElementById("studentLanguage").value;
+    const country=document.getElementById("studentCountry").value;
+
+    currentAdventure=generateAdventure(grade,lang,country);
+    currentQuestionIndex=0;
+    lastAdventure=currentAdventure;
+
+    showView("studentGame");
+    renderGameQuestion();
+}
+
+function renderGameQuestion(){
+    if(!currentAdventure){
+        return;
+    }
+
+    if(currentQuestionIndex>=currentAdventure.questions.length){
+        showView("completionView");
+        return;
+    }
+
+    const q=currentAdventure.questions[currentQuestionIndex];
+
+    document.getElementById("gameChapter").textContent =
+        `${t(currentAdventure.language,"chapter")} ${q.chapter}`;
+
+    document.getElementById("gameQuestionTitle").textContent =
+        q.question;
+
+    document.getElementById("gameStory").textContent =
+        q.story;
+
+    document.getElementById("gameProgressText").textContent =
+        `${currentQuestionIndex+1} / ${currentAdventure.questions.length}`;
+
+    document.getElementById("gameProgressBar").style.width =
+        `${((currentQuestionIndex)/currentAdventure.questions.length)*100}%`;
+
+    const image=document.getElementById("gameImage");
+
+    if(q.image){
+        image.classList.remove("hidden");
+        image.innerHTML=`<img src="${escapeAttribute(q.image)}" alt="">`;
+    }else{
+        image.classList.add("hidden");
+        image.innerHTML="";
+    }
+
+    const answer=document.getElementById("gameAnswer");
+    answer.value="";
+    answer.disabled=false;
+
+    document.getElementById("gameFeedback").innerHTML="";
+    document.getElementById("gameHint").classList.add("hidden");
+    document.getElementById("gameHint").textContent="";
+
+    setTimeout(()=>answer.focus(),100);
+}
+
+function normalizeAnswer(value){
+    return String(value)
+        .trim()
+        .toLocaleLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"")
+        .replace(/[.,!?;:()[\]{}"'`´’]/g,"")
+        .replace(/\s+/g," ");
+}
+
+function checkGameAnswer(){
+    if(!currentAdventure)return;
+
+    const q=currentAdventure.questions[currentQuestionIndex];
+
+    const input=document.getElementById("gameAnswer");
+    const feedback=document.getElementById("gameFeedback");
+    const hint=document.getElementById("gameHint");
+
+    const given=normalizeAnswer(input.value);
+
+    if(!given){
+        feedback.innerHTML="";
+        hint.classList.remove("hidden");
+        hint.textContent=t(currentAdventure.language,"hint")+" Gib eine Antwort ein.";
+        return;
+    }
+
+    const accepted=q.answers.map(normalizeAnswer);
+
+    if(accepted.includes(given)){
+        feedback.className="feedback success";
+        feedback.textContent=t(currentAdventure.language,"correct");
+
+        input.disabled=true;
+
+        hint.classList.add("hidden");
+
+        setTimeout(()=>{
+            currentQuestionIndex++;
+            renderGameQuestion();
+        },850);
+
+    }else{
+        feedback.className="feedback error";
+        feedback.textContent=t(currentAdventure.language,"wrong");
+
+        hint.classList.remove("hidden");
+        hint.textContent=`${t(currentAdventure.language,"hint")} ${q.hint || "Suche die entscheidende Information direkt in der Geschichte."}`;
+    }
+}
+
+function restartLastAdventure(){
+    if(!lastAdventure){
+        showView("studentSetup");
+        return;
+    }
+
+    currentAdventure=JSON.parse(JSON.stringify(lastAdventure));
+    currentQuestionIndex=0;
+
+    showView("studentGame");
+    renderGameQuestion();
+}
+
+
+/* =========================================================
+   TEACHER EDITOR
+   ========================================================= */
+
+function newTeacherPuzzle(){
+    teacherPuzzle={
+        id:"p_"+Date.now(),
+        title:"",
+        language:"de",
+        grade:5,
+        country:"DE",
+        questions:[]
+    };
+
+    for(let i=0;i<5;i++){
+        addTeacherQuestion(false);
+    }
+
+    document.getElementById("puzzleTitle").value="";
+    document.getElementById("puzzleLanguage").value="de";
+    document.getElementById("puzzleGrade").value="5";
+    document.getElementById("puzzleCountry").value="DE";
+
+    renderTeacherQuestions();
+    showView("teacherEditor");
+}
+
+function addTeacherQuestion(render=true){
+    if(!teacherPuzzle){
+        teacherPuzzle={
+            id:"p_"+Date.now(),
+            title:"",
+            language:"de",
+            grade:5,
+            country:"DE",
+            questions:[]
+        };
+    }
+
+    teacherPuzzle.questions.push({
+        story:"",
+        question:"",
+        h1:"",
+        h3:"",
+        image:"",
+        answers:[""],
+        hint:""
+    });
+
+    if(render)renderTeacherQuestions();
+}
+
+function deleteTeacherQuestion(index){
+    if(!teacherPuzzle)return;
+
+    teacherPuzzle.questions.splice(index,1);
+
+    renderTeacherQuestions();
+}
+
+function renderTeacherQuestions(){
+    const container=document.getElementById("teacherQuestions");
+
+    container.innerHTML="";
+
+    if(!teacherPuzzle)return;
+
+    teacherPuzzle.questions.forEach((q,index)=>{
+        const card=document.createElement("div");
+        card.className="qCard";
+
+        card.innerHTML=`
+            <div class="qCardTop">
+                <div class="qNumber">${index+1}</div>
+                <div class="qCardTitle">
+                    Frage ${index+1}
+                </div>
+                <button class="danger" onclick="deleteTeacherQuestion(${index})">
+                    Löschen
+                </button>
+            </div>
+
+            <div class="editorQuestion">
+
+                <div class="field">
+                    <label>H1 Überschrift</label>
+                    <input
+                        data-field="h1"
+                        data-index="${index}"
+                        value="${escapeAttribute(q.h1)}"
+                        placeholder="z. B. Die geheimnisvolle Karte"
+                    >
+                </div>
+
+                <div class="field">
+                    <label>H3 Überschrift</label>
+                    <input
+                        data-field="h3"
+                        data-index="${index}"
+                        value="${escapeAttribute(q.h3)}"
+                        placeholder="z. B. Kapitel 1"
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Lange Geschichte / Lesetext</label>
+                    <textarea
+                        data-field="story"
+                        data-index="${index}"
+                        placeholder="Schreibe hier den längeren Story-Abschnitt…"
+                    >${escapeHTML(q.story)}</textarea>
+                </div>
+
+                <div class="field">
+                    <label>Frage</label>
+                    <input
+                        data-field="question"
+                        data-index="${index}"
+                        value="${escapeAttribute(q.question)}"
+                        placeholder="z. B. Welche Stadt wird genannt?"
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Akzeptierte kurze Antworten</label>
+                    <input
+                        data-field="answers"
+                        data-index="${index}"
+                        value="${escapeAttribute(q.answers.join(" | "))}"
+                        placeholder="Berlin | berlin"
+                    >
+                    <small>Mehrere Antworten mit <strong>|</strong> trennen.</small>
+                </div>
+
+                <div class="field">
+                    <label>Hinweis bei falscher Antwort</label>
+                    <input
+                        data-field="hint"
+                        data-index="${index}"
+                        value="${escapeAttribute(q.hint)}"
+                        placeholder="z. B. Suche nach dem Namen der Stadt."
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Bild-URL (optional)</label>
+                    <input
+                        data-field="image"
+                        data-index="${index}"
+                        value="${escapeAttribute(q.image)}"
+                        placeholder="https://…"
+                    >
+                </div>
+
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+
+    container.querySelectorAll("[data-field]").forEach(el=>{
+        el.addEventListener("input",()=>{
+            updateTeacherField(el);
+        });
+    });
+}
+
+function updateTeacherField(el){
+    const index=Number(el.dataset.index);
+    const field=el.dataset.field;
+
+    if(!teacherPuzzle || !teacherPuzzle.questions[index])return;
+
+    if(field==="answers"){
+        teacherPuzzle.questions[index].answers=
+            el.value.split("|").map(x=>x.trim()).filter(Boolean);
+    }else{
+        teacherPuzzle.questions[index][field]=el.value;
+    }
+}
+
+function collectTeacherMeta(){
+    if(!teacherPuzzle)return;
+
+    teacherPuzzle.title=document.getElementById("puzzleTitle").value.trim();
+    teacherPuzzle.language=document.getElementById("puzzleLanguage").value;
+    teacherPuzzle.grade=Number(document.getElementById("puzzleGrade").value);
+    teacherPuzzle.country=document.getElementById("puzzleCountry").value;
+}
+
+
+/* =========================================================
+   TEACHER 50 QUESTION TEMPLATE
+   ========================================================= */
+
+function generateTeacherTemplate(){
+    collectTeacherMeta();
+
+    const generated=generateAdventure(
+        teacherPuzzle.grade,
+        teacherPuzzle.language,
+        teacherPuzzle.country
+    );
+
+    teacherPuzzle.questions=generated.questions.map((q,index)=>({
+        story:q.story,
+        question:q.question,
+        h1:`${q.chapter === 1 ? "Die große Reise" : "Das Abenteuer geht weiter"}`,
+        h3:`Kapitel ${q.chapter} · Frage ${index+1}`,
+        image:"",
+        answers:q.answers,
+        hint:q.hint
+    }));
+
+    if(!teacherPuzzle.title){
+        teacherPuzzle.title=generated.title;
+        document.getElementById("puzzleTitle").value=teacherPuzzle.title;
+    }
+
+    renderTeacherQuestions();
+}
+
+
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+
+function getSavedPuzzles(){
+    try{
+        return JSON.parse(localStorage.getItem("learningweb_puzzles") || "[]");
+    }catch{
+        return [];
+    }
+}
+
+function saveTeacherPuzzle(){
+    collectTeacherMeta();
+
+    if(!teacherPuzzle){
+        alert("Bitte zuerst ein Rätsel erstellen.");
+        return;
+    }
+
+    if(!teacherPuzzle.title){
+        teacherPuzzle.title="learningweb Rätsel";
+    }
+
+    if(!teacherPuzzle.questions.length){
+        alert("Füge mindestens eine Frage hinzu.");
+        return;
+    }
+
+    for(let i=0;i<teacherPuzzle.questions.length;i++){
+        const q=teacherPuzzle.questions[i];
+
+        if(!q.question || !q.story || !q.answers.length){
+            alert(`Frage ${i+1} ist noch nicht vollständig.`);
+            return;
+        }
+    }
+
+    const puzzles=getSavedPuzzles();
+
+    const existing=puzzles.findIndex(p=>p.id===teacherPuzzle.id);
+
+    if(existing>=0){
+        puzzles[existing]=teacherPuzzle;
+    }else{
+        puzzles.push(teacherPuzzle);
+    }
+
+    localStorage.setItem("learningweb_puzzles",JSON.stringify(puzzles));
+
+    alert("Rätsel gespeichert.");
+}
+
+function loadTeacherHome(){
+    const container=document.getElementById("savedPuzzles");
+    const puzzles=getSavedPuzzles();
+
+    container.innerHTML="";
+
+    if(!puzzles.length){
+        container.innerHTML=`
+            <div class="notice">
+                Noch keine gespeicherten Rätsel.
+                Erstelle dein erstes mit „Neues Rätsel“.
+            </div>
+        `;
+        return;
+    }
+
+    puzzles.forEach(p=>{
+        const item=document.createElement("div");
+        item.className="savedItem";
+
+        item.innerHTML=`
+            <div class="savedInfo">
+                <strong>${escapeHTML(p.title || "Ohne Titel")}</strong>
+                <small>
+                    ${p.questions.length} Fragen · Klasse ${p.grade}
+                </small>
+            </div>
+
+            <div class="actions" style="margin:0">
+                <button class="secondary" onclick="editSavedPuzzle('${escapeAttribute(p.id)}')">
+                    Bearbeiten
+                </button>
+
+                <button class="primary" onclick="loadSavedAndQR('${escapeAttribute(p.id)}')">
+                    QR-Code
+                </button>
+
+                <button class="danger" onclick="deleteSavedPuzzle('${escapeAttribute(p.id)}')">
+                    Löschen
+                </button>
+            </div>
+        `;
+
+        container.appendChild(item);
+    });
+}
+
+function editSavedPuzzle(id){
+    const puzzles=getSavedPuzzles();
+    const found=puzzles.find(p=>p.id===id);
+
+    if(!found)return;
+
+    teacherPuzzle=JSON.parse(JSON.stringify(found));
+
+    document.getElementById("puzzleTitle").value=teacherPuzzle.title;
+    document.getElementById("puzzleLanguage").value=teacherPuzzle.language;
+    document.getElementById("puzzleGrade").value=teacherPuzzle.grade;
+    document.getElementById("puzzleCountry").value=teacherPuzzle.country;
+
+    renderTeacherQuestions();
+    showView("teacherEditor");
+}
+
+function loadSavedAndQR(id){
+    editSavedPuzzle(id);
+
+    setTimeout(()=>{
+        generateQR();
+    },50);
+}
+
+function deleteSavedPuzzle(id){
+    if(!confirm("Dieses Rätsel wirklich löschen?"))return;
+
+    const puzzles=getSavedPuzzles().filter(p=>p.id!==id);
+
+    localStorage.setItem("learningweb_puzzles",JSON.stringify(puzzles));
+
+    loadTeacherHome();
+}
+
+
+/* =========================================================
+   QR ENCODING
+   ========================================================= */
+
+function compactPuzzle(puzzle){
+    return {
+        v:APP_VERSION,
+        t:puzzle.title,
+        l:puzzle.language,
+        g:puzzle.grade,
+        c:puzzle.country,
+        q:puzzle.questions.map(q=>({
+            s:q.story,
+            q:q.question,
+            h1:q.h1||"",
+            h3:q.h3||"",
+            i:q.image||"",
+            a:q.answers,
+            h:q.hint||""
+        }))
+    };
+}
+
+function expandPuzzle(data){
+    return {
+        version:data.v,
+        title:data.t,
+        language:data.l,
+        grade:data.g,
+        country:data.c,
+        questions:data.q.map(q=>({
+            story:q.s,
+            question:q.q,
+            h1:q.h1,
+            h3:q.h3,
+            image:q.i,
+            answers:q.a,
+            hint:q.h
+        }))
+    };
+}
+
+function encodePuzzle(puzzle){
+    const compact=compactPuzzle(puzzle);
+    const json=JSON.stringify(compact);
+
+    const compressed=LZString.compressToEncodedURIComponent(json);
+
+    return "LW2."+compressed;
+}
+
+function decodePuzzle(payload){
+    if(!payload.startsWith("LW2.")){
+        throw new Error("Kein learningweb-QR-Code.");
+    }
+
+    const compressed=payload.slice(4);
+
+    const json=LZString.decompressFromEncodedURIComponent(compressed);
+
+    if(!json){
+        throw new Error("QR-Daten konnten nicht entschlüsselt werden.");
+    }
+
+    return expandPuzzle(JSON.parse(json));
+}
+
+function generateQR(){
+    collectTeacherMeta();
+
+    if(!teacherPuzzle){
+        alert("Kein Rätsel geladen.");
+        return;
+    }
+
+    if(!teacherPuzzle.questions.length){
+        alert("Das Rätsel enthält keine Fragen.");
+        return;
+    }
+
+    let payload;
+
+    try{
+        payload=encodePuzzle(teacherPuzzle);
+    }catch(error){
+        alert("QR-Daten konnten nicht erstellt werden.");
+        return;
+    }
+
+    const qrcode=document.getElementById("qrcode");
+    qrcode.innerHTML="";
+
+    /*
+      QR version/capacity is handled by qrcode.js.
+      We use a high error correction level because the code
+      is intended to be scanned from a screen.
+    */
+
+    try{
+        new QRCode(qrcode,{
+            text:payload,
+            width:280,
+            height:280,
+            correctLevel:QRCode.CorrectLevel.M
+        });
+
+        document.getElementById("qrSection").classList.remove("hidden");
+
+        document.getElementById("qrStatus").innerHTML=
+            `QR-Code erstellt.<br>
+             Komprimierte Daten: <strong>${payload.length.toLocaleString("de-DE")} Zeichen</strong>.<br>
+             ${teacherPuzzle.questions.length} Fragen sind enthalten.`;
+
+    }catch(error){
+        document.getElementById("qrSection").classList.remove("hidden");
+
+        document.getElementById("qrStatus").innerHTML=
+            `<strong>⚠️ QR-Code zu groß.</strong><br>
+             Dieses Rätsel enthält zu viele Daten für einen einzelnen QR-Code.
+             Kürze insbesondere die langen Story-Texte oder teile das Rätsel in kleinere Abschnitte.`;
+
+        console.error(error);
+    }
+}
+
+function downloadQR(){
+    const canvas=document.querySelector("#qrcode canvas");
+
+    if(!canvas){
+        alert("Erstelle zuerst einen QR-Code.");
+        return;
+    }
+
+    const link=document.createElement("a");
+    link.download="learningweb-qr.png";
+    link.href=canvas.toDataURL("image/png");
+    link.click();
+}
+
+
+/* =========================================================
+   QR SCANNER
+   ========================================================= */
+
+async function startScanner(){
+    const video=document.getElementById("scannerVideo");
+    const result=document.getElementById("scanResult");
+
+    if(!("BarcodeDetector" in window)){
+        result.innerHTML=`
+            <div class="notice">
+                Dein Browser unterstützt die direkte QR-Erkennung nicht.
+                Öffne learningweb in einem aktuellen Browser mit BarcodeDetector-Unterstützung
+                oder ergänze später eine QR-Scanner-Bibliothek.
+            </div>
+        `;
+        return;
+    }
+
+    try{
+        const detector=new BarcodeDetector({
+            formats:["qr_code"]
+        });
+
+        scannerStream=await navigator.mediaDevices.getUserMedia({
+            video:{
+                facingMode:{ideal:"environment"}
+            },
+            audio:false
+        });
+
+        video.srcObject=scannerStream;
+        await video.play();
+
+        result.innerHTML="📷 Suche nach einem learningweb-QR-Code…";
+
+        scannerTimer=setInterval(async()=>{
+            try{
+                const codes=await detector.detect(video);
+
+                if(!codes.length)return;
+
+                const raw=codes[0].rawValue;
+
+                stopScanner();
+
+                const puzzle=decodePuzzle(raw);
+
+                currentAdventure=puzzle;
+                currentQuestionIndex=0;
+                lastAdventure=puzzle;
+
+                showView("studentGame");
+                renderGameQuestion();
+
+            }catch(error){
+                result.innerHTML=`
+                    <div class="feedback error">
+                        ${escapeHTML(error.message || "Ungültiger QR-Code.")}
+                    </div>
+                `;
+            }
+        },400);
+
+    }catch(error){
+        result.innerHTML=`
+            <div class="feedback error">
+                Kamerazugriff konnte nicht gestartet werden.
+                Bitte erlaube den Kamerazugriff im Browser.
+            </div>
+        `;
+    }
+}
+
+function stopScanner(){
+    if(scannerTimer){
+        clearInterval(scannerTimer);
+        scannerTimer=null;
+    }
+
+    if(scannerStream){
+        scannerStream.getTracks().forEach(track=>track.stop());
+        scannerStream=null;
+    }
+
+    const video=document.getElementById("scannerVideo");
+
+    if(video){
+        video.srcObject=null;
+    }
+}
+
+
+/* =========================================================
+   SECURITY / HTML HELPERS
+   ========================================================= */
+
+function escapeHTML(value){
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+function escapeAttribute(value){
+    return escapeHTML(value)
+        .replace(/`/g,"&#096;");
+}
+
+
+/* =========================================================
+   INITIALIZATION
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded",()=>{
+    showView("homeView");
+});
+
+
+/* =========================================================
+   OPTIONAL KEYBOARD SHORTCUT
+   ========================================================= */
+
+document.addEventListener("keydown",event=>{
+    if(
+        event.key==="Enter" &&
+        currentView==="studentGame" &&
+        document.activeElement?.id==="gameAnswer"
+    ){
+        checkGameAnswer();
+    }
+});
+</script>
+
+</body>
+</html>
