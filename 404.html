@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>404 – Seite nicht gefunden | lamacHub</title>
+
+<meta name="description" content="Diese Seite wurde auf lamacHub nicht gefunden.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --accent: #ff7a00;
+    --bg: #07080a;
+    --text: #f5f5f7;
+    --muted: #9b9da4;
+    --glass: rgba(255,255,255,.055);
+    --glass-strong: rgba(255,255,255,.09);
+    --border: rgba(255,255,255,.11);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Inter, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(255,122,0,.13),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 15% 90%,
+            rgba(255,122,0,.06),
+            transparent 28%
+        ),
+        var(--bg);
+    overflow: hidden;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+
+    height: 74px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 32px;
+
+    background: rgba(7,8,10,.55);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    font-family: Poppins, sans-serif;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -.7px;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.home-mini {
+    text-decoration: none;
+    color: var(--muted);
+
+    padding: 10px 15px;
+
+    border: 1px solid var(--border);
+    border-radius: 13px;
+
+    background: var(--glass);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    transition: .2s ease;
+}
+
+.home-mini:hover {
+    color: var(--text);
+    border-color: rgba(255,122,0,.4);
+    background: var(--glass-strong);
+    transform: translateY(-1px);
+}
+
+/* =========================
+   MAIN
+========================= */
+
+main {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 100px 20px 40px;
+}
+
+.container {
+    width: min(850px, 100%);
+    text-align: center;
+}
+
+/* =========================
+   ILLUSTRATION
+========================= */
+
+.visual {
+    position: relative;
+
+    width: min(400px, 80vw);
+    height: 250px;
+
+    margin: 0 auto 15px;
+}
+
+.glow {
+    position: absolute;
+
+    width: 260px;
+    height: 260px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    background: rgba(255,122,0,.13);
+    filter: blur(65px);
+
+    border-radius: 50%;
+}
+
+.number {
+    position: absolute;
+
+    left: 50%;
+    top: 48%;
+
+    transform: translate(-50%, -50%);
+
+    font-family: Poppins, sans-serif;
+    font-weight: 800;
+    font-size: clamp(115px, 20vw, 190px);
+
+    letter-spacing: -12px;
+
+    line-height: 1;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 5%,
+            #b9bbc2 48%,
+            #ff7a00 100%
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    filter:
+        drop-shadow(0 25px 40px rgba(0,0,0,.45));
+
+    animation: float 5s ease-in-out infinite;
+}
+
+.number::after {
+    content: "";
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    right: 19px;
+    top: 27px;
+
+    border-radius: 50%;
+
+    background: var(--accent);
+
+    box-shadow:
+        0 0 25px rgba(255,122,0,.7),
+        0 0 60px rgba(255,122,0,.35);
+
+    animation: blink 2.5s ease-in-out infinite;
+}
+
+.orbit {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 330px;
+    height: 110px;
+
+    transform:
+        translate(-50%, -50%)
+        rotate(-13deg);
+
+    border: 1px solid rgba(255,122,0,.22);
+
+    border-radius: 50%;
+
+    animation: orbit 8s linear infinite;
+}
+
+.orbit::before {
+    content: "";
+
+    position: absolute;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: var(--accent);
+
+    box-shadow:
+        0 0 15px rgba(255,122,0,.9);
+
+    left: 17px;
+    top: 7px;
+}
+
+/* =========================
+   TEXT
+========================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 12px;
+
+    margin-bottom: 17px;
+
+    border: 1px solid rgba(255,122,0,.2);
+    border-radius: 999px;
+
+    background: rgba(255,122,0,.07);
+
+    color: var(--accent);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.badge-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: var(--accent);
+
+    box-shadow:
+        0 0 10px rgba(255,122,0,.8);
+}
+
+h1 {
+    margin: 0;
+
+    font-family: Poppins, sans-serif;
+
+    font-size: clamp(30px, 5vw, 50px);
+
+    line-height: 1.1;
+
+    letter-spacing: -2px;
+}
+
+.description {
+    max-width: 590px;
+
+    margin: 18px auto 0;
+
+    color: var(--muted);
+
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.actions {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-top: 30px;
+
+    flex-wrap: wrap;
+}
+
+.btn {
+    min-height: 50px;
+
+    padding: 0 21px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    border-radius: 14px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition: .2s ease;
+}
+
+.primary {
+    color: white;
+
+    background: var(--accent);
+
+    box-shadow:
+        0 12px 35px rgba(255,122,0,.18);
+}
+
+.primary:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 18px 45px rgba(255,122,0,.28);
+}
+
+.secondary {
+    color: var(--text);
+
+    background: var(--glass);
+
+    border: 1px solid var(--border);
+}
+
+.secondary:hover {
+    transform: translateY(-2px);
+
+    background: var(--glass-strong);
+
+    border-color: rgba(255,255,255,.18);
+}
+
+/* =========================
+   BOTTOM CARD
+========================= */
+
+.info {
+    margin: 42px auto 0;
+
+    width: min(620px, 100%);
+
+    padding: 17px 20px;
+
+    border: 1px solid var(--border);
+    border-radius: 17px;
+
+    background: var(--glass);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    color: var(--muted);
+
+    font-size: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.info strong {
+    color: var(--text);
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 17px;
+
+    text-align: center;
+
+    color: rgba(155,157,164,.65);
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes float {
+    0%,100% {
+        transform:
+            translate(-50%, -50%)
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translate(-50%, -50%)
+            translateY(-9px);
+    }
+}
+
+@keyframes orbit {
+    from {
+        transform:
+            translate(-50%, -50%)
+            rotate(-13deg);
+    }
+
+    to {
+        transform:
+            translate(-50%, -50%)
+            rotate(347deg);
+    }
+}
+
+@keyframes blink {
+    0%,100% {
+        opacity: .45;
+        transform: scale(.85);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    .navbar {
+        padding: 0 17px;
+        height: 65px;
+    }
+
+    .visual {
+        height: 205px;
+    }
+
+    .orbit {
+        width: 270px;
+        height: 90px;
+    }
+
+    .number {
+        letter-spacing: -8px;
+    }
+
+    .description {
+        font-size: 15px;
+    }
+
+    .info {
+        margin-top: 30px;
+    }
+
+    footer {
+        bottom: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        lamac<span>Hub</span>
+    </div>
+
+    <a href="/" class="home-mini">
+        Startseite
+    </a>
+
+</header>
+
+
+<main>
+
+    <div class="container">
+
+        <div class="visual">
+
+            <div class="glow"></div>
+
+            <div class="orbit"></div>
+
+            <div class="number">
+                404
+            </div>
+
+        </div>
+
+
+        <div class="badge">
+            <span class="badge-dot"></span>
+            Seite nicht gefunden
+        </div>
+
+
+        <h1>
+            Diese Seite ist<br>
+            irgendwo verloren gegangen.
+        </h1>
+
+
+        <p class="description">
+            Die Adresse, die du aufgerufen hast, existiert auf
+            lamacHub nicht – oder sie hat sich gerade vor dir versteckt.
+            Keine Sorge: Deine Daten sind nicht verloren.
+        </p>
+
+
+        <div class="actions">
+
+            <a href="/" class="btn primary">
+                ← Zur Startseite
+            </a>
+
+            <a href="javascript:history.back()" class="btn secondary">
+                Zurück
+            </a>
+
+        </div>
+
+
+        <div class="info">
+            <span>Fehlercode:</span>
+            <strong>404</strong>
+            <span>·</span>
+            <span>Die gesuchte Seite wurde nicht gefunden.</span>
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer>
+    © 2026 lamacHub
+</footer>
+
+
+<script>
+
+/* Kleine zufällige Bewegung des 404-Orbits */
+
+const orbit = document.querySelector(".orbit");
+
+document.addEventListener("mousemove", (event) => {
+
+    const x =
+        (event.clientX / window.innerWidth - .5) * 8;
+
+    const y =
+        (event.clientY / window.innerHeight - .5) * 8;
+
+    orbit.style.marginLeft = `${x}px`;
+    orbit.style.marginTop = `${y}px`;
+
+});
+
+</script>
+
+</body>
+</html>
