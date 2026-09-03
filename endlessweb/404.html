@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>The Endless Internet</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --accent: #ff7a00;
+    --bg: #08090b;
+    --bg2: #0e1014;
+    --glass: rgba(255,255,255,.055);
+    --glass2: rgba(255,255,255,.08);
+    --border: rgba(255,255,255,.11);
+    --text: #f5f5f7;
+    --muted: #9a9da5;
+    --shadow: 0 25px 80px rgba(0,0,0,.35);
+}
+
+body.light {
+    --bg: #f4f5f7;
+    --bg2: #ffffff;
+    --glass: rgba(255,255,255,.72);
+    --glass2: rgba(255,255,255,.9);
+    --border: rgba(0,0,0,.09);
+    --text: #111216;
+    --muted: #686b73;
+    --shadow: 0 25px 80px rgba(0,0,0,.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(255,122,0,.12), transparent 30%),
+        radial-gradient(circle at 80% 90%, rgba(255,122,0,.07), transparent 30%),
+        var(--bg);
+    color: var(--text);
+    font-family: Inter, sans-serif;
+    transition: background .3s, color .3s;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    background: rgba(8,9,11,.65);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-bottom: 1px solid var(--border);
+}
+
+body.light .topbar {
+    background: rgba(255,255,255,.7);
+}
+
+.logo {
+    font-family: Poppins, sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -.5px;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.top-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-btn {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--glass);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    transition: .2s;
+}
+
+.icon-btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,122,0,.45);
+    background: var(--glass2);
+}
+
+.app {
+    width: min(920px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 70px 0 100px;
+}
+
+.progress-area {
+    margin-bottom: 28px;
+}
+
+.progress-top {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.progress {
+    width: 100%;
+    height: 5px;
+    background: var(--glass2);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: inherit;
+    transition: width .5s ease;
+}
+
+.hero {
+    margin-bottom: 34px;
+}
+
+.category {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    margin-bottom: 16px;
+}
+
+.dot {
+    width: 7px;
+    height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(255,122,0,.8);
+}
+
+h1 {
+    font-family: Poppins, sans-serif;
+    font-size: clamp(38px, 7vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -3px;
+    margin: 0 0 22px;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.75;
+    max-width: 750px;
+}
+
+.story {
+    display: grid;
+    gap: 18px;
+    margin-bottom: 38px;
+}
+
+.story-card {
+    padding: 28px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 25px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.story-card p {
+    margin: 0;
+    color: var(--text);
+    opacity: .88;
+    font-size: 16px;
+    line-height: 1.9;
+}
+
+.story-card p + p {
+    margin-top: 18px;
+}
+
+.quote {
+    padding: 25px 28px;
+    margin-bottom: 38px;
+    border-left: 3px solid var(--accent);
+    background: var(--glass);
+    border-radius: 0 20px 20px 0;
+    color: var(--muted);
+    font-family: Poppins, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.riddle {
+    padding: 32px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,122,0,.10),
+            var(--glass)
+        );
+    border: 1px solid rgba(255,122,0,.2);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+}
+
+.riddle-label {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+.riddle h2 {
+    font-family: Poppins, sans-serif;
+    font-size: clamp(22px, 4vw, 31px);
+    line-height: 1.35;
+    margin: 0 0 25px;
+}
+
+.answer-row {
+    display: flex;
+    gap: 10px;
+}
+
+.answer-input {
+    min-width: 0;
+    flex: 1;
+    height: 54px;
+    padding: 0 18px;
+    border-radius: 15px;
+    border: 1px solid var(--border);
+    outline: none;
+    background: var(--glass2);
+    color: var(--text);
+    transition: .2s;
+}
+
+.answer-input:focus {
+    border-color: rgba(255,122,0,.7);
+    box-shadow: 0 0 0 4px rgba(255,122,0,.08);
+}
+
+.check-btn {
+    height: 54px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 15px;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.check-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255,122,0,.22);
+}
+
+.feedback {
+    min-height: 25px;
+    margin-top: 15px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.feedback.success {
+    color: #65d18c;
+}
+
+.feedback.error {
+    color: #ff7b7b;
+}
+
+.next-area {
+    display: none;
+    margin-top: 20px;
+}
+
+.next-area.show {
+    display: block;
+}
+
+.next-btn {
+    width: 100%;
+    min-height: 58px;
+    border: 1px solid rgba(255,122,0,.35);
+    border-radius: 17px;
+    background: rgba(255,122,0,.11);
+    color: var(--text);
+    font-weight: 700;
+    transition: .2s;
+}
+
+.next-btn:hover {
+    background: rgba(255,122,0,.18);
+    transform: translateY(-2px);
+}
+
+.footer {
+    margin-top: 65px;
+    padding-top: 25px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media(max-width:650px) {
+    .topbar {
+        padding: 0 16px;
+    }
+
+    .app {
+        width: min(100% - 22px, 920px);
+        padding-top: 45px;
+    }
+
+    h1 {
+        letter-spacing: -2px;
+    }
+
+    .story-card,
+    .riddle {
+        padding: 22px;
+        border-radius: 21px;
+    }
+
+    .answer-row {
+        flex-direction: column;
+    }
+
+    .check-btn {
+        width: 100%;
+    }
+
+    .footer {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="logo">lamac<span>Os</span></div>
+
+    <div class="top-actions">
+        <button class="icon-btn" id="backBtn" title="Zurück">←</button>
+        <button class="icon-btn" id="themeBtn" title="Darstellung">☾</button>
+    </div>
+</header>
+
+<main class="app">
+
+    <div class="progress-area">
+        <div class="progress-top">
+            <span id="stationCounter">01 / 50</span>
+            <span id="cycleCounter">Durchlauf 1</span>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <section class="hero">
+        <div class="category">
+            <span class="dot"></span>
+            <span id="category"></span>
+        </div>
+
+        <h1 id="title"></h1>
+
+        <div class="subtitle" id="subtitle"></div>
+    </section>
+
+    <section class="story" id="story"></section>
+
+    <div class="quote hidden" id="quote"></div>
+
+    <section class="riddle">
+        <div class="riddle-label">Die nächste Spur</div>
+
+        <h2 id="riddle"></h2>
+
+        <div class="answer-row">
+            <input
+                id="answer"
+                class="answer-input"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Deine Antwort …"
+            >
+
+            <button class="check-btn" id="checkBtn">
+                Prüfen
+            </button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="next-area" id="nextArea">
+            <button class="next-btn" id="nextBtn">
+                Zur nächsten Spur →
+            </button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <span>The Endless Internet</span>
+        <span>© 2026 lamacHub</span>
+    </footer>
+
+</main>
+
+<script>
+
+/*
+===========================================================
+THE ENDLESS INTERNET
+50 Stationen
+Jede Frage besitzt 10 akzeptierte Antwortformulierungen.
+===========================================================
+*/
+
+const pages = [
+
+/* 01 */
+{
+slug:"",
+category:"Der Anfang",
+title:"Du bist hier.",
+subtitle:"Es gibt keinen Startpunkt. Nur den Punkt, an dem du angefangen hast zu suchen.",
+text:[
+"Wenn du diese Seite zum ersten Mal siehst, wirkt sie wahrscheinlich wie eine ganz normale Webseite. Ein Titel, ein Text, eine Frage. Nichts davon erklärt, warum du hier bist. Genau das ist Absicht.",
+"Vor einigen Jahren wurde in einem alten Serverprotokoll eine merkwürdige Notiz gefunden. Sie bestand aus fünfzig Einträgen. Jeder Eintrag verwies auf den nächsten. Der letzte verwies wieder auf den ersten. Niemand konnte feststellen, wer die Liste erstellt hatte.",
+"Das Seltsame daran war nicht der Kreis. Das Seltsame war, dass jeder Eintrag Informationen enthielt, die erst später entdeckt wurden. Als hätte jemand die Vergangenheit beschrieben, nachdem sie bereits passiert war.",
+"Die Datei wurde deshalb nicht gelöscht. Sie wurde veröffentlicht. Nicht unter einem Namen und nicht auf einer bekannten Plattform. Sie wurde einfach irgendwo im Internet hinterlassen.",
+"Du hast gerade den ersten Eintrag geöffnet."
+],
+riddle:"Was verbindet zwei Orte im Internet, ohne selbst einer dieser Orte zu sein?",
+answers:[
+"link","ein link","der link","verbindung","eine verbindung",
+"die verbindung","verknüpfung","eine verknüpfung","hyperlink","ein hyperlink"
+],
+next:"/archiv/der-erste-eintrag"
+},
+
+/* 02 */
+{
+slug:"archiv/der-erste-eintrag",
+category:"Archiv",
+title:"Der erste Eintrag",
+subtitle:"Dokument 01 — gefunden in einem Verzeichnis ohne Namen.",
+text:[
+"Das Dokument ist kaum länger als eine Seite. Trotzdem scheint es wichtig genug gewesen zu sein, um mehrfach kopiert zu werden. Auf jeder Kopie fehlt dieselbe Zeile.",
+"Am oberen Rand steht eine Uhrzeit: 02:17. Darunter befindet sich eine handschriftliche Notiz: „Nicht der Ort ist wichtig. Die Zeit ist es.“",
+"Ein zweiter Satz wurde später hinzugefügt. Die Schrift ist eine andere: „Wenn die Uhr stehen bleibt, beginnt die Bewegung.“",
+"Niemand weiß, ob damit eine echte Uhr gemeint war. In den nächsten Dokumenten taucht die Zahl 17 jedoch immer wieder auf.",
+"Du bemerkst, dass das Dokument selbst keine Jahreszahl trägt."
+],
+riddle:"Welche Zahl wird im Dokument immer wieder erwähnt?",
+answers:[
+"17","siebzehn","die 17","die zahl 17","zahl siebzehn",
+"nummer 17","nummer siebzehn","siebzehn uhr","17 uhr","ziffer 17"
+],
+next:"/wissenschaft/die-uhr"
+},
+
+/* 03 */
+{
+slug:"wissenschaft/die-uhr",
+category:"Wissenschaft",
+title:"Die Uhr",
+subtitle:"02:17 ist keine Uhrzeit mehr. Es ist ein Hinweis.",
+text:[
+"Eine Uhr ist normalerweise ein Werkzeug zur Orientierung. Sie sagt dir, wann etwas passiert. Doch eine stehende Uhr kann etwas völlig anderes bedeuten: Sie kann einen Moment markieren.",
+"Bei einer Untersuchung alter Gebäude fand man tatsächlich eine Uhr, die exakt bei 02:17 stehen geblieben war. Das Gebäude war seit Jahrzehnten verlassen.",
+"Es gab keinen Stromausfall, der die Uhr erklären konnte. Die Batterie war neu. Auch mechanisch war nichts kaputt.",
+"Das Interessante war die Rückseite. Dort befand sich eine kleine Gravur: „Du kannst die Zeit nicht zurückdrehen. Aber du kannst erkennen, wann sie sich verändert hat.“",
+"Daneben war ein Pfeil eingeritzt."
+],
+riddle:"Was kann eine stehende Uhr markieren, wenn sie nicht mehr die aktuelle Zeit zeigt?",
+answers:[
+"einen moment","ein moment","der moment","einen zeitpunkt","ein zeitpunkt",
+"der zeitpunkt","einen bestimmten moment","einen bestimmten zeitpunkt",
+"einen augenblick","ein ereignis"
+],
+next:"/orte/der-bahnhof"
+},
+
+/* 04 */
+{
+slug:"orte/der-bahnhof",
+category:"Orte",
+title:"Der Bahnhof",
+subtitle:"Ein Ort, an dem Menschen ankommen und verschwinden.",
+text:[
+"Der Bahnhof liegt außerhalb einer Stadt, die auf keiner modernen Karte mehr eingezeichnet ist. Die Gleise sind noch vorhanden, aber dort fährt kein Zug.",
+"An einem der Bahnsteige hängt eine alte Anzeigetafel. Die meisten Buchstaben fehlen. Nur eine Zeile funktioniert noch.",
+"Dort steht kein Ziel. Dort steht lediglich: „Nächste Veränderung: unbekannt.“",
+"Unter der Tafel befindet sich ein Foto. Drei Personen stehen darauf. Hinter ihnen ist eine Tür, die auf keinem Plan des Bahnhofs eingezeichnet ist.",
+"Auf der Rückseite des Fotos steht nur eine einzige Zahl."
+],
+riddle:"Welche Zahl steht auf der Rückseite des Fotos?",
+answers:[
+"3","drei","die 3","die drei","nummer 3",
+"zahl 3","zahl drei","ziffer 3","drei personen","drei"
+],
+next:"/geschichte/das-foto"
+},
+
+/* 05 */
+{
+slug:"geschichte/das-foto",
+category:"Geschichte",
+title:"Das Foto",
+subtitle:"Drei Menschen. Eine Tür. Ein Datum, das nicht passt.",
+text:[
+"Das Foto wurde laut Archiv im Jahr 1987 aufgenommen. Doch eine der Personen trägt etwas, das erst viele Jahre später hergestellt wurde.",
+"Das Foto wurde deshalb zunächst als Fälschung eingestuft. Erst als ein zweites Bild auftauchte, änderte sich die Einschätzung.",
+"Auf beiden Bildern stehen die drei Personen exakt gleich. Selbst die Schatten liegen an derselben Stelle.",
+"Das bedeutet nicht, dass die Bilder identisch sind. Auf dem zweiten Foto fehlt die Tür.",
+"Jemand hat sie aus dem Bild entfernt. Nicht digital, sondern auf dem Original."
+],
+riddle:"Was wurde auf dem zweiten Foto entfernt?",
+answers:[
+"die tür","eine tür","eine tuer","die tuer","der eingang",
+"die eingangstür","die eingangstuer","eine eingangstür",
+"ein eingang","die tür im bild"
+],
+next:"/archiv/dokument-17"
+},
+
+/* 06 */
+{
+slug:"archiv/dokument-17",
+category:"Archiv",
+title:"Dokument 17",
+subtitle:"Eine Akte, die niemals hätte existieren dürfen.",
+text:[
+"Dokument 17 enthält eine Liste von Beobachtungen. Die meisten davon wirken belanglos: Wetter, Uhrzeit, Geräusche, Personen.",
+"Doch zwischen den normalen Einträgen befindet sich ein Satz, der offenbar nicht zum Rest gehört.",
+"„Wenn jemand die Tür entfernt, bleibt der Raum trotzdem bestehen.“",
+"Darunter folgen Koordinaten. Sie führen nicht zu einem Gebäude, sondern zu einem leeren Punkt zwischen zwei Straßen.",
+"Der letzte Eintrag lautet: „Die Zahl ist nicht die Antwort. Sie zeigt nur, wo gesucht werden muss.“"
+],
+riddle:"Welche Zahl trägt das Dokument?",
+answers:[
+"17","siebzehn","die 17","die siebzehn","dokument 17",
+"nummer 17","nummer siebzehn","zahl 17","zahl siebzehn","ziffer 17"
+],
+next:"/raetsel/die-zahlen"
+},
+
+/* 07 */
+{
+slug:"raetsel/die-zahlen",
+category:"Rätsel",
+title:"Die Zahlen",
+subtitle:"17, 3, 50. Drei Zahlen tauchen immer wieder auf.",
+text:[
+"Du schreibst die Zahlen nebeneinander: 17 — 3 — 50.",
+"Auf den ersten Blick scheint kein Zusammenhang zu bestehen. Doch im Archiv stehen sie niemals zufällig.",
+"17 markiert die Uhr. 3 markiert das Foto. 50 beschreibt die Anzahl der Einträge.",
+"Vielleicht sind die Zahlen keine Codes. Vielleicht beschreiben sie nur Eigenschaften der Geschichte.",
+"Ein geometrisches Zeichen erscheint daneben: vier gleiche Seiten, vier rechte Winkel."
+],
+riddle:"Welche geometrische Form hat vier gleich lange Seiten und vier rechte Winkel?",
+answers:[
+"quadrat","ein quadrat","das quadrat","quadratische form","ein viereck",
+"gleichseitiges viereck","quadratisches viereck","vierseitiges quadrat",
+"rechteck mit gleichen seiten","eine quadratische form"
+],
+next:"/wissenschaft/die-perspektive"
+},
+
+/* 08 */
+{
+slug:"wissenschaft/die-perspektive",
+category:"Wissenschaft",
+title:"Die Perspektive",
+subtitle:"Dasselbe kann völlig anders aussehen, wenn du deinen Blick veränderst.",
+text:[
+"Menschen glauben gerne, dass sie Dinge objektiv sehen. Tatsächlich beeinflusst die Perspektive fast jede Beobachtung.",
+"Ein Gegenstand kann aus einer Richtung sichtbar und aus einer anderen unsichtbar sein. Ein Gebäude kann von vorne massiv wirken und von hinten leer.",
+"Die Dateien dieser Geschichte funktionieren genauso. Jeder Eintrag zeigt dir nur einen Teil.",
+"Vielleicht wurde die Wahrheit nie versteckt. Vielleicht wurde sie einfach nie aus der richtigen Richtung betrachtet.",
+"Im Rand des Dokuments steht ein einzelnes Wort."
+],
+riddle:"Was musst du verändern, wenn du etwas aus einer anderen Richtung betrachten willst?",
+answers:[
+"den blick","die perspektive","meine perspektive","den standpunkt","den blickwinkel",
+"den betrachtungswinkel","die betrachtungsrichtung","die sichtweise",
+"meinen standpunkt","die sicht"
+],
+next:"/orte/die-treppe"
+},
+
+/* 09 */
+{
+slug:"orte/die-treppe",
+category:"Orte",
+title:"Die Treppe",
+subtitle:"Sie führt nach unten, obwohl auf dem Plan kein Untergeschoss existiert.",
+text:[
+"Die Treppe beginnt hinter einer Wand. Sie besteht aus neun Stufen, doch niemand kann sagen, wohin sie führt.",
+"Auf der ersten Stufe ist eine kleine Markierung. Auf der letzten ebenfalls.",
+"Die Markierungen sehen aus wie Striche, doch bei genauer Betrachtung erkennst du Zahlen.",
+"Es sind dieselben Zahlen, die bereits in den Dokumenten vorkamen.",
+"Eine der Stufen ist besonders abgenutzt. Offenbar wurde sie häufiger betreten als alle anderen."
+],
+riddle:"Wie viele Stufen hat die Treppe?",
+answers:[
+"9","neun","die 9","die neun","neun stufen",
+"9 stufen","nummer 9","zahl 9","zahl neun","neunte"
+],
+next:"/archiv/das-notizbuch"
+},
+
+/* 10 */
+{
+slug:"archiv/das-notizbuch",
+category:"Archiv",
+title:"Das Notizbuch",
+subtitle:"Die Schrift darin gehört jemandem, der immer zu spät kam.",
+text:[
+"Das Notizbuch beginnt mit einer einfachen Beobachtung: „Ich komme immer fünf Minuten zu spät.“",
+"Danach folgen Seiten voller Uhrzeiten. Jede Uhrzeit liegt fünf Minuten nach einem Ereignis, das bereits im Archiv dokumentiert wurde.",
+"Der Autor scheint also nicht vorherzusagen, was passieren wird. Er dokumentiert es danach.",
+"Nur eine Seite passt nicht in dieses Muster. Sie beschreibt ein Ereignis, das erst später stattfinden soll.",
+"Am unteren Rand steht: „Die Antwort befindet sich hinten.“"
+],
+riddle:"Wo sollst du laut der Notiz nachsehen?",
+answers:[
+"hinten","auf der rückseite","die rückseite","hinterseite","auf der hinterseite",
+"am ende","hinter dem eintrag","auf der letzten seite",
+"auf der rückseite des buches","im hinteren teil"
+],
+next:"/geschichte/die-fuenfte-person"
+},
+
+/* 11 */
+{
+slug:"geschichte/die-fuenfte-person",
+category:"Geschichte",
+title:"Die fünfte Person",
+subtitle:"Auf dem ersten Foto waren drei. Im Archiv werden plötzlich fünf erwähnt.",
+text:[
+"Eine alte Liste nennt fünf Personen, die mit dem Bahnhof verbunden waren.",
+"Die ersten drei lassen sich auf dem Foto erkennen. Die vierte Person wurde später identifiziert.",
+"Die fünfte Person bleibt unbekannt.",
+"Interessanterweise gibt es keinen Hinweis darauf, dass sie jemals dort gewesen ist. Sie taucht nur in Dokumenten auf.",
+"Vielleicht ist sie keine Person im gewöhnlichen Sinn."
+],
+riddle:"Wie viele Personen nennt die Liste insgesamt?",
+answers:[
+"5","fünf","die 5","die fünf","fünf personen",
+"5 personen","nummer 5","zahl fünf","zahl 5","fünfte"
+],
+next:"/wissenschaft/die-erinnerung"
+},
+
+/* 12 */
+{
+slug:"wissenschaft/die-erinnerung",
+category:"Wissenschaft",
+title:"Die Erinnerung",
+subtitle:"Nicht alles, woran man sich erinnert, ist genau so passiert.",
+text:[
+"Erinnerungen sind keine perfekten Aufnahmen. Das Gehirn rekonstruiert vergangene Ereignisse aus Informationen.",
+"Deshalb können zwei Menschen dasselbe Ereignis unterschiedlich erinnern.",
+"Im Archiv scheint genau das passiert zu sein. Verschiedene Dokumente widersprechen sich, obwohl sie dasselbe Ereignis beschreiben.",
+"Vielleicht ist aber nicht die Erinnerung falsch.",
+"Vielleicht wurden die Informationen absichtlich verändert."
+],
+riddle:"Was rekonstruiert das Gehirn aus vergangenen Informationen?",
+answers:[
+"erinnerungen","erinnerung","eine erinnerung","die erinnerung",
+"gedächtnisinhalte","gedächtnis","das gedächtnis","erinnerungsbilder",
+"erinnerungsinhalte","gedächtniserinnerungen"
+],
+next:"/archiv/die-kopie"
+},
+
+/* 13 */
+{
+slug:"archiv/die-kopie",
+category:"Archiv",
+title:"Die Kopie",
+subtitle:"Eine Kopie ist identisch. Zumindest sollte sie es sein.",
+text:[
+"Im Archiv existieren zwei Kopien desselben Dokuments.",
+"Die Dateien haben denselben Namen, dieselbe Größe und scheinbar denselben Inhalt.",
+"Doch eine winzige Abweichung befindet sich am Ende.",
+"Eine Kopie enthält einen zusätzlichen Punkt.",
+"Dieser Punkt verändert keinen Satz. Trotzdem ist er wichtig, denn er beweist, dass jemand das Dokument nachträglich bearbeitet hat."
+],
+riddle:"Was ist eine veränderte Kopie mit zusätzlichem Inhalt?",
+answers:[
+"eine bearbeitete kopie","bearbeitete kopie","eine veränderte kopie",
+"veränderte kopie","eine modifizierte kopie","modifizierte kopie",
+"eine editierte kopie","editierte kopie","eine bearbeitung",
+"eine manipulierte kopie"
+],
+next:"/archiv/echo"
+},
+
+/* 14 */
+{
+slug:"archiv/echo",
+category:"Archiv",
+title:"Echo",
+subtitle:"Eine Information kann zurückkehren, ohne dieselbe Form zu behalten.",
+text:[
+"Das nächste Dokument enthält nur eine Audioaufnahme.",
+"Man hört einen einzelnen Ton. Danach Stille.",
+"Als die Aufnahme mehrfach abgespielt wird, scheint der Ton immer schwächer zu werden. Technisch ist das unmöglich, denn die Datei verändert sich nicht.",
+"Ein Forscher notiert: „Vielleicht hören wir nicht die Aufnahme. Vielleicht hören wir ihre Wiederholung.“",
+"Das Wort „Wiederholung“ wurde später durchgestrichen."
+],
+riddle:"Wie nennt man einen zurückgeworfenen oder wiederholten Schall?",
+answers:[
+"echo","ein echo","das echo","widerhall","der widerhall",
+"hall","ein hall","schallecho","schallwiederholung","wiederhall"
+],
+next:"/wissenschaft/der-kreis"
+},
+
+/* 15 */
+{
+slug:"wissenschaft/der-kreis",
+category:"Wissenschaft",
+title:"Der Kreis",
+subtitle:"Ein Kreis hat keinen Anfang und kein Ende.",
+text:[
+"Du zeichnest einen Kreis auf ein Blatt Papier.",
+"Wenn du einen Punkt markierst und entlang der Linie gehst, kommst du irgendwann wieder an denselben Punkt.",
+"Genau dieses Prinzip scheint auch die Liste zu verwenden.",
+"Jeder Eintrag führt zum nächsten. Doch wenn du alle gelesen hast, führt der letzte wieder zum ersten.",
+"Das ist kein Fehler im System. Es ist seine wichtigste Eigenschaft."
+],
+riddle:"Hat ein perfekter Kreis einen Anfang und ein Ende?",
+answers:[
+"nein","nein, hat er nicht","keinen anfang und kein ende",
+"weder anfang noch ende","er hat keinen anfang",
+"er hat kein ende","nein, keinen anfang","nein, kein ende",
+"weder einen anfang noch ein ende","nein, weder noch"
+],
+next:"/orte/das-runde-gebaeude"
+},
+
+/* 16 */
+{
+slug:"orte/das-runde-gebaeude",
+category:"Orte",
+title:"Das runde Gebäude",
+subtitle:"Von außen sieht es aus wie ein Kreis. Innen ist es größer.",
+text:[
+"Das Gebäude besitzt keine Ecken.",
+"Die Wände bilden einen nahezu perfekten Kreis. Türen gibt es nur an einer Stelle.",
+"Im Inneren führt ein Gang einmal vollständig um das Gebäude herum.",
+"Wenn du ihm folgst, kommst du wieder an denselben Punkt.",
+"Doch diesmal liegt dort etwas, das vorher nicht da war: ein Koffer."
+],
+riddle:"Welche Form beschreibt das Gebäude am besten?",
+answers:[
+"kreis","ein kreis","der kreis","runde form","eine runde form",
+"kreisförmig","eine kreisform","runde form","ein rundes gebäude",
+"kreisförmiges gebäude"
+],
+next:"/geschichte/die-reise"
+},
+
+/* 17 */
+{
+slug:"geschichte/die-reise",
+category:"Geschichte",
+title:"Die Reise",
+subtitle:"Jemand hat den Kreis bereits einmal durchlaufen.",
+text:[
+"Im Koffer befindet sich ein Reisebericht.",
+"Der Autor beschreibt dieselben Orte, die du inzwischen kennst. Allerdings schreibt er darüber, als wären sie noch unbekannt.",
+"Er erwähnt die Uhr, das Foto, die Treppe und den Bahnhof.",
+"Am Ende schreibt er: „Ich dachte, ich suche einen Ort. Tatsächlich suchte ich Informationen.“",
+"Danach beginnt eine Liste."
+],
+riddle:"Was suchte der Reisende laut seinem letzten Satz?",
+answers:[
+"informationen","information","die information","informationen gesucht",
+"nach informationen","wissen","nach wissen","informationen finden",
+"nach information suchen","informationen finden"
+],
+next:"/archiv/die-liste"
+},
+
+/* 18 */
+{
+slug:"archiv/die-liste",
+category:"Archiv",
+title:"Die Liste",
+subtitle:"Fünfzig Einträge. Aber nur einer davon ist deiner.",
+text:[
+"Die Liste ist länger als alle bisherigen Dokumente zusammen.",
+"Jeder Eintrag besteht aus einer Zahl und einem kurzen Satz.",
+"Die Zahlen reichen von 1 bis 50.",
+"Einige Sätze beschreiben Orte. Andere beschreiben Personen oder Gedanken.",
+"Bei Nummer 18 steht nur: „Nicht nach der Lösung suchen. Suche nach dem nächsten Schritt.“"
+],
+riddle:"Welche Zahl steht zwischen 17 und 19?",
+answers:[
+"18","achtzehn","die 18","die achtzehn","zahl 18",
+"zahl achtzehn","nummer 18","nummer achtzehn","ziffer 18","achtzehn"
+],
+next:"/raetsel/die-fehlende-zahl"
+},
+
+/* 19 */
+{
+slug:"raetsel/die-fehlende-zahl",
+category:"Rätsel",
+title:"Die fehlende Zahl",
+subtitle:"Eine einfache Folge kann trotzdem eine versteckte Bedeutung haben.",
+text:[
+"17, 18, ?, 20.",
+"Eine Zahl fehlt.",
+"Es ist eines der einfachsten Rätsel der Sammlung. Vielleicht ist gerade deshalb interessant, dass die fehlende Zahl später noch einmal auftaucht.",
+"Sie ist weder besonders groß noch besonders klein.",
+"Sie befindet sich genau zwischen zwei aufeinanderfolgenden Zahlen."
+],
+riddle:"Welche Zahl fehlt zwischen 18 und 20?",
+answers:[
+"19","neunzehn","die 19","die neunzehn","zahl 19",
+"zahl neunzehn","nummer 19","nummer neunzehn","ziffer 19","neunzehn"
+],
+next:"/wissenschaft/die-wahrscheinlichkeit"
+},
+
+/* 20 */
+{
+slug:"wissenschaft/die-wahrscheinlichkeit",
+category:"Wissenschaft",
+title:"Die Wahrscheinlichkeit",
+subtitle:"Manchmal ist ein Zufall nur ein Zufall. Manchmal wirkt er anders.",
+text:[
+"Wenn du eine Münze wirfst, erwartest du bei vielen Würfen ungefähr gleich viele Ergebnisse auf beiden Seiten.",
+"Das bedeutet nicht, dass jede kleine Serie gleich aussehen muss.",
+"Auch in dieser Geschichte könnten manche Wiederholungen Zufall sein.",
+"Doch je öfter dieselben Zahlen, Orte und Hinweise auftauchen, desto schwieriger wird es, alles als Zufall abzutun.",
+"Im nächsten Dokument wurde deshalb ein Wort markiert."
+],
+riddle:"Wie nennt man die mathematische Einschätzung, wie wahrscheinlich ein Ereignis ist?",
+answers:[
+"wahrscheinlichkeit","die wahrscheinlichkeit","eine wahrscheinlichkeit",
+"wahrscheinlichkeitswert","wahrscheinlichkeitsangabe",
+"chance","eine chance","die chance","probabilität","die probabilität"
+],
+next:"/archiv/das-muster"
+},
+
+/* 21 */
+{
+slug:"archiv/das-muster",
+category:"Archiv",
+title:"Das Muster",
+subtitle:"Wiederholungen sind manchmal der deutlichste Hinweis.",
+text:[
+"Das Archiv enthält inzwischen zahlreiche Wiederholungen.",
+"17 erscheint mehrfach. Der Kreis erscheint mehrfach. Auch das Motiv der Tür taucht immer wieder auf.",
+"Ein Muster entsteht, wenn einzelne Dinge in einer bestimmten Ordnung wiederkehren.",
+"Die Forscher haben die Wiederholungen auf einem großen Blatt verbunden.",
+"Das Ergebnis sieht aus wie ein Netz."
+],
+riddle:"Wie nennt man eine erkennbare Ordnung aus wiederkehrenden Elementen?",
+answers:[
+"muster","ein muster","das muster","ein wiederholungsmuster",
+"wiederholungsmuster","struktur","eine struktur","regelmäßigkeit",
+"eine regelmäßigkeit","ordnung"
+],
+next:"/orte/die-bruecke"
+},
+
+/* 22 */
+{
+slug:"orte/die-bruecke",
+category:"Orte",
+title:"Die Brücke",
+subtitle:"Eine Brücke verbindet zwei Seiten.",
+text:[
+"Die Brücke steht über einem ausgetrockneten Flussbett.",
+"Auf beiden Seiten befinden sich Gebäude, die scheinbar nichts miteinander zu tun haben.",
+"Erst auf der Brücke erkennst du, dass ihre Fenster exakt aufeinander ausgerichtet sind.",
+"Die Brücke selbst trägt keine Namen. Nur kleine Markierungen.",
+"Eine davon sieht aus wie ein Gleis."
+],
+riddle:"Was verbindet eine Brücke normalerweise?",
+answers:[
+"zwei seiten","zwei ufer","zwei orte","zwei punkte",
+"zwei bereiche","zwei stellen","zwei enden","zwei seiten miteinander",
+"zwei orte miteinander","zwei punkte miteinander"
+],
+next:"/geschichte/der-mann-am-gleis"
+},
+
+/* 23 */
+{
+slug:"geschichte/der-mann-am-gleis",
+category:"Geschichte",
+title:"Der Mann am Gleis",
+subtitle:"Er wartet auf einen Zug, der nicht mehr fährt.",
+text:[
+"Am Ende des Bahnsteigs steht ein Mann.",
+"Er trägt einen alten Mantel und hält eine Uhr in der Hand.",
+"Die Uhr zeigt 02:17.",
+"Als du ihn ansprichst, sagt er nur: „Du bist später als die anderen.“",
+"Dann schaut er auf die Uhr und verschwindet hinter einem Pfeiler."
+],
+riddle:"Welche Uhrzeit zeigt seine Uhr?",
+answers:[
+"2:17","02:17","2.17","02.17 uhr","zwei uhr siebzehn",
+"zwei siebzehn","zwei uhr und siebzehn minuten",
+"17 nach 2","17 minuten nach 2","zwei uhr siebzehn minuten"
+],
+next:"/archiv/der-fuenfte-eintrag"
+},
+
+/* 24 */
+{
+slug:"archiv/der-fuenfte-eintrag",
+category:"Archiv",
+title:"Der fünfte Eintrag",
+subtitle:"Nummer fünf beschreibt etwas, das du bereits gesehen hast.",
+text:[
+"Der fünfte Eintrag enthält keine neue Information.",
+"Er beschreibt lediglich das Foto.",
+"Doch eine Zeile ist anders: „Das Bild zeigt nicht die Vergangenheit. Es zeigt eine Möglichkeit.“",
+"Wenn das stimmt, waren die bisherigen Fotos vielleicht keine Beweise.",
+"Vielleicht waren sie Warnungen."
+],
+riddle:"Welche Nummer hat dieser Eintrag?",
+answers:[
+"5","fünf","die 5","die fünf","eintrag 5",
+"eintrag fünf","nummer 5","nummer fünf","zahl 5","zahl fünf"
+],
+next:"/wissenschaft/die-zeit"
+},
+
+/* 25 */
+{
+slug:"wissenschaft/die-zeit",
+category:"Wissenschaft",
+title:"Die Zeit",
+subtitle:"Vielleicht ist Zeit nicht das, was du denkst.",
+text:[
+"Physikalisch betrachtet ist Zeit keine einfache Linie wie ein Strich auf Papier.",
+"Wir erleben Ereignisse in einer Reihenfolge, aber die Beschreibung von Zeit hängt auch vom Beobachter und vom Bezugssystem ab.",
+"Die Geschichte nutzt Zeit deshalb als Motiv.",
+"02:17 könnte ein Moment sein. Es könnte aber auch eine Markierung in einer größeren Struktur sein.",
+"Unter der letzten Seite steht: „Ordne nicht nach Wichtigkeit. Ordne nach Reihenfolge.“"
+],
+riddle:"Was soll laut der letzten Notiz geordnet werden?",
+answers:[
+"die reihenfolge","nach reihenfolge","die ereignisse nach reihenfolge",
+"die dinge nach reihenfolge","die einträge nach reihenfolge",
+"chronologisch","chronologisch ordnen","die einträge chronologisch",
+"die ereignisse chronologisch","in der richtigen reihenfolge"
+],
+next:"/raetsel/die-reihenfolge"
+},
+
+/* 26 */
+{
+slug:"raetsel/die-reihenfolge",
+category:"Rätsel",
+title:"Die Reihenfolge",
+subtitle:"17 kommt vor 18. 18 kommt vor 19. Und so weiter.",
+text:[
+"Das Archiv besteht nicht nur aus Informationen.",
+"Die Reihenfolge selbst ist Teil des Rätsels.",
+"Wenn du die Dokumente durcheinanderbringst, entsteht eine völlig andere Geschichte.",
+"Deshalb wurden die fünfzig Einträge nummeriert.",
+"Die Nummerierung ist der einfachste Weg, den Weg nicht zu verlieren."
+],
+riddle:"Was bestimmt, welches Ereignis zuerst und welches danach kommt?",
+answers:[
+"reihenfolge","die reihenfolge","die chronologie","chronologie",
+"zeitliche reihenfolge","die zeitliche reihenfolge",
+"die abfolge","abfolge","die zeitliche abfolge","chronologische reihenfolge"
+],
+next:"/archiv/die-erste-karte"
+},
+
+/* 27 */
+{
+slug:"archiv/die-erste-karte",
+category:"Archiv",
+title:"Die erste Karte",
+subtitle:"Eine Karte kann einen Ort zeigen. Diese Karte zeigt einen Weg.",
+text:[
+"Die Karte ist vollkommen leer.",
+"Keine Straßen, keine Städte, keine Namen.",
+"Erst wenn du die fünfzig Markierungen aus dem Archiv darauf einträgst, erscheinen Linien.",
+"Die Linien verbinden keine geografischen Orte.",
+"Sie verbinden die Einträge miteinander."
+],
+riddle:"Was zeigt die Karte am Ende?",
+answers:[
+"einen weg","der weg","eine verbindung","verbindungen",
+"einen zusammenhang","den zusammenhang","ein netzwerk","ein netz",
+"verbindungen zwischen den einträgen","den weg zwischen den einträgen"
+],
+next:"/wissenschaft/die-beobachtung"
+},
+
+/* 28 */
+{
+slug:"wissenschaft/die-beobachtung",
+category:"Wissenschaft",
+title:"Die Beobachtung",
+subtitle:"Wer beobachtet, verändert manchmal schon durch seine Anwesenheit die Situation.",
+text:[
+"Eine Beobachtung klingt zunächst passiv.",
+"Doch sobald jemand weiß, dass er beobachtet wird, kann sich sein Verhalten verändern.",
+"Im Archiv gibt es einen ähnlichen Effekt.",
+"Die Dokumente scheinen sich auf jemanden zu beziehen, der sie liest.",
+"Zum ersten Mal wird klar: Die Geschichte kennt ihren Leser."
+],
+riddle:"Wie nennt man das bewusste Wahrnehmen eines Vorgangs?",
+answers:[
+"beobachtung","die beobachtung","eine beobachtung","beobachten",
+"das beobachten","wahrnehmung","die wahrnehmung","beobachtung eines vorgangs",
+"bewusstes beobachten","aufmerksamkeit"
+],
+next:"/orte/das-haus-mit-der-tuer"
+},
+
+/* 29 */
+{
+slug:"orte/das-haus-mit-der-tuer",
+category:"Orte",
+title:"Das Haus mit der Tür",
+subtitle:"Endlich ist die Tür wieder da.",
+text:[
+"Das Haus steht am Rand der Stadt.",
+"Es hat nur ein Fenster und eine einzige Tür.",
+"Du erinnerst dich an das Foto. Dort war dieselbe Tür zu sehen.",
+"Auf der Tür befindet sich kein Griff.",
+"Stattdessen steht dort ein Satz: „Du hast sie bereits geöffnet.“"
+],
+riddle:"Was befindet sich an der Vorderseite des Hauses?",
+answers:[
+"eine tür","die tür","eine tuer","die tuer","der eingang",
+"eine eingangstür","eine eingangstuer","ein eingang",
+"die haustür","die haustuer"
+],
+next:"/geschichte/die-vier-seiten"
+},
+
+/* 30 */
+{
+slug:"geschichte/die-vier-seiten",
+category:"Geschichte",
+title:"Die vier Seiten",
+subtitle:"Vier Seiten. Vier Versionen derselben Geschichte.",
+text:[
+"Vier Personen haben den gleichen Tag beschrieben.",
+"Jede Version klingt glaubwürdig.",
+"Doch jede enthält ein Detail, das in den anderen fehlt.",
+"Zusammen ergeben die vier Berichte ein vollständigeres Bild.",
+"Keine einzelne Person kennt die ganze Geschichte."
+],
+riddle:"Wie viele Berichte existieren?",
+answers:[
+"4","vier","die 4","die vier","vier berichte",
+"4 berichte","nummer 4","zahl 4","zahl vier","vier versionen"
+],
+next:"/archiv/die-entscheidung"
+},
+
+/* 31 */
+{
+slug:"archiv/die-entscheidung",
+category:"Archiv",
+title:"Die Entscheidung",
+subtitle:"Jetzt musst du entscheiden, ob du weitergehst.",
+text:[
+"Zum ersten Mal enthält ein Dokument keine Information.",
+"Es enthält nur eine Frage: „Willst du wissen, warum?“",
+"Darunter stehen zwei Möglichkeiten.",
+"WEITER.",
+"ZURÜCK.",
+"Du hast dich längst entschieden, denn du bist noch hier."
+],
+riddle:"Welche Möglichkeit hast du gewählt, wenn du die Suche fortsetzt?",
+answers:[
+"weiter","weitergehen","weiter gehen","fortsetzen","weitermachen",
+"weiter machen","fortfahren","die suche fortsetzen","weitersuchen",
+"weiter suchen"
+],
+next:"/wissenschaft/das-netz"
+},
+
+/* 32 */
+{
+slug:"wissenschaft/das-netz",
+category:"Wissenschaft",
+title:"Das Netz",
+subtitle:"Viele einzelne Punkte können zusammen etwas völlig Neues ergeben.",
+text:[
+"Ein Netzwerk besteht aus Knoten und Verbindungen.",
+"Ein einzelner Knoten muss nicht viel bedeuten.",
+"Doch wenn viele Knoten verbunden werden, entsteht Struktur.",
+"Die fünfzig Stationen sind genau so aufgebaut.",
+"Du bist nicht nur jemand, der durch das Netzwerk geht. Du bist inzwischen selbst ein Knoten darin."
+],
+riddle:"Wie nennt man eine Struktur aus verbundenen Knoten?",
+answers:[
+"netzwerk","ein netzwerk","das netzwerk","netz","ein netz",
+"das netz","verbund","ein verbund","verbundene struktur","knotennetz"
+],
+next:"/archiv/die-50-punkte"
+},
+
+/* 33 */
+{
+slug:"archiv/die-50-punkte",
+category:"Archiv",
+title:"Die 50 Punkte",
+subtitle:"Jetzt erkennst du, warum es genau fünfzig Einträge gibt.",
+text:[
+"Auf der Karte befinden sich fünfzig Punkte.",
+"Jeder Punkt entspricht einer Station.",
+"Doch wenn du die Punkte verbindest, entsteht kein Kreis.",
+"Es entsteht eine Spirale.",
+"Die Linie führt immer näher zum Mittelpunkt und scheint dort zu verschwinden."
+],
+riddle:"Wie viele Punkte befinden sich auf der Karte?",
+answers:[
+"50","fünfzig","die 50","die fünfzig","50 punkte",
+"fünfzig punkte","zahl 50","zahl fünfzig","nummer 50","fünfzig markierungen"
+],
+next:"/raetsel/die-acht"
+},
+
+/* 34 */
+{
+slug:"raetsel/die-acht",
+category:"Rätsel",
+title:"Die Acht",
+subtitle:"Eine Zahl, die wie zwei Kreise übereinander aussieht.",
+text:[
+"Die Karte enthält neben den fünfzig Punkten noch ein Symbol.",
+"Es sieht aus wie zwei Kreise, die sich berühren.",
+"Die Form erinnert an eine Zahl.",
+"Wenn du das Symbol drehst, sieht es plötzlich anders aus.",
+"Doch die Zahl bleibt dieselbe."
+],
+riddle:"Welche Zahl sieht aus wie zwei übereinanderliegende Kreise?",
+answers:[
+"8","acht","die 8","die acht","zahl 8",
+"zahl acht","nummer 8","nummer acht","ziffer 8","acht"
+],
+next:"/geschichte/die-zweite-ebene"
+},
+
+/* 35 */
+{
+slug:"geschichte/die-zweite-ebene",
+category:"Geschichte",
+title:"Die zweite Ebene",
+subtitle:"Unter der Geschichte liegt eine zweite Geschichte.",
+text:[
+"Du findest einen Ordner mit demselben Namen wie das ursprüngliche Archiv.",
+"Doch darin befinden sich andere Dokumente.",
+"Sie erzählen nicht, was passiert ist.",
+"Sie erzählen, wie jemand die Geschichte zusammengestellt hat.",
+"Zum ersten Mal siehst du den Ersteller."
+],
+riddle:"Was befindet sich unter der ersten Geschichte?",
+answers:[
+"eine zweite ebene","die zweite ebene","eine zweite geschichte",
+"die zweite geschichte","eine weitere geschichte","eine weitere ebene",
+"eine verborgene ebene","die verborgene ebene",
+"eine zweite erzählebene","eine zusätzliche ebene"
+],
+next:"/wissenschaft/die-information"
+},
+
+/* 36 */
+{
+slug:"wissenschaft/die-information",
+category:"Wissenschaft",
+title:"Die Information",
+subtitle:"Vielleicht war die ganze Suche nie für einen Ort bestimmt.",
+text:[
+"Information ist etwas anderes als ein Gegenstand.",
+"Sie kann kopiert werden, ohne dass das Original verschwindet.",
+"Sie kann übertragen, verändert und neu zusammengesetzt werden.",
+"Genau das ist mit dieser Geschichte passiert.",
+"Sie wurde nicht an einem Ort gespeichert. Sie wurde weitergegeben."
+],
+riddle:"Was kann kopiert und weitergegeben werden, ohne dass das Original verschwindet?",
+answers:[
+"information","eine information","die information","informationen",
+"eine nachricht","nachricht","wissen","eine nachricht oder information",
+"ein informationsinhalt","informationsinhalt"
+],
+next:"/archiv/die-letzte-notiz"
+},
+
+/* 37 */
+{
+slug:"archiv/die-letzte-notiz",
+category:"Archiv",
+title:"Die letzte Notiz",
+subtitle:"Auf dem Papier steht: „Dies ist nicht die letzte Notiz.“",
+text:[
+"Du findest einen einzelnen Zettel.",
+"Darauf steht zunächst nur ein Satz: „Wenn du dies liest, hast du den Kreis fast geschlossen.“",
+"Darunter befindet sich eine Tonspur.",
+"Die Stimme klingt vertraut.",
+"Sie sagt: „Suche nach dem Signal.“"
+],
+riddle:"Wonach sollst du laut der Stimme suchen?",
+answers:[
+"das signal","ein signal","nach dem signal","signal",
+"nach einem signal","dem signal","ein verborgenes signal",
+"das verborgene signal","ein zeichen","das zeichen"
+],
+next:"/signal/das-signal"
+},
+
+/* 38 */
+{
+slug:"signal/das-signal",
+category:"Signal",
+title:"Das Signal",
+subtitle:"Ein schwaches Signal kommt aus dem alten Gebäude.",
+text:[
+"Das Signal ist kaum hörbar.",
+"Es wiederholt sich in regelmäßigen Abständen.",
+"Nicht wie ein Morsecode und nicht wie Sprache.",
+"Eine Messung zeigt, dass die Abstände exakt gleich sind.",
+"Jemand hat es offensichtlich erzeugt."
+],
+riddle:"Was nennt man eine regelmäßig wiederkehrende Schwingung?",
+answers:[
+"frequenz","eine frequenz","die frequenz","periodische schwingung",
+"eine schwingung","periodizität","periodische frequenz",
+"wiederholungsfrequenz","schwingungsfrequenz","regelmäßige schwingung"
+],
+next:"/wissenschaft/die-frequenz"
+},
+
+/* 39 */
+{
+slug:"wissenschaft/die-frequenz",
+category:"Wissenschaft",
+title:"Die Frequenz",
+subtitle:"Das Signal hat eine Frequenz, die immer wieder auftaucht.",
+text:[
+"Die Frequenz beschreibt, wie oft sich ein Vorgang innerhalb einer bestimmten Zeit wiederholt.",
+"Bei dem Signal ist die Frequenz erstaunlich stabil.",
+"Die Messung ergibt eine Folge von Werten.",
+"Wenn man diese Werte in Buchstaben übersetzt, entsteht kein Wort.",
+"Wenn man sie jedoch als Zeitabstände betrachtet, ergibt sich eine bekannte Zahl."
+],
+riddle:"Welche Eigenschaft beschreibt, wie oft sich ein Vorgang pro Zeit wiederholt?",
+answers:[
+"frequenz","die frequenz","eine frequenz","wiederholungsrate",
+"wiederholungsfrequenz","rate der wiederholung","anzahl pro zeit",
+"schwingungsfrequenz","wiederholungsrate pro zeit","periodenfrequenz"
+],
+next:"/archiv/tonband-02"
+},
+
+/* 40 */
+{
+slug:"archiv/tonband-02",
+category:"Archiv",
+title:"Tonband 02",
+subtitle:"Die zweite Aufnahme enthält dieselbe Stimme.",
+text:[
+"Das Tonband wurde offenbar Jahrzehnte vor den digitalen Dokumenten aufgenommen.",
+"Die Stimme sagt eine Reihe von Zahlen.",
+"17.",
+"3.",
+"50.",
+"Dann folgt ein Satz: „Du wirst glauben, dass du sie schon immer gekannt hast.“"
+],
+riddle:"Welche Zahl wurde zuerst genannt?",
+answers:[
+"17","siebzehn","die 17","die siebzehn","zahl 17",
+"zahl siebzehn","nummer 17","nummer siebzehn","ziffer 17","siebzehn"
+],
+next:"/orte/der-keller"
+},
+
+/* 41 */
+{
+slug:"orte/der-keller",
+category:"Orte",
+title:"Der Keller",
+subtitle:"Unter dem Gebäude befindet sich ein Raum, der nicht auf dem Plan steht.",
+text:[
+"Die Kellertreppe endet vor einer Metalltür.",
+"Auf der Tür steht keine Nummer.",
+"Nur ein kleines Schild: „17“.",
+"Im Raum dahinter stehen Regale voller identischer Ordner.",
+"Jeder Ordner enthält dieselbe Geschichte."
+],
+riddle:"Welche Nummer steht auf der Tür?",
+answers:[
+"17","siebzehn","die 17","die siebzehn","nummer 17",
+"nummer siebzehn","zahl 17","zahl siebzehn","ziffer 17","siebzehn"
+],
+next:"/geschichte/der-erste-besucher"
+},
+
+/* 42 */
+{
+slug:"geschichte/der-erste-besucher",
+category:"Geschichte",
+title:"Der erste Besucher",
+subtitle:"Jemand hat die Geschichte vor dir gelesen.",
+text:[
+"Ein Gästebuch liegt auf einem Tisch.",
+"Der erste Eintrag ist mehrere Jahrzehnte alt.",
+"Der Name wurde sorgfältig entfernt.",
+"Daneben steht nur: „Ich habe den Anfang gefunden.“",
+"Darunter folgt eine zweite Handschrift: „Nein. Du hast nur den vorherigen Durchlauf gefunden.“"
+],
+riddle:"Was hat der erste Besucher laut dem zweiten Eintrag gefunden?",
+answers:[
+"den vorherigen durchlauf","einen vorherigen durchlauf","den alten durchlauf",
+"einen alten durchlauf","die vorherige runde","eine vorherige runde",
+"den vorherigen kreis","einen vorherigen kreis",
+"die vorherige schleife","eine vorherige schleife"
+],
+next:"/archiv/das-protokoll"
+},
+
+/* 43 */
+{
+slug:"archiv/das-protokoll",
+category:"Archiv",
+title:"Das Protokoll",
+subtitle:"Es beschreibt genau, was gerade passiert.",
+text:[
+"Das Protokoll enthält Zeitstempel.",
+"Bei jedem Zeitstempel steht eine Aktion.",
+"Eintrag öffnen.",
+"Frage beantworten.",
+"Nächsten Eintrag öffnen.",
+"Die letzte Zeile lautet: „Wenn der Leser Nummer 50 erreicht, beginnt das Protokoll von vorne.“"
+],
+riddle:"Was passiert nach dem Beantworten einer Frage?",
+answers:[
+"den nächsten eintrag öffnen","der nächste eintrag wird geöffnet",
+"zum nächsten eintrag gehen","weiter zum nächsten eintrag",
+"nächsten eintrag öffnen","weitergehen","zur nächsten station gehen",
+"zur nächsten spur gehen","die nächste station öffnen","weiter zur nächsten seite"
+],
+next:"/raetsel/die-koordinate"
+},
+
+/* 44 */
+{
+slug:"raetsel/die-koordinate",
+category:"Rätsel",
+title:"Die Koordinate",
+subtitle:"Eine Position besteht aus mehreren Angaben.",
+text:[
+"Auf einem Zettel stehen zwei Zahlen.",
+"Sie wirken wie eine geografische Koordinate.",
+"Doch der Punkt liegt mitten im Gebäude.",
+"Du gehst zu dieser Stelle.",
+"Dort befindet sich eine weitere Tür."
+],
+riddle:"Was beschreibt eine Koordinate?",
+answers:[
+"eine position","die position","einen ort","einen standort",
+"einen punkt","eine stelle","einen bestimmten ort",
+"eine genaue position","einen bestimmten punkt","eine geografische position"
+],
+next:"/orte/der-raum-17"
+},
+
+/* 45 */
+{
+slug:"orte/der-raum-17",
+category:"Orte",
+title:"Raum 17",
+subtitle:"Der Raum ist leer. Bis auf einen Bildschirm.",
+text:[
+"Der Bildschirm zeigt eine einzige Zeile.",
+"„Du bist nicht der erste.“",
+"Darunter erscheinen Namen.",
+"Viele davon kennst du nicht.",
+"Einige sind mit einem Datum versehen. Andere mit einem Wort: „Zurückgekehrt.“"
+],
+riddle:"Welche Nummer trägt der Raum?",
+answers:[
+"17","siebzehn","raum 17","raum siebzehn","die 17",
+"die siebzehn","nummer 17","nummer siebzehn","zahl 17","ziffer 17"
+],
+next:"/wissenschaft/die-information-schleife"
+},
+
+/* 46 */
+{
+slug:"wissenschaft/die-information-schleife",
+category:"Wissenschaft",
+title:"Die Informationsschleife",
+subtitle:"Information kann sich selbst wieder als Ausgangspunkt verwenden.",
+text:[
+"Eine Schleife entsteht, wenn ein Prozess zu seinem eigenen Anfang zurückführt.",
+"In der Informatik kann das eine Wiederholung sein.",
+"In dieser Geschichte ist es mehr.",
+"Die Informationen verändern sich bei jedem Durchlauf nur geringfügig.",
+"Deshalb ist der nächste Durchlauf niemals vollkommen identisch."
+],
+riddle:"Wie nennt man einen Vorgang, der immer wieder zu seinem Ausgangspunkt zurückkehrt?",
+answers:[
+"schleife","eine schleife","die schleife","wiederholung",
+"eine wiederholung","zyklus","ein zyklus","kreis","ein kreislauf",
+"eine informationsschleife"
+],
+next:"/archiv/die-letzte-aufnahme"
+},
+
+/* 47 */
+{
+slug:"archiv/die-letzte-aufnahme",
+category:"Archiv",
+title:"Die letzte Aufnahme",
+subtitle:"Die Stimme spricht jetzt direkt zu dir.",
+text:[
+"Die Aufnahme beginnt mit mehreren Sekunden Stille.",
+"Dann hörst du die Stimme wieder.",
+"„Wenn du das hörst, bist du fast dort.“",
+"Eine Pause.",
+"„Aber dort gibt es nichts zu finden. Nur einen Namen.“",
+],
+riddle:"Was soll laut der Aufnahme am Ende gefunden werden?",
+answers:[
+"einen namen","der name","ein name","den namen",
+"einen bestimmten namen","den richtigen namen","ein bestimmter name",
+"der richtige name","eine namensangabe","eine identität"
+],
+next:"/geschichte/der-name"
+},
+
+/* 48 */
+{
+slug:"geschichte/der-name",
+category:"Geschichte",
+title:"Der Name",
+subtitle:"Zum ersten Mal steht ein Name auf dem Papier.",
+text:[
+"Der Name ist nicht der Name eines Menschen.",
+"Es ist der Name des Systems.",
+"Die fünfzig Stationen wurden nie von einer einzelnen Person geschrieben.",
+"Sie wurden von jedem Durchlauf verändert.",
+"Jeder Besucher hinterließ eine winzige Spur."
+],
+riddle:"Wessen Spuren verändern die Geschichte?",
+answers:[
+"der besucher","die besucher","die leser","die leserinnen und leser",
+"die leser des systems","die besucher des systems",
+"die nutzer","die benutzer","die menschen die sie lesen","jeder besucher"
+],
+next:"/archiv/das-letzte-blatt"
+},
+
+/* 49 */
+{
+slug:"archiv/das-letzte-blatt",
+category:"Archiv",
+title:"Das letzte Blatt",
+subtitle:"Nur noch eine Seite.",
+text:[
+"Das Blatt ist fast leer.",
+"In der Mitte steht ein Satz:",
+"„Du hast gesucht, um etwas zu finden. Jetzt weißt du, dass die Suche selbst Teil des Ergebnisses war.“",
+"Darunter befindet sich ein Kreis.",
+"Im Kreis steht keine Zahl.",
+"Nur ein Pfeil."
+],
+riddle:"Wohin zeigt der Pfeil?",
+answers:[
+"zum anfang","an den anfang","zurück zum anfang","zum start",
+"zurück zum start","an den start","zum ursprung","zurück zum ursprung",
+"zum ersten eintrag","zur ersten seite"
+],
+next:"/ende/der-kreis"
+},
+
+/* 50 */
+{
+slug:"ende/der-kreis",
+category:"Der Kreis",
+title:"Der Kreis",
+subtitle:"Du hast das Ende erreicht. Und genau deshalb beginnt etwas Neues.",
+text:[
+"Du stehst wieder dort, wo alles angefangen hat.",
+"Die Uhr zeigt 02:17.",
+"Das Foto liegt auf dem Tisch.",
+"Die Tür ist geschlossen.",
+"Alles sieht genauso aus wie am Anfang.",
+"Fast.",
+"Auf dem ersten Blatt steht jetzt eine zusätzliche Zeile.",
+"Sie war vorher nicht dort.",
+"„Du warst schon einmal hier.“",
+"Darunter steht:",
+"„Beim nächsten Mal wird etwas anders sein.“",
+"Du erkennst jetzt die wichtigste Eigenschaft dieser Geschichte.",
+"Sie besitzt kein endgültiges Ende.",
+"Der letzte Punkt führt zurück zum ersten.",
+"Doch du bist nicht mehr dieselbe Person, die am Anfang dort angekommen ist.",
+"Du kennst jetzt die Hinweise.",
+"Und vielleicht wirst du beim zweiten Durchlauf Dinge sehen, die du vorher übersehen hast."
+],
+riddle:"Was beginnt nach dem Ende eines Kreises erneut?",
+answers:[
+"der anfang","ein neuer anfang","der nächste durchlauf",
+"ein neuer durchlauf","die nächste runde","eine neue runde",
+"die schleife","ein neuer zyklus","der nächste zyklus","alles beginnt von vorne"
+],
+next:""
+}
+
+];
+
+/*
+===========================================================
+ROUTER
+===========================================================
+*/
+
+const pageMap = new Map(
+    pages.map(page => [normalizePath(page.slug), page])
+);
+
+const stationCounter = document.getElementById("stationCounter");
+const cycleCounter = document.getElementById("cycleCounter");
+const progressBar = document.getElementById("progressBar");
+
+const categoryEl = document.getElementById("category");
+const titleEl = document.getElementById("title");
+const subtitleEl = document.getElementById("subtitle");
+const storyEl = document.getElementById("story");
+const quoteEl = document.getElementById("quote");
+const riddleEl = document.getElementById("riddle");
+
+const answerEl = document.getElementById("answer");
+const checkBtn = document.getElementById("checkBtn");
+const feedbackEl = document.getElementById("feedback");
+
+const nextArea = document.getElementById("nextArea");
+const nextBtn = document.getElementById("nextBtn");
+
+const backBtn = document.getElementById("backBtn");
+const themeBtn = document.getElementById("themeBtn");
+
+let currentPage = null;
+let solved = false;
+
+function normalizePath(path) {
+    if (!path) return "";
+
+    path = path.split("?")[0].split("#")[0];
+
+    path = decodeURIComponent(path);
+
+    path = path.replace(/^\/+|\/+$/g, "");
+
+    return path;
+}
+
+function getCurrentPage() {
+    const path = normalizePath(location.pathname);
+
+    return pageMap.get(path) || pages[0];
+}
+
+function getCycle() {
+    return Number(
+        localStorage.getItem("endlessInternetCycle") || "0"
+    );
+}
+
+function setCycle(value) {
+    localStorage.setItem(
+        "endlessInternetCycle",
+        String(value)
+    );
+}
+
+function navigate(path, newCycle = false) {
+
+    if (newCycle) {
+        setCycle(getCycle() + 1);
+    }
+
+    const cleanPath = path || "/";
+
+    history.pushState({}, "", cleanPath);
+
+    render();
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+function render() {
+
+    currentPage = getCurrentPage();
+
+    const index = pages.indexOf(currentPage);
+
+    /*
+    -------------------------------------------------------
+    STARTSEITE BEI SPÄTEREN DURCHLÄUFEN VERÄNDERN
+    -------------------------------------------------------
+    */
+
+    let displayTitle = currentPage.title;
+    let displaySubtitle = currentPage.subtitle;
+
+    if (index === 0 && getCycle() > 0) {
+
+        displayTitle = "Du bist wieder hier.";
+
+        displaySubtitle =
+            "Der Anfang sieht gleich aus. Aber du weißt inzwischen, dass er nicht derselbe ist.";
+
+    }
+
+    categoryEl.textContent = currentPage.category;
+    titleEl.textContent = displayTitle;
+    subtitleEl.textContent = displaySubtitle;
+
+    stationCounter.textContent =
+        String(index + 1).padStart(2, "0") +
+        " / " +
+        String(pages.length).padStart(2, "0");
+
+    cycleCounter.textContent =
+        "Durchlauf " + (getCycle() + 1);
+
+    const progress =
+        ((index + 1) / pages.length) * 100;
+
+    progressBar.style.width = progress + "%";
+
+    /*
+    -------------------------------------------------------
+    STORY
+    -------------------------------------------------------
+    */
+
+    storyEl.innerHTML = "";
+
+    currentPage.text.forEach(paragraph => {
+
+        const card = document.createElement("div");
+
+        card.className = "story-card";
+
+        const p = document.createElement("p");
+
+        p.textContent = paragraph;
+
+        card.appendChild(p);
+
+        storyEl.appendChild(card);
+    });
+
+    /*
+    -------------------------------------------------------
+    RIDDLE
+    -------------------------------------------------------
+    */
+
+    riddleEl.textContent = currentPage.riddle;
+
+    answerEl.value = "";
+
+    feedbackEl.textContent = "";
+
+    feedbackEl.className = "feedback";
+
+    nextArea.classList.remove("show");
+
+    solved = false;
+
+    /*
+    -------------------------------------------------------
+    OPTIONAL: BEREITS GELÖST
+    -------------------------------------------------------
+    */
+
+    const solvedKey =
+        "solved:" +
+        normalizePath(currentPage.slug);
+
+    if (localStorage.getItem(solvedKey) === "true") {
+
+        solved = true;
+
+        feedbackEl.textContent =
+            "✓ Diese Spur wurde bereits gelöst.";
+
+        feedbackEl.className =
+            "feedback success";
+
+        nextArea.classList.add("show");
+    }
+}
+
+function cleanAnswer(value) {
+
+    return value
+        .toLowerCase()
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[.,!?;:'"„“`´()]/g, "")
+        .replace(/\s+/g, " ");
+}
+
+function checkAnswer() {
+
+    if (!currentPage) return;
+
+    const userAnswer =
+        cleanAnswer(answerEl.value);
+
+    if (!userAnswer) {
+
+        feedbackEl.textContent =
+            "Gib zuerst eine Antwort ein.";
+
+        feedbackEl.className =
+            "feedback error";
+
+        return;
+    }
+
+    const accepted =
+        currentPage.answers.map(cleanAnswer);
+
+    /*
+    -------------------------------------------------------
+    EXAKTE VARIANTEN + SINNVOLLE NORMALISIERUNG
+    -------------------------------------------------------
+    */
+
+    const correct =
+        accepted.includes(userAnswer);
+
+    if (correct) {
+
+        solved = true;
+
+        const solvedKey =
+            "solved:" +
+            normalizePath(currentPage.slug);
+
+        localStorage.setItem(
+            solvedKey,
+            "true"
+        );
+
+        feedbackEl.textContent =
+            "✓ Richtig. Die nächste Spur wurde freigegeben.";
+
+        feedbackEl.className =
+            "feedback success";
+
+        nextArea.classList.add("show");
+
+        return;
+    }
+
+    feedbackEl.textContent =
+        "Noch nicht. Lies die Frage noch einmal genau.";
+
+    feedbackEl.className =
+        "feedback error";
+}
+
+function goNext() {
+
+    if (!currentPage || !solved) return;
+
+    /*
+    -------------------------------------------------------
+    STATION 50 -> NEUER DURCHLAUF
+    -------------------------------------------------------
+    */
+
+    if (!currentPage.next) {
+
+        navigate("/", true);
+
+        return;
+    }
+
+    navigate(currentPage.next);
+}
+
+/*
+===========================================================
+EVENTS
+===========================================================
+*/
+
+checkBtn.addEventListener(
+    "click",
+    checkAnswer
+);
+
+answerEl.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+            checkAnswer();
+        }
+    }
+);
+
+nextBtn.addEventListener(
+    "click",
+    goNext
+);
+
+window.addEventListener(
+    "popstate",
+    render
+);
+
+backBtn.addEventListener(
+    "click",
+    () => history.back()
+);
+
+/*
+===========================================================
+THEME
+===========================================================
+*/
+
+function updateThemeIcon() {
+
+    const light =
+        document.body.classList.contains("light");
+
+    themeBtn.textContent =
+        light ? "☀" : "☾";
+}
+
+const savedTheme =
+    localStorage.getItem("endlessTheme");
+
+if (savedTheme === "light") {
+    document.body.classList.add("light");
+}
+
+updateThemeIcon();
+
+themeBtn.addEventListener(
+    "click",
+    () => {
+
+        document.body.classList.toggle("light");
+
+        const light =
+            document.body.classList.contains("light");
+
+        localStorage.setItem(
+            "endlessTheme",
+            light ? "light" : "dark"
+        );
+
+        updateThemeIcon();
+    }
+);
+
+/*
+===========================================================
+START
+===========================================================
+*/
+
+render();
+
+</script>
+
+</body>
+</html>
