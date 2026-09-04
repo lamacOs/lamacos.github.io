@@ -12,6 +12,11 @@
           content="Diese Seite wurde auf lamacHub nicht gefunden.">
 
     <style>
+
+        /* =========================================================
+           RESET
+        ========================================================= */
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -25,15 +30,10 @@
 
         body {
             min-height: 100%;
-            background:
-                radial-gradient(
-                    circle at 50% -10%,
-                    rgba(255, 122, 0, 0.14),
-                    transparent 38%
-                ),
-                #08080a;
+            background: #050507;
 
             color: #fff;
+
             font-family:
                 Inter,
                 -apple-system,
@@ -48,20 +48,170 @@
             text-rendering: optimizeLegibility;
         }
 
-        /* =========================
+
+        /* =========================================================
            BACKGROUND
-        ========================= */
+        ========================================================= */
 
         .background {
             position: fixed;
             inset: 0;
+
             pointer-events: none;
+
             overflow: hidden;
+
             z-index: 0;
+
+            background:
+                radial-gradient(
+                    circle at 50% 42%,
+                    rgba(255, 90, 0, 0.08),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 50% -10%,
+                    rgba(255, 122, 0, 0.14),
+                    transparent 38%
+                ),
+                #050507;
         }
+
+
+        /* =========================================================
+           STAR FIELD
+        ========================================================= */
+
+        .stars,
+        .stars::before,
+        .stars::after {
+            position: absolute;
+            inset: -20%;
+
+            content: "";
+
+            background-image:
+                radial-gradient(
+                    circle,
+                    rgba(255,255,255,.95) 1px,
+                    transparent 1px
+                ),
+                radial-gradient(
+                    circle,
+                    rgba(255,255,255,.65) 1px,
+                    transparent 1px
+                ),
+                radial-gradient(
+                    circle,
+                    rgba(255,120,30,.85) 1px,
+                    transparent 1px
+                );
+
+            background-size:
+                83px 97px,
+                137px 151px,
+                211px 193px;
+
+            background-position:
+                10px 20px,
+                40px 80px,
+                100px 30px;
+
+            animation:
+                starsMove 14s linear infinite;
+        }
+
+        .stars {
+            opacity: .48;
+        }
+
+        .stars::before {
+            transform: scale(1.5);
+
+            opacity: .35;
+
+            animation-duration: 8s;
+        }
+
+        .stars::after {
+            transform: scale(2);
+
+            opacity: .18;
+
+            animation-duration: 5s;
+        }
+
+        @keyframes starsMove {
+
+            from {
+                transform: translate3d(0, 0, 0);
+            }
+
+            to {
+                transform: translate3d(0, 160px, 0);
+            }
+        }
+
+
+        /* =========================================================
+           AURORA / ENERGY CLOUD
+        ========================================================= */
+
+        .aurora {
+            position: absolute;
+
+            width: 100vw;
+            height: 45vh;
+
+            left: 0;
+            top: 8%;
+
+            filter: blur(55px);
+
+            opacity: .32;
+
+            background:
+                linear-gradient(
+                    110deg,
+                    transparent 5%,
+                    #ff3c00 28%,
+                    #ff9d00 45%,
+                    transparent 58%,
+                    #742cff 76%,
+                    transparent 95%
+                );
+
+            transform: rotate(-12deg);
+
+            animation:
+                aurora 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes aurora {
+
+            0% {
+                transform:
+                    translateX(-15%)
+                    rotate(-12deg)
+                    scale(1);
+            }
+
+            100% {
+                transform:
+                    translateX(15%)
+                    rotate(-7deg)
+                    scale(1.25);
+            }
+        }
+
+
+        /* =========================================================
+           FLOATING ORBS
+        ========================================================= */
 
         .orb {
             position: absolute;
+
             width: clamp(180px, 30vw, 420px);
             height: clamp(180px, 30vw, 420px);
 
@@ -70,12 +220,14 @@
             background:
                 radial-gradient(
                     circle,
-                    rgba(255, 122, 0, 0.13),
+                    rgba(255, 122, 0, 0.14),
                     transparent 70%
                 );
 
             filter: blur(20px);
-            animation: float 10s ease-in-out infinite;
+
+            animation:
+                float 10s ease-in-out infinite;
         }
 
         .orb.one {
@@ -86,25 +238,542 @@
         .orb.two {
             right: -150px;
             bottom: -150px;
+
             animation-delay: -4s;
         }
 
         @keyframes float {
+
             0%, 100% {
-                transform: translate3d(0, 0, 0);
+                transform:
+                    translate3d(0, 0, 0);
             }
 
             50% {
-                transform: translate3d(20px, -25px, 0);
+                transform:
+                    translate3d(20px, -25px, 0);
             }
         }
 
-        /* =========================
-           APP
-        ========================= */
+
+        /* =========================================================
+           ENERGY SCENE
+        ========================================================= */
+
+        .energy-scene {
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: min(680px, 100vw);
+            height: min(680px, 100vw);
+
+            transform:
+                translate(-50%, -50%);
+
+            pointer-events: none;
+
+            overflow: visible;
+
+            z-index: 0;
+        }
+
+
+        /* =========================================================
+           ENERGY CORE
+        ========================================================= */
+
+        .core {
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: clamp(80px, 15vw, 170px);
+            height: clamp(80px, 15vw, 170px);
+
+            transform:
+                translate(-50%, -50%);
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    #ffffff 0%,
+                    #ffe1bd 5%,
+                    #ff9d38 13%,
+                    #ff5a00 28%,
+                    rgba(255, 35, 0, .7) 42%,
+                    transparent 68%
+                );
+
+            box-shadow:
+                0 0 25px rgba(255, 110, 0, .9),
+                0 0 70px rgba(255, 80, 0, .8),
+                0 0 140px rgba(255, 55, 0, .55),
+                0 0 240px rgba(255, 30, 0, .25);
+
+            animation:
+                corePulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes corePulse {
+
+            0%, 100% {
+                transform:
+                    translate(-50%, -50%)
+                    scale(.78);
+
+                filter: brightness(.9);
+            }
+
+            50% {
+                transform:
+                    translate(-50%, -50%)
+                    scale(1.13);
+
+                filter: brightness(1.45);
+            }
+        }
+
+
+        /* =========================================================
+           ENERGY RINGS
+        ========================================================= */
+
+        .ring {
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            border-radius: 50%;
+
+            border:
+                1px solid rgba(255, 112, 30, .55);
+
+            box-shadow:
+                0 0 18px rgba(255, 80, 0, .65),
+                inset 0 0 18px rgba(255, 80, 0, .22);
+
+            transform-style: preserve-3d;
+
+            mix-blend-mode: screen;
+        }
+
+        .ring.one {
+            width: clamp(180px, 32vw, 270px);
+            height: clamp(180px, 32vw, 270px);
+
+            transform:
+                translate(-50%, -50%)
+                rotateX(70deg);
+
+            animation:
+                ringOne 4s linear infinite;
+        }
+
+        .ring.two {
+            width: clamp(250px, 45vw, 370px);
+            height: clamp(250px, 45vw, 370px);
+
+            transform:
+                translate(-50%, -50%)
+                rotateY(70deg);
+
+            animation:
+                ringTwo 6s linear infinite;
+        }
+
+        .ring.three {
+            width: clamp(340px, 58vw, 500px);
+            height: clamp(340px, 58vw, 500px);
+
+            transform:
+                translate(-50%, -50%)
+                rotateX(65deg)
+                rotateY(15deg);
+
+            border-color:
+                rgba(255, 90, 20, .35);
+
+            animation:
+                ringThree 9s linear infinite;
+        }
+
+        .ring.four {
+            width: clamp(440px, 75vw, 640px);
+            height: clamp(440px, 75vw, 640px);
+
+            transform:
+                translate(-50%, -50%)
+                rotateY(65deg);
+
+            border-color:
+                rgba(120, 50, 255, .28);
+
+            box-shadow:
+                0 0 30px rgba(110, 50, 255, .25);
+
+            animation:
+                ringFour 13s linear infinite;
+        }
+
+        @keyframes ringOne {
+
+            to {
+                transform:
+                    translate(-50%, -50%)
+                    rotateX(70deg)
+                    rotateZ(360deg);
+            }
+        }
+
+        @keyframes ringTwo {
+
+            to {
+                transform:
+                    translate(-50%, -50%)
+                    rotateY(70deg)
+                    rotateZ(-360deg);
+            }
+        }
+
+        @keyframes ringThree {
+
+            to {
+                transform:
+                    translate(-50%, -50%)
+                    rotateX(65deg)
+                    rotateY(15deg)
+                    rotateZ(360deg);
+            }
+        }
+
+        @keyframes ringFour {
+
+            to {
+                transform:
+                    translate(-50%, -50%)
+                    rotateY(65deg)
+                    rotateZ(-360deg);
+            }
+        }
+
+
+        /* =========================================================
+           RING ENERGY DOTS
+        ========================================================= */
+
+        .ring::before,
+        .ring::after {
+            content: "";
+
+            position: absolute;
+
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #ff7a00;
+
+            box-shadow:
+                0 0 10px #ff7a00,
+                0 0 25px rgba(255, 70, 0, .9);
+        }
+
+        .ring::before {
+            top: -4px;
+            left: 50%;
+        }
+
+        .ring::after {
+            bottom: -4px;
+            right: 20%;
+        }
+
+
+        /* =========================================================
+           ENERGY BEAMS
+        ========================================================= */
+
+        .beams {
+            position: absolute;
+
+            inset: 0;
+
+            transform:
+                translate(-50%, -50%);
+
+            left: 50%;
+            top: 50%;
+        }
+
+        .beam {
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: 2px;
+            height: 45%;
+
+            transform-origin:
+                center bottom;
+
+            background:
+                linear-gradient(
+                    to top,
+                    transparent,
+                    rgba(255, 90, 0, .15),
+                    #ff6a00,
+                    #fff,
+                    #ff3d00,
+                    transparent
+                );
+
+            filter: blur(1px);
+
+            box-shadow:
+                0 0 12px #ff4d00;
+
+            opacity: .3;
+
+            animation:
+                beamPulse 2.2s ease-in-out infinite;
+        }
+
+        .beam:nth-child(1) {
+            transform: translate(-50%, -100%) rotate(0deg);
+        }
+
+        .beam:nth-child(2) {
+            transform: translate(-50%, -100%) rotate(60deg);
+            animation-delay: -.4s;
+        }
+
+        .beam:nth-child(3) {
+            transform: translate(-50%, -100%) rotate(120deg);
+            animation-delay: -.8s;
+        }
+
+        .beam:nth-child(4) {
+            transform: translate(-50%, -100%) rotate(180deg);
+            animation-delay: -1.2s;
+        }
+
+        .beam:nth-child(5) {
+            transform: translate(-50%, -100%) rotate(240deg);
+            animation-delay: -1.6s;
+        }
+
+        .beam:nth-child(6) {
+            transform: translate(-50%, -100%) rotate(300deg);
+            animation-delay: -2s;
+        }
+
+        @keyframes beamPulse {
+
+            0%, 100% {
+                opacity: .08;
+                height: 25%;
+            }
+
+            50% {
+                opacity: .7;
+                height: 48%;
+            }
+        }
+
+
+        /* =========================================================
+           PARTICLES
+        ========================================================= */
+
+        .particles {
+            position: absolute;
+
+            inset: 0;
+        }
+
+        .particle {
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: 4px;
+            height: 4px;
+
+            border-radius: 50%;
+
+            background: #ff7a00;
+
+            box-shadow:
+                0 0 8px #ff5a00,
+                0 0 20px rgba(255, 80, 0, .8);
+
+            animation:
+                particleFly 3.5s linear infinite;
+        }
+
+        .particle:nth-child(1) {
+            --x: -300px;
+            --y: -180px;
+            animation-delay: -.2s;
+        }
+
+        .particle:nth-child(2) {
+            --x: 320px;
+            --y: -210px;
+            animation-delay: -.8s;
+        }
+
+        .particle:nth-child(3) {
+            --x: -290px;
+            --y: 190px;
+            animation-delay: -1.4s;
+        }
+
+        .particle:nth-child(4) {
+            --x: 300px;
+            --y: 210px;
+            animation-delay: -2s;
+        }
+
+        .particle:nth-child(5) {
+            --x: -180px;
+            --y: -300px;
+            animation-delay: -.5s;
+        }
+
+        .particle:nth-child(6) {
+            --x: 180px;
+            --y: 290px;
+            animation-delay: -1.8s;
+        }
+
+        .particle:nth-child(7) {
+            --x: -360px;
+            --y: 20px;
+            animation-delay: -2.5s;
+        }
+
+        .particle:nth-child(8) {
+            --x: 360px;
+            --y: -30px;
+            animation-delay: -1s;
+        }
+
+        .particle:nth-child(9) {
+            --x: -100px;
+            --y: 350px;
+            animation-delay: -2.7s;
+        }
+
+        .particle:nth-child(10) {
+            --x: 90px;
+            --y: -350px;
+            animation-delay: -1.7s;
+        }
+
+        .particle:nth-child(11) {
+            --x: -230px;
+            --y: 110px;
+            animation-delay: -3s;
+        }
+
+        .particle:nth-child(12) {
+            --x: 240px;
+            --y: 120px;
+            animation-delay: -1.2s;
+        }
+
+        @keyframes particleFly {
+
+            0% {
+                transform:
+                    translate(-50%, -50%)
+                    scale(.1);
+
+                opacity: 0;
+            }
+
+            15% {
+                opacity: 1;
+            }
+
+            100% {
+                transform:
+                    translate(
+                        calc(-50% + var(--x)),
+                        calc(-50% + var(--y))
+                    )
+                    scale(1.8);
+
+                opacity: 0;
+            }
+        }
+
+
+        /* =========================================================
+           SCANLINES
+        ========================================================= */
+
+        .scanlines {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 30;
+
+            pointer-events: none;
+
+            background:
+                repeating-linear-gradient(
+                    to bottom,
+                    transparent 0,
+                    transparent 3px,
+                    rgba(255,255,255,.018) 4px
+                );
+
+            opacity: .5;
+        }
+
+
+        /* =========================================================
+           VIGNETTE
+        ========================================================= */
+
+        .vignette {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 29;
+
+            pointer-events: none;
+
+            background:
+                radial-gradient(
+                    circle,
+                    transparent 25%,
+                    rgba(0,0,0,.25) 62%,
+                    rgba(0,0,0,.82) 120%
+                );
+        }
+
+
+        /* =========================================================
+           PAGE
+        ========================================================= */
 
         .page {
             position: relative;
+
             z-index: 1;
 
             min-height: 100dvh;
@@ -113,9 +782,10 @@
             flex-direction: column;
         }
 
-        /* =========================
+
+        /* =========================================================
            NAVBAR
-        ========================= */
+        ========================================================= */
 
         .navbar {
             width: 100%;
@@ -137,21 +807,30 @@
 
             z-index: 20;
 
-            background: rgba(8, 8, 10, 0.62);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
+            background:
+                rgba(8, 8, 10, .62);
 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            backdrop-filter:
+                blur(22px);
+
+            -webkit-backdrop-filter:
+                blur(22px);
+
+            border-bottom:
+                1px solid rgba(255,255,255,.07);
         }
 
         .logo {
             color: #fff;
+
             text-decoration: none;
 
-            font-size: clamp(20px, 2vw, 25px);
+            font-size:
+                clamp(20px, 2vw, 25px);
+
             font-weight: 700;
 
-            letter-spacing: -0.7px;
+            letter-spacing: -.7px;
 
             white-space: nowrap;
         }
@@ -161,38 +840,52 @@
         }
 
         .home-link {
-            color: rgba(255, 255, 255, 0.78);
+            color:
+                rgba(255,255,255,.78);
+
             text-decoration: none;
 
-            padding: 11px 17px;
+            padding:
+                11px 17px;
 
             border-radius: 13px;
 
-            background: rgba(255, 255, 255, 0.055);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background:
+                rgba(255,255,255,.055);
+
+            border:
+                1px solid rgba(255,255,255,.08);
 
             font-size: 14px;
+
             font-weight: 600;
 
             transition:
-                background 0.2s ease,
-                transform 0.2s ease,
-                border-color 0.2s ease;
+                background .2s ease,
+                transform .2s ease,
+                border-color .2s ease;
         }
 
         .home-link:hover {
-            background: rgba(255, 122, 0, 0.11);
-            border-color: rgba(255, 122, 0, 0.28);
-            transform: translateY(-1px);
+            background:
+                rgba(255,122,0,.11);
+
+            border-color:
+                rgba(255,122,0,.28);
+
+            transform:
+                translateY(-1px);
         }
 
         .home-link:active {
-            transform: scale(0.97);
+            transform:
+                scale(.97);
         }
 
-        /* =========================
+
+        /* =========================================================
            MAIN
-        ========================= */
+        ========================================================= */
 
         main {
             width: 100%;
@@ -213,35 +906,51 @@
 
             display: flex;
             flex-direction: column;
+
             align-items: center;
 
             text-align: center;
         }
 
-        /* =========================
+
+        /* =========================================================
            BADGE
-        ========================= */
+        ========================================================= */
 
         .badge {
+            position: relative;
+            z-index: 4;
+
             display: inline-flex;
+
             align-items: center;
             justify-content: center;
 
             gap: 8px;
 
-            padding: 9px 14px;
+            padding:
+                9px 14px;
 
             border-radius: 999px;
 
-            background: rgba(255, 122, 0, 0.08);
-            border: 1px solid rgba(255, 122, 0, 0.18);
+            background:
+                rgba(255,122,0,.08);
 
-            color: #ffb16d;
+            border:
+                1px solid rgba(255,122,0,.18);
+
+            color:
+                #ffb16d;
 
             font-size: 13px;
+
             font-weight: 600;
 
-            margin-bottom: clamp(22px, 4vw, 35px);
+            margin-bottom:
+                clamp(22px, 4vw, 35px);
+
+            box-shadow:
+                0 0 30px rgba(255,80,0,.05);
         }
 
         .badge-dot {
@@ -253,46 +962,76 @@
             background: #ff7a00;
 
             box-shadow:
-                0 0 10px rgba(255, 122, 0, 0.8);
+                0 0 10px rgba(255,122,0,.8);
+
+            animation:
+                badgePulse 1.5s ease-in-out infinite;
         }
 
-        /* =========================
+        @keyframes badgePulse {
+
+            0%, 100% {
+                transform: scale(.8);
+                opacity: .6;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+        }
+
+
+        /* =========================================================
            404 VISUAL
-        ========================= */
+        ========================================================= */
 
         .visual {
             position: relative;
 
-            width: min(620px, 100%);
+            width: min(700px, 100%);
 
-            min-height: clamp(190px, 34vw, 320px);
+            min-height:
+                clamp(260px, 42vw, 400px);
 
             display: flex;
+
             align-items: center;
             justify-content: center;
 
-            margin-bottom: clamp(30px, 6vw, 55px);
+            margin-bottom:
+                clamp(30px, 6vw, 55px);
 
-            overflow: hidden;
+            overflow: visible;
+
+            isolation: isolate;
+
+            transition:
+                transform .15s ease-out;
         }
 
         .error-number {
             position: relative;
-            z-index: 2;
 
-            font-size: clamp(120px, 25vw, 300px);
-            line-height: 0.8;
+            z-index: 3;
+
+            font-size:
+                clamp(120px, 25vw, 300px);
+
+            line-height: .8;
 
             font-weight: 800;
 
-            letter-spacing: clamp(-10px, -1vw, -4px);
+            letter-spacing:
+                clamp(-10px, -1vw, -4px);
 
             background:
                 linear-gradient(
                     135deg,
                     #ffffff 10%,
-                    #ff9a4a 48%,
-                    #ff7a00 90%
+                    #ffbd83 42%,
+                    #ff7a00 70%,
+                    #ff3900 100%
                 );
 
             -webkit-background-clip: text;
@@ -301,62 +1040,48 @@
             color: transparent;
 
             filter:
-                drop-shadow(0 0 35px rgba(255, 122, 0, 0.18));
+                drop-shadow(
+                    0 0 25px
+                    rgba(255,122,0,.18)
+                );
+
+            animation:
+                numberGlow 3s ease-in-out infinite;
         }
 
-        .orbit {
-            position: absolute;
+        @keyframes numberGlow {
 
-            width: clamp(150px, 35vw, 330px);
-            height: clamp(80px, 18vw, 150px);
-
-            border:
-                1px solid rgba(255, 122, 0, 0.28);
-
-            border-radius: 50%;
-
-            transform: rotate(-20deg);
-
-            animation: orbit 8s linear infinite;
-        }
-
-        .orbit::before {
-            content: "";
-
-            position: absolute;
-
-            width: 10px;
-            height: 10px;
-
-            border-radius: 50%;
-
-            background: #ff7a00;
-
-            box-shadow:
-                0 0 18px rgba(255, 122, 0, 0.9);
-
-            top: -5px;
-            left: 50%;
-        }
-
-        @keyframes orbit {
-            from {
-                transform: rotate(-20deg) rotate(0deg);
+            0%, 100% {
+                filter:
+                    drop-shadow(
+                        0 0 25px
+                        rgba(255,122,0,.15)
+                    );
             }
 
-            to {
-                transform: rotate(-20deg) rotate(360deg);
+            50% {
+                filter:
+                    drop-shadow(
+                        0 0 50px
+                        rgba(255,90,0,.35)
+                    );
             }
         }
 
-        /* =========================
+
+        /* =========================================================
            TEXT
-        ========================= */
+        ========================================================= */
 
         h1 {
+            position: relative;
+            z-index: 3;
+
             max-width: 780px;
 
-            font-size: clamp(30px, 5vw, 58px);
+            font-size:
+                clamp(30px, 5vw, 58px);
+
             line-height: 1.08;
 
             letter-spacing: -2px;
@@ -367,24 +1092,36 @@
         }
 
         .description {
+            position: relative;
+            z-index: 3;
+
             max-width: 650px;
 
-            color: rgba(255, 255, 255, 0.62);
+            color:
+                rgba(255,255,255,.62);
 
-            font-size: clamp(15px, 2vw, 18px);
+            font-size:
+                clamp(15px, 2vw, 18px);
+
             line-height: 1.7;
 
-            margin-bottom: clamp(30px, 5vw, 45px);
+            margin-bottom:
+                clamp(30px, 5vw, 45px);
         }
 
-        /* =========================
+
+        /* =========================================================
            BUTTONS
-        ========================= */
+        ========================================================= */
 
         .buttons {
+            position: relative;
+            z-index: 3;
+
             width: 100%;
 
             display: flex;
+
             justify-content: center;
             align-items: center;
 
@@ -392,78 +1129,103 @@
 
             flex-wrap: wrap;
 
-            margin-bottom: clamp(45px, 8vw, 75px);
+            margin-bottom:
+                clamp(45px, 8vw, 75px);
         }
 
         .button {
             min-height: 50px;
 
             display: inline-flex;
+
             align-items: center;
             justify-content: center;
 
-            padding: 13px 22px;
+            padding:
+                13px 22px;
 
             border-radius: 15px;
 
             text-decoration: none;
 
             font-size: 14px;
+
             font-weight: 600;
 
             cursor: pointer;
 
             transition:
-                transform 0.2s ease,
-                background 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
+                transform .2s ease,
+                background .2s ease,
+                border-color .2s ease,
+                box-shadow .2s ease;
         }
 
         .button.primary {
             color: #fff;
 
-            background: #ff7a00;
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff8a18,
+                    #ff6500
+                );
 
             box-shadow:
-                0 10px 30px rgba(255, 122, 0, 0.18);
+                0 10px 30px
+                rgba(255,122,0,.18);
         }
 
         .button.primary:hover {
-            transform: translateY(-2px);
+            transform:
+                translateY(-2px);
 
             box-shadow:
-                0 15px 38px rgba(255, 122, 0, 0.28);
+                0 15px 38px
+                rgba(255,122,0,.32);
         }
 
         .button.secondary {
-            color: rgba(255, 255, 255, 0.85);
+            color:
+                rgba(255,255,255,.85);
 
-            background: rgba(255, 255, 255, 0.055);
+            background:
+                rgba(255,255,255,.055);
 
-            border: 1px solid rgba(255, 255, 255, 0.09);
+            border:
+                1px solid
+                rgba(255,255,255,.09);
         }
 
         .button.secondary:hover {
-            transform: translateY(-2px);
+            transform:
+                translateY(-2px);
 
-            background: rgba(255, 255, 255, 0.09);
+            background:
+                rgba(255,255,255,.09);
         }
 
         .button:active {
-            transform: scale(0.97);
+            transform:
+                scale(.97);
         }
 
-        /* =========================
+
+        /* =========================================================
            INFO CARD
-        ========================= */
+        ========================================================= */
 
         .info-card {
+            position: relative;
+            z-index: 3;
+
             width: min(600px, 100%);
 
-            padding: clamp(20px, 4vw, 28px);
+            padding:
+                clamp(20px, 4vw, 28px);
 
             display: flex;
+
             justify-content: space-between;
             align-items: center;
 
@@ -476,17 +1238,25 @@
             background:
                 linear-gradient(
                     135deg,
-                    rgba(255,255,255,0.065),
-                    rgba(255,255,255,0.025)
+                    rgba(255,255,255,.065),
+                    rgba(255,255,255,.025)
                 );
 
-            border: 1px solid rgba(255,255,255,0.09);
+            border:
+                1px solid
+                rgba(255,255,255,.09);
 
             box-shadow:
-                inset 0 1px 0 rgba(255,255,255,0.04);
+                inset 0 1px 0
+                rgba(255,255,255,.04),
+                0 15px 60px
+                rgba(0,0,0,.2);
 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter:
+                blur(20px);
+
+            -webkit-backdrop-filter:
+                blur(20px);
         }
 
         .info-left {
@@ -495,6 +1265,7 @@
 
         .info-title {
             font-size: 14px;
+
             font-weight: 700;
 
             margin-bottom: 5px;
@@ -505,28 +1276,37 @@
 
             line-height: 1.5;
 
-            color: rgba(255,255,255,0.48);
+            color:
+                rgba(255,255,255,.48);
         }
 
         .error-code {
             flex-shrink: 0;
 
-            padding: 8px 11px;
+            padding:
+                8px 11px;
 
             border-radius: 10px;
 
-            background: rgba(255,122,0,0.09);
-            border: 1px solid rgba(255,122,0,0.16);
+            background:
+                rgba(255,122,0,.09);
 
-            color: #ff9b50;
+            border:
+                1px solid
+                rgba(255,122,0,.16);
+
+            color:
+                #ff9b50;
 
             font-size: 12px;
+
             font-weight: 700;
         }
 
-        /* =========================
+
+        /* =========================================================
            FOOTER
-        ========================= */
+        ========================================================= */
 
         footer {
             width: 100%;
@@ -538,18 +1318,23 @@
 
             text-align: center;
 
-            color: rgba(255,255,255,0.32);
+            color:
+                rgba(255,255,255,.32);
 
             font-size: 12px;
 
-            border-top: 1px solid rgba(255,255,255,0.055);
+            border-top:
+                1px solid
+                rgba(255,255,255,.055);
         }
 
-        /* =========================
+
+        /* =========================================================
            TABLET
-        ========================= */
+        ========================================================= */
 
         @media (max-width: 900px) {
+
             .navbar {
                 padding-left: 24px;
                 padding-right: 24px;
@@ -561,9 +1346,10 @@
             }
         }
 
-        /* =========================
+
+        /* =========================================================
            MOBILE
-        ========================= */
+        ========================================================= */
 
         @media (max-width: 600px) {
 
@@ -573,7 +1359,9 @@
             }
 
             .home-link {
-                padding: 10px 13px;
+                padding:
+                    10px 13px;
+
                 font-size: 13px;
             }
 
@@ -585,7 +1373,7 @@
             }
 
             .visual {
-                min-height: 180px;
+                min-height: 230px;
             }
 
             h1 {
@@ -604,17 +1392,24 @@
 
             .button {
                 width: 100%;
+
                 max-width: 360px;
             }
 
             .info-card {
                 align-items: flex-start;
             }
+
+            .energy-scene {
+                width: 130vw;
+                height: 130vw;
+            }
         }
 
-        /* =========================
-           VERY SMALL / FLIP PHONES
-        ========================= */
+
+        /* =========================================================
+           VERY SMALL
+        ========================================================= */
 
         @media (max-width: 380px) {
 
@@ -624,7 +1419,9 @@
 
             .home-link {
                 font-size: 12px;
-                padding: 9px 11px;
+
+                padding:
+                    9px 11px;
             }
 
             main {
@@ -633,15 +1430,18 @@
 
             .badge {
                 font-size: 12px;
-                padding: 8px 12px;
+
+                padding:
+                    8px 12px;
             }
 
             .visual {
-                min-height: 145px;
+                min-height: 190px;
             }
 
             .error-number {
-                font-size: clamp(100px, 32vw, 150px);
+                font-size:
+                    clamp(100px, 32vw, 150px);
             }
 
             h1 {
@@ -661,20 +1461,24 @@
             }
         }
 
-        /* =========================
-           VERY NARROW FOLDABLES
-        ========================= */
+
+        /* =========================================================
+           VERY NARROW
+        ========================================================= */
 
         @media (max-width: 300px) {
 
             .navbar {
                 align-items: flex-start;
+
                 flex-direction: column;
+
                 gap: 12px;
             }
 
             .home-link {
                 width: 100%;
+
                 text-align: center;
             }
 
@@ -684,7 +1488,7 @@
             }
 
             .visual {
-                min-height: 120px;
+                min-height: 150px;
             }
 
             .error-number {
@@ -704,11 +1508,13 @@
             }
         }
 
-        /* =========================
-           LANDSCAPE MOBILE
-        ========================= */
 
-        @media (max-height: 500px) and (orientation: landscape) {
+        /* =========================================================
+           LANDSCAPE MOBILE
+        ========================================================= */
+
+        @media (max-height: 500px)
+        and (orientation: landscape) {
 
             main {
                 padding-top: 35px;
@@ -716,22 +1522,31 @@
             }
 
             .visual {
-                min-height: 140px;
+                min-height: 190px;
+
                 margin-bottom: 30px;
             }
 
             .error-number {
-                font-size: clamp(100px, 25vh, 180px);
+                font-size:
+                    clamp(100px, 25vh, 180px);
             }
 
             h1 {
-                font-size: clamp(28px, 7vh, 42px);
+                font-size:
+                    clamp(28px, 7vh, 42px);
+            }
+
+            .energy-scene {
+                width: 500px;
+                height: 500px;
             }
         }
 
-        /* =========================
+
+        /* =========================================================
            REDUCED MOTION
-        ========================= */
+        ========================================================= */
 
         @media (prefers-reduced-motion: reduce) {
 
@@ -742,24 +1557,48 @@
             *,
             *::before,
             *::after {
-                animation-duration: 0.001ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.001ms !important;
+                animation-duration: .001ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    .001ms !important;
             }
         }
+
     </style>
 </head>
 
+
 <body>
 
+
+<!-- =============================================================
+     BACKGROUND
+============================================================= -->
+
 <div class="background">
+
+    <div class="stars"></div>
+
+    <div class="aurora"></div>
+
     <div class="orb one"></div>
+
     <div class="orb two"></div>
+
 </div>
+
+
 
 <div class="page">
 
-    <!-- NAVIGATION -->
+
+    <!-- =========================================================
+         NAVBAR
+    ========================================================= -->
+
     <nav class="navbar">
 
         <a href="/" class="logo">
@@ -773,27 +1612,104 @@
     </nav>
 
 
-    <!-- MAIN -->
+
+    <!-- =========================================================
+         MAIN
+    ========================================================= -->
+
     <main>
 
         <section class="content">
 
+
+            <!-- BADGE -->
+
             <div class="badge">
+
                 <span class="badge-dot"></span>
+
                 Seite nicht gefunden
+
             </div>
 
 
+
+            <!-- =================================================
+                 404 VISUAL
+            ================================================= -->
+
             <div class="visual" id="visual">
 
-                <div class="orbit"></div>
+
+                <!-- ENERGY ANIMATION -->
+
+                <div class="energy-scene">
+
+
+                    <!-- ENERGY BEAMS -->
+
+                    <div class="beams">
+
+                        <div class="beam"></div>
+                        <div class="beam"></div>
+                        <div class="beam"></div>
+                        <div class="beam"></div>
+                        <div class="beam"></div>
+                        <div class="beam"></div>
+
+                    </div>
+
+
+                    <!-- PARTICLES -->
+
+                    <div class="particles">
+
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+
+                    </div>
+
+
+                    <!-- RINGS -->
+
+                    <div class="ring one"></div>
+                    <div class="ring two"></div>
+                    <div class="ring three"></div>
+                    <div class="ring four"></div>
+
+
+                    <!-- CORE -->
+
+                    <div class="core"></div>
+
+                </div>
+
+
+
+                <!-- 404 -->
 
                 <div class="error-number">
                     404
                 </div>
 
+
             </div>
 
+
+
+            <!-- =================================================
+                 TEXT
+            ================================================= -->
 
             <h1>
                 Diese Seite ist irgendwo
@@ -802,12 +1718,19 @@
 
 
             <p class="description">
+
                 Die angeforderte Seite existiert nicht,
                 wurde verschoben oder hat sich gerade
                 einen sehr guten Versteckplatz gesucht.
                 Keine Sorge – deine Startseite ist noch da.
+
             </p>
 
+
+
+            <!-- =================================================
+                 BUTTONS
+            ================================================= -->
 
             <div class="buttons">
 
@@ -822,6 +1745,11 @@
 
             </div>
 
+
+
+            <!-- =================================================
+                 INFO CARD
+            ================================================= -->
 
             <div class="info-card">
 
@@ -838,50 +1766,85 @@
 
                 </div>
 
+
                 <div class="error-code">
                     ERROR 404
                 </div>
 
             </div>
 
+
         </section>
 
     </main>
 
 
-    <!-- FOOTER -->
+
+    <!-- =========================================================
+         FOOTER
+    ========================================================= -->
+
     <footer>
         © 2026 lamacHub
     </footer>
 
+
 </div>
 
 
+
+<!-- =============================================================
+     SCREEN EFFECTS
+============================================================= -->
+
+<div class="vignette"></div>
+
+<div class="scanlines"></div>
+
+
+
+<!-- =============================================================
+     MOUSE PARALLAX
+============================================================= -->
+
 <script>
-    /*
-        Desktop-Maus-Effekt.
-        Auf Touch-Geräten wird nichts gemacht.
-    */
 
-    const visual = document.getElementById("visual");
+    const visual =
+        document.getElementById("visual");
 
-    if (window.matchMedia("(pointer: fine)").matches) {
+    if (
+        window.matchMedia("(pointer: fine)").matches
+    ) {
 
-        document.addEventListener("mousemove", (event) => {
+        document.addEventListener(
+            "mousemove",
+            (event) => {
 
-            const x =
-                (event.clientX / window.innerWidth - 0.5) * 10;
+                const x =
+                    (
+                        event.clientX /
+                        window.innerWidth -
+                        0.5
+                    ) * 10;
 
-            const y =
-                (event.clientY / window.innerHeight - 0.5) * 10;
+                const y =
+                    (
+                        event.clientY /
+                        window.innerHeight -
+                        0.5
+                    ) * 10;
 
-            visual.style.transform =
-                `translate(${x}px, ${y}px)`;
 
-        });
+                visual.style.transform =
+                    `translate(${x}px, ${y}px)`;
+
+            }
+        );
 
     }
+
 </script>
+
 
 </body>
 </html>
