@@ -4,11 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>lamacOs — Live Kamera</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --accent: #ff7a00;
+
       --light-bg: #ffffff;
       --light-text: #111111;
       --light-muted: #666666;
@@ -43,14 +45,15 @@
     html, body {
       margin: 0;
       padding: 0;
+      min-height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: Inter, sans-serif;
-      transition: background 0.3s ease, color 0.3s ease;
+      transition: background .3s ease, color .3s ease;
       -webkit-font-smoothing: antialiased;
     }
 
-    h1, h2, h3, h4 {
+    h1, h2, h3 {
       color: var(--accent);
       margin: 0;
     }
@@ -71,23 +74,23 @@
     }
 
     /* NAVBAR */
+
     .navbar {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255,255,255,.7);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      transition: all 0.3s ease;
     }
 
     [data-theme="dark"] .navbar {
-      background: rgba(15, 17, 21, 0.7);
+      background: rgba(15,17,21,.7);
     }
 
     .navbar-container {
       max-width: 1200px;
-      margin: 0 auto;
+      margin: auto;
       padding: 16px 24px;
       display: flex;
       align-items: center;
@@ -109,22 +112,28 @@
     .navbar-title {
       font-weight: 800;
       font-size: 16px;
-      color: #111111;
+      color: #111;
     }
 
     [data-theme="dark"] .navbar-title {
-      color: #ffffff;
+      color: #fff;
     }
 
-    .navbar-right {
-      display: flex;
-      gap: 8px;
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 1.1rem;
     }
 
-    /* MAIN CONTAINER */
+    /* MAIN */
+
     .container {
       max-width: 1200px;
-      margin: 0 auto;
+      margin: auto;
       padding: 60px 24px;
       min-height: calc(100vh - 80px);
       display: flex;
@@ -133,7 +142,6 @@
       justify-content: center;
     }
 
-    /* SECTIONS */
     .section {
       text-align: center;
       display: none;
@@ -144,18 +152,22 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 0.3s ease;
+      animation: fadeIn .3s ease;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    /* MENU */
-    #menuSection h1 {
-      margin-bottom: 16px;
-    }
+    /* BUTTONS */
 
     .button-group {
       display: flex;
@@ -164,7 +176,6 @@
       min-width: 300px;
     }
 
-    /* BUTTONS */
     .btn {
       background: var(--accent);
       color: white;
@@ -174,7 +185,7 @@
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all .3s ease;
       font-family: Inter, sans-serif;
       display: flex;
       align-items: center;
@@ -184,15 +195,11 @@
 
     .btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(255, 122, 0, 0.3);
-    }
-
-    .btn:active {
-      transform: translateY(0);
+      box-shadow: 0 8px 24px rgba(255,122,0,.3);
     }
 
     .btn:disabled {
-      opacity: 0.6;
+      opacity: .6;
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
@@ -206,10 +213,11 @@
 
     .btn-secondary:hover {
       background: var(--card-bg);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: none;
     }
 
-    /* VIDEO SECTIONS */
+    /* VIDEO */
+
     .video-section {
       width: 100%;
       max-width: 800px;
@@ -224,30 +232,27 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,.1);
       width: 100%;
-    }
-
-    [data-theme="dark"] .video-card {
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
 
     .video-card video {
       width: 100%;
       display: block;
       background: #000;
+      min-height: 200px;
     }
 
-    .video-info {
-      padding: 24px;
-    }
-
-    .video-info h3 {
-      margin-bottom: 8px;
-    }
+    /* CODE */
 
     .code-display {
-      background: linear-gradient(135deg, rgba(255, 122, 0, 0.1), rgba(255, 122, 0, 0.05));
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255,122,0,.1),
+          rgba(255,122,0,.05)
+        );
+
       border: 2px solid var(--accent);
       border-radius: 12px;
       padding: 24px;
@@ -258,19 +263,20 @@
 
     .code-display p {
       color: var(--muted);
-      margin: 0 0 8px 0;
-      font-size: 0.9rem;
+      margin: 0 0 8px;
+      font-size: .9rem;
     }
 
     .code-display h2 {
       margin: 0;
       font-size: 2.5rem;
       letter-spacing: 3px;
-      font-family: 'Courier New', monospace;
+      font-family: monospace;
       font-weight: 800;
     }
 
-    /* INPUT FIELDS */
+    /* INPUT */
+
     input {
       width: 100%;
       padding: 16px;
@@ -284,41 +290,26 @@
       letter-spacing: 2px;
       font-weight: 600;
       text-transform: uppercase;
-      transition: all 0.3s ease;
     }
 
     input:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
-    }
-
-    input::placeholder {
-      color: var(--muted);
-    }
-
-    /* CONTROL BUTTONS */
-    .control-buttons {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-      flex-direction: column;
-    }
-
-    .control-buttons .btn {
-      flex: 1;
+      box-shadow: 0 0 0 3px rgba(255,122,0,.1);
     }
 
     /* STATUS */
+
     .status {
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: .9rem;
       margin-top: 12px;
       padding: 12px;
       background: var(--card-bg);
       border-radius: 8px;
       border-left: 3px solid var(--accent);
       width: 100%;
+      text-align: left;
     }
 
     .status.connecting {
@@ -334,34 +325,140 @@
       border-left-color: #ef4444;
     }
 
-    /* THEME TOGGLE */
-    .theme-toggle {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 8px 12px;
+    .control-buttons {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      flex-direction: column;
+    }
+
+    /* SUPPORT CHAT */
+
+    #lamac-ai {
+      font-family: Arial, sans-serif;
+    }
+
+    #lamac-ai-open {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 9999;
+      width: 58px;
+      height: 58px;
+      border: 0;
+      border-radius: 50%;
+      background: #007e62;
+      color: white;
+      font-size: 25px;
       cursor: pointer;
-      font-size: 1.1rem;
-      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px #0004;
     }
 
-    .theme-toggle:hover {
-      background: var(--card-bg);
+    #lamac-ai-window {
+      display: none;
+      position: fixed;
+      right: 24px;
+      bottom: 94px;
+      z-index: 9999;
+      width: min(370px, calc(100vw - 32px));
+      height: 520px;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #efeae2;
+      box-shadow: 0 12px 40px #0004;
     }
 
-    /* FOOTER */
+    #lamac-ai-window.open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #lamac-ai-window header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      color: white;
+      background: #11211d;
+    }
+
+    #lamac-ai-window small {
+      display: block;
+      margin-top: 2px;
+      color: #b5c6bf;
+      font-size: 11px;
+    }
+
+    #lamac-ai-close {
+      border: 0;
+      background: transparent;
+      color: white;
+      font-size: 27px;
+      cursor: pointer;
+    }
+
+    #lamac-ai-messages {
+      flex: 1;
+      overflow: auto;
+      padding: 15px;
+    }
+
+    .lamac-bot,
+    .lamac-user {
+      max-width: 82%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .lamac-bot {
+      background: white;
+    }
+
+    .lamac-user {
+      margin-left: auto;
+      background: #d8f8e8;
+    }
+
+    #lamac-ai-form {
+      display: flex;
+      gap: 8px;
+      padding: 11px;
+      background: #f0f2f5;
+    }
+
+    #lamac-ai-input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      border-radius: 20px;
+      padding: 11px;
+      text-transform: none;
+      letter-spacing: normal;
+      text-align: left;
+    }
+
+    #lamac-ai-form button {
+      width: 42px;
+      border: 0;
+      border-radius: 50%;
+      background: #007e62;
+      color: white;
+      cursor: pointer;
+    }
+
     footer {
       background: var(--card-bg);
       border-top: 1px solid var(--border);
       padding: 24px;
       text-align: center;
       color: var(--muted);
-      font-size: 0.85rem;
-      margin-top: auto;
+      font-size: .85rem;
     }
 
-    /* RESPONSIVE */
     @media (max-width: 768px) {
       .container {
         padding: 40px 16px;
@@ -373,7 +470,6 @@
 
       .btn {
         padding: 14px 24px;
-        font-size: 0.95rem;
       }
 
       .code-display h2 {
@@ -382,577 +478,1865 @@
     }
   </style>
 </head>
-<div id="lamac-ai">
-  <button id="lamac-ai-open" aria-label="Kundensupport öffnen">💬</button>
 
-  <section id="lamac-ai-window" aria-label="lamachub Kundensupport">
-    <header>
-      <div>
-        <strong>lamachub Kundenservice</strong>
-        <small>KI-gestützter Support</small>
-      </div>
-      <button id="lamac-ai-close" aria-label="Chat schließen">×</button>
-    </header>
-
-    <div id="lamac-ai-messages">
-      <div class="lamac-bot">Hallo! Wie kann ich Ihnen weiterhelfen?</div>
-    </div>
-
-    <form id="lamac-ai-form">
-      <input id="lamac-ai-input" placeholder="Nachricht schreiben" maxlength="1800">
-      <button aria-label="Senden">➤</button>
-    </form>
-  </section>
-</div>
-
-<style>
-  #lamac-ai { font-family:Arial,sans-serif; }
-  #lamac-ai-open {
-    position:fixed; right:24px; bottom:24px; z-index:9999;
-    width:58px; height:58px; border:0; border-radius:50%;
-    background:#007e62; color:#fff; font-size:25px; cursor:pointer;
-    box-shadow:0 8px 24px #0004;
-  }
-  #lamac-ai-window {
-    display:none; position:fixed; right:24px; bottom:94px; z-index:9999;
-    width:min(370px,calc(100vw - 32px)); height:520px;
-    overflow:hidden; border-radius:16px; background:#efeae2;
-    box-shadow:0 12px 40px #0004;
-  }
-  #lamac-ai-window.open { display:flex; flex-direction:column; }
-  #lamac-ai-window header {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:15px; color:#fff; background:#11211d;
-  }
-  #lamac-ai-window small { display:block; margin-top:2px; color:#b5c6bf; font-size:11px; }
-  #lamac-ai-close { border:0; background:transparent; color:#fff; font-size:27px; cursor:pointer; }
-  #lamac-ai-messages { flex:1; overflow:auto; padding:15px; }
-  .lamac-bot, .lamac-user {
-    max-width:82%; margin:8px 0; padding:10px; border-radius:10px;
-    white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px;
-  }
-  .lamac-bot { background:#fff; }
-  .lamac-user { margin-left:auto; background:#d8f8e8; }
-  #lamac-ai-form { display:flex; gap:8px; padding:11px; background:#f0f2f5; }
-  #lamac-ai-input { flex:1; min-width:0; border:0; border-radius:20px; padding:11px; }
-  #lamac-ai-form button { width:42px; border:0; border-radius:50%; background:#007e62; color:#fff; cursor:pointer; }
-</style>
-
-<script>
-  const WORKER_URL = "https://lamacai.oslamu.workers.dev/chat";
-
-  const chatWindow = document.querySelector("#lamac-ai-window");
-  const chatMessages = document.querySelector("#lamac-ai-messages");
-  const chatInput = document.querySelector("#lamac-ai-input");
-  let history = [];
-  let messageCount = 0;
-
-  document.querySelector("#lamac-ai-open").onclick = () => {
-    chatWindow.classList.add("open");
-    chatInput.focus();
-  };
-
-  document.querySelector("#lamac-ai-close").onclick = () => {
-    chatWindow.classList.remove("open");
-  };
-
-  function addMessage(text, type) {
-    const item = document.createElement("div");
-    item.className = type;
-    item.textContent = text;
-    chatMessages.appendChild(item);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  document.querySelector("#lamac-ai-form").onsubmit = async event => {
-    event.preventDefault();
-    const text = chatInput.value.trim();
-    if (!text) return;
-
-    addMessage(text, "lamac-user");
-    chatInput.value = "";
-    messageCount++;
-
-    if (messageCount === 15) {
-      addMessage(
-        "Hinweis: Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.",
-        "lamac-bot"
-      );
-    }
-
-    try {
-      const response = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-
-      addMessage(data.reply, "lamac-bot");
-      history.push(
-        { role: "user", content: text },
-        { role: "assistant", content: data.reply }
-      );
-
-      history = history.slice(-12);
-    } catch {
-      addMessage(
-        "Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.",
-        "lamac-bot"
-      );
-    }
-  };
-</script>
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <div class="navbar-left">
-        <img class="navbar-logo" src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png" alt="lamacOs Logo">
-        <h1 class="navbar-title">lamacOs Live</h1>
-      </div>
-      <div class="navbar-right">
-        <button class="theme-toggle" id="themeToggle" title="Theme umschalten">🌗</button>
-      </div>
-    </div>
-  </nav>
+  <!-- =========================
+       SUPPORT CHAT
+  ========================== -->
 
-  <!-- MAIN CONTENT -->
-  <div class="container">
+  <div id="lamac-ai">
 
-    <!-- MENU SECTION -->
-    <section id="menuSection" class="section active">
-      <h1>Live Kamera System</h1>
-      <p style="color: var(--muted); font-size: 1.1rem; margin-bottom: 32px;">Teile deinen Bildschirm oder deine Kamera in Echtzeit</p>
-      <div class="button-group">
-        <button class="btn" onclick="startSender()">
-          <span>📤</span>
-          <span>Hosten (Kamera teilen)</span>
+    <button id="lamac-ai-open" aria-label="Kundensupport öffnen">
+      💬
+    </button>
+
+    <section id="lamac-ai-window">
+
+      <header>
+        <div>
+          <strong>lamachub Kundenservice</strong>
+          <small>KI-gestützter Support</small>
+        </div>
+
+        <button id="lamac-ai-close">
+          ×
         </button>
-        <button class="btn btn-secondary" onclick="showJoin()">
-          <span>📥</span>
-          <span>Empfangen (Code eingeben)</span>
-        </button>
-      </div>
-    </section>
+      </header>
 
-    <!-- SENDER SECTION -->
-    <section id="senderSection" class="section">
-      <div class="video-section">
-        <h2>📤 Sender aktiv</h2>
-
-        <div class="video-card">
-          <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-
-        <div class="code-display">
-          <p>Teile diesen Code mit dem Empfänger:</p>
-          <h2 id="code">—</h2>
-          <p style="margin-top: 12px; font-size: 0.85rem;">Dieser Code ist 30 Minuten lang gültig</p>
-        </div>
-
-        <div id="senderStatus" class="status connecting">
-          🔄 Warte auf Empfänger...
-        </div>
-
-        <div class="control-buttons">
-          <button class="btn" onclick="copyCode()">📋 Code kopieren</button>
-          <button class="btn btn-secondary" onclick="goBack()">← Zurück zum Menü</button>
+      <div id="lamac-ai-messages">
+        <div class="lamac-bot">
+          Hallo! Wie kann ich Ihnen weiterhelfen?
         </div>
       </div>
-    </section>
 
-    <!-- RECEIVER SECTION -->
-    <section id="receiverSection" class="section">
-      <div class="video-section">
-        <h2>📥 Empfänger</h2>
+      <form id="lamac-ai-form">
 
-        <p style="color: var(--muted); margin-bottom: 24px;">Gib den Code ein, um die Kamera zu sehen</p>
+        <input
+          id="lamac-ai-input"
+          placeholder="Nachricht schreiben"
+          maxlength="1800"
+        >
 
-        <input id="inputCode" placeholder="CODE EINGEBEN" maxlength="6">
-
-        <button class="btn" id="joinBtn" onclick="join()" style="width: 100%; margin-top: 16px;">
-          <span id="joinButtonText">Start</span>
+        <button aria-label="Senden">
+          ➤
         </button>
 
-        <div id="receiverStatus" class="status" style="display: none;"></div>
+      </form>
 
-        <div class="video-card" id="videoCardContainer" style="display: none; margin-top: 24px;">
-          <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-
-        <div class="control-buttons" style="margin-top: 24px;">
-          <button class="btn btn-secondary" onclick="goBack()">← Zurück zum Menü</button>
-        </div>
-      </div>
     </section>
 
   </div>
 
-  <!-- FOOTER -->
+
+  <!-- =========================
+       NAVBAR
+  ========================== -->
+
+  <nav class="navbar">
+
+    <div class="navbar-container">
+
+      <div class="navbar-left">
+
+        <img
+          class="navbar-logo"
+          src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png"
+          alt="lamacOs Logo"
+        >
+
+        <div class="navbar-title">
+          lamacOs Live
+        </div>
+
+      </div>
+
+      <button
+        class="theme-toggle"
+        id="themeToggle"
+        title="Theme umschalten"
+      >
+        🌗
+      </button>
+
+    </div>
+
+  </nav>
+
+
+  <!-- =========================
+       MAIN
+  ========================== -->
+
+  <div class="container">
+
+    <!-- MENU -->
+
+    <section
+      id="menuSection"
+      class="section active"
+    >
+
+      <h1>
+        Live Kamera System
+      </h1>
+
+      <p
+        style="
+          color:var(--muted);
+          font-size:1.1rem;
+          margin-bottom:32px;
+        "
+      >
+        Teile deine Kamera in Echtzeit
+      </p>
+
+      <div class="button-group">
+
+        <button
+          class="btn"
+          onclick="startSender()"
+        >
+          📤 Hosten (Kamera teilen)
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          onclick="showJoin()"
+        >
+          📥 Empfangen (Code eingeben)
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- SENDER -->
+
+    <section
+      id="senderSection"
+      class="section"
+    >
+
+      <div class="video-section">
+
+        <h2>
+          📤 Sender aktiv
+        </h2>
+
+        <div class="video-card">
+
+          <video
+            id="localVideo"
+            autoplay
+            muted
+            playsinline
+          ></video>
+
+        </div>
+
+        <div class="code-display">
+
+          <p>
+            Teile diesen Code mit dem Empfänger:
+          </p>
+
+          <h2 id="code">
+            —
+          </h2>
+
+          <p style="margin-top:12px;font-size:.85rem;">
+            Dieser Code ist 30 Minuten lang gültig.
+          </p>
+
+        </div>
+
+        <div
+          id="senderStatus"
+          class="status connecting"
+        >
+          🔄 Kamera wird gestartet...
+        </div>
+
+        <div class="control-buttons">
+
+          <button
+            class="btn"
+            onclick="copyCode()"
+          >
+            📋 Code kopieren
+          </button>
+
+          <button
+            class="btn btn-secondary"
+            onclick="goBack()"
+          >
+            ← Zurück zum Menü
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- RECEIVER -->
+
+    <section
+      id="receiverSection"
+      class="section"
+    >
+
+      <div class="video-section">
+
+        <h2>
+          📥 Empfänger
+        </h2>
+
+        <p style="color:var(--muted);margin-bottom:24px;">
+          Gib den Code ein, um die Kamera zu sehen.
+        </p>
+
+        <input
+          id="inputCode"
+          placeholder="CODE EINGEBEN"
+          maxlength="6"
+        >
+
+        <button
+          class="btn"
+          id="joinBtn"
+          onclick="join()"
+          style="width:100%;margin-top:16px;"
+        >
+          <span id="joinButtonText">
+            Start
+          </span>
+        </button>
+
+        <div
+          id="receiverStatus"
+          class="status"
+          style="display:none;"
+        ></div>
+
+        <div
+          class="video-card"
+          id="videoCardContainer"
+          style="display:none;margin-top:24px;"
+        >
+
+          <video
+            id="remoteVideo"
+            autoplay
+            playsinline
+          ></video>
+
+        </div>
+
+        <div
+          class="control-buttons"
+          style="margin-top:24px;"
+        >
+
+          <button
+            class="btn btn-secondary"
+            onclick="goBack()"
+          >
+            ← Zurück zum Menü
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
   <footer>
-    <p>© 2026 lamacHub — Live Kamera System</p>
+    © 2026 lamacHub — Live Kamera System
   </footer>
 
-  <!-- Firebase Scripts -->
+
+  <!-- =========================
+       FIREBASE
+  ========================== -->
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
     import {
-      getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, deleteDoc, collection
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      initializeApp
+    }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      updateDoc,
+      onSnapshot,
+      deleteDoc,
+      collection
+    }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDa3M2CdooyC6rhan-IH1wrS_fFCsqd9l4",
-      authDomain: "lamacoslivecam.firebaseapp.com",
-      projectId: "lamacoslivecam",
-      storageBucket: "lamacoslivecam.firebasestorage.app",
-      messagingSenderId: "907480106804",
-      appId: "1:907480106804:web:b25a8091943f255e518761"
+
+      apiKey:
+        "AIzaSyDa3M2CdooyC6rhan-IH1wrS_fFCsqd9l4",
+
+      authDomain:
+        "lamacoslivecam.firebaseapp.com",
+
+      projectId:
+        "lamacoslivecam",
+
+      storageBucket:
+        "lamacoslivecam.firebasestorage.app",
+
+      messagingSenderId:
+        "907480106804",
+
+      appId:
+        "1:907480106804:web:b25a8091943f255e518761"
+
     };
+
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+
     let pc = null;
     let localStream = null;
     let code = null;
-    let currentRole = null; // 'sender' or 'receiver'
+    let currentRole = null;
+
     let unsubCallDoc = null;
     let unsubCandidates = null;
 
+
     const servers = {
+
       iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
-        { urls: "stun:stun2.l.google.com:19302" }
-      ]
-    };
 
-    // ===== Theme Toggle =====
-    function initTheme() {
-      const saved = localStorage.getItem('livecam-theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', saved);
-    }
+        {
+          urls: "stun:stun.l.google.com:19302"
+        },
 
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') || 'dark';
-      const newTheme = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('livecam-theme', newTheme);
-    });
+        {
+          urls: "stun:stun1.l.google.com:19302"
+        },
 
-    // ===== UI Helpers =====
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    function updateStatus(element, text, type) {
-      if (!element) return;
-      element.textContent = text;
-      element.className = `status ${type}`;
-      element.style.display = 'block';
-    }
-
-    function cleanupConnection() {
-      if (unsubCallDoc) { unsubCallDoc(); unsubCallDoc = null; }
-      if (unsubCandidates) { unsubCandidates(); unsubCandidates = null; }
-      if (pc) { pc.close(); pc = null; }
-      if (localStream) {
-        localStream.getTracks().forEach(t => t.stop());
-        localStream = null;
-      }
-    }
-
-    // ===== SENDER LOGIC =====
-    window.startSender = async function () {
-      currentRole = 'sender';
-      showSection('senderSection');
-
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            frameRate: { ideal: 30, max: 60 }
-          },
-          audio: true
-        });
-
-        document.getElementById('localVideo').srcObject = localStream;
-
-        pc = new RTCPeerConnection(servers);
-
-        localStream.getTracks().forEach(track => {
-          pc.addTrack(track, localStream);
-        });
-
-        code = Math.random().toString(36).substring(2, 8).toUpperCase();
-        document.getElementById('code').innerText = code;
-
-        const callDoc = doc(db, "calls", code);
-        const offerCandidates = collection(db, "calls", code, "offerCandidates");
-        const answerCandidates = collection(db, "calls", code, "answerCandidates");
-
-        // ICE-Kandidaten des Senders speichern
-        pc.onicecandidate = async (event) => {
-          if (event.candidate) {
-            try {
-              await setDoc(doc(offerCandidates, Date.now().toString()), event.candidate.toJSON());
-            } catch (e) {
-              console.warn('ICE candidate error:', e);
-            }
-          }
-        };
-
-        pc.onconnectionstatechange = () => {
-          console.log('Connection state:', pc.connectionState);
-          const statusEl = document.getElementById('senderStatus');
-          if (pc.connectionState === 'connected') {
-            updateStatus(statusEl, '✓ Verbindung aktiv und stabil', 'connected');
-          } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
-            updateStatus(statusEl, '❌ Verbindung getrennt', 'error');
-          }
-        };
-
-        // Offer erstellen
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-
-        await setDoc(callDoc, {
-          offer: { sdp: offer.sdp, type: offer.type },
-          createdAt: new Date()
-        });
-
-        // Auf Antwort des Empfängers warten
-        // WICHTIG: pc.signalingState ist nach setLocalDescription(offer)
-        // "have-local-offer", NICHT "stable". Die alte Prüfung auf 'stable'
-        // hat verhindert, dass die Antwort jemals verarbeitet wurde.
-        unsubCallDoc = onSnapshot(callDoc, (snap) => {
-          const data = snap.data();
-          if (data?.answer && pc && !pc.currentRemoteDescription) {
-            pc.setRemoteDescription(new RTCSessionDescription(data.answer))
-              .catch(e => console.warn('Remote description error:', e));
-          }
-        });
-
-        // Auf ICE-Kandidaten des Empfängers hören
-        unsubCandidates = onSnapshot(answerCandidates, (snap) => {
-          snap.docChanges().forEach(change => {
-            if (change.type === 'added') {
-              const candidate = change.doc.data();
-              if (pc) {
-                pc.addIceCandidate(new RTCIceCandidate(candidate))
-                  .catch(e => console.warn('Add ICE candidate error:', e));
-              }
-            }
-          });
-        });
-
-        localStorage.setItem('lastCode', code);
-
-        // Automatisches Aufräumen nach 30 Minuten
-        setTimeout(() => {
-          if (currentRole === 'sender' && code) {
-            cleanupConnection();
-            deleteDoc(callDoc).catch(() => {});
-          }
-        }, 30 * 60 * 1000);
-
-      } catch (err) {
-        alert('Fehler beim Zugriff auf die Kamera:\n' + err.message);
-        goBack();
-      }
-    };
-
-    window.copyCode = function () {
-      const codeText = document.getElementById('code').innerText;
-      navigator.clipboard.writeText(codeText).then(() => {
-        alert('Code kopiert: ' + codeText);
-      }).catch(() => {
-        alert('Code: ' + codeText);
-      });
-    };
-
-    // ===== RECEIVER LOGIC =====
-    window.showJoin = function () {
-      showSection('receiverSection');
-      const lastCode = localStorage.getItem('lastCode');
-      if (lastCode) {
-        document.getElementById('inputCode').value = lastCode;
-      }
-    };
-
-    window.join = async function () {
-      const inputCode = document.getElementById('inputCode').value.trim().toUpperCase();
-      const joinBtn = document.getElementById('joinBtn');
-      const joinBtnText = document.getElementById('joinButtonText');
-
-      if (!inputCode) {
-        updateStatus(document.getElementById('receiverStatus'), '⚠ Bitte gib einen Code ein', 'error');
-        return;
-      }
-
-      currentRole = 'receiver';
-      updateStatus(document.getElementById('receiverStatus'), '🔄 Verbinde...', 'connecting');
-      joinBtnText.textContent = 'Verbinde...';
-      joinBtn.disabled = true;
-
-      try {
-        const callDoc = doc(db, "calls", inputCode);
-        const data = (await getDoc(callDoc)).data();
-
-        if (!data?.offer) {
-          updateStatus(document.getElementById('receiverStatus'), '❌ Code nicht gefunden oder abgelaufen', 'error');
-          joinBtnText.textContent = 'Start';
-          joinBtn.disabled = false;
-          return;
+        {
+          urls: "stun:stun2.l.google.com:19302"
         }
 
-        pc = new RTCPeerConnection(servers);
+      ]
 
-        // Eingehende Tracks anzeigen
-        pc.ontrack = (event) => {
-          console.log('Received track:', event.track.kind);
-          document.getElementById('remoteVideo').srcObject = event.streams[0];
-          document.getElementById('videoCardContainer').style.display = 'block';
-          updateStatus(document.getElementById('receiverStatus'), '✓ Verbindung hergestellt', 'connected');
-        };
-
-        pc.onconnectionstatechange = () => {
-          console.log('Receiver connection state:', pc.connectionState);
-          if (pc.connectionState === 'failed') {
-            updateStatus(document.getElementById('receiverStatus'), '❌ Verbindung fehlgeschlagen', 'error');
-          }
-        };
-
-        const answerCandidates = collection(db, "calls", inputCode, "answerCandidates");
-
-        pc.onicecandidate = async (event) => {
-          if (event.candidate) {
-            try {
-              await setDoc(doc(answerCandidates, Date.now().toString()), event.candidate.toJSON());
-            } catch (e) {
-              console.warn('Answer ICE candidate error:', e);
-            }
-          }
-        };
-
-        // Remote Description setzen
-        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-
-        // Antwort erstellen
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-
-        await updateDoc(callDoc, {
-          answer: { sdp: answer.sdp, type: answer.type }
-        });
-
-        // Auf ICE-Kandidaten des Senders hören
-        const offerCandidates = collection(db, "calls", inputCode, "offerCandidates");
-        unsubCandidates = onSnapshot(offerCandidates, (snap) => {
-          snap.docChanges().forEach(change => {
-            if (change.type === 'added') {
-              const candidate = change.doc.data();
-              if (pc) {
-                pc.addIceCandidate(new RTCIceCandidate(candidate))
-                  .catch(e => console.warn('Add ICE candidate error:', e));
-              }
-            }
-          });
-        });
-
-        joinBtnText.textContent = 'Verbunden';
-
-      } catch (err) {
-        console.error('Join error:', err);
-        updateStatus(document.getElementById('receiverStatus'), '❌ Fehler: ' + (err.message || 'Unbekannt'), 'error');
-        joinBtnText.textContent = 'Start';
-        joinBtn.disabled = false;
-      }
     };
+
+
+    /* =========================
+       THEME
+    ========================== */
+
+    function initTheme() {
+
+      const saved =
+        localStorage.getItem("livecam-theme") || "dark";
+
+      document.documentElement
+        .setAttribute("data-theme", saved);
+
+    }
+
+
+    document
+      .getElementById("themeToggle")
+      .addEventListener("click", () => {
+
+        const current =
+          document.documentElement
+            .getAttribute("data-theme") || "dark";
+
+        const newTheme =
+          current === "dark" ? "light" : "dark";
+
+        document.documentElement
+          .setAttribute("data-theme", newTheme);
+
+        localStorage.setItem(
+          "livecam-theme",
+          newTheme
+        );
+
+      });
+
+
+    /* =========================
+       UI
+    ========================== */
+
+    function showSection(id) {
+
+      document
+        .querySelectorAll(".section")
+        .forEach(section =>
+          section.classList.remove("active")
+        );
+
+      document
+        .getElementById(id)
+        .classList.add("active");
+
+    }
+
+
+    function updateStatus(
+      element,
+      text,
+      type = ""
+    ) {
+
+      if (!element) return;
+
+      element.textContent = text;
+
+      element.className =
+        `status ${type}`;
+
+      element.style.display = "block";
+
+    }
+
+
+    /* =========================
+       BROWSER CHECK
+    ========================== */
+
+    function checkCameraSupport() {
+
+      if (!window.isSecureContext) {
+
+        return {
+          ok: false,
+          message:
+            "❌ Diese Seite läuft nicht über HTTPS. Kamera und Mikrofon funktionieren nur über HTTPS oder localhost."
+        };
+
+      }
+
+
+      if (!navigator.mediaDevices) {
+
+        return {
+          ok: false,
+          message:
+            "❌ Dein Browser stellt keine MediaDevices-API bereit. Öffne die Seite direkt in Safari/Chrome und nicht in einem eingebetteten Browser."
+        };
+
+      }
+
+
+      if (!navigator.mediaDevices.getUserMedia) {
+
+        return {
+          ok: false,
+          message:
+            "❌ Dein Browser unterstützt getUserMedia() nicht."
+        };
+
+      }
+
+
+      return {
+        ok: true
+      };
+
+    }
+
+
+    /* =========================
+       CAMERA ERROR
+    ========================== */
+
+    function explainMediaError(error) {
+
+      if (!error) {
+
+        return "Unbekannter Fehler.";
+
+      }
+
+
+      switch (error.name) {
+
+        case "NotAllowedError":
+
+          return (
+            "Der Browser hat den Zugriff auf Kamera oder Mikrofon blockiert.\n\n" +
+            "Prüfe die Website-Berechtigungen für Kamera und Mikrofon.\n\n" +
+            "Falls diese Seite in einem iframe eingebettet ist, muss der iframe außerdem `allow=\"camera; microphone\"` besitzen."
+          );
+
+
+        case "NotFoundError":
+
+          return (
+            "Es wurde keine passende Kamera oder kein Mikrofon gefunden."
+          );
+
+
+        case "NotReadableError":
+
+          return (
+            "Die Kamera oder das Mikrofon wird bereits von einer anderen App verwendet oder konnte nicht geöffnet werden."
+          );
+
+
+        case "SecurityError":
+
+          return (
+            "Der Browser hat den Zugriff aus Sicherheitsgründen blockiert. Prüfe HTTPS und Website-Berechtigungen."
+          );
+
+
+        case "AbortError":
+
+          return (
+            "Der Zugriff auf Kamera oder Mikrofon wurde abgebrochen."
+          );
+
+
+        case "OverconstrainedError":
+
+          return (
+            "Die angeforderten Kamera-Einstellungen werden von deinem Gerät nicht unterstützt."
+          );
+
+
+        case "TypeError":
+
+          return (
+            "Die Kamera-API konnte nicht korrekt aufgerufen werden. Prüfe, ob die Seite über HTTPS geöffnet wurde."
+          );
+
+
+        default:
+
+          return (
+            "Unbekannter Medienfehler."
+          );
+
+      }
+
+    }
+
+
+    /* =========================
+       CLEANUP
+    ========================== */
+
+    function cleanupConnection() {
+
+      if (unsubCallDoc) {
+
+        unsubCallDoc();
+        unsubCallDoc = null;
+
+      }
+
+
+      if (unsubCandidates) {
+
+        unsubCandidates();
+        unsubCandidates = null;
+
+      }
+
+
+      if (pc) {
+
+        pc.close();
+        pc = null;
+
+      }
+
+
+      if (localStream) {
+
+        localStream
+          .getTracks()
+          .forEach(track => track.stop());
+
+        localStream = null;
+
+      }
+
+    }
+
+
+    /* =========================
+       SENDER
+    ========================== */
+
+    window.startSender = async function () {
+
+      currentRole = "sender";
+
+      showSection("senderSection");
+
+
+      const status =
+        document.getElementById("senderStatus");
+
+
+      const support =
+        checkCameraSupport();
+
+
+      if (!support.ok) {
+
+        updateStatus(
+          status,
+          support.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      updateStatus(
+        status,
+        "🔄 Bitte erlaube Kamera und Mikrofon...",
+        "connecting"
+      );
+
+
+      try {
+
+        /*
+         * Kamera + Mikrofon
+         *
+         * Wir verwenden absichtlich zunächst
+         * einfache Anforderungen.
+         * Dadurch gibt es weniger Probleme
+         * auf iPad/iPhone/Safari.
+         */
+
+        localStream =
+          await navigator.mediaDevices.getUserMedia({
+
+            video: true,
+
+            audio: true
+
+          });
+
+
+        /* Kamera testen */
+
+        const videoTracks =
+          localStream.getVideoTracks();
+
+        const audioTracks =
+          localStream.getAudioTracks();
+
+
+        if (videoTracks.length === 0) {
+
+          throw new Error(
+            "Keine Kamera wurde bereitgestellt."
+          );
+
+        }
+
+
+        document
+          .getElementById("localVideo")
+          .srcObject = localStream;
+
+
+        updateStatus(
+          status,
+          "✓ Kamera und Mikrofon aktiviert",
+          "connected"
+        );
+
+
+        /* WebRTC */
+
+        pc =
+          new RTCPeerConnection(servers);
+
+
+        localStream
+          .getTracks()
+          .forEach(track => {
+
+            pc.addTrack(
+              track,
+              localStream
+            );
+
+          });
+
+
+        code =
+          Math.random()
+            .toString(36)
+            .substring(2, 8)
+            .toUpperCase();
+
+
+        document
+          .getElementById("code")
+          .textContent = code;
+
+
+        const callDoc =
+          doc(db, "calls", code);
+
+
+        const offerCandidates =
+          collection(
+            db,
+            "calls",
+            code,
+            "offerCandidates"
+          );
+
+
+        const answerCandidates =
+          collection(
+            db,
+            "calls",
+            code,
+            "answerCandidates"
+          );
+
+
+        /* ICE */
+
+        pc.onicecandidate =
+          async event => {
+
+            if (!event.candidate)
+              return;
+
+            try {
+
+              await setDoc(
+
+                doc(
+                  offerCandidates,
+                  Date.now().toString()
+                ),
+
+                event.candidate.toJSON()
+
+              );
+
+            } catch (error) {
+
+              console.warn(
+                "ICE candidate error:",
+                error
+              );
+
+            }
+
+          };
+
+
+        /* Verbindung */
+
+        pc.onconnectionstatechange =
+          () => {
+
+            console.log(
+              "Sender connection:",
+              pc.connectionState
+            );
+
+
+            if (
+              pc.connectionState ===
+              "connected"
+            ) {
+
+              updateStatus(
+                status,
+                "✓ Verbindung aktiv und stabil",
+                "connected"
+              );
+
+            }
+
+
+            else if (
+              pc.connectionState ===
+              "failed"
+            ) {
+
+              updateStatus(
+                status,
+                "❌ WebRTC-Verbindung fehlgeschlagen",
+                "error"
+              );
+
+            }
+
+
+            else if (
+              pc.connectionState ===
+              "disconnected"
+            ) {
+
+              updateStatus(
+                status,
+                "⚠ Verbindung getrennt",
+                "error"
+              );
+
+            }
+
+          };
+
+
+        /* Offer */
+
+        const offer =
+          await pc.createOffer();
+
+
+        await pc.setLocalDescription(
+          offer
+        );
+
+
+        await setDoc(
+
+          callDoc,
+
+          {
+
+            offer: {
+
+              sdp: offer.sdp,
+
+              type: offer.type
+
+            },
+
+            createdAt:
+              new Date()
+
+          }
+
+        );
+
+
+        /* Antwort überwachen */
+
+        unsubCallDoc =
+          onSnapshot(
+            callDoc,
+            async snap => {
+
+              const data =
+                snap.data();
+
+
+              if (
+                data?.answer &&
+                pc &&
+                !pc.currentRemoteDescription
+              ) {
+
+                try {
+
+                  await pc.setRemoteDescription(
+
+                    new RTCSessionDescription(
+                      data.answer
+                    )
+
+                  );
+
+                } catch (error) {
+
+                  console.warn(
+                    "Remote description error:",
+                    error
+                  );
+
+                }
+
+              }
+
+            }
+          );
+
+
+        /* ICE Empfänger */
+
+        unsubCandidates =
+          onSnapshot(
+
+            answerCandidates,
+
+            snap => {
+
+              snap
+                .docChanges()
+                .forEach(change => {
+
+                  if (
+                    change.type !== "added"
+                  )
+                    return;
+
+                  const candidate =
+                    change.doc.data();
+
+
+                  if (pc) {
+
+                    pc
+                      .addIceCandidate(
+                        new RTCIceCandidate(
+                          candidate
+                        )
+                      )
+                      .catch(error =>
+                        console.warn(
+                          "ICE error:",
+                          error
+                        )
+                      );
+
+                  }
+
+                });
+
+            }
+
+          );
+
+
+        localStorage.setItem(
+          "lastCode",
+          code
+        );
+
+
+        /* 30 Minuten */
+
+        setTimeout(() => {
+
+          if (
+            currentRole === "sender" &&
+            code
+          ) {
+
+            cleanupConnection();
+
+            deleteDoc(callDoc)
+              .catch(() => {});
+
+          }
+
+        }, 30 * 60 * 1000);
+
+
+      } catch (error) {
+
+        console.error(
+          "getUserMedia / Sender Fehler:",
+          error
+        );
+
+
+        updateStatus(
+
+          status,
+
+          "❌ " +
+          explainMediaError(error) +
+          "\n\nTechnischer Fehler: " +
+          error.name,
+
+          "error"
+
+        );
+
+
+        cleanupConnection();
+
+      }
+
+    };
+
+
+    /* =========================
+       COPY CODE
+    ========================== */
+
+    window.copyCode = function () {
+
+      const codeText =
+        document
+          .getElementById("code")
+          .textContent;
+
+
+      navigator.clipboard
+        .writeText(codeText)
+
+        .then(() => {
+
+          alert(
+            "Code kopiert: " +
+            codeText
+          );
+
+        })
+
+        .catch(() => {
+
+          alert(
+            "Code: " +
+            codeText
+          );
+
+        });
+
+    };
+
+
+    /* =========================
+       JOIN
+    ========================== */
+
+    window.showJoin = function () {
+
+      showSection(
+        "receiverSection"
+      );
+
+
+      const lastCode =
+        localStorage.getItem(
+          "lastCode"
+        );
+
+
+      if (lastCode) {
+
+        document
+          .getElementById("inputCode")
+          .value = lastCode;
+
+      }
+
+    };
+
+
+    window.join = async function () {
+
+      const inputCode =
+        document
+          .getElementById("inputCode")
+          .value
+          .trim()
+          .toUpperCase();
+
+
+      const joinBtn =
+        document.getElementById(
+          "joinBtn"
+        );
+
+
+      const joinBtnText =
+        document.getElementById(
+          "joinButtonText"
+        );
+
+
+      const status =
+        document.getElementById(
+          "receiverStatus"
+        );
+
+
+      if (!inputCode) {
+
+        updateStatus(
+          status,
+          "⚠ Bitte gib einen Code ein.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      currentRole =
+        "receiver";
+
+
+      updateStatus(
+        status,
+        "🔄 Verbinde...",
+        "connecting"
+      );
+
+
+      joinBtnText.textContent =
+        "Verbinde...";
+
+      joinBtn.disabled = true;
+
+
+      try {
+
+        const callDoc =
+          doc(
+            db,
+            "calls",
+            inputCode
+          );
+
+
+        const snapshot =
+          await getDoc(callDoc);
+
+
+        const data =
+          snapshot.data();
+
+
+        if (!data?.offer) {
+
+          updateStatus(
+            status,
+            "❌ Code nicht gefunden oder abgelaufen.",
+            "error"
+          );
+
+          joinBtnText.textContent =
+            "Start";
+
+          joinBtn.disabled = false;
+
+          return;
+
+        }
+
+
+        pc =
+          new RTCPeerConnection(
+            servers
+          );
+
+
+        /* Video empfangen */
+
+        pc.ontrack =
+          event => {
+
+            console.log(
+              "Received:",
+              event.track.kind
+            );
+
+
+            const video =
+              document.getElementById(
+                "remoteVideo"
+              );
+
+
+            if (event.streams[0]) {
+
+              video.srcObject =
+                event.streams[0];
+
+            }
+
+
+            document
+              .getElementById(
+                "videoCardContainer"
+              )
+              .style.display = "block";
+
+
+            updateStatus(
+              status,
+              "✓ Verbindung hergestellt",
+              "connected"
+            );
+
+          };
+
+
+        pc.onconnectionstatechange =
+          () => {
+
+            console.log(
+              "Receiver:",
+              pc.connectionState
+            );
+
+
+            if (
+              pc.connectionState ===
+              "failed"
+            ) {
+
+              updateStatus(
+                status,
+                "❌ WebRTC-Verbindung fehlgeschlagen.",
+                "error"
+              );
+
+            }
+
+          };
+
+
+        const answerCandidates =
+          collection(
+            db,
+            "calls",
+            inputCode,
+            "answerCandidates"
+          );
+
+
+        pc.onicecandidate =
+          async event => {
+
+            if (!event.candidate)
+              return;
+
+            try {
+
+              await setDoc(
+
+                doc(
+                  answerCandidates,
+                  Date.now().toString()
+                ),
+
+                event.candidate.toJSON()
+
+              );
+
+            } catch (error) {
+
+              console.warn(
+                "Answer ICE error:",
+                error
+              );
+
+            }
+
+          };
+
+
+        await pc.setRemoteDescription(
+
+          new RTCSessionDescription(
+            data.offer
+          )
+
+        );
+
+
+        const answer =
+          await pc.createAnswer();
+
+
+        await pc.setLocalDescription(
+          answer
+        );
+
+
+        await updateDoc(
+
+          callDoc,
+
+          {
+
+            answer: {
+
+              sdp: answer.sdp,
+
+              type: answer.type
+
+            }
+
+          }
+
+        );
+
+
+        const offerCandidates =
+          collection(
+            db,
+            "calls",
+            inputCode,
+            "offerCandidates"
+          );
+
+
+        unsubCandidates =
+          onSnapshot(
+
+            offerCandidates,
+
+            snap => {
+
+              snap
+                .docChanges()
+                .forEach(change => {
+
+                  if (
+                    change.type !== "added"
+                  )
+                    return;
+
+
+                  const candidate =
+                    change.doc.data();
+
+
+                  if (pc) {
+
+                    pc
+                      .addIceCandidate(
+                        new RTCIceCandidate(
+                          candidate
+                        )
+                      )
+                      .catch(error =>
+                        console.warn(
+                          "ICE error:",
+                          error
+                        )
+                      );
+
+                  }
+
+                });
+
+            }
+
+          );
+
+
+        joinBtnText.textContent =
+          "Verbunden";
+
+
+      } catch (error) {
+
+        console.error(
+          "Join error:",
+          error
+        );
+
+
+        updateStatus(
+          status,
+          "❌ Fehler: " +
+          (
+            error.message ||
+            "Unbekannter Fehler"
+          ),
+          "error"
+        );
+
+
+        joinBtnText.textContent =
+          "Start";
+
+        joinBtn.disabled = false;
+
+      }
+
+    };
+
+
+    /* =========================
+       BACK
+    ========================== */
 
     window.goBack = function () {
+
       cleanupConnection();
-      document.getElementById('localVideo').srcObject = null;
-      document.getElementById('remoteVideo').srcObject = null;
+
+
+      document
+        .getElementById(
+          "localVideo"
+        )
+        .srcObject = null;
+
+
+      document
+        .getElementById(
+          "remoteVideo"
+        )
+        .srcObject = null;
+
+
       currentRole = null;
       code = null;
-      document.getElementById('receiverStatus').style.display = 'none';
-      document.getElementById('videoCardContainer').style.display = 'none';
-      document.getElementById('joinButtonText').textContent = 'Start';
-      document.getElementById('joinBtn').disabled = false;
-      showSection('menuSection');
+
+
+      document
+        .getElementById(
+          "receiverStatus"
+        )
+        .style.display = "none";
+
+
+      document
+        .getElementById(
+          "videoCardContainer"
+        )
+        .style.display = "none";
+
+
+      document
+        .getElementById(
+          "joinButtonText"
+        )
+        .textContent = "Start";
+
+
+      document
+        .getElementById(
+          "joinBtn"
+        )
+        .disabled = false;
+
+
+      showSection(
+        "menuSection"
+      );
+
     };
 
-    // Initialisieren
+
+    /* INIT */
+
     initTheme();
+
   </script>
-<script>
-(function () {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-  // 1) Nur anzeigen, wenn der Referrer exakt https://www.lamachub.de ist
-  let referrer = '';
-  try { referrer = new URL(document.referrer); } catch (e) {}
-  if (
-    referrer.protocol !== 'https:' ||
-    referrer.hostname.toLowerCase() !== 'www.lamachub.de'
-  ) return;
 
-  // 2) Container in Shadow DOM, damit die Styles der Host-Seite nicht stören
-  const root = document.createElement('div');
-  root.setAttribute('data-lamachub-back', '');
-  Object.assign(root.style, {
-    all: 'initial',
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    zIndex: '2147483647',
-    pointerEvents: 'none'
-  });
-  document.documentElement.appendChild(root);
+  <!-- =========================
+       SUPPORT CHAT SCRIPT
+  ========================== -->
 
-  const shadow = root.attachShadow({ mode: 'open' });
-  shadow.innerHTML = `
-    <style>
-      :host { all: initial; }
-      button {
-        pointer-events: auto;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin: 12px;
-        padding: 10px 16px;
-        background: #ff6a00;
-        color: #fff;
-        font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        border: 0;
-        border-radius: 8px;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,.2);
-        transition: background .15s ease, transform .1s ease;
-      }
-      button:hover  { background: #e65f00; }
-      button:active { transform: scale(.97); }
-      button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-      .arrow { font-size: 16px; line-height: 1; }
-    </style>
-    <button type="button" aria-label="Zurück zu lamachub.de">
-      <span class="arrow">←</span>
-      <span>Zurück</span>
-    </button>
-  `;
+  <script>
 
-  shadow.querySelector('button').addEventListener('click', () => {
-    // Navigation im selben Tab (window.top bricht ggf. aus iFrames aus)
-    window.top.location.href = 'https://www.lamachub.de/';
-  });
-})();
-</script>
+    const WORKER_URL =
+      "https://lamacai.oslamu.workers.dev/chat";
+
+
+    const chatWindow =
+      document.querySelector(
+        "#lamac-ai-window"
+      );
+
+
+    const chatMessages =
+      document.querySelector(
+        "#lamac-ai-messages"
+      );
+
+
+    const chatInput =
+      document.querySelector(
+        "#lamac-ai-input"
+      );
+
+
+    let history = [];
+    let messageCount = 0;
+
+
+    document
+      .querySelector("#lamac-ai-open")
+      .onclick = () => {
+
+        chatWindow.classList.add(
+          "open"
+        );
+
+        chatInput.focus();
+
+      };
+
+
+    document
+      .querySelector("#lamac-ai-close")
+      .onclick = () => {
+
+        chatWindow.classList.remove(
+          "open"
+        );
+
+      };
+
+
+    function addMessage(
+      text,
+      type
+    ) {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        type;
+
+
+      item.textContent =
+        text;
+
+
+      chatMessages.appendChild(
+        item
+      );
+
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
+    }
+
+
+    document
+      .querySelector("#lamac-ai-form")
+      .onsubmit = async event => {
+
+        event.preventDefault();
+
+
+        const text =
+          chatInput.value.trim();
+
+
+        if (!text)
+          return;
+
+
+        addMessage(
+          text,
+          "lamac-user"
+        );
+
+
+        chatInput.value = "";
+
+
+        messageCount++;
+
+
+        if (
+          messageCount === 15
+        ) {
+
+          addMessage(
+
+            "Hinweis: Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.",
+
+            "lamac-bot"
+
+          );
+
+        }
+
+
+        try {
+
+          const response =
+            await fetch(
+
+              WORKER_URL,
+
+              {
+
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body: JSON.stringify({
+
+                  message: text,
+
+                  history
+
+                })
+
+              }
+
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!response.ok)
+            throw new Error(
+              data.error
+            );
+
+
+          addMessage(
+            data.reply,
+            "lamac-bot"
+          );
+
+
+          history.push(
+
+            {
+              role: "user",
+              content: text
+            },
+
+            {
+              role: "assistant",
+              content: data.reply
+            }
+
+          );
+
+
+          history =
+            history.slice(-12);
+
+
+        } catch {
+
+          addMessage(
+
+            "Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.",
+
+            "lamac-bot"
+
+          );
+
+        }
+
+      };
+
+  </script>
+
+
+  <!-- =========================
+       ZURÜCK ZU LAMACHUB
+  ========================== -->
+
+  <script>
+
+    (function () {
+
+      if (
+        typeof window === "undefined" ||
+        typeof document === "undefined"
+      )
+        return;
+
+
+      let referrer = "";
+
+
+      try {
+
+        referrer =
+          new URL(
+            document.referrer
+          );
+
+      } catch (e) {}
+
+
+      if (
+
+        referrer.protocol !== "https:" ||
+
+        referrer.hostname
+          .toLowerCase() !==
+          "www.lamachub.de"
+
+      )
+        return;
+
+
+      const root =
+        document.createElement(
+          "div"
+        );
+
+
+      root.setAttribute(
+        "data-lamachub-back",
+        ""
+      );
+
+
+      Object.assign(
+        root.style,
+        {
+
+          all: "initial",
+
+          position: "fixed",
+
+          top: "0",
+
+          left: "0",
+
+          zIndex:
+            "2147483647",
+
+          pointerEvents:
+            "none"
+
+        }
+      );
+
+
+      document.documentElement
+        .appendChild(root);
+
+
+      const shadow =
+        root.attachShadow({
+          mode: "open"
+        });
+
+
+      shadow.innerHTML = `
+
+        <style>
+
+          :host {
+            all: initial;
+          }
+
+          button {
+
+            pointer-events: auto;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            margin: 12px;
+
+            padding: 10px 16px;
+
+            background: #ff6a00;
+
+            color: #fff;
+
+            font: 600 14px/1
+              -apple-system,
+              BlinkMacSystemFont,
+              "Segoe UI",
+              Roboto,
+              Helvetica,
+              Arial,
+              sans-serif;
+
+            border: 0;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            box-shadow:
+              0 2px 8px rgba(0,0,0,.2);
+
+          }
+
+          button:hover {
+            background: #e65f00;
+          }
+
+          button:active {
+            transform: scale(.97);
+          }
+
+        </style>
+
+
+        <button
+          type="button"
+          aria-label="Zurück zu lamachub.de"
+        >
+
+          <span
+            style="font-size:16px"
+          >
+            ←
+          </span>
+
+          <span>
+            Zurück
+          </span>
+
+        </button>
+
+      `;
+
+
+      shadow
+        .querySelector("button")
+        .addEventListener(
+          "click",
+          () => {
+
+            window.top.location.href =
+              "https://www.lamachub.de/";
+
+          }
+        );
+
+
+    })();
+
+  </script>
+
 </body>
 </html>
