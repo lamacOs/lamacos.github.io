@@ -1,26 +1,15 @@
+```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width,
-             initial-scale=1,
-             maximum-scale=1,
-             user-scalable=no,
-             viewport-fit=cover"
->
-
+<meta name="viewport"
+content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Adaptive Music Visualizer</title>
 
 <style>
 :root{
     --orange:#ff7a00;
-    --glass:rgba(255,255,255,.07);
-    --border:rgba(255,255,255,.12);
-    --text:#fff;
-    --muted:rgba(255,255,255,.58);
 }
 
 *{
@@ -28,32 +17,26 @@
     -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body{
+html,body{
+    margin:0;
     width:100%;
     height:100%;
-    margin:0;
     overflow:hidden;
     background:#000;
-    color:var(--text);
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+    color:#fff;
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
 body{
     position:fixed;
     inset:0;
     touch-action:none;
-    cursor:default;
 }
 
-/* =========================================================
-   CANVAS
-========================================================= */
+body.cursor-hidden,
+body.cursor-hidden *{
+    cursor:none !important;
+}
 
 #visualizer{
     position:fixed;
@@ -64,18 +47,12 @@ body{
     background:#000;
 }
 
-/* =========================================================
-   UI
-========================================================= */
-
 #ui{
     position:fixed;
     inset:0;
     z-index:20;
     pointer-events:none;
-    transition:
-        opacity .35s ease,
-        transform .35s ease;
+    transition:opacity .35s ease;
 }
 
 #ui.hidden{
@@ -84,43 +61,36 @@ body{
 
 .topbar{
     position:absolute;
-    top:
-        max(18px, env(safe-area-inset-top));
-    left:
-        max(18px, env(safe-area-inset-left));
-    right:
-        max(18px, env(safe-area-inset-right));
-
+    top:max(15px,env(safe-area-inset-top));
+    left:max(15px,env(safe-area-inset-left));
+    right:max(15px,env(safe-area-inset-right));
     display:flex;
     justify-content:space-between;
-    align-items:flex-start;
-    gap:12px;
-
-    pointer-events:none;
+    gap:10px;
 }
 
-.brand{
-    display:flex;
-    align-items:center;
-    gap:10px;
-
-    padding:10px 14px;
-
-    border:1px solid var(--border);
-    border-radius:14px;
-
+.brand,
+button,
+.fileButton,
+.info{
+    border:1px solid rgba(255,255,255,.13);
     background:rgba(0,0,0,.42);
     backdrop-filter:blur(18px);
     -webkit-backdrop-filter:blur(18px);
+}
 
+.brand{
+    padding:10px 14px;
+    border-radius:14px;
     font-size:13px;
-    font-weight:700;
-    letter-spacing:.4px;
+    font-weight:800;
 }
 
 .dot{
+    display:inline-block;
     width:8px;
     height:8px;
+    margin-right:8px;
     border-radius:50%;
     background:var(--orange);
     box-shadow:0 0 15px var(--orange);
@@ -128,44 +98,20 @@ body{
 
 .controls{
     display:flex;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-    gap:8px;
-
+    gap:7px;
     pointer-events:auto;
 }
 
 button,
 .fileButton{
-    appearance:none;
-    border:1px solid var(--border);
-    background:rgba(0,0,0,.48);
-    color:white;
-
     min-height:42px;
-    padding:10px 14px;
-
+    padding:9px 13px;
     border-radius:13px;
-
+    color:#fff;
     font:inherit;
-    font-size:13px;
+    font-size:12px;
     font-weight:700;
-
     cursor:pointer;
-
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-
-    transition:
-        transform .15s ease,
-        background .15s ease,
-        border-color .15s ease;
-}
-
-button:hover,
-.fileButton:hover{
-    background:rgba(255,255,255,.1);
-    border-color:rgba(255,255,255,.25);
 }
 
 button:active,
@@ -174,7 +120,7 @@ button:active,
 }
 
 .fileButton{
-    display:inline-flex;
+    display:flex;
     align-items:center;
     justify-content:center;
 }
@@ -185,187 +131,89 @@ button:active,
 
 .bottom{
     position:absolute;
-
-    left:
-        max(18px, env(safe-area-inset-left));
-    right:
-        max(18px, env(safe-area-inset-right));
-    bottom:
-        max(18px, env(safe-area-inset-bottom));
-
+    left:max(15px,env(safe-area-inset-left));
+    right:max(15px,env(safe-area-inset-right));
+    bottom:max(15px,env(safe-area-inset-bottom));
     display:flex;
     flex-direction:column;
-    gap:10px;
-
-    pointer-events:none;
+    gap:9px;
 }
 
 .info{
     display:flex;
     justify-content:space-between;
-    align-items:flex-end;
-    gap:20px;
-
-    padding:12px 15px;
-
-    border-radius:15px;
-    border:1px solid var(--border);
-
-    background:rgba(0,0,0,.42);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
+    gap:15px;
+    padding:11px 14px;
+    border-radius:14px;
 }
 
 #songName{
-    font-size:14px;
-    font-weight:800;
+    min-width:0;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
-    max-width:70%;
+    font-size:13px;
+    font-weight:800;
 }
 
 #status{
-    color:var(--muted);
-    font-size:11px;
-    text-align:right;
+    color:rgba(255,255,255,.6);
+    font-size:10px;
     white-space:nowrap;
 }
 
 .progress{
-    width:100%;
     height:4px;
+    border-radius:20px;
     overflow:hidden;
-    border-radius:99px;
     background:rgba(255,255,255,.12);
 }
 
 #progressBar{
-    width:0%;
+    width:0;
     height:100%;
-    background:white;
-    transform-origin:left center;
-    transition:width .08s linear;
+    background:#fff;
 }
 
-/* =========================================================
-   MOBILE / FLIP PHONE
-========================================================= */
-
 @media(max-width:700px){
-
-    .topbar{
-        align-items:stretch;
-    }
-
     .brand{
-        font-size:11px;
+        font-size:10px;
         padding:8px 10px;
-        border-radius:11px;
-    }
-
-    .controls{
-        gap:5px;
     }
 
     button,
     .fileButton{
-        min-height:38px;
-        padding:8px 10px;
-        border-radius:11px;
-        font-size:11px;
+        min-height:37px;
+        padding:7px 9px;
+        font-size:10px;
     }
 
     .info{
-        padding:9px 11px;
-        border-radius:12px;
-    }
-
-    #songName{
-        font-size:12px;
-    }
-
-    #status{
-        font-size:9px;
+        padding:8px 10px;
     }
 }
 
-/* Very narrow / flip phone */
-
 @media(max-width:380px){
-
     .topbar{
         flex-direction:column;
-        align-items:stretch;
     }
 
     .controls{
         justify-content:flex-start;
     }
 
-    .brand{
-        width:max-content;
-    }
-
-    .bottom{
-        bottom:
-            max(10px, env(safe-area-inset-bottom));
-        left:
-            max(10px, env(safe-area-inset-left));
-        right:
-            max(10px, env(safe-area-inset-right));
-    }
-
     #status{
         display:none;
     }
-
-    #songName{
-        max-width:100%;
-    }
 }
 
-/* Landscape flip phones / small screens */
-
 @media(max-height:430px){
-
     .topbar{
-        top:
-            max(8px, env(safe-area-inset-top));
+        top:max(7px,env(safe-area-inset-top));
     }
 
     .bottom{
-        bottom:
-            max(8px, env(safe-area-inset-bottom));
-    }
-
-    .brand{
-        padding:6px 9px;
-    }
-
-    button,
-    .fileButton{
-        min-height:34px;
-        padding:6px 9px;
-    }
-
-    .info{
-        padding:7px 10px;
-    }
-}
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media(prefers-reduced-motion:reduce){
-
-    *,
-    *::before,
-    *::after{
-        animation-duration:.001ms !important;
-        animation-iteration-count:1 !important;
-        transition-duration:.001ms !important;
+        bottom:max(7px,env(safe-area-inset-bottom));
     }
 }
 </style>
@@ -388,37 +236,21 @@ button:active,
 
             <label class="fileButton">
                 🎵 Musik
-                <input
-                    id="fileInput"
-                    type="file"
-                    accept="audio/*"
-                >
+                <input id="fileInput" type="file" accept="audio/*">
             </label>
 
-            <button id="playButton">
-                ▶ Play
-            </button>
+            <button id="playButton">▶ Play</button>
 
-            <button id="fullscreenButton">
-                ⛶ Vollbild
-            </button>
+            <button id="fullscreenButton">⛶ Vollbild</button>
 
         </div>
-
     </div>
 
     <div class="bottom">
 
         <div class="info">
-
-            <div id="songName">
-                Keine Musik geladen
-            </div>
-
-            <div id="status">
-                Bereit
-            </div>
-
+            <div id="songName">Keine Musik geladen</div>
+            <div id="status">Bereit</div>
         </div>
 
         <div class="progress">
@@ -426,413 +258,1978 @@ button:active,
         </div>
 
     </div>
-
 </div>
 
-<audio id="audio" crossorigin="anonymous"></audio>
+<audio id="audio"></audio>
 
 <script>
 /* =========================================================
    ELEMENTS
 ========================================================= */
 
-const canvas =
-    document.getElementById("visualizer");
+const canvas=document.getElementById("visualizer");
+const ctx=canvas.getContext("2d");
 
-const ctx =
-    canvas.getContext("2d", {
-        alpha:false
-    });
-
-const audio =
-    document.getElementById("audio");
-
-const fileInput =
-    document.getElementById("fileInput");
-
-const playButton =
-    document.getElementById("playButton");
-
-const fullscreenButton =
-    document.getElementById("fullscreenButton");
-
-const songName =
-    document.getElementById("songName");
-
-const status =
-    document.getElementById("status");
-
-const progressBar =
-    document.getElementById("progressBar");
-
-const ui =
-    document.getElementById("ui");
+const audio=document.getElementById("audio");
+const fileInput=document.getElementById("fileInput");
+const playButton=document.getElementById("playButton");
+const fullscreenButton=document.getElementById("fullscreenButton");
+const songName=document.getElementById("songName");
+const status=document.getElementById("status");
+const progressBar=document.getElementById("progressBar");
+const ui=document.getElementById("ui");
 
 
 /* =========================================================
-   STATE
+   SIZE
 ========================================================= */
 
-let audioContext = null;
-let analyser = null;
-let source = null;
-
-let frequencyData = null;
-let timeData = null;
-
-let animationFrame = null;
-
-let lastTime = performance.now();
-
-let beatEnergy = 0;
-let previousEnergy = 0;
-
-let bass = 0;
-let lowMid = 0;
-let mid = 0;
-let highMid = 0;
-let treble = 0;
-
-let totalEnergy = 0;
-let dynamicEnergy = 0;
-
-let intensity = 0;
-
-let pulse = 0;
-
-let scene = "VOID";
-
-let sceneStart = performance.now();
-
-let lastBeat = 0;
-
-let beatCounter = 0;
-
-let particles = [];
-
-let stars = [];
-
-let wavePoints = [];
-
-let cityBlocks = [];
-
-let laserLines = [];
-
-let touchStartX = 0;
-let touchStartY = 0;
-
-let mouseTimer = null;
-
-let wasFullscreen = false;
-
-let songFinished = false;
-
-let fullscreenWasUsed = false;
-
-let reloadArmed = false;
-
-let currentObjectURL = null;
-
-
-/* =========================================================
-   RESIZE
-========================================================= */
-
-let width = 1;
-let height = 1;
-let dpr = 1;
+let W=1;
+let H=1;
+let DPR=1;
 
 function resize(){
 
-    dpr = Math.min(
-        window.devicePixelRatio || 1,
-        2
-    );
+    W=innerWidth;
+    H=innerHeight;
 
-    width =
-        Math.max(
-            1,
-            window.innerWidth
-        );
+    DPR=Math.min(devicePixelRatio||1,2);
 
-    height =
-        Math.max(
-            1,
-            window.innerHeight
-        );
+    canvas.width=W*DPR;
+    canvas.height=H*DPR;
 
-    canvas.width =
-        Math.floor(width * dpr);
+    canvas.style.width=W+"px";
+    canvas.style.height=H+"px";
 
-    canvas.height =
-        Math.floor(height * dpr);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
 
-    canvas.style.width =
-        width + "px";
-
-    canvas.style.height =
-        height + "px";
-
-    ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-    );
-
-    buildWorld();
+    createObjects();
 }
 
-window.addEventListener(
-    "resize",
-    resize,
-    {passive:true}
-);
-
-window.addEventListener(
-    "orientationchange",
-    () => {
-        setTimeout(resize,100);
-    },
-    {passive:true}
-);
+addEventListener("resize",resize);
+addEventListener("orientationchange",()=>setTimeout(resize,100));
 
 
 /* =========================================================
-   WORLD GENERATION
+   AUDIO
 ========================================================= */
 
-function random(min,max){
-    return Math.random() * (max-min) + min;
-}
+let audioContext=null;
+let analyser=null;
+let source=null;
 
-function buildWorld(){
-
-    particles = [];
-
-    const particleCount =
-        Math.min(
-            420,
-            Math.max(
-                100,
-                Math.floor(
-                    (width * height) / 8500
-                )
-            )
-        );
-
-    for(let i=0;i<particleCount;i++){
-
-        particles.push({
-            x:random(0,width),
-            y:random(0,height),
-            z:random(.15,1),
-            size:random(.5,3),
-            speed:random(.2,1.5),
-            angle:random(0,Math.PI*2),
-            phase:random(0,Math.PI*2)
-        });
-    }
-
-
-    stars = [];
-
-    const starCount =
-        Math.min(
-            500,
-            Math.max(
-                120,
-                Math.floor(
-                    width * height / 7000
-                )
-            )
-        );
-
-    for(let i=0;i<starCount;i++){
-
-        stars.push({
-            x:random(-1,1),
-            y:random(-1,1),
-            z:random(.05,1),
-            size:random(.3,2)
-        });
-    }
-
-
-    wavePoints = [];
-
-    const waveCount =
-        Math.min(
-            180,
-            Math.max(
-                60,
-                Math.floor(width / 8)
-            )
-        );
-
-    for(let i=0;i<waveCount;i++){
-        wavePoints.push({
-            phase:random(0,Math.PI*2),
-            offset:random(-1,1)
-        });
-    }
-
-
-    cityBlocks = [];
-
-    const columns =
-        Math.max(
-            8,
-            Math.floor(width / 45)
-        );
-
-    for(let i=0;i<columns;i++){
-
-        cityBlocks.push({
-            x:i / columns,
-            w:1 / columns * random(.5,.9),
-            h:random(.08,.5),
-            depth:random(.2,1),
-            phase:random(0,Math.PI*2)
-        });
-    }
-
-
-    laserLines = [];
-
-    for(let i=0;i<30;i++){
-
-        laserLines.push({
-            angle:random(0,Math.PI*2),
-            length:random(.2,1),
-            offset:random(0,Math.PI*2)
-        });
-    }
-}
-
-
-/* =========================================================
-   AUDIO INITIALIZATION
-========================================================= */
+let frequencyData=null;
+let timeData=null;
 
 async function initAudio(){
 
     if(audioContext){
-        if(audioContext.state === "suspended"){
+
+        if(audioContext.state==="suspended")
             await audioContext.resume();
-        }
+
         return;
     }
 
-    audioContext =
-        new (
-            window.AudioContext ||
-            window.webkitAudioContext
-        )();
+    audioContext=new(window.AudioContext||window.webkitAudioContext)();
 
-    analyser =
-        audioContext.createAnalyser();
+    analyser=audioContext.createAnalyser();
 
-    analyser.fftSize = 2048;
+    analyser.fftSize=2048;
+    analyser.smoothingTimeConstant=.8;
 
-    analyser.smoothingTimeConstant = .82;
+    frequencyData=new Uint8Array(analyser.frequencyBinCount);
+    timeData=new Uint8Array(analyser.fftSize);
 
-    frequencyData =
-        new Uint8Array(
-            analyser.frequencyBinCount
-        );
-
-    timeData =
-        new Uint8Array(
-            analyser.fftSize
-        );
-
-    source =
-        audioContext.createMediaElementSource(audio);
+    source=audioContext.createMediaElementSource(audio);
 
     source.connect(analyser);
+    analyser.connect(audioContext.destination);
+}
 
-    analyser.connect(
-        audioContext.destination
+
+let bass=0;
+let lowMid=0;
+let mid=0;
+let highMid=0;
+let treble=0;
+let energy=0;
+let previousEnergy=0;
+let dynamics=0;
+let intensity=0;
+let pulse=0;
+
+let lastBeat=0;
+let beatCount=0;
+
+function avg(a,b){
+
+    if(!analyser)return 0;
+
+    const nyquist=audioContext.sampleRate/2;
+
+    const start=Math.floor(a/nyquist*frequencyData.length);
+    const end=Math.min(
+        frequencyData.length-1,
+        Math.ceil(b/nyquist*frequencyData.length)
+    );
+
+    let sum=0;
+    let n=0;
+
+    for(let i=Math.max(0,start);i<=end;i++){
+        sum+=frequencyData[i];
+        n++;
+    }
+
+    return n?sum/n/255:0;
+}
+
+function analyse(){
+
+    if(!analyser){
+        energy=0;
+        intensity=0;
+        return;
+    }
+
+    analyser.getByteFrequencyData(frequencyData);
+    analyser.getByteTimeDomainData(timeData);
+
+    bass=avg(20,150);
+    lowMid=avg(150,400);
+    mid=avg(400,2000);
+    highMid=avg(2000,6000);
+    treble=avg(6000,16000);
+
+    energy=
+        bass*.34+
+        lowMid*.2+
+        mid*.18+
+        highMid*.16+
+        treble*.12;
+
+    dynamics=Math.abs(energy-previousEnergy);
+
+    previousEnergy=energy;
+
+    intensity=Math.min(
+        1,
+        energy*.8+
+        dynamics*4
+    );
+
+    const now=performance.now();
+
+    if(
+        energy>.53-
+        bass*.14-
+        intensity*.08 &&
+        now-lastBeat>145
+    ){
+
+        pulse=1;
+        lastBeat=now;
+        beatCount++;
+    }
+
+    pulse*=.89;
+}
+
+
+/* =========================================================
+   OBJECTS
+========================================================= */
+
+let particles=[];
+let stars=[];
+let rings=[];
+let bubbles=[];
+let sparks=[];
+
+function rand(a,b){
+    return Math.random()*(b-a)+a;
+}
+
+function createObjects(){
+
+    particles=[];
+    stars=[];
+    rings=[];
+    bubbles=[];
+    sparks=[];
+
+    for(let i=0;i<450;i++){
+
+        particles.push({
+            x:rand(0,W),
+            y:rand(0,H),
+            z:rand(.1,1),
+            size:rand(.5,3),
+            angle:rand(0,Math.PI*2),
+            speed:rand(.2,2),
+            phase:rand(0,Math.PI*2)
+        });
+    }
+
+    for(let i=0;i<450;i++){
+
+        stars.push({
+            x:rand(-1,1),
+            y:rand(-1,1),
+            z:rand(.02,1),
+            size:rand(.3,2)
+        });
+    }
+
+    for(let i=0;i<100;i++){
+
+        rings.push({
+            radius:rand(20,Math.max(W,H)),
+            angle:rand(0,Math.PI*2),
+            speed:rand(.1,1)
+        });
+    }
+
+    for(let i=0;i<80;i++){
+
+        bubbles.push({
+            x:rand(0,W),
+            y:rand(0,H),
+            r:rand(2,30),
+            speed:rand(.1,1),
+            phase:rand(0,Math.PI*2)
+        });
+    }
+
+    for(let i=0;i<200;i++){
+
+        sparks.push({
+            angle:rand(0,Math.PI*2),
+            radius:rand(20,Math.max(W,H)),
+            speed:rand(.2,2)
+        });
+    }
+}
+
+
+/* =========================================================
+   29 SCENES
+========================================================= */
+
+const scenes=[
+
+    "VOID",
+    "NEON_RAIN",
+    "COSMIC_TUNNEL",
+    "LIQUID_LIGHT",
+    "GLASS_CITY",
+    "PARTICLE_STORM",
+    "LASER_GARDEN",
+    "DREAM_WAVE",
+    "GEOMETRIC_DREAM",
+
+    /* 10 */
+    "BLACK_HOLE",
+    "GALAXY_SPIRAL",
+    "ENERGY_ORB",
+    "MIRROR_WORLD",
+    "DIGITAL_OCEAN",
+    "LIGHTNING",
+    "INFINITE_GRID",
+    "AURORA",
+    "DNA_TWIST",
+    "EXPLOSION",
+
+    /* 20 */
+    "FRACTAL_FLOW",
+    "STAR_WARP",
+    "RIPPLE_WORLD",
+    "MAGNETIC_FIELD",
+    "CRYSTAL_CAVE",
+    "SOLAR_FLARE",
+    "RAINBOW_WORMHOLE",
+    "SHATTER",
+    "ELECTRIC_VINES",
+    "QUANTUM_FIELD"
+];
+
+let scene="VOID";
+let sceneStart=performance.now();
+
+function nextScene(){
+
+    let i=scenes.indexOf(scene);
+
+    scene=scenes[(i+1)%scenes.length];
+
+    sceneStart=performance.now();
+}
+
+function previousScene(){
+
+    let i=scenes.indexOf(scene);
+
+    scene=scenes[
+        (i-1+scenes.length)%scenes.length
+    ];
+
+    sceneStart=performance.now();
+}
+
+
+/* =========================================================
+   AUTOMATIC SCENE SELECTION
+========================================================= */
+
+function chooseScene(){
+
+    if(!audio.src)return;
+
+    const now=performance.now();
+
+    let duration=11000;
+
+    if(intensity>.72)
+        duration=6500;
+
+    if(intensity<.2)
+        duration=15000;
+
+    if(now-sceneStart<duration)return;
+
+    let pool;
+
+    if(intensity>.72){
+
+        pool=[
+            "PARTICLE_STORM",
+            "LASER_GARDEN",
+            "LIGHTNING",
+            "EXPLOSION",
+            "STAR_WARP",
+            "SHATTER",
+            "ELECTRIC_VINES",
+            "SOLAR_FLARE",
+            "QUANTUM_FIELD"
+        ];
+
+    }else if(intensity<.2){
+
+        pool=[
+            "VOID",
+            "DREAM_WAVE",
+            "LIQUID_LIGHT",
+            "COSMIC_TUNNEL",
+            "AURORA",
+            "CRYSTAL_CAVE",
+            "DIGITAL_OCEAN",
+            "MIRROR_WORLD"
+        ];
+
+    }else{
+
+        pool=scenes.filter(x=>x!==scene);
+    }
+
+    scene=
+        pool[
+            Math.floor(
+                Math.random()*pool.length
+            )
+        ];
+
+    sceneStart=now;
+}
+
+
+/* =========================================================
+   COMMON
+========================================================= */
+
+function clear(){
+
+    ctx.fillStyle="#000";
+    ctx.fillRect(0,0,W,H);
+}
+
+function circle(x,y,r,a=.5){
+
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(255,255,255,${a})`;
+    ctx.stroke();
+}
+
+
+/* =========================================================
+   1 VOID
+========================================================= */
+
+function drawVoid(){
+
+    clear();
+
+    if(energy<.035)return;
+
+    const r=Math.min(W,H)*(.03+pulse*.15);
+
+    const g=ctx.createRadialGradient(
+        W/2,H/2,0,
+        W/2,H/2,r
+    );
+
+    g.addColorStop(
+        0,
+        `rgba(255,255,255,${.04+pulse*.3})`
+    );
+
+    g.addColorStop(1,"transparent");
+
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,W,H);
+}
+
+
+/* =========================================================
+   2 NEON RAIN
+========================================================= */
+
+function drawNeonRain(t){
+
+    clear();
+
+    const n=Math.floor(W/16);
+
+    for(let i=0;i<n;i++){
+
+        const x=i*16;
+
+        const y=
+            (t*(.03+intensity*.2)*(20+i%5*10)
+            +i*80)%
+            (H+150)-150;
+
+        const len=
+            25+
+            intensity*130+
+            bass*80;
+
+        const g=ctx.createLinearGradient(
+            x,y,x,y+len
+        );
+
+        g.addColorStop(0,"transparent");
+        g.addColorStop(
+            .5,
+            `rgba(255,255,255,${.2+intensity*.7})`
+        );
+        g.addColorStop(1,"transparent");
+
+        ctx.fillStyle=g;
+
+        ctx.fillRect(
+            x,
+            y,
+            2+pulse*2,
+            len
+        );
+    }
+}
+
+
+/* =========================================================
+   3 COSMIC TUNNEL
+========================================================= */
+
+function drawCosmicTunnel(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+    const max=Math.max(W,H);
+
+    for(let i=0;i<130;i++){
+
+        const z=
+            (i/130+t*.00008*(.3+intensity*5))%1;
+
+        const radius=Math.pow(z,3)*max*1.5;
+
+        const a=
+            i*.71+
+            t*.0002+
+            pulse*.5;
+
+        const x=cx+Math.cos(a)*radius;
+        const y=cy+Math.sin(a)*radius;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,y,
+            .5+z*4+pulse*4,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.05+z*.8})`;
+
+        ctx.fill();
+    }
+}
+
+
+/* =========================================================
+   4 LIQUID LIGHT
+========================================================= */
+
+function drawLiquidLight(t){
+
+    clear();
+
+    for(let l=0;l<9;l++){
+
+        ctx.beginPath();
+
+        for(
+            let x=0;
+            x<=W;
+            x+=Math.max(4,W/100)
+        ){
+
+            const n=x/W;
+
+            const y=
+                H*.5+
+                Math.sin(
+                    n*8+l+
+                    t*.0003*(.3+intensity*3)
+                )*
+                H*.08*
+                (1+l*.08)+
+                Math.sin(
+                    n*18-t*.0002
+                )*
+                H*.025;
+
+            if(x===0)
+                ctx.moveTo(x,y);
+            else
+                ctx.lineTo(x,y);
+        }
+
+        ctx.lineTo(W,H);
+        ctx.lineTo(0,H);
+        ctx.closePath();
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.012+l*.006+intensity*.02})`;
+
+        ctx.fill();
+    }
+}
+
+
+/* =========================================================
+   5 GLASS CITY
+========================================================= */
+
+function drawGlassCity(t){
+
+    clear();
+
+    const horizon=H*.65;
+
+    const columns=Math.ceil(W/45);
+
+    for(let i=0;i<columns;i++){
+
+        const x=i/columns*W;
+        const w=W/columns*.85;
+
+        const h=
+            H*
+            (.1+
+            ((Math.sin(i*4.3)+1)/2)*.35)*
+            (1+bass*.5+pulse*.4);
+
+        ctx.fillStyle=
+            "rgba(255,255,255,.035)";
+
+        ctx.fillRect(
+            x,
+            horizon-h,
+            w,
+            h
+        );
+
+        for(let r=0;r<Math.floor(h/22);r++){
+
+            for(let c=0;c<Math.max(1,Math.floor(w/16));c++){
+
+                if(
+                    Math.sin(
+                        i+r+c+t*.001
+                    )>.55
+                ){
+
+                    ctx.fillStyle=
+                        `rgba(255,255,255,${.05+intensity*.3})`;
+
+                    ctx.fillRect(
+                        x+5+c*16,
+                        horizon-h+8+r*21,
+                        3,
+                        6
+                    );
+                }
+            }
+        }
+    }
+
+    ctx.fillStyle=
+        `rgba(255,255,255,${.1+intensity*.4})`;
+
+    ctx.fillRect(
+        0,horizon,W,1+pulse*3
     );
 }
 
 
 /* =========================================================
-   FILE LOADING
+   6 PARTICLE STORM
 ========================================================= */
 
-fileInput.addEventListener(
-    "change",
-    async event => {
+function drawParticleStorm(t){
 
-        const file =
-            event.target.files[0];
+    clear();
 
-        if(!file) return;
+    const cx=W/2;
+    const cy=H/2;
 
-        if(currentObjectURL){
-            URL.revokeObjectURL(
-                currentObjectURL
-            );
-        }
+    for(const p of particles){
 
-        currentObjectURL =
-            URL.createObjectURL(file);
+        const a=
+            p.angle+
+            t*.0002*(.2+intensity*5);
 
-        audio.src =
-            currentObjectURL;
+        p.x+=Math.cos(a)*p.speed*(.3+intensity*3);
+        p.y+=Math.sin(a)*p.speed*(.3+intensity*3);
 
-        audio.load();
+        if(p.x<-30)p.x=W+30;
+        if(p.x>W+30)p.x=-30;
+        if(p.y<-30)p.y=H+30;
+        if(p.y>H+30)p.y=-30;
 
-        songName.textContent =
-            file.name;
+        ctx.beginPath();
 
-        status.textContent =
-            "Lade Audio…";
+        ctx.arc(
+            p.x,p.y,
+            p.size*(1+intensity*2),
+            0,
+            Math.PI*2
+        );
 
-        songFinished = false;
-        reloadArmed = false;
-        fullscreenWasUsed = false;
+        ctx.fillStyle=
+            `rgba(255,255,255,${.1+p.z*.7})`;
 
-        scene = "VOID";
-        sceneStart = performance.now();
-
-        beatCounter = 0;
-        pulse = 0;
-
-        await initAudio();
-
-        playButton.textContent =
-            "▶ Play";
-
-        try{
-            await audio.play();
-
-            playButton.textContent =
-                "❚❚ Pause";
-
-            status.textContent =
-                "Analyse läuft";
-        }
-        catch(error){
-
-            status.textContent =
-                "Bereit – Play drücken";
-        }
+        ctx.fill();
     }
-);
+
+    circle(
+        cx,
+        cy,
+        pulse*Math.max(W,H)*.7,
+        pulse*.3
+    );
+}
 
 
 /* =========================================================
-   PLAY / PAUSE
+   7 LASER GARDEN
+========================================================= */
+
+function drawLaserGarden(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<55;i++){
+
+        const a=
+            i*.35+
+            t*.0002+
+            Math.sin(i+t*.001)*.4;
+
+        const r=
+            Math.max(W,H)*
+            (.2+Math.random()*.7);
+
+        ctx.beginPath();
+
+        ctx.moveTo(cx,cy);
+
+        ctx.lineTo(
+            cx+Math.cos(a)*r,
+            cy+Math.sin(a)*r
+        );
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.015+intensity*.08})`;
+
+        ctx.lineWidth=
+            .5+pulse*2;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   8 DREAM WAVE
+========================================================= */
+
+function drawDreamWave(t){
+
+    clear();
+
+    for(let l=0;l<8;l++){
+
+        ctx.beginPath();
+
+        for(let x=0;x<=W;x+=8){
+
+            const y=
+                H*.5+
+                Math.sin(
+                    x*.018+l+
+                    t*.0002
+                )*
+                H*.04*
+                (1+intensity)+
+                Math.sin(
+                    x*.05-t*.00015
+                )*
+                H*.02;
+
+            if(x===0)
+                ctx.moveTo(x,y);
+            else
+                ctx.lineTo(x,y);
+        }
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.025+l*.018})`;
+
+        ctx.lineWidth=1+pulse*2;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   9 GEOMETRIC DREAM
+========================================================= */
+
+function drawGeometricDream(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<18;i++){
+
+        const s=
+            Math.min(W,H)*
+            (.08+i*.025)*
+            (1+pulse*.5);
+
+        ctx.save();
+
+        ctx.translate(cx,cy);
+
+        ctx.rotate(
+            t*.00015*(.3+intensity*4)+i*.3
+        );
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.025+i*.006})`;
+
+        ctx.strokeRect(
+            -s/2,-s/2,s,s
+        );
+
+        ctx.restore();
+    }
+}
+
+
+/* =========================================================
+   10 BLACK HOLE
+========================================================= */
+
+function drawBlackHole(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<90;i++){
+
+        const a=
+            i*.17+
+            t*.0002+
+            pulse;
+
+        const r=
+            20+
+            i*i*.22+
+            pulse*80;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            cx+Math.cos(a)*r,
+            cy+Math.sin(a)*r*.55,
+            1+i*.015,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.03+i*.004})`;
+
+        ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(
+        cx,cy,
+        35+bass*100+pulse*30,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle="#000";
+    ctx.fill();
+}
+
+
+/* =========================================================
+   11 GALAXY SPIRAL
+========================================================= */
+
+function drawGalaxySpiral(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<700;i++){
+
+        const a=
+            i*.15+
+            t*.00015*(1+intensity*3);
+
+        const r=
+            Math.sqrt(i)/Math.sqrt(700)*
+            Math.max(W,H)*.55;
+
+        const x=
+            cx+
+            Math.cos(a)*r;
+
+        const y=
+            cy+
+            Math.sin(a)*r*.55;
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.02+(1-r/(Math.max(W,H)*.55))*.6})`;
+
+        ctx.fillRect(
+            x,
+            y,
+            1+pulse*2,
+            1+pulse*2
+        );
+    }
+}
+
+
+/* =========================================================
+   12 ENERGY ORB
+========================================================= */
+
+function drawEnergyOrb(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    const r=
+        Math.min(W,H)*
+        (.12+bass*.25+pulse*.15);
+
+    for(let i=0;i<80;i++){
+
+        const a=
+            i*.3+
+            t*.0005;
+
+        const rr=
+            r+
+            Math.sin(i*2+t*.003)*
+            r*.4*
+            (1+intensity);
+
+        ctx.beginPath();
+
+        ctx.moveTo(cx,cy);
+
+        ctx.lineTo(
+            cx+Math.cos(a)*rr,
+            cy+Math.sin(a)*rr
+        );
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.015+intensity*.1})`;
+
+        ctx.stroke();
+    }
+
+    const g=ctx.createRadialGradient(
+        cx,cy,0,
+        cx,cy,r
+    );
+
+    g.addColorStop(
+        0,
+        `rgba(255,255,255,${.2+pulse*.5})`
+    );
+
+    g.addColorStop(1,"transparent");
+
+    ctx.fillStyle=g;
+
+    ctx.fillRect(
+        cx-r,
+        cy-r,
+        r*2,
+        r*2
+    );
+}
+
+
+/* =========================================================
+   13 MIRROR WORLD
+========================================================= */
+
+function drawMirrorWorld(t){
+
+    clear();
+
+    const half=W/2;
+
+    for(let i=0;i<90;i++){
+
+        const y=
+            (i/90)*H;
+
+        const wave=
+            Math.sin(
+                i*.5+t*.002
+            )*
+            40*
+            (1+intensity);
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.02+intensity*.03})`;
+
+        ctx.fillRect(
+            half+wave,
+            y,
+            2+pulse*3,
+            2
+        );
+
+        ctx.fillRect(
+            half-wave,
+            y,
+            2+pulse*3,
+            2
+        );
+    }
+
+    ctx.fillStyle=
+        `rgba(255,255,255,${.08+intensity*.2})`;
+
+    ctx.fillRect(
+        half-1,
+        0,
+        2,
+        H
+    );
+}
+
+
+/* =========================================================
+   14 DIGITAL OCEAN
+========================================================= */
+
+function drawDigitalOcean(t){
+
+    clear();
+
+    for(let y=0;y<H;y+=12){
+
+        ctx.beginPath();
+
+        for(let x=0;x<W;x+=12){
+
+            const wave=
+                Math.sin(
+                    x*.015+
+                    y*.025+
+                    t*.001
+                )*
+                (10+intensity*30);
+
+            const yy=y+wave;
+
+            if(x===0)
+                ctx.moveTo(x,yy);
+            else
+                ctx.lineTo(x,yy);
+        }
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.02+intensity*.06})`;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   15 LIGHTNING
+========================================================= */
+
+function drawLightning(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let b=0;b<12;b++){
+
+        let x=cx;
+        let y=cy;
+
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+
+        for(let i=0;i<12;i++){
+
+            x+=rand(-W*.15,W*.15);
+            y+=rand(-H*.15,H*.15);
+
+            ctx.lineTo(x,y);
+        }
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.025+intensity*.25})`;
+
+        ctx.lineWidth=
+            .5+pulse*3;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   16 INFINITE GRID
+========================================================= */
+
+function drawInfiniteGrid(t){
+
+    clear();
+
+    const horizon=H*.5;
+
+    for(let i=-20;i<=20;i++){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            W/2+i*35,
+            horizon
+        );
+
+        ctx.lineTo(
+            W/2+i*1200,
+            H
+        );
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.03+intensity*.08})`;
+
+        ctx.stroke();
+    }
+
+    for(let i=0;i<25;i++){
+
+        const p=
+            ((i/25+t*.00008*(1+intensity*4))%1);
+
+        const y=
+            horizon+
+            Math.pow(p,2)*(H-horizon);
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,y);
+        ctx.lineTo(W,y);
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.025+intensity*.07})`;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   17 AURORA
+========================================================= */
+
+function drawAurora(t){
+
+    clear();
+
+    for(let l=0;l<10;l++){
+
+        ctx.beginPath();
+
+        for(let x=0;x<=W;x+=6){
+
+            const y=
+                H*.3+
+                Math.sin(
+                    x*.006+
+                    t*.0002+
+                    l
+                )*
+                H*.15+
+                Math.sin(
+                    x*.018-t*.0001
+                )*
+                H*.04;
+
+            if(x===0)
+                ctx.moveTo(x,y);
+            else
+                ctx.lineTo(x,y);
+        }
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.015+l*.008+intensity*.03})`;
+
+        ctx.lineWidth=
+            8+l*2+pulse*10;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   18 DNA TWIST
+========================================================= */
+
+function drawDNATwist(t){
+
+    clear();
+
+    const cx=W/2;
+
+    for(let i=0;i<80;i++){
+
+        const y=
+            i/79*H;
+
+        const a=
+            i*.25+
+            t*.001*(.3+intensity*3);
+
+        const x1=
+            cx+
+            Math.sin(a)*
+            W*.18;
+
+        const x2=
+            cx-
+            Math.sin(a)*
+            W*.18;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x1,
+            y,
+            3+pulse*4,
+            0,
+            Math.PI*2
+        );
+
+        ctx.arc(
+            x2,
+            y,
+            3+pulse*4,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.1+intensity*.5})`;
+
+        ctx.fill();
+
+        if(i%5===0){
+
+            ctx.beginPath();
+            ctx.moveTo(x1,y);
+            ctx.lineTo(x2,y);
+
+            ctx.strokeStyle=
+                "rgba(255,255,255,.08)";
+
+            ctx.stroke();
+        }
+    }
+}
+
+
+/* =========================================================
+   19 EXPLOSION
+========================================================= */
+
+function drawExplosion(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<350;i++){
+
+        const a=i*.618;
+        const r=
+            ((i*17)%100)/100*
+            Math.max(W,H)*
+            (.15+intensity*1.1);
+
+        const x=
+            cx+Math.cos(a)*r;
+
+        const y=
+            cy+Math.sin(a)*r;
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.03+intensity*.5})`;
+
+        ctx.fillRect(
+            x,
+            y,
+            1+pulse*3,
+            1+pulse*3
+        );
+    }
+}
+
+
+/* =========================================================
+   20 FRACTAL FLOW
+========================================================= */
+
+function drawFractalFlow(t){
+
+    clear();
+
+    for(let i=0;i<100;i++){
+
+        const a=i*.37+t*.0002;
+
+        let x=W/2;
+        let y=H/2;
+
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+
+        for(let j=0;j<8;j++){
+
+            const r=
+                15+j*25+
+                intensity*80;
+
+            x+=Math.cos(a+j*.8)*r*.12;
+            y+=Math.sin(a-j*.7)*r*.12;
+
+            ctx.lineTo(x,y);
+        }
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.015+intensity*.05})`;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   21 STAR WARP
+========================================================= */
+
+function drawStarWarp(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(const s of stars){
+
+        const z=
+            (s.z-
+            t*.00015*(.2+intensity*5))%1;
+
+        const zz=z<0?z+1:z;
+
+        const x=
+            cx+
+            s.x/zz*
+            Math.max(W,H);
+
+        const y=
+            cy+
+            s.y/zz*
+            Math.max(W,H);
+
+        if(
+            x<-50||
+            x>W+50||
+            y<-50||
+            y>H+50
+        )continue;
+
+        const px=
+            cx+
+            s.x/(zz+.03)*
+            Math.max(W,H);
+
+        const py=
+            cy+
+            s.y/(zz+.03)*
+            Math.max(W,H);
+
+        ctx.beginPath();
+
+        ctx.moveTo(px,py);
+        ctx.lineTo(x,y);
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.05+(1-zz)*.8})`;
+
+        ctx.lineWidth=
+            s.size*(1-zz)*3;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   22 RIPPLE WORLD
+========================================================= */
+
+function drawRippleWorld(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<35;i++){
+
+        const r=
+            (
+                i*45+
+                t*.06*(.2+intensity*4)
+            )%
+            (Math.max(W,H)*1.2);
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            cx,
+            cy,
+            r,
+            r*.45,
+            0,
+            0,
+            Math.PI*2
+        );
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.02+intensity*.08})`;
+
+        ctx.lineWidth=
+            1+pulse*2;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   23 MAGNETIC FIELD
+========================================================= */
+
+function drawMagneticField(t){
+
+    clear();
+
+    for(let x=0;x<W;x+=28){
+
+        for(let y=0;y<H;y+=28){
+
+            const dx=x-W/2;
+            const dy=y-H/2;
+
+            const angle=
+                Math.atan2(dy,dx)+
+                Math.sin(
+                    Math.sqrt(dx*dx+dy*dy)*.01+
+                    t*.001
+                );
+
+            const len=
+                8+intensity*15+pulse*10;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x,y);
+
+            ctx.lineTo(
+                x+Math.cos(angle)*len,
+                y+Math.sin(angle)*len
+            );
+
+            ctx.strokeStyle=
+                `rgba(255,255,255,${.025+intensity*.06})`;
+
+            ctx.stroke();
+        }
+    }
+}
+
+
+/* =========================================================
+   24 CRYSTAL CAVE
+========================================================= */
+
+function drawCrystalCave(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<80;i++){
+
+        const a=i*.47;
+        const r=
+            50+
+            i*12+
+            Math.sin(t*.001+i)*30;
+
+        const x=
+            cx+Math.cos(a)*r;
+
+        const y=
+            cy+Math.sin(a)*r;
+
+        const s=
+            10+i*.2+pulse*20;
+
+        ctx.beginPath();
+
+        ctx.moveTo(x,y-s);
+        ctx.lineTo(x+s*.5,y);
+        ctx.lineTo(x,y+s);
+        ctx.lineTo(x-s*.5,y);
+        ctx.closePath();
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.02+intensity*.08})`;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   25 SOLAR FLARE
+========================================================= */
+
+function drawSolarFlare(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<180;i++){
+
+        const a=i*.17+t*.0003;
+        const r=
+            30+
+            Math.sin(i*2+t*.003)*
+            40+
+            intensity*100+
+            pulse*150;
+
+        ctx.beginPath();
+
+        ctx.moveTo(cx,cy);
+
+        ctx.lineTo(
+            cx+Math.cos(a)*r,
+            cy+Math.sin(a)*r
+        );
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.01+intensity*.06})`;
+
+        ctx.stroke();
+    }
+
+    const g=ctx.createRadialGradient(
+        cx,cy,0,
+        cx,cy,
+        100+intensity*150
+    );
+
+    g.addColorStop(
+        0,
+        `rgba(255,255,255,${.15+pulse*.5})`
+    );
+
+    g.addColorStop(
+        1,
+        "transparent"
+    );
+
+    ctx.fillStyle=g;
+
+    ctx.fillRect(
+        cx-250,
+        cy-250,
+        500,
+        500
+    );
+}
+
+
+/* =========================================================
+   26 RAINBOW WORMHOLE
+========================================================= */
+
+function drawRainbowWormhole(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<180;i++){
+
+        const a=
+            i*.18+
+            t*.0005;
+
+        const r=
+            Math.pow(
+                i/180,
+                1.8
+            )*
+            Math.max(W,H)*.7;
+
+        const wobble=
+            Math.sin(
+                i*.2+t*.002
+            )*
+            30*
+            intensity;
+
+        const x=
+            cx+
+            Math.cos(a)*r+
+            wobble;
+
+        const y=
+            cy+
+            Math.sin(a)*r;
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.02+i/180*.35})`;
+
+        ctx.fillRect(
+            x,
+            y,
+            2+pulse*3,
+            2+pulse*3
+        );
+    }
+}
+
+
+/* =========================================================
+   27 SHATTER
+========================================================= */
+
+function drawShatter(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<80;i++){
+
+        const a=i*.47;
+        const r=
+            (i*13+
+            pulse*300+
+            intensity*100)%
+            Math.max(W,H);
+
+        const x=
+            cx+Math.cos(a)*r;
+
+        const y=
+            cy+Math.sin(a)*r;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            cx+Math.cos(a)*20,
+            cy+Math.sin(a)*20
+        );
+
+        ctx.lineTo(x,y);
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.015+intensity*.1})`;
+
+        ctx.lineWidth=
+            1+pulse*3;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   28 ELECTRIC VINES
+========================================================= */
+
+function drawElectricVines(t){
+
+    clear();
+
+    for(let v=0;v<25;v++){
+
+        let x=
+            (v/25)*W;
+
+        let y=H;
+
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+
+        for(let i=0;i<15;i++){
+
+            x+=
+                Math.sin(
+                    t*.002+
+                    i+
+                    v
+                )*
+                (10+intensity*30);
+
+            y-=H/15;
+
+            ctx.lineTo(x,y);
+        }
+
+        ctx.strokeStyle=
+            `rgba(255,255,255,${.02+intensity*.08})`;
+
+        ctx.lineWidth=
+            1+pulse*2;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   29 QUANTUM FIELD
+========================================================= */
+
+function drawQuantumField(t){
+
+    clear();
+
+    const cx=W/2;
+    const cy=H/2;
+
+    for(let i=0;i<900;i++){
+
+        const a=
+            i*.618+
+            t*.0001;
+
+        const r=
+            Math.sqrt(i/900)*
+            Math.max(W,H)*.7;
+
+        const wobble=
+            Math.sin(
+                i*.13+
+                t*.002
+            )*
+            30*
+            (1+intensity);
+
+        const x=
+            cx+
+            Math.cos(a)*r+
+            wobble;
+
+        const y=
+            cy+
+            Math.sin(a)*r;
+
+        ctx.fillStyle=
+            `rgba(255,255,255,${.01+intensity*.08})`;
+
+        ctx.fillRect(
+            x,y,
+            1+pulse*2,
+            1+pulse*2
+        );
+    }
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function render(t){
+
+    chooseScene();
+
+    if(
+        energy<.025 &&
+        audio.paused
+    ){
+
+        clear();
+        return;
+    }
+
+    switch(scene){
+
+        case"VOID":drawVoid();break;
+        case"NEON_RAIN":drawNeonRain(t);break;
+        case"COSMIC_TUNNEL":drawCosmicTunnel(t);break;
+        case"LIQUID_LIGHT":drawLiquidLight(t);break;
+        case"GLASS_CITY":drawGlassCity(t);break;
+        case"PARTICLE_STORM":drawParticleStorm(t);break;
+        case"LASER_GARDEN":drawLaserGarden(t);break;
+        case"DREAM_WAVE":drawDreamWave(t);break;
+        case"GEOMETRIC_DREAM":drawGeometricDream(t);break;
+
+        case"BLACK_HOLE":drawBlackHole(t);break;
+        case"GALAXY_SPIRAL":drawGalaxySpiral(t);break;
+        case"ENERGY_ORB":drawEnergyOrb(t);break;
+        case"MIRROR_WORLD":drawMirrorWorld(t);break;
+        case"DIGITAL_OCEAN":drawDigitalOcean(t);break;
+        case"LIGHTNING":drawLightning(t);break;
+        case"INFINITE_GRID":drawInfiniteGrid(t);break;
+        case"AURORA":drawAurora(t);break;
+        case"DNA_TWIST":drawDNATwist(t);break;
+        case"EXPLOSION":drawExplosion(t);break;
+
+        case"FRACTAL_FLOW":drawFractalFlow(t);break;
+        case"STAR_WARP":drawStarWarp(t);break;
+        case"RIPPLE_WORLD":drawRippleWorld(t);break;
+        case"MAGNETIC_FIELD":drawMagneticField(t);break;
+        case"CRYSTAL_CAVE":drawCrystalCave(t);break;
+        case"SOLAR_FLARE":drawSolarFlare(t);break;
+        case"RAINBOW_WORMHOLE":drawRainbowWormhole(t);break;
+        case"SHATTER":drawShatter(t);break;
+        case"ELECTRIC_VINES":drawElectricVines(t);break;
+        case"QUANTUM_FIELD":drawQuantumField(t);break;
+    }
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+let uiTimer=null;
+
+function showUI(){
+
+    ui.classList.remove("hidden");
+
+    clearTimeout(uiTimer);
+
+    uiTimer=setTimeout(()=>{
+
+        if(
+            !audio.paused &&
+            (
+                document.fullscreenElement||
+                document.webkitFullscreenElement
+            )
+        ){
+            ui.classList.add("hidden");
+        }
+
+    },2500);
+}
+
+
+/* =========================================================
+   CURSOR TOGGLE
+========================================================= */
+
+let cursorHidden=false;
+
+function toggleCursor(){
+
+    cursorHidden=!cursorHidden;
+
+    document.body.classList.toggle(
+        "cursor-hidden",
+        cursorHidden
+    );
+
+    status.textContent=
+        cursorHidden
+        ?"CURSOR AUS"
+        :"CURSOR AN";
+
+    if(!cursorHidden)
+        showUI();
+}
+
+addEventListener("keydown",e=>{
+
+    if(
+        e.key.toLowerCase()==="t" &&
+        e.target.tagName!=="INPUT"
+    ){
+
+        e.preventDefault();
+
+        toggleCursor();
+    }
+
+    if(e.code==="Space"){
+
+        e.preventDefault();
+
+        togglePlay();
+    }
+
+    if(e.key.toLowerCase()==="f"){
+
+        e.preventDefault();
+
+        fullscreen();
+    }
+
+});
+
+
+/* =========================================================
+   FILE
+========================================================= */
+
+let objectURL=null;
+
+fileInput.addEventListener("change",async e=>{
+
+    const file=e.target.files[0];
+
+    if(!file)return;
+
+    if(objectURL)
+        URL.revokeObjectURL(objectURL);
+
+    objectURL=URL.createObjectURL(file);
+
+    audio.src=objectURL;
+    audio.load();
+
+    songName.textContent=file.name;
+
+    songFinished=false;
+    scene="VOID";
+    sceneStart=performance.now();
+
+    await initAudio();
+
+    try{
+
+        await audio.play();
+
+        playButton.textContent="❚❚ Pause";
+        status.textContent="Analyse läuft";
+
+    }catch{
+
+        status.textContent="Bereit – Play drücken";
+    }
+});
+
+
+/* =========================================================
+   PLAY
 ========================================================= */
 
 async function togglePlay(){
 
     if(!audio.src){
+
         fileInput.click();
         return;
     }
@@ -841,29 +2238,21 @@ async function togglePlay(){
 
     if(audio.paused){
 
-        try{
-            await audio.play();
+        if(songFinished){
 
-            playButton.textContent =
-                "❚❚ Pause";
-
-            if(songFinished){
-                songFinished = false;
-                reloadArmed = false;
-            }
-
-        }catch(error){
-
-            status.textContent =
-                "Audio konnte nicht gestartet werden";
+            audio.currentTime=0;
+            songFinished=false;
         }
+
+        await audio.play();
+
+        playButton.textContent="❚❚ Pause";
 
     }else{
 
         audio.pause();
 
-        playButton.textContent =
-            "▶ Play";
+        playButton.textContent="▶ Play";
     }
 }
 
@@ -877,70 +2266,46 @@ playButton.addEventListener(
    FULLSCREEN
 ========================================================= */
 
-async function enterFullscreen(){
+let wasFullscreen=false;
+let fullscreenUsed=false;
+let songFinished=false;
+let reloadDone=false;
+
+async function fullscreen(){
 
     try{
 
-        if(!document.fullscreenElement){
+        if(
+            !document.fullscreenElement &&
+            !document.webkitFullscreenElement
+        ){
 
-            fullscreenWasUsed = true;
+            fullscreenUsed=true;
 
-            if(document.documentElement.requestFullscreen){
+            if(document.documentElement.requestFullscreen)
+                await document.documentElement.requestFullscreen();
 
-                await document.documentElement
-                    .requestFullscreen();
-            }
+            else if(document.documentElement.webkitRequestFullscreen)
+                document.documentElement.webkitRequestFullscreen();
 
-            else if(document.documentElement.webkitRequestFullscreen){
+        }else{
 
-                document.documentElement
-                    .webkitRequestFullscreen();
-            }
+            if(document.exitFullscreen)
+                await document.exitFullscreen();
 
-            fullscreenButton.textContent =
-                "⛶ Vollbild an";
+            else if(document.webkitExitFullscreen)
+                document.webkitExitFullscreen();
         }
 
-        else{
+    }catch{
 
-            await exitFullscreen();
-        }
-
-    }catch(error){
-
-        /*
-          Manche iPhones/iPads erlauben
-          Fullscreen nur über bestimmte
-          Benutzeraktionen.
-        */
-
-        status.textContent =
-            "Vollbild nicht verfügbar";
+        status.textContent="Vollbild nicht verfügbar";
     }
 }
 
-
-async function exitFullscreen(){
-
-    try{
-
-        if(document.exitFullscreen){
-
-            await document.exitFullscreen();
-        }
-
-        else if(document.webkitExitFullscreen){
-
-            document.webkitExitFullscreen();
-        }
-
-    }catch(error){}
-}
-
-
 fullscreenButton.addEventListener(
     "click",
-    enterFullscreen
+    fullscreen
 );
 
 
@@ -948,61 +2313,54 @@ fullscreenButton.addEventListener(
    FULLSCREEN CHANGE
 ========================================================= */
 
-function fullscreenChanged(){
+function fullscreenChange(){
 
-    const isFullscreen =
+    const active=
         !!(
-            document.fullscreenElement ||
+            document.fullscreenElement||
             document.webkitFullscreenElement
         );
 
-    if(isFullscreen){
+    if(active){
 
-        wasFullscreen = true;
-
-        fullscreenButton.textContent =
-            "⛶ Vollbild an";
+        wasFullscreen=true;
 
     }else{
 
-        fullscreenButton.textContent =
-            "⛶ Vollbild";
-
         /*
-          Automatischer Reload:
+          Genau hier erfolgt der gewünschte
+          automatische Reload.
 
-          Nur wenn
-          1. Vollbild benutzt wurde
-          2. der Song komplett fertig war
-          3. die Seite danach verlassen wurde
+          Song muss komplett fertig sein
+          UND Vollbild muss vorher aktiv
+          gewesen sein.
         */
 
         if(
-            wasFullscreen &&
-            fullscreenWasUsed &&
-            songFinished &&
-            !reloadArmed
+            wasFullscreen&&
+            fullscreenUsed&&
+            songFinished&&
+            !reloadDone
         ){
 
-            reloadArmed = true;
+            reloadDone=true;
 
-            setTimeout(() => {
-
-                location.reload();
-
-            },350);
+            setTimeout(
+                ()=>location.reload(),
+                350
+            );
         }
     }
 }
 
 document.addEventListener(
     "fullscreenchange",
-    fullscreenChanged
+    fullscreenChange
 );
 
 document.addEventListener(
     "webkitfullscreenchange",
-    fullscreenChanged
+    fullscreenChange
 );
 
 
@@ -1010,79 +2368,39 @@ document.addEventListener(
    SONG ENDED
 ========================================================= */
 
-audio.addEventListener(
-    "ended",
-    () => {
+audio.addEventListener("ended",()=>{
 
-        songFinished = true;
+    songFinished=true;
 
-        audio.currentTime = 0;
+    playButton.textContent="▶ Play";
 
-        playButton.textContent =
-            "▶ Play";
+    status.textContent="■ ENDE";
 
-        status.textContent =
-            "■ ENDE";
+    progressBar.style.width="100%";
 
-        progressBar.style.width =
-            "100%";
-
-        /*
-          Nicht sofort reloaden.
-          Erst wenn anschließend Vollbild
-          verlassen wird.
-        */
-
-        pulse = 0;
-
-        ctx.fillStyle =
-            "#000";
-
-        ctx.fillRect(
-            0,
-            0,
-            width,
-            height
-        );
-    }
-);
+    clear();
+});
 
 
 /* =========================================================
-   KEYBOARD
+   PROGRESS
 ========================================================= */
 
-window.addEventListener(
-    "keydown",
-    event => {
+audio.addEventListener(
+    "timeupdate",
+    ()=>{
 
         if(
-            event.target.tagName ===
-            "INPUT"
-        ) return;
-
-        if(event.code === "Space"){
-
-            event.preventDefault();
-
-            togglePlay();
-        }
-
-        if(
-            event.key === "f" ||
-            event.key === "F"
+            audio.duration&&
+            isFinite(audio.duration)
         ){
 
-            event.preventDefault();
-
-            enterFullscreen();
-        }
-
-        if(event.key === "Escape"){
-
-            /*
-              Browser übernimmt Exit.
-            */
+            progressBar.style.width=
+                (
+                    audio.currentTime/
+                    audio.duration*
+                    100
+                )+"%";
         }
     }
 );
@@ -1092,21 +2410,17 @@ window.addEventListener(
    TOUCH
 ========================================================= */
 
+let touchX=0;
+let touchY=0;
+
 canvas.addEventListener(
     "touchstart",
-    event => {
+    e=>{
 
-        if(event.touches.length !== 1)
-            return;
+        if(e.touches.length!==1)return;
 
-        const touch =
-            event.touches[0];
-
-        touchStartX =
-            touch.clientX;
-
-        touchStartY =
-            touch.clientY;
+        touchX=e.touches[0].clientX;
+        touchY=e.touches[0].clientY;
 
         showUI();
 
@@ -1114,60 +2428,57 @@ canvas.addEventListener(
     {passive:true}
 );
 
-
 canvas.addEventListener(
     "touchend",
-    event => {
+    e=>{
 
-        if(event.changedTouches.length !== 1)
-            return;
+        if(e.changedTouches.length!==1)return;
 
-        const touch =
-            event.changedTouches[0];
+        const x=e.changedTouches[0].clientX;
+        const y=e.changedTouches[0].clientY;
 
-        const dx =
-            touch.clientX -
-            touchStartX;
+        const dx=x-touchX;
+        const dy=y-touchY;
 
-        const dy =
-            touch.clientY -
-            touchStartY;
+        if(
+            Math.abs(dx)>60&&
+            Math.abs(dx)>Math.abs(dy)
+        ){
 
-        const distance =
-            Math.sqrt(
-                dx*dx +
-                dy*dy
-            );
+            if(dx>0)
+                previousScene();
+            else
+                nextScene();
 
-        /*
-          Wischen:
-          rechts → nächste Szene
-          links → vorherige Szene
-        */
+        }else{
 
-        if(distance > 60){
-
-            if(Math.abs(dx) > Math.abs(dy)){
-
-                if(dx > 0){
-                    nextScene();
-                }else{
-                    previousScene();
-                }
-            }
-
-            return;
+            showUI();
         }
-
-        /*
-          Einfaches Tippen:
-          UI anzeigen.
-        */
-
-        showUI();
-
     },
     {passive:true}
+);
+
+
+/* =========================================================
+   DOUBLE TAP / DOUBLE CLICK
+========================================================= */
+
+let lastTap=0;
+
+canvas.addEventListener(
+    "click",
+    ()=>{
+
+        const now=Date.now();
+
+        if(now-lastTap<350){
+
+            fullscreen();
+        }
+
+        lastTap=now;
+
+    }
 );
 
 
@@ -1175,1681 +2486,57 @@ canvas.addEventListener(
    MOUSE
 ========================================================= */
 
-window.addEventListener(
+addEventListener(
     "mousemove",
-    () => {
-
-        showUI();
-
-    },
+    showUI,
     {passive:true}
 );
-
-
-function showUI(){
-
-    ui.classList.remove(
-        "hidden"
-    );
-
-    clearTimeout(mouseTimer);
-
-    mouseTimer =
-        setTimeout(() => {
-
-            if(
-                audio &&
-                !audio.paused &&
-                document.fullscreenElement
-            ){
-
-                ui.classList.add(
-                    "hidden"
-                );
-            }
-
-        },2500);
-}
-
-
-/* =========================================================
-   SCENES
-========================================================= */
-
-const scenes = [
-    "VOID",
-    "NEON_RAIN",
-    "COSMIC_TUNNEL",
-    "LIQUID_LIGHT",
-    "GLASS_CITY",
-    "PARTICLE_STORM",
-    "LASER_GARDEN",
-    "DREAM_WAVE",
-    "GEOMETRIC_DREAM"
-];
-
-
-function nextScene(){
-
-    const index =
-        scenes.indexOf(scene);
-
-    scene =
-        scenes[
-            (index + 1) %
-            scenes.length
-        ];
-
-    sceneStart =
-        performance.now();
-
-    resetScene();
-}
-
-
-function previousScene(){
-
-    const index =
-        scenes.indexOf(scene);
-
-    scene =
-        scenes[
-            (index - 1 + scenes.length) %
-            scenes.length
-        ];
-
-    sceneStart =
-        performance.now();
-
-    resetScene();
-}
-
-
-function resetScene(){
-
-    particles.forEach(p => {
-
-        p.x = random(0,width);
-        p.y = random(0,height);
-        p.z = random(.15,1);
-    });
-}
-
-
-/* =========================================================
-   AUDIO ANALYSIS
-========================================================= */
-
-function averageFrequency(
-    startHz,
-    endHz
-){
-
-    if(!analyser)
-        return 0;
-
-    const nyquist =
-        audioContext.sampleRate / 2;
-
-    const start =
-        Math.floor(
-            startHz / nyquist *
-            frequencyData.length
-        );
-
-    const end =
-        Math.min(
-            frequencyData.length - 1,
-            Math.ceil(
-                endHz / nyquist *
-                frequencyData.length
-            )
-        );
-
-    let sum = 0;
-    let count = 0;
-
-    for(
-        let i=Math.max(0,start);
-        i<=end;
-        i++
-    ){
-
-        sum +=
-            frequencyData[i];
-
-        count++;
-    }
-
-    return count
-        ? sum / count / 255
-        : 0;
-}
-
-
-function analyseAudio(){
-
-    if(!analyser){
-
-        bass = 0;
-        lowMid = 0;
-        mid = 0;
-        highMid = 0;
-        treble = 0;
-
-        totalEnergy = 0;
-
-        return;
-    }
-
-    analyser.getByteFrequencyData(
-        frequencyData
-    );
-
-    analyser.getByteTimeDomainData(
-        timeData
-    );
-
-    bass =
-        averageFrequency(
-            20,
-            150
-        );
-
-    lowMid =
-        averageFrequency(
-            150,
-            400
-        );
-
-    mid =
-        averageFrequency(
-            400,
-            2000
-        );
-
-    highMid =
-        averageFrequency(
-            2000,
-            6000
-        );
-
-    treble =
-        averageFrequency(
-            6000,
-            16000
-        );
-
-    totalEnergy =
-        bass*.34 +
-        lowMid*.2 +
-        mid*.18 +
-        highMid*.16 +
-        treble*.12;
-
-    dynamicEnergy =
-        Math.abs(
-            totalEnergy -
-            previousEnergy
-        );
-
-    previousEnergy =
-        totalEnergy;
-
-    /*
-      Dynamik + Bass
-      bestimmen die Intensität.
-    */
-
-    intensity =
-        Math.min(
-            1,
-            totalEnergy * .75 +
-            dynamicEnergy * 4
-        );
-
-    /*
-      Beat-Erkennung.
-    */
-
-    const now =
-        performance.now();
-
-    const beatThreshold =
-        .54 -
-        bass*.15 -
-        intensity*.08;
-
-    if(
-        totalEnergy > beatThreshold &&
-        now-lastBeat > 150
-    ){
-
-        pulse = 1;
-
-        lastBeat = now;
-
-        beatCounter++;
-
-        onBeat();
-    }
-
-    pulse *= .89;
-}
-
-
-/* =========================================================
-   ADAPTIVE SCENE SELECTION
-========================================================= */
-
-function chooseAdaptiveScene(){
-
-    if(!audio.src)
-        return;
-
-    const elapsed =
-        audio.currentTime || 0;
-
-    /*
-      Fast / energetic
-    */
-
-    if(intensity > .72){
-
-        const fastScenes = [
-            "PARTICLE_STORM",
-            "LASER_GARDEN",
-            "NEON_RAIN",
-            "GEOMETRIC_DREAM"
-        ];
-
-        /*
-          Nicht bei jedem Beat wechseln.
-        */
-
-        if(
-            performance.now() -
-            sceneStart >
-            8500
-        ){
-
-            const next =
-                fastScenes[
-                    Math.floor(
-                        Math.random() *
-                        fastScenes.length
-                    )
-                ];
-
-            if(next !== scene){
-
-                scene = next;
-
-                sceneStart =
-                    performance.now();
-            }
-        }
-
-        return;
-    }
-
-
-    /*
-      Ruhig
-    */
-
-    if(intensity < .23){
-
-        const calmScenes = [
-            "VOID",
-            "DREAM_WAVE",
-            "LIQUID_LIGHT",
-            "COSMIC_TUNNEL"
-        ];
-
-        if(
-            performance.now() -
-            sceneStart >
-            15000
-        ){
-
-            const next =
-                calmScenes[
-                    Math.floor(
-                        Math.random() *
-                        calmScenes.length
-                    )
-                ];
-
-            if(next !== scene){
-
-                scene = next;
-
-                sceneStart =
-                    performance.now();
-            }
-        }
-
-        return;
-    }
-
-
-    /*
-      Mittel
-    */
-
-    if(
-        performance.now() -
-        sceneStart >
-        11000
-    ){
-
-        const normalScenes = [
-            "COSMIC_TUNNEL",
-            "GLASS_CITY",
-            "LIQUID_LIGHT",
-            "DREAM_WAVE",
-            "NEON_RAIN"
-        ];
-
-        const next =
-            normalScenes[
-                Math.floor(
-                    Math.random() *
-                    normalScenes.length
-                )
-            ];
-
-        if(next !== scene){
-
-            scene = next;
-
-            sceneStart =
-                performance.now();
-        }
-    }
-}
-
-
-/* =========================================================
-   BEAT EVENT
-========================================================= */
-
-function onBeat(){
-
-    /*
-      Hier reagiert jede Szene
-      auf den Beat.
-    */
-
-    for(let i=0;i<8;i++){
-
-        particles.push({
-
-            x:
-                width/2 +
-                random(-width*.1,width*.1),
-
-            y:
-                height/2 +
-                random(-height*.1,height*.1),
-
-            z:1,
-
-            size:
-                random(1,4),
-
-            speed:
-                random(1,4),
-
-            angle:
-                random(
-                    0,
-                    Math.PI*2
-                ),
-
-            phase:
-                random(
-                    0,
-                    Math.PI*2
-                )
-        });
-    }
-
-    if(
-        particles.length >
-        600
-    ){
-
-        particles.splice(
-            0,
-            particles.length-600
-        );
-    }
-}
-
-
-/* =========================================================
-   BACKGROUND
-========================================================= */
-
-function clearScreen(){
-
-    ctx.fillStyle =
-        "#000";
-
-    ctx.fillRect(
-        0,
-        0,
-        width,
-        height
-    );
-}
-
-
-/* =========================================================
-   VOID
-========================================================= */
-
-function drawVoid(){
-
-    clearScreen();
-
-    /*
-      Bei fast vollständiger Stille
-      bleibt es wirklich schwarz.
-    */
-
-    if(totalEnergy < .035)
-        return;
-
-    const r =
-        Math.min(width,height) *
-        (.03 + pulse*.15);
-
-    const gradient =
-        ctx.createRadialGradient(
-            width/2,
-            height/2,
-            0,
-            width/2,
-            height/2,
-            r
-        );
-
-    gradient.addColorStop(
-        0,
-        `rgba(255,255,255,${.06+pulse*.2})`
-    );
-
-    gradient.addColorStop(
-        1,
-        "rgba(0,0,0,0)"
-    );
-
-    ctx.fillStyle =
-        gradient;
-
-    ctx.fillRect(
-        0,
-        0,
-        width,
-        height
-    );
-}
-
-
-/* =========================================================
-   NEON RAIN
-========================================================= */
-
-function drawNeonRain(time){
-
-    clearScreen();
-
-    const amount =
-        Math.floor(
-            width / 18
-        );
-
-    for(let i=0;i<amount;i++){
-
-        const x =
-            i * 18;
-
-        const speed =
-            .2 +
-            intensity*2;
-
-        const y =
-            (
-                time *
-                speed *
-                (30+i%5*15)
-                +
-                i*83
-            ) %
-            (height+150)
-            - 150;
-
-        const length =
-            20 +
-            intensity*100 +
-            bass*80;
-
-        const alpha =
-            .15 +
-            intensity*.65;
-
-        const gradient =
-            ctx.createLinearGradient(
-                x,
-                y,
-                x,
-                y+length
-            );
-
-        gradient.addColorStop(
-            0,
-            "rgba(255,255,255,0)"
-        );
-
-        gradient.addColorStop(
-            .5,
-            `rgba(255,255,255,${alpha})`
-        );
-
-        gradient.addColorStop(
-            1,
-            "rgba(255,255,255,0)"
-        );
-
-        ctx.fillStyle =
-            gradient;
-
-        ctx.fillRect(
-            x,
-            y,
-            2 +
-                pulse*2,
-            length
-        );
-    }
-}
-
-
-/* =========================================================
-   COSMIC TUNNEL
-========================================================= */
-
-function drawCosmicTunnel(time){
-
-    clearScreen();
-
-    const cx =
-        width/2;
-
-    const cy =
-        height/2;
-
-    const max =
-        Math.max(
-            width,
-            height
-        );
-
-    for(let i=0;i<90;i++){
-
-        const z =
-            (
-                i/90 +
-                time*.00012 *
-                (.4+intensity*4)
-            ) % 1;
-
-        const depth =
-            Math.pow(
-                z,
-                3
-            );
-
-        const radius =
-            depth *
-            max *
-            1.4;
-
-        const angle =
-            i*.7 +
-            time*.00015 +
-            pulse*.2;
-
-        const x =
-            cx +
-            Math.cos(angle) *
-            radius;
-
-        const y =
-            cy +
-            Math.sin(angle) *
-            radius;
-
-        const size =
-            .5 +
-            z*3 +
-            pulse*5;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y,
-            size,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle =
-            `rgba(255,255,255,${.05+z*.8})`;
-
-        ctx.fill();
-    }
-}
-
-
-/* =========================================================
-   LIQUID LIGHT
-========================================================= */
-
-function drawLiquidLight(time){
-
-    clearScreen();
-
-    const layers = 8;
-
-    for(let layer=0;layer<layers;layer++){
-
-        ctx.beginPath();
-
-        for(
-            let x=0;
-            x<=width;
-            x+=Math.max(4,width/100)
-        ){
-
-            const normalized =
-                x/width;
-
-            const wave =
-                Math.sin(
-                    normalized*8 +
-                    time*.0004*
-                    (.3+intensity*3) +
-                    layer
-                );
-
-            const wave2 =
-                Math.sin(
-                    normalized*17 -
-                    time*.00025
-                );
-
-            const y =
-                height*.5 +
-                wave *
-                height*.08 *
-                (1+layer*.08) +
-                wave2 *
-                height*.025;
-
-            if(x===0){
-                ctx.moveTo(x,y);
-            }else{
-                ctx.lineTo(x,y);
-            }
-        }
-
-        ctx.lineTo(
-            width,
-            height
-        );
-
-        ctx.lineTo(
-            0,
-            height
-        );
-
-        ctx.closePath();
-
-        ctx.fillStyle =
-            `rgba(
-                255,
-                255,
-                255,
-                ${.012+layer*.006+intensity*.02}
-            )`;
-
-        ctx.fill();
-    }
-}
-
-
-/* =========================================================
-   GLASS CITY
-========================================================= */
-
-function drawGlassCity(time){
-
-    clearScreen();
-
-    const horizon =
-        height*.64;
-
-    ctx.fillStyle =
-        "rgba(255,255,255,.025)";
-
-    ctx.fillRect(
-        0,
-        horizon,
-        width,
-        height-horizon
-    );
-
-    for(const block of cityBlocks){
-
-        const x =
-            block.x * width;
-
-        const w =
-            block.w * width;
-
-        const dynamicHeight =
-            block.h *
-            (
-                1 +
-                bass*.5 +
-                pulse*.6
-            );
-
-        const h =
-            dynamicHeight *
-            height;
-
-        const y =
-            horizon-h;
-
-        ctx.fillStyle =
-            `rgba(
-                255,
-                255,
-                255,
-                ${.025+block.depth*.035}
-            )`;
-
-        ctx.fillRect(
-            x,
-            y,
-            w,
-            h
-        );
-
-        /*
-          Fenster
-        */
-
-        const rows =
-            Math.max(
-                2,
-                Math.floor(
-                    h/25
-                )
-            );
-
-        const cols =
-            Math.max(
-                1,
-                Math.floor(
-                    w/18
-                )
-            );
-
-        for(let r=0;r<rows;r++){
-
-            for(let c=0;c<cols;c++){
-
-                const active =
-                    Math.sin(
-                        block.phase +
-                        r*.8 +
-                        c*.5 +
-                        time*.001
-                    ) > .35;
-
-                if(!active)
-                    continue;
-
-                ctx.fillStyle =
-                    `rgba(
-                        255,
-                        255,
-                        255,
-                        ${.04+intensity*.3}
-                    )`;
-
-                ctx.fillRect(
-                    x+7+c*18,
-                    y+10+r*24,
-                    3,
-                    7
-                );
-            }
-        }
-    }
-
-    /*
-      Horizontale Lichtlinie
-    */
-
-    ctx.fillStyle =
-        `rgba(
-            255,
-            255,
-            255,
-            ${.12+intensity*.5}
-        )`;
-
-    ctx.fillRect(
-        0,
-        horizon,
-        width,
-        1+pulse*3
-    );
-}
-
-
-/* =========================================================
-   PARTICLE STORM
-========================================================= */
-
-function drawParticleStorm(time){
-
-    clearScreen();
-
-    const cx =
-        width/2;
-
-    const cy =
-        height/2;
-
-    for(const p of particles){
-
-        const angle =
-            p.angle +
-            time*.0003 *
-            (.2+intensity*5);
-
-        const radius =
-            (
-                Math.sqrt(
-                    Math.pow(
-                        p.x-width/2,
-                        2
-                    )+
-                    Math.pow(
-                        p.y-height/2,
-                        2
-                    )
-                ) /
-                Math.max(width,height)
-            );
-
-        const force =
-            .2 +
-            intensity*2 +
-            pulse*2;
-
-        p.x +=
-            Math.cos(angle) *
-            force *
-            p.speed;
-
-        p.y +=
-            Math.sin(angle) *
-            force *
-            p.speed;
-
-        /*
-          Wrap around
-        */
-
-        if(
-            p.x < -50
-        ) p.x = width+50;
-
-        if(
-            p.x > width+50
-        ) p.x = -50;
-
-        if(
-            p.y < -50
-        ) p.y = height+50;
-
-        if(
-            p.y > height+50
-        ) p.y = -50;
-
-        const size =
-            p.size *
-            (.5+p.z) *
-            (1+intensity*2);
-
-        ctx.beginPath();
-
-        ctx.arc(
-            p.x,
-            p.y,
-            size,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle =
-            `rgba(
-                255,
-                255,
-                255,
-                ${.15+p.z*.65}
-            )`;
-
-        ctx.fill();
-    }
-
-    /*
-      Beat shockwave
-    */
-
-    if(pulse>.01){
-
-        ctx.beginPath();
-
-        ctx.arc(
-            cx,
-            cy,
-            pulse *
-            Math.max(
-                width,
-                height
-            )*.7,
-            0,
-            Math.PI*2
-        );
-
-        ctx.strokeStyle =
-            `rgba(
-                255,
-                255,
-                255,
-                ${pulse*.25}
-            )`;
-
-        ctx.lineWidth =
-            2+pulse*8;
-
-        ctx.stroke();
-    }
-}
-
-
-/* =========================================================
-   LASER GARDEN
-========================================================= */
-
-function drawLaserGarden(time){
-
-    clearScreen();
-
-    const cx =
-        width/2;
-
-    const cy =
-        height/2;
-
-    const radius =
-        Math.max(
-            width,
-            height
-        )*.7;
-
-    for(let i=0;i<laserLines.length;i++){
-
-        const line =
-            laserLines[i];
-
-        const angle =
-            line.angle +
-            Math.sin(
-                time*.0004 +
-                line.offset
-            )*.7;
-
-        const length =
-            radius *
-            (
-                line.length +
-                intensity*.4 +
-                pulse*.5
-            );
-
-        const x =
-            cx +
-            Math.cos(angle) *
-            length;
-
-        const y =
-            cy +
-            Math.sin(angle) *
-            length;
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            cx,
-            cy
-        );
-
-        ctx.lineTo(
-            x,
-            y
-        );
-
-        ctx.strokeStyle =
-            `rgba(
-                255,
-                255,
-                255,
-                ${.02+intensity*.13}
-            )`;
-
-        ctx.lineWidth =
-            .5 +
-            pulse*3;
-
-        ctx.stroke();
-    }
-
-    /*
-      Center
-    */
-
-    const centerSize =
-        10 +
-        pulse*60 +
-        bass*30;
-
-    const gradient =
-        ctx.createRadialGradient(
-            cx,
-            cy,
-            0,
-            cx,
-            cy,
-            centerSize
-        );
-
-    gradient.addColorStop(
-        0,
-        `rgba(255,255,255,${.25+intensity*.5})`
-    );
-
-    gradient.addColorStop(
-        1,
-        "rgba(255,255,255,0)"
-    );
-
-    ctx.fillStyle =
-        gradient;
-
-    ctx.fillRect(
-        cx-centerSize,
-        cy-centerSize,
-        centerSize*2,
-        centerSize*2
-    );
-}
-
-
-/* =========================================================
-   DREAM WAVE
-========================================================= */
-
-function drawDreamWave(time){
-
-    clearScreen();
-
-    const center =
-        height*.5;
-
-    for(let layer=0;layer<7;layer++){
-
-        ctx.beginPath();
-
-        const amplitude =
-            height *
-            (
-                .02 +
-                layer*.006
-            ) *
-            (
-                1+
-                intensity*.8+
-                pulse*.8
-            );
-
-        for(
-            let i=0;
-            i<wavePoints.length;
-            i++
-        ){
-
-            const p =
-                wavePoints[i];
-
-            const x =
-                i /
-                (wavePoints.length-1) *
-                width;
-
-            const y =
-                center +
-                Math.sin(
-                    i*.18 +
-                    p.phase +
-                    time*.0002 *
-                    (.3+intensity*2)
-                ) *
-                amplitude +
-                Math.sin(
-                    i*.047 -
-                    time*.00015
-                ) *
-                amplitude*.7;
-
-            if(i===0){
-                ctx.moveTo(x,y);
-            }else{
-                ctx.lineTo(x,y);
-            }
-        }
-
-        ctx.strokeStyle =
-            `rgba(
-                255,
-                255,
-                255,
-                ${.025+layer*.018+intensity*.04}
-            )`;
-
-        ctx.lineWidth =
-            1 +
-            layer*.2 +
-            pulse*2;
-
-        ctx.stroke();
-    }
-}
-
-
-/* =========================================================
-   GEOMETRIC DREAM
-========================================================= */
-
-function drawGeometricDream(time){
-
-    clearScreen();
-
-    const cx =
-        width/2;
-
-    const cy =
-        height/2;
-
-    const base =
-        Math.min(
-            width,
-            height
-        )*.15;
-
-    for(let i=0;i<16;i++){
-
-        const rotation =
-            time*.00015 *
-            (.4+intensity*4) +
-            i*.4;
-
-        const size =
-            base *
-            (
-                1 +
-                i*.18 +
-                pulse*.6
-            );
-
-        ctx.save();
-
-        ctx.translate(
-            cx,
-            cy
-        );
-
-        ctx.rotate(
-            rotation
-        );
-
-        ctx.strokeStyle =
-            `rgba(
-                255,
-                255,
-                255,
-                ${.025+i*.006+intensity*.03}
-            )`;
-
-        ctx.lineWidth =
-            1 +
-            pulse*2;
-
-        ctx.strokeRect(
-            -size/2,
-            -size/2,
-            size,
-            size
-        );
-
-        ctx.restore();
-    }
-
-    /*
-      Center pulse
-    */
-
-    if(pulse>.01){
-
-        ctx.beginPath();
-
-        ctx.arc(
-            cx,
-            cy,
-            base *
-            (.4+pulse*2),
-            0,
-            Math.PI*2
-        );
-
-        ctx.strokeStyle =
-            `rgba(
-                255,
-                255,
-                255,
-                ${pulse*.3}
-            )`;
-
-        ctx.lineWidth =
-            2+pulse*4;
-
-        ctx.stroke();
-    }
-}
-
-
-/* =========================================================
-   SCENE RENDER
-========================================================= */
-
-function renderScene(time){
-
-    /*
-      Fast automatic choice
-    */
-
-    chooseAdaptiveScene();
-
-    /*
-      Black when essentially silent.
-      Nicht einfach nur eine dunkle Animation:
-      wirklich schwarz.
-    */
-
-    if(
-        totalEnergy < .025 &&
-        audio.paused
-    ){
-
-        clearScreen();
-
-        return;
-    }
-
-
-    switch(scene){
-
-        case "VOID":
-            drawVoid();
-            break;
-
-        case "NEON_RAIN":
-            drawNeonRain(time);
-            break;
-
-        case "COSMIC_TUNNEL":
-            drawCosmicTunnel(time);
-            break;
-
-        case "LIQUID_LIGHT":
-            drawLiquidLight(time);
-            break;
-
-        case "GLASS_CITY":
-            drawGlassCity(time);
-            break;
-
-        case "PARTICLE_STORM":
-            drawParticleStorm(time);
-            break;
-
-        case "LASER_GARDEN":
-            drawLaserGarden(time);
-            break;
-
-        case "DREAM_WAVE":
-            drawDreamWave(time);
-            break;
-
-        case "GEOMETRIC_DREAM":
-            drawGeometricDream(time);
-            break;
-
-        default:
-            drawVoid();
-    }
-}
-
-
-/* =========================================================
-   PROGRESS
-========================================================= */
-
-function updateProgress(){
-
-    if(
-        !audio.duration ||
-        !isFinite(audio.duration)
-    ){
-
-        progressBar.style.width =
-            "0%";
-
-        return;
-    }
-
-    const percent =
-        Math.min(
-            100,
-            audio.currentTime /
-            audio.duration *
-            100
-        );
-
-    progressBar.style.width =
-        percent + "%";
-}
-
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-function updateStatus(){
-
-    if(!audio.src){
-
-        status.textContent =
-            "Bereit";
-
-        return;
-    }
-
-    if(songFinished){
-
-        status.textContent =
-            "■ ENDE";
-
-        return;
-    }
-
-    if(audio.paused){
-
-        status.textContent =
-            "❚❚ Pause";
-
-        return;
-    }
-
-    let mode =
-        "NORMAL";
-
-    if(intensity>.72){
-
-        mode =
-            "WILD";
-    }
-
-    else if(intensity<.23){
-
-        mode =
-            "CALM";
-    }
-
-    status.textContent =
-        mode +
-        " • " +
-        scene.replaceAll(
-            "_",
-            " "
-        );
-}
 
 
 /* =========================================================
    MAIN LOOP
 ========================================================= */
 
-function animate(time){
+let lastTime=performance.now();
 
-    const dt =
-        Math.min(
-            .05,
-            (time-lastTime)/1000
-        );
+function loop(t){
 
-    lastTime = time;
+    lastTime=t;
 
-    analyseAudio();
+    analyse();
 
-    renderScene(time);
+    render(t);
 
-    updateProgress();
+    if(!songFinished){
 
-    updateStatus();
+        const mode=
+            intensity>.72
+            ?"WILD"
+            :
+            intensity<.2
+            ?"CALM"
+            :"NORMAL";
 
-    animationFrame =
-        requestAnimationFrame(
-            animate
-        );
+        status.textContent=
+            mode+
+            " • "+
+            scene.replaceAll("_"," ");
+    }
+
+    requestAnimationFrame(loop);
 }
 
 
 /* =========================================================
-   INITIALIZE
+   INIT
 ========================================================= */
 
 resize();
 
-clearScreen();
-
-animationFrame =
-    requestAnimationFrame(
-        animate
-    );
-
-
-/* =========================================================
-   AUDIO EVENTS
-========================================================= */
-
-audio.addEventListener(
-    "play",
-    () => {
-
-        playButton.textContent =
-            "❚❚ Pause";
-
-        status.textContent =
-            "Analyse läuft";
-
-        /*
-          Wenn ein neuer Durchlauf beginnt,
-          darf kein alter Reload-Zustand bleiben.
-        */
-
-        if(
-            audio.currentTime <
-            .1
-        ){
-
-            songFinished = false;
-            reloadArmed = false;
-        }
-    }
-);
-
-
-audio.addEventListener(
-    "pause",
-    () => {
-
-        if(!songFinished){
-
-            playButton.textContent =
-                "▶ Play";
-        }
-    }
-);
-
-
-audio.addEventListener(
-    "loadedmetadata",
-    () => {
-
-        status.textContent =
-            "Bereit";
-
-        songFinished = false;
-        reloadArmed = false;
-    }
-);
-
-
-/* =========================================================
-   DOUBLE CLICK / DOUBLE TAP
-========================================================= */
-
-canvas.addEventListener(
-    "dblclick",
-    () => {
-
-        enterFullscreen();
-    }
-);
-
-
-/* =========================================================
-   PREVENT UNWANTED MOBILE GESTURES
-========================================================= */
-
-document.addEventListener(
-    "gesturestart",
-    event => {
-        event.preventDefault();
-    },
-    {passive:false}
-);
-
-document.addEventListener(
-    "gesturechange",
-    event => {
-        event.preventDefault();
-    },
-    {passive:false}
-);
-
-document.addEventListener(
-    "gestureend",
-    event => {
-        event.preventDefault();
-    },
-    {passive:false}
-);
-
-
-/* =========================================================
-   PAGE VISIBILITY
-========================================================= */
-
-document.addEventListener(
-    "visibilitychange",
-    () => {
-
-        /*
-          Beim Zurückkehren nicht
-          automatisch neu starten.
-        */
-
-        if(!document.hidden){
-
-            showUI();
-        }
-    }
-);
-
-
-/* =========================================================
-   ERROR HANDLING
-========================================================= */
-
-audio.addEventListener(
-    "error",
-    () => {
-
-        status.textContent =
-            "Fehler beim Laden der Musik";
-
-        playButton.textContent =
-            "▶ Play";
-    }
-);
-
-
-/* =========================================================
-   CONTEXT MENU
-========================================================= */
-
-canvas.addEventListener(
-    "contextmenu",
-    event => {
-
-        event.preventDefault();
-    }
-);
+requestAnimationFrame(loop);
 
 </script>
 
 </body>
 </html>
+```
