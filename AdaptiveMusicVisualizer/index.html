@@ -1,0 +1,2855 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,
+             initial-scale=1,
+             maximum-scale=1,
+             user-scalable=no,
+             viewport-fit=cover"
+>
+
+<title>Adaptive Music Visualizer</title>
+
+<style>
+:root{
+    --orange:#ff7a00;
+    --glass:rgba(255,255,255,.07);
+    --border:rgba(255,255,255,.12);
+    --text:#fff;
+    --muted:rgba(255,255,255,.58);
+}
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    margin:0;
+    overflow:hidden;
+    background:#000;
+    color:var(--text);
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+body{
+    position:fixed;
+    inset:0;
+    touch-action:none;
+    cursor:default;
+}
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+#visualizer{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    background:#000;
+}
+
+/* =========================================================
+   UI
+========================================================= */
+
+#ui{
+    position:fixed;
+    inset:0;
+    z-index:20;
+    pointer-events:none;
+    transition:
+        opacity .35s ease,
+        transform .35s ease;
+}
+
+#ui.hidden{
+    opacity:0;
+}
+
+.topbar{
+    position:absolute;
+    top:
+        max(18px, env(safe-area-inset-top));
+    left:
+        max(18px, env(safe-area-inset-left));
+    right:
+        max(18px, env(safe-area-inset-right));
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+
+    pointer-events:none;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    padding:10px 14px;
+
+    border:1px solid var(--border);
+    border-radius:14px;
+
+    background:rgba(0,0,0,.42);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.4px;
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--orange);
+    box-shadow:0 0 15px var(--orange);
+}
+
+.controls{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    gap:8px;
+
+    pointer-events:auto;
+}
+
+button,
+.fileButton{
+    appearance:none;
+    border:1px solid var(--border);
+    background:rgba(0,0,0,.48);
+    color:white;
+
+    min-height:42px;
+    padding:10px 14px;
+
+    border-radius:13px;
+
+    font:inherit;
+    font-size:13px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        border-color .15s ease;
+}
+
+button:hover,
+.fileButton:hover{
+    background:rgba(255,255,255,.1);
+    border-color:rgba(255,255,255,.25);
+}
+
+button:active,
+.fileButton:active{
+    transform:scale(.94);
+}
+
+.fileButton{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#fileInput{
+    display:none;
+}
+
+.bottom{
+    position:absolute;
+
+    left:
+        max(18px, env(safe-area-inset-left));
+    right:
+        max(18px, env(safe-area-inset-right));
+    bottom:
+        max(18px, env(safe-area-inset-bottom));
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+    pointer-events:none;
+}
+
+.info{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+
+    padding:12px 15px;
+
+    border-radius:15px;
+    border:1px solid var(--border);
+
+    background:rgba(0,0,0,.42);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+
+#songName{
+    font-size:14px;
+    font-weight:800;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    max-width:70%;
+}
+
+#status{
+    color:var(--muted);
+    font-size:11px;
+    text-align:right;
+    white-space:nowrap;
+}
+
+.progress{
+    width:100%;
+    height:4px;
+    overflow:hidden;
+    border-radius:99px;
+    background:rgba(255,255,255,.12);
+}
+
+#progressBar{
+    width:0%;
+    height:100%;
+    background:white;
+    transform-origin:left center;
+    transition:width .08s linear;
+}
+
+/* =========================================================
+   MOBILE / FLIP PHONE
+========================================================= */
+
+@media(max-width:700px){
+
+    .topbar{
+        align-items:stretch;
+    }
+
+    .brand{
+        font-size:11px;
+        padding:8px 10px;
+        border-radius:11px;
+    }
+
+    .controls{
+        gap:5px;
+    }
+
+    button,
+    .fileButton{
+        min-height:38px;
+        padding:8px 10px;
+        border-radius:11px;
+        font-size:11px;
+    }
+
+    .info{
+        padding:9px 11px;
+        border-radius:12px;
+    }
+
+    #songName{
+        font-size:12px;
+    }
+
+    #status{
+        font-size:9px;
+    }
+}
+
+/* Very narrow / flip phone */
+
+@media(max-width:380px){
+
+    .topbar{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .controls{
+        justify-content:flex-start;
+    }
+
+    .brand{
+        width:max-content;
+    }
+
+    .bottom{
+        bottom:
+            max(10px, env(safe-area-inset-bottom));
+        left:
+            max(10px, env(safe-area-inset-left));
+        right:
+            max(10px, env(safe-area-inset-right));
+    }
+
+    #status{
+        display:none;
+    }
+
+    #songName{
+        max-width:100%;
+    }
+}
+
+/* Landscape flip phones / small screens */
+
+@media(max-height:430px){
+
+    .topbar{
+        top:
+            max(8px, env(safe-area-inset-top));
+    }
+
+    .bottom{
+        bottom:
+            max(8px, env(safe-area-inset-bottom));
+    }
+
+    .brand{
+        padding:6px 9px;
+    }
+
+    button,
+    .fileButton{
+        min-height:34px;
+        padding:6px 9px;
+    }
+
+    .info{
+        padding:7px 10px;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+        animation-duration:.001ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.001ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="visualizer"></canvas>
+
+<div id="ui">
+
+    <div class="topbar">
+
+        <div class="brand">
+            <span class="dot"></span>
+            ADAPTIVE VISUALIZER
+        </div>
+
+        <div class="controls">
+
+            <label class="fileButton">
+                🎵 Musik
+                <input
+                    id="fileInput"
+                    type="file"
+                    accept="audio/*"
+                >
+            </label>
+
+            <button id="playButton">
+                ▶ Play
+            </button>
+
+            <button id="fullscreenButton">
+                ⛶ Vollbild
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="bottom">
+
+        <div class="info">
+
+            <div id="songName">
+                Keine Musik geladen
+            </div>
+
+            <div id="status">
+                Bereit
+            </div>
+
+        </div>
+
+        <div class="progress">
+            <div id="progressBar"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
+
+<script>
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const canvas =
+    document.getElementById("visualizer");
+
+const ctx =
+    canvas.getContext("2d", {
+        alpha:false
+    });
+
+const audio =
+    document.getElementById("audio");
+
+const fileInput =
+    document.getElementById("fileInput");
+
+const playButton =
+    document.getElementById("playButton");
+
+const fullscreenButton =
+    document.getElementById("fullscreenButton");
+
+const songName =
+    document.getElementById("songName");
+
+const status =
+    document.getElementById("status");
+
+const progressBar =
+    document.getElementById("progressBar");
+
+const ui =
+    document.getElementById("ui");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let audioContext = null;
+let analyser = null;
+let source = null;
+
+let frequencyData = null;
+let timeData = null;
+
+let animationFrame = null;
+
+let lastTime = performance.now();
+
+let beatEnergy = 0;
+let previousEnergy = 0;
+
+let bass = 0;
+let lowMid = 0;
+let mid = 0;
+let highMid = 0;
+let treble = 0;
+
+let totalEnergy = 0;
+let dynamicEnergy = 0;
+
+let intensity = 0;
+
+let pulse = 0;
+
+let scene = "VOID";
+
+let sceneStart = performance.now();
+
+let lastBeat = 0;
+
+let beatCounter = 0;
+
+let particles = [];
+
+let stars = [];
+
+let wavePoints = [];
+
+let cityBlocks = [];
+
+let laserLines = [];
+
+let touchStartX = 0;
+let touchStartY = 0;
+
+let mouseTimer = null;
+
+let wasFullscreen = false;
+
+let songFinished = false;
+
+let fullscreenWasUsed = false;
+
+let reloadArmed = false;
+
+let currentObjectURL = null;
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+let width = 1;
+let height = 1;
+let dpr = 1;
+
+function resize(){
+
+    dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+    width =
+        Math.max(
+            1,
+            window.innerWidth
+        );
+
+    height =
+        Math.max(
+            1,
+            window.innerHeight
+        );
+
+    canvas.width =
+        Math.floor(width * dpr);
+
+    canvas.height =
+        Math.floor(height * dpr);
+
+    canvas.style.width =
+        width + "px";
+
+    canvas.style.height =
+        height + "px";
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+    buildWorld();
+}
+
+window.addEventListener(
+    "resize",
+    resize,
+    {passive:true}
+);
+
+window.addEventListener(
+    "orientationchange",
+    () => {
+        setTimeout(resize,100);
+    },
+    {passive:true}
+);
+
+
+/* =========================================================
+   WORLD GENERATION
+========================================================= */
+
+function random(min,max){
+    return Math.random() * (max-min) + min;
+}
+
+function buildWorld(){
+
+    particles = [];
+
+    const particleCount =
+        Math.min(
+            420,
+            Math.max(
+                100,
+                Math.floor(
+                    (width * height) / 8500
+                )
+            )
+        );
+
+    for(let i=0;i<particleCount;i++){
+
+        particles.push({
+            x:random(0,width),
+            y:random(0,height),
+            z:random(.15,1),
+            size:random(.5,3),
+            speed:random(.2,1.5),
+            angle:random(0,Math.PI*2),
+            phase:random(0,Math.PI*2)
+        });
+    }
+
+
+    stars = [];
+
+    const starCount =
+        Math.min(
+            500,
+            Math.max(
+                120,
+                Math.floor(
+                    width * height / 7000
+                )
+            )
+        );
+
+    for(let i=0;i<starCount;i++){
+
+        stars.push({
+            x:random(-1,1),
+            y:random(-1,1),
+            z:random(.05,1),
+            size:random(.3,2)
+        });
+    }
+
+
+    wavePoints = [];
+
+    const waveCount =
+        Math.min(
+            180,
+            Math.max(
+                60,
+                Math.floor(width / 8)
+            )
+        );
+
+    for(let i=0;i<waveCount;i++){
+        wavePoints.push({
+            phase:random(0,Math.PI*2),
+            offset:random(-1,1)
+        });
+    }
+
+
+    cityBlocks = [];
+
+    const columns =
+        Math.max(
+            8,
+            Math.floor(width / 45)
+        );
+
+    for(let i=0;i<columns;i++){
+
+        cityBlocks.push({
+            x:i / columns,
+            w:1 / columns * random(.5,.9),
+            h:random(.08,.5),
+            depth:random(.2,1),
+            phase:random(0,Math.PI*2)
+        });
+    }
+
+
+    laserLines = [];
+
+    for(let i=0;i<30;i++){
+
+        laserLines.push({
+            angle:random(0,Math.PI*2),
+            length:random(.2,1),
+            offset:random(0,Math.PI*2)
+        });
+    }
+}
+
+
+/* =========================================================
+   AUDIO INITIALIZATION
+========================================================= */
+
+async function initAudio(){
+
+    if(audioContext){
+        if(audioContext.state === "suspended"){
+            await audioContext.resume();
+        }
+        return;
+    }
+
+    audioContext =
+        new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+    analyser =
+        audioContext.createAnalyser();
+
+    analyser.fftSize = 2048;
+
+    analyser.smoothingTimeConstant = .82;
+
+    frequencyData =
+        new Uint8Array(
+            analyser.frequencyBinCount
+        );
+
+    timeData =
+        new Uint8Array(
+            analyser.fftSize
+        );
+
+    source =
+        audioContext.createMediaElementSource(audio);
+
+    source.connect(analyser);
+
+    analyser.connect(
+        audioContext.destination
+    );
+}
+
+
+/* =========================================================
+   FILE LOADING
+========================================================= */
+
+fileInput.addEventListener(
+    "change",
+    async event => {
+
+        const file =
+            event.target.files[0];
+
+        if(!file) return;
+
+        if(currentObjectURL){
+            URL.revokeObjectURL(
+                currentObjectURL
+            );
+        }
+
+        currentObjectURL =
+            URL.createObjectURL(file);
+
+        audio.src =
+            currentObjectURL;
+
+        audio.load();
+
+        songName.textContent =
+            file.name;
+
+        status.textContent =
+            "Lade Audio…";
+
+        songFinished = false;
+        reloadArmed = false;
+        fullscreenWasUsed = false;
+
+        scene = "VOID";
+        sceneStart = performance.now();
+
+        beatCounter = 0;
+        pulse = 0;
+
+        await initAudio();
+
+        playButton.textContent =
+            "▶ Play";
+
+        try{
+            await audio.play();
+
+            playButton.textContent =
+                "❚❚ Pause";
+
+            status.textContent =
+                "Analyse läuft";
+        }
+        catch(error){
+
+            status.textContent =
+                "Bereit – Play drücken";
+        }
+    }
+);
+
+
+/* =========================================================
+   PLAY / PAUSE
+========================================================= */
+
+async function togglePlay(){
+
+    if(!audio.src){
+        fileInput.click();
+        return;
+    }
+
+    await initAudio();
+
+    if(audio.paused){
+
+        try{
+            await audio.play();
+
+            playButton.textContent =
+                "❚❚ Pause";
+
+            if(songFinished){
+                songFinished = false;
+                reloadArmed = false;
+            }
+
+        }catch(error){
+
+            status.textContent =
+                "Audio konnte nicht gestartet werden";
+        }
+
+    }else{
+
+        audio.pause();
+
+        playButton.textContent =
+            "▶ Play";
+    }
+}
+
+playButton.addEventListener(
+    "click",
+    togglePlay
+);
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+async function enterFullscreen(){
+
+    try{
+
+        if(!document.fullscreenElement){
+
+            fullscreenWasUsed = true;
+
+            if(document.documentElement.requestFullscreen){
+
+                await document.documentElement
+                    .requestFullscreen();
+            }
+
+            else if(document.documentElement.webkitRequestFullscreen){
+
+                document.documentElement
+                    .webkitRequestFullscreen();
+            }
+
+            fullscreenButton.textContent =
+                "⛶ Vollbild an";
+        }
+
+        else{
+
+            await exitFullscreen();
+        }
+
+    }catch(error){
+
+        /*
+          Manche iPhones/iPads erlauben
+          Fullscreen nur über bestimmte
+          Benutzeraktionen.
+        */
+
+        status.textContent =
+            "Vollbild nicht verfügbar";
+    }
+}
+
+
+async function exitFullscreen(){
+
+    try{
+
+        if(document.exitFullscreen){
+
+            await document.exitFullscreen();
+        }
+
+        else if(document.webkitExitFullscreen){
+
+            document.webkitExitFullscreen();
+        }
+
+    }catch(error){}
+}
+
+
+fullscreenButton.addEventListener(
+    "click",
+    enterFullscreen
+);
+
+
+/* =========================================================
+   FULLSCREEN CHANGE
+========================================================= */
+
+function fullscreenChanged(){
+
+    const isFullscreen =
+        !!(
+            document.fullscreenElement ||
+            document.webkitFullscreenElement
+        );
+
+    if(isFullscreen){
+
+        wasFullscreen = true;
+
+        fullscreenButton.textContent =
+            "⛶ Vollbild an";
+
+    }else{
+
+        fullscreenButton.textContent =
+            "⛶ Vollbild";
+
+        /*
+          Automatischer Reload:
+
+          Nur wenn
+          1. Vollbild benutzt wurde
+          2. der Song komplett fertig war
+          3. die Seite danach verlassen wurde
+        */
+
+        if(
+            wasFullscreen &&
+            fullscreenWasUsed &&
+            songFinished &&
+            !reloadArmed
+        ){
+
+            reloadArmed = true;
+
+            setTimeout(() => {
+
+                location.reload();
+
+            },350);
+        }
+    }
+}
+
+document.addEventListener(
+    "fullscreenchange",
+    fullscreenChanged
+);
+
+document.addEventListener(
+    "webkitfullscreenchange",
+    fullscreenChanged
+);
+
+
+/* =========================================================
+   SONG ENDED
+========================================================= */
+
+audio.addEventListener(
+    "ended",
+    () => {
+
+        songFinished = true;
+
+        audio.currentTime = 0;
+
+        playButton.textContent =
+            "▶ Play";
+
+        status.textContent =
+            "■ ENDE";
+
+        progressBar.style.width =
+            "100%";
+
+        /*
+          Nicht sofort reloaden.
+          Erst wenn anschließend Vollbild
+          verlassen wird.
+        */
+
+        pulse = 0;
+
+        ctx.fillStyle =
+            "#000";
+
+        ctx.fillRect(
+            0,
+            0,
+            width,
+            height
+        );
+    }
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+window.addEventListener(
+    "keydown",
+    event => {
+
+        if(
+            event.target.tagName ===
+            "INPUT"
+        ) return;
+
+        if(event.code === "Space"){
+
+            event.preventDefault();
+
+            togglePlay();
+        }
+
+        if(
+            event.key === "f" ||
+            event.key === "F"
+        ){
+
+            event.preventDefault();
+
+            enterFullscreen();
+        }
+
+        if(event.key === "Escape"){
+
+            /*
+              Browser übernimmt Exit.
+            */
+        }
+    }
+);
+
+
+/* =========================================================
+   TOUCH
+========================================================= */
+
+canvas.addEventListener(
+    "touchstart",
+    event => {
+
+        if(event.touches.length !== 1)
+            return;
+
+        const touch =
+            event.touches[0];
+
+        touchStartX =
+            touch.clientX;
+
+        touchStartY =
+            touch.clientY;
+
+        showUI();
+
+    },
+    {passive:true}
+);
+
+
+canvas.addEventListener(
+    "touchend",
+    event => {
+
+        if(event.changedTouches.length !== 1)
+            return;
+
+        const touch =
+            event.changedTouches[0];
+
+        const dx =
+            touch.clientX -
+            touchStartX;
+
+        const dy =
+            touch.clientY -
+            touchStartY;
+
+        const distance =
+            Math.sqrt(
+                dx*dx +
+                dy*dy
+            );
+
+        /*
+          Wischen:
+          rechts → nächste Szene
+          links → vorherige Szene
+        */
+
+        if(distance > 60){
+
+            if(Math.abs(dx) > Math.abs(dy)){
+
+                if(dx > 0){
+                    nextScene();
+                }else{
+                    previousScene();
+                }
+            }
+
+            return;
+        }
+
+        /*
+          Einfaches Tippen:
+          UI anzeigen.
+        */
+
+        showUI();
+
+    },
+    {passive:true}
+);
+
+
+/* =========================================================
+   MOUSE
+========================================================= */
+
+window.addEventListener(
+    "mousemove",
+    () => {
+
+        showUI();
+
+    },
+    {passive:true}
+);
+
+
+function showUI(){
+
+    ui.classList.remove(
+        "hidden"
+    );
+
+    clearTimeout(mouseTimer);
+
+    mouseTimer =
+        setTimeout(() => {
+
+            if(
+                audio &&
+                !audio.paused &&
+                document.fullscreenElement
+            ){
+
+                ui.classList.add(
+                    "hidden"
+                );
+            }
+
+        },2500);
+}
+
+
+/* =========================================================
+   SCENES
+========================================================= */
+
+const scenes = [
+    "VOID",
+    "NEON_RAIN",
+    "COSMIC_TUNNEL",
+    "LIQUID_LIGHT",
+    "GLASS_CITY",
+    "PARTICLE_STORM",
+    "LASER_GARDEN",
+    "DREAM_WAVE",
+    "GEOMETRIC_DREAM"
+];
+
+
+function nextScene(){
+
+    const index =
+        scenes.indexOf(scene);
+
+    scene =
+        scenes[
+            (index + 1) %
+            scenes.length
+        ];
+
+    sceneStart =
+        performance.now();
+
+    resetScene();
+}
+
+
+function previousScene(){
+
+    const index =
+        scenes.indexOf(scene);
+
+    scene =
+        scenes[
+            (index - 1 + scenes.length) %
+            scenes.length
+        ];
+
+    sceneStart =
+        performance.now();
+
+    resetScene();
+}
+
+
+function resetScene(){
+
+    particles.forEach(p => {
+
+        p.x = random(0,width);
+        p.y = random(0,height);
+        p.z = random(.15,1);
+    });
+}
+
+
+/* =========================================================
+   AUDIO ANALYSIS
+========================================================= */
+
+function averageFrequency(
+    startHz,
+    endHz
+){
+
+    if(!analyser)
+        return 0;
+
+    const nyquist =
+        audioContext.sampleRate / 2;
+
+    const start =
+        Math.floor(
+            startHz / nyquist *
+            frequencyData.length
+        );
+
+    const end =
+        Math.min(
+            frequencyData.length - 1,
+            Math.ceil(
+                endHz / nyquist *
+                frequencyData.length
+            )
+        );
+
+    let sum = 0;
+    let count = 0;
+
+    for(
+        let i=Math.max(0,start);
+        i<=end;
+        i++
+    ){
+
+        sum +=
+            frequencyData[i];
+
+        count++;
+    }
+
+    return count
+        ? sum / count / 255
+        : 0;
+}
+
+
+function analyseAudio(){
+
+    if(!analyser){
+
+        bass = 0;
+        lowMid = 0;
+        mid = 0;
+        highMid = 0;
+        treble = 0;
+
+        totalEnergy = 0;
+
+        return;
+    }
+
+    analyser.getByteFrequencyData(
+        frequencyData
+    );
+
+    analyser.getByteTimeDomainData(
+        timeData
+    );
+
+    bass =
+        averageFrequency(
+            20,
+            150
+        );
+
+    lowMid =
+        averageFrequency(
+            150,
+            400
+        );
+
+    mid =
+        averageFrequency(
+            400,
+            2000
+        );
+
+    highMid =
+        averageFrequency(
+            2000,
+            6000
+        );
+
+    treble =
+        averageFrequency(
+            6000,
+            16000
+        );
+
+    totalEnergy =
+        bass*.34 +
+        lowMid*.2 +
+        mid*.18 +
+        highMid*.16 +
+        treble*.12;
+
+    dynamicEnergy =
+        Math.abs(
+            totalEnergy -
+            previousEnergy
+        );
+
+    previousEnergy =
+        totalEnergy;
+
+    /*
+      Dynamik + Bass
+      bestimmen die Intensität.
+    */
+
+    intensity =
+        Math.min(
+            1,
+            totalEnergy * .75 +
+            dynamicEnergy * 4
+        );
+
+    /*
+      Beat-Erkennung.
+    */
+
+    const now =
+        performance.now();
+
+    const beatThreshold =
+        .54 -
+        bass*.15 -
+        intensity*.08;
+
+    if(
+        totalEnergy > beatThreshold &&
+        now-lastBeat > 150
+    ){
+
+        pulse = 1;
+
+        lastBeat = now;
+
+        beatCounter++;
+
+        onBeat();
+    }
+
+    pulse *= .89;
+}
+
+
+/* =========================================================
+   ADAPTIVE SCENE SELECTION
+========================================================= */
+
+function chooseAdaptiveScene(){
+
+    if(!audio.src)
+        return;
+
+    const elapsed =
+        audio.currentTime || 0;
+
+    /*
+      Fast / energetic
+    */
+
+    if(intensity > .72){
+
+        const fastScenes = [
+            "PARTICLE_STORM",
+            "LASER_GARDEN",
+            "NEON_RAIN",
+            "GEOMETRIC_DREAM"
+        ];
+
+        /*
+          Nicht bei jedem Beat wechseln.
+        */
+
+        if(
+            performance.now() -
+            sceneStart >
+            8500
+        ){
+
+            const next =
+                fastScenes[
+                    Math.floor(
+                        Math.random() *
+                        fastScenes.length
+                    )
+                ];
+
+            if(next !== scene){
+
+                scene = next;
+
+                sceneStart =
+                    performance.now();
+            }
+        }
+
+        return;
+    }
+
+
+    /*
+      Ruhig
+    */
+
+    if(intensity < .23){
+
+        const calmScenes = [
+            "VOID",
+            "DREAM_WAVE",
+            "LIQUID_LIGHT",
+            "COSMIC_TUNNEL"
+        ];
+
+        if(
+            performance.now() -
+            sceneStart >
+            15000
+        ){
+
+            const next =
+                calmScenes[
+                    Math.floor(
+                        Math.random() *
+                        calmScenes.length
+                    )
+                ];
+
+            if(next !== scene){
+
+                scene = next;
+
+                sceneStart =
+                    performance.now();
+            }
+        }
+
+        return;
+    }
+
+
+    /*
+      Mittel
+    */
+
+    if(
+        performance.now() -
+        sceneStart >
+        11000
+    ){
+
+        const normalScenes = [
+            "COSMIC_TUNNEL",
+            "GLASS_CITY",
+            "LIQUID_LIGHT",
+            "DREAM_WAVE",
+            "NEON_RAIN"
+        ];
+
+        const next =
+            normalScenes[
+                Math.floor(
+                    Math.random() *
+                    normalScenes.length
+                )
+            ];
+
+        if(next !== scene){
+
+            scene = next;
+
+            sceneStart =
+                performance.now();
+        }
+    }
+}
+
+
+/* =========================================================
+   BEAT EVENT
+========================================================= */
+
+function onBeat(){
+
+    /*
+      Hier reagiert jede Szene
+      auf den Beat.
+    */
+
+    for(let i=0;i<8;i++){
+
+        particles.push({
+
+            x:
+                width/2 +
+                random(-width*.1,width*.1),
+
+            y:
+                height/2 +
+                random(-height*.1,height*.1),
+
+            z:1,
+
+            size:
+                random(1,4),
+
+            speed:
+                random(1,4),
+
+            angle:
+                random(
+                    0,
+                    Math.PI*2
+                ),
+
+            phase:
+                random(
+                    0,
+                    Math.PI*2
+                )
+        });
+    }
+
+    if(
+        particles.length >
+        600
+    ){
+
+        particles.splice(
+            0,
+            particles.length-600
+        );
+    }
+}
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+function clearScreen(){
+
+    ctx.fillStyle =
+        "#000";
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+}
+
+
+/* =========================================================
+   VOID
+========================================================= */
+
+function drawVoid(){
+
+    clearScreen();
+
+    /*
+      Bei fast vollständiger Stille
+      bleibt es wirklich schwarz.
+    */
+
+    if(totalEnergy < .035)
+        return;
+
+    const r =
+        Math.min(width,height) *
+        (.03 + pulse*.15);
+
+    const gradient =
+        ctx.createRadialGradient(
+            width/2,
+            height/2,
+            0,
+            width/2,
+            height/2,
+            r
+        );
+
+    gradient.addColorStop(
+        0,
+        `rgba(255,255,255,${.06+pulse*.2})`
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(0,0,0,0)"
+    );
+
+    ctx.fillStyle =
+        gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+}
+
+
+/* =========================================================
+   NEON RAIN
+========================================================= */
+
+function drawNeonRain(time){
+
+    clearScreen();
+
+    const amount =
+        Math.floor(
+            width / 18
+        );
+
+    for(let i=0;i<amount;i++){
+
+        const x =
+            i * 18;
+
+        const speed =
+            .2 +
+            intensity*2;
+
+        const y =
+            (
+                time *
+                speed *
+                (30+i%5*15)
+                +
+                i*83
+            ) %
+            (height+150)
+            - 150;
+
+        const length =
+            20 +
+            intensity*100 +
+            bass*80;
+
+        const alpha =
+            .15 +
+            intensity*.65;
+
+        const gradient =
+            ctx.createLinearGradient(
+                x,
+                y,
+                x,
+                y+length
+            );
+
+        gradient.addColorStop(
+            0,
+            "rgba(255,255,255,0)"
+        );
+
+        gradient.addColorStop(
+            .5,
+            `rgba(255,255,255,${alpha})`
+        );
+
+        gradient.addColorStop(
+            1,
+            "rgba(255,255,255,0)"
+        );
+
+        ctx.fillStyle =
+            gradient;
+
+        ctx.fillRect(
+            x,
+            y,
+            2 +
+                pulse*2,
+            length
+        );
+    }
+}
+
+
+/* =========================================================
+   COSMIC TUNNEL
+========================================================= */
+
+function drawCosmicTunnel(time){
+
+    clearScreen();
+
+    const cx =
+        width/2;
+
+    const cy =
+        height/2;
+
+    const max =
+        Math.max(
+            width,
+            height
+        );
+
+    for(let i=0;i<90;i++){
+
+        const z =
+            (
+                i/90 +
+                time*.00012 *
+                (.4+intensity*4)
+            ) % 1;
+
+        const depth =
+            Math.pow(
+                z,
+                3
+            );
+
+        const radius =
+            depth *
+            max *
+            1.4;
+
+        const angle =
+            i*.7 +
+            time*.00015 +
+            pulse*.2;
+
+        const x =
+            cx +
+            Math.cos(angle) *
+            radius;
+
+        const y =
+            cy +
+            Math.sin(angle) *
+            radius;
+
+        const size =
+            .5 +
+            z*3 +
+            pulse*5;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            size,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle =
+            `rgba(255,255,255,${.05+z*.8})`;
+
+        ctx.fill();
+    }
+}
+
+
+/* =========================================================
+   LIQUID LIGHT
+========================================================= */
+
+function drawLiquidLight(time){
+
+    clearScreen();
+
+    const layers = 8;
+
+    for(let layer=0;layer<layers;layer++){
+
+        ctx.beginPath();
+
+        for(
+            let x=0;
+            x<=width;
+            x+=Math.max(4,width/100)
+        ){
+
+            const normalized =
+                x/width;
+
+            const wave =
+                Math.sin(
+                    normalized*8 +
+                    time*.0004*
+                    (.3+intensity*3) +
+                    layer
+                );
+
+            const wave2 =
+                Math.sin(
+                    normalized*17 -
+                    time*.00025
+                );
+
+            const y =
+                height*.5 +
+                wave *
+                height*.08 *
+                (1+layer*.08) +
+                wave2 *
+                height*.025;
+
+            if(x===0){
+                ctx.moveTo(x,y);
+            }else{
+                ctx.lineTo(x,y);
+            }
+        }
+
+        ctx.lineTo(
+            width,
+            height
+        );
+
+        ctx.lineTo(
+            0,
+            height
+        );
+
+        ctx.closePath();
+
+        ctx.fillStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${.012+layer*.006+intensity*.02}
+            )`;
+
+        ctx.fill();
+    }
+}
+
+
+/* =========================================================
+   GLASS CITY
+========================================================= */
+
+function drawGlassCity(time){
+
+    clearScreen();
+
+    const horizon =
+        height*.64;
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.025)";
+
+    ctx.fillRect(
+        0,
+        horizon,
+        width,
+        height-horizon
+    );
+
+    for(const block of cityBlocks){
+
+        const x =
+            block.x * width;
+
+        const w =
+            block.w * width;
+
+        const dynamicHeight =
+            block.h *
+            (
+                1 +
+                bass*.5 +
+                pulse*.6
+            );
+
+        const h =
+            dynamicHeight *
+            height;
+
+        const y =
+            horizon-h;
+
+        ctx.fillStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${.025+block.depth*.035}
+            )`;
+
+        ctx.fillRect(
+            x,
+            y,
+            w,
+            h
+        );
+
+        /*
+          Fenster
+        */
+
+        const rows =
+            Math.max(
+                2,
+                Math.floor(
+                    h/25
+                )
+            );
+
+        const cols =
+            Math.max(
+                1,
+                Math.floor(
+                    w/18
+                )
+            );
+
+        for(let r=0;r<rows;r++){
+
+            for(let c=0;c<cols;c++){
+
+                const active =
+                    Math.sin(
+                        block.phase +
+                        r*.8 +
+                        c*.5 +
+                        time*.001
+                    ) > .35;
+
+                if(!active)
+                    continue;
+
+                ctx.fillStyle =
+                    `rgba(
+                        255,
+                        255,
+                        255,
+                        ${.04+intensity*.3}
+                    )`;
+
+                ctx.fillRect(
+                    x+7+c*18,
+                    y+10+r*24,
+                    3,
+                    7
+                );
+            }
+        }
+    }
+
+    /*
+      Horizontale Lichtlinie
+    */
+
+    ctx.fillStyle =
+        `rgba(
+            255,
+            255,
+            255,
+            ${.12+intensity*.5}
+        )`;
+
+    ctx.fillRect(
+        0,
+        horizon,
+        width,
+        1+pulse*3
+    );
+}
+
+
+/* =========================================================
+   PARTICLE STORM
+========================================================= */
+
+function drawParticleStorm(time){
+
+    clearScreen();
+
+    const cx =
+        width/2;
+
+    const cy =
+        height/2;
+
+    for(const p of particles){
+
+        const angle =
+            p.angle +
+            time*.0003 *
+            (.2+intensity*5);
+
+        const radius =
+            (
+                Math.sqrt(
+                    Math.pow(
+                        p.x-width/2,
+                        2
+                    )+
+                    Math.pow(
+                        p.y-height/2,
+                        2
+                    )
+                ) /
+                Math.max(width,height)
+            );
+
+        const force =
+            .2 +
+            intensity*2 +
+            pulse*2;
+
+        p.x +=
+            Math.cos(angle) *
+            force *
+            p.speed;
+
+        p.y +=
+            Math.sin(angle) *
+            force *
+            p.speed;
+
+        /*
+          Wrap around
+        */
+
+        if(
+            p.x < -50
+        ) p.x = width+50;
+
+        if(
+            p.x > width+50
+        ) p.x = -50;
+
+        if(
+            p.y < -50
+        ) p.y = height+50;
+
+        if(
+            p.y > height+50
+        ) p.y = -50;
+
+        const size =
+            p.size *
+            (.5+p.z) *
+            (1+intensity*2);
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            size,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${.15+p.z*.65}
+            )`;
+
+        ctx.fill();
+    }
+
+    /*
+      Beat shockwave
+    */
+
+    if(pulse>.01){
+
+        ctx.beginPath();
+
+        ctx.arc(
+            cx,
+            cy,
+            pulse *
+            Math.max(
+                width,
+                height
+            )*.7,
+            0,
+            Math.PI*2
+        );
+
+        ctx.strokeStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${pulse*.25}
+            )`;
+
+        ctx.lineWidth =
+            2+pulse*8;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   LASER GARDEN
+========================================================= */
+
+function drawLaserGarden(time){
+
+    clearScreen();
+
+    const cx =
+        width/2;
+
+    const cy =
+        height/2;
+
+    const radius =
+        Math.max(
+            width,
+            height
+        )*.7;
+
+    for(let i=0;i<laserLines.length;i++){
+
+        const line =
+            laserLines[i];
+
+        const angle =
+            line.angle +
+            Math.sin(
+                time*.0004 +
+                line.offset
+            )*.7;
+
+        const length =
+            radius *
+            (
+                line.length +
+                intensity*.4 +
+                pulse*.5
+            );
+
+        const x =
+            cx +
+            Math.cos(angle) *
+            length;
+
+        const y =
+            cy +
+            Math.sin(angle) *
+            length;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            cx,
+            cy
+        );
+
+        ctx.lineTo(
+            x,
+            y
+        );
+
+        ctx.strokeStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${.02+intensity*.13}
+            )`;
+
+        ctx.lineWidth =
+            .5 +
+            pulse*3;
+
+        ctx.stroke();
+    }
+
+    /*
+      Center
+    */
+
+    const centerSize =
+        10 +
+        pulse*60 +
+        bass*30;
+
+    const gradient =
+        ctx.createRadialGradient(
+            cx,
+            cy,
+            0,
+            cx,
+            cy,
+            centerSize
+        );
+
+    gradient.addColorStop(
+        0,
+        `rgba(255,255,255,${.25+intensity*.5})`
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(255,255,255,0)"
+    );
+
+    ctx.fillStyle =
+        gradient;
+
+    ctx.fillRect(
+        cx-centerSize,
+        cy-centerSize,
+        centerSize*2,
+        centerSize*2
+    );
+}
+
+
+/* =========================================================
+   DREAM WAVE
+========================================================= */
+
+function drawDreamWave(time){
+
+    clearScreen();
+
+    const center =
+        height*.5;
+
+    for(let layer=0;layer<7;layer++){
+
+        ctx.beginPath();
+
+        const amplitude =
+            height *
+            (
+                .02 +
+                layer*.006
+            ) *
+            (
+                1+
+                intensity*.8+
+                pulse*.8
+            );
+
+        for(
+            let i=0;
+            i<wavePoints.length;
+            i++
+        ){
+
+            const p =
+                wavePoints[i];
+
+            const x =
+                i /
+                (wavePoints.length-1) *
+                width;
+
+            const y =
+                center +
+                Math.sin(
+                    i*.18 +
+                    p.phase +
+                    time*.0002 *
+                    (.3+intensity*2)
+                ) *
+                amplitude +
+                Math.sin(
+                    i*.047 -
+                    time*.00015
+                ) *
+                amplitude*.7;
+
+            if(i===0){
+                ctx.moveTo(x,y);
+            }else{
+                ctx.lineTo(x,y);
+            }
+        }
+
+        ctx.strokeStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${.025+layer*.018+intensity*.04}
+            )`;
+
+        ctx.lineWidth =
+            1 +
+            layer*.2 +
+            pulse*2;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   GEOMETRIC DREAM
+========================================================= */
+
+function drawGeometricDream(time){
+
+    clearScreen();
+
+    const cx =
+        width/2;
+
+    const cy =
+        height/2;
+
+    const base =
+        Math.min(
+            width,
+            height
+        )*.15;
+
+    for(let i=0;i<16;i++){
+
+        const rotation =
+            time*.00015 *
+            (.4+intensity*4) +
+            i*.4;
+
+        const size =
+            base *
+            (
+                1 +
+                i*.18 +
+                pulse*.6
+            );
+
+        ctx.save();
+
+        ctx.translate(
+            cx,
+            cy
+        );
+
+        ctx.rotate(
+            rotation
+        );
+
+        ctx.strokeStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${.025+i*.006+intensity*.03}
+            )`;
+
+        ctx.lineWidth =
+            1 +
+            pulse*2;
+
+        ctx.strokeRect(
+            -size/2,
+            -size/2,
+            size,
+            size
+        );
+
+        ctx.restore();
+    }
+
+    /*
+      Center pulse
+    */
+
+    if(pulse>.01){
+
+        ctx.beginPath();
+
+        ctx.arc(
+            cx,
+            cy,
+            base *
+            (.4+pulse*2),
+            0,
+            Math.PI*2
+        );
+
+        ctx.strokeStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${pulse*.3}
+            )`;
+
+        ctx.lineWidth =
+            2+pulse*4;
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   SCENE RENDER
+========================================================= */
+
+function renderScene(time){
+
+    /*
+      Fast automatic choice
+    */
+
+    chooseAdaptiveScene();
+
+    /*
+      Black when essentially silent.
+      Nicht einfach nur eine dunkle Animation:
+      wirklich schwarz.
+    */
+
+    if(
+        totalEnergy < .025 &&
+        audio.paused
+    ){
+
+        clearScreen();
+
+        return;
+    }
+
+
+    switch(scene){
+
+        case "VOID":
+            drawVoid();
+            break;
+
+        case "NEON_RAIN":
+            drawNeonRain(time);
+            break;
+
+        case "COSMIC_TUNNEL":
+            drawCosmicTunnel(time);
+            break;
+
+        case "LIQUID_LIGHT":
+            drawLiquidLight(time);
+            break;
+
+        case "GLASS_CITY":
+            drawGlassCity(time);
+            break;
+
+        case "PARTICLE_STORM":
+            drawParticleStorm(time);
+            break;
+
+        case "LASER_GARDEN":
+            drawLaserGarden(time);
+            break;
+
+        case "DREAM_WAVE":
+            drawDreamWave(time);
+            break;
+
+        case "GEOMETRIC_DREAM":
+            drawGeometricDream(time);
+            break;
+
+        default:
+            drawVoid();
+    }
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+function updateProgress(){
+
+    if(
+        !audio.duration ||
+        !isFinite(audio.duration)
+    ){
+
+        progressBar.style.width =
+            "0%";
+
+        return;
+    }
+
+    const percent =
+        Math.min(
+            100,
+            audio.currentTime /
+            audio.duration *
+            100
+        );
+
+    progressBar.style.width =
+        percent + "%";
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function updateStatus(){
+
+    if(!audio.src){
+
+        status.textContent =
+            "Bereit";
+
+        return;
+    }
+
+    if(songFinished){
+
+        status.textContent =
+            "■ ENDE";
+
+        return;
+    }
+
+    if(audio.paused){
+
+        status.textContent =
+            "❚❚ Pause";
+
+        return;
+    }
+
+    let mode =
+        "NORMAL";
+
+    if(intensity>.72){
+
+        mode =
+            "WILD";
+    }
+
+    else if(intensity<.23){
+
+        mode =
+            "CALM";
+    }
+
+    status.textContent =
+        mode +
+        " • " +
+        scene.replaceAll(
+            "_",
+            " "
+        );
+}
+
+
+/* =========================================================
+   MAIN LOOP
+========================================================= */
+
+function animate(time){
+
+    const dt =
+        Math.min(
+            .05,
+            (time-lastTime)/1000
+        );
+
+    lastTime = time;
+
+    analyseAudio();
+
+    renderScene(time);
+
+    updateProgress();
+
+    updateStatus();
+
+    animationFrame =
+        requestAnimationFrame(
+            animate
+        );
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+resize();
+
+clearScreen();
+
+animationFrame =
+    requestAnimationFrame(
+        animate
+    );
+
+
+/* =========================================================
+   AUDIO EVENTS
+========================================================= */
+
+audio.addEventListener(
+    "play",
+    () => {
+
+        playButton.textContent =
+            "❚❚ Pause";
+
+        status.textContent =
+            "Analyse läuft";
+
+        /*
+          Wenn ein neuer Durchlauf beginnt,
+          darf kein alter Reload-Zustand bleiben.
+        */
+
+        if(
+            audio.currentTime <
+            .1
+        ){
+
+            songFinished = false;
+            reloadArmed = false;
+        }
+    }
+);
+
+
+audio.addEventListener(
+    "pause",
+    () => {
+
+        if(!songFinished){
+
+            playButton.textContent =
+                "▶ Play";
+        }
+    }
+);
+
+
+audio.addEventListener(
+    "loadedmetadata",
+    () => {
+
+        status.textContent =
+            "Bereit";
+
+        songFinished = false;
+        reloadArmed = false;
+    }
+);
+
+
+/* =========================================================
+   DOUBLE CLICK / DOUBLE TAP
+========================================================= */
+
+canvas.addEventListener(
+    "dblclick",
+    () => {
+
+        enterFullscreen();
+    }
+);
+
+
+/* =========================================================
+   PREVENT UNWANTED MOBILE GESTURES
+========================================================= */
+
+document.addEventListener(
+    "gesturestart",
+    event => {
+        event.preventDefault();
+    },
+    {passive:false}
+);
+
+document.addEventListener(
+    "gesturechange",
+    event => {
+        event.preventDefault();
+    },
+    {passive:false}
+);
+
+document.addEventListener(
+    "gestureend",
+    event => {
+        event.preventDefault();
+    },
+    {passive:false}
+);
+
+
+/* =========================================================
+   PAGE VISIBILITY
+========================================================= */
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        /*
+          Beim Zurückkehren nicht
+          automatisch neu starten.
+        */
+
+        if(!document.hidden){
+
+            showUI();
+        }
+    }
+);
+
+
+/* =========================================================
+   ERROR HANDLING
+========================================================= */
+
+audio.addEventListener(
+    "error",
+    () => {
+
+        status.textContent =
+            "Fehler beim Laden der Musik";
+
+        playButton.textContent =
+            "▶ Play";
+    }
+);
+
+
+/* =========================================================
+   CONTEXT MENU
+========================================================= */
+
+canvas.addEventListener(
+    "contextmenu",
+    event => {
+
+        event.preventDefault();
+    }
+);
+
+</script>
+
+</body>
+</html>
