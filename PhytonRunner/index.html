@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>lamacPy — Python Runner</title>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    margin:0;
+    width:100%;
+    min-height:100%;
+    font-family:Inter,Arial,sans-serif;
+    background:#0d0f12;
+    color:#fff;
+}
+
+body{
+    display:flex;
+    flex-direction:column;
+    overflow:auto;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar{
+    min-height:64px;
+    flex-shrink:0;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:0 18px;
+
+    background:#15181d;
+    border-bottom:1px solid #292e36;
+
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.logo{
+    font-size:21px;
+    font-weight:800;
+    color:#ff7a00;
+    white-space:nowrap;
+}
+
+.badge{
+    font-size:12px;
+
+    padding:5px 9px;
+
+    border-radius:999px;
+
+    background:#222730;
+    color:#aeb6c3;
+
+    white-space:nowrap;
+}
+
+.spacer{
+    flex:1;
+}
+
+button{
+    border:0;
+    border-radius:9px;
+
+    padding:9px 14px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    color:white;
+    background:#252a32;
+
+    transition:
+        background .15s,
+        transform .1s;
+}
+
+button:hover{
+    background:#303640;
+}
+
+button:active{
+    transform:scale(.97);
+}
+
+.run{
+    background:#ff7a00;
+}
+
+.run:hover{
+    background:#ff8d26;
+}
+
+button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+/* =========================
+   WORKSPACE
+========================= */
+
+.workspace{
+    width:100%;
+
+    min-height:calc(100vh - 64px);
+
+    display:grid;
+
+    grid-template-columns:
+        minmax(0,1fr)
+        minmax(0,1fr);
+}
+
+/* =========================
+   EDITOR
+========================= */
+
+.editor{
+    min-width:0;
+    min-height:600px;
+
+    display:flex;
+    flex-direction:column;
+
+    border-right:1px solid #292e36;
+}
+
+.panel-title{
+    height:42px;
+    min-height:42px;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 15px;
+
+    font-size:13px;
+    font-weight:700;
+
+    color:#9da6b3;
+
+    background:#111419;
+
+    border-bottom:1px solid #292e36;
+}
+
+/* Editor wrapper */
+
+.editor-area{
+    flex:1;
+
+    min-height:550px;
+
+    display:flex;
+
+    overflow:hidden;
+
+    background:#0b0d10;
+}
+
+/* Zeilennummern */
+
+.line-numbers{
+    width:55px;
+
+    flex-shrink:0;
+
+    padding-top:20px;
+
+    background:#0b0d10;
+
+    color:#4d5561;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size:15px;
+
+    line-height:1.6;
+
+    text-align:right;
+
+    padding-right:12px;
+
+    user-select:none;
+
+    overflow:hidden;
+}
+
+/* Textarea */
+
+textarea{
+    flex:1;
+
+    width:100%;
+
+    min-width:0;
+    min-height:550px;
+
+    resize:none;
+
+    border:0;
+    outline:none;
+
+    padding:20px;
+
+    background:#0b0d10;
+
+    color:#e8edf3;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size:15px;
+
+    line-height:1.6;
+
+    tab-size:4;
+
+    overflow:auto;
+
+    white-space:pre;
+
+    caret-color:#ff7a00;
+}
+
+/* =========================
+   OUTPUT
+========================= */
+
+.output{
+    min-width:0;
+    min-height:600px;
+
+    display:flex;
+    flex-direction:column;
+}
+
+#console{
+    flex:1;
+
+    min-height:550px;
+
+    overflow:auto;
+
+    padding:20px;
+
+    background:#090b0d;
+
+    color:#d9e1ea;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size:14px;
+
+    line-height:1.55;
+
+    white-space:pre-wrap;
+
+    word-break:break-word;
+
+    tab-size:4;
+
+    scrollbar-width:thin;
+}
+
+.console-line{
+    margin:0;
+}
+
+.console-error{
+    color:#ff6b6b;
+}
+
+.console-success{
+    color:#4ade80;
+}
+
+.console-info{
+    color:#8bd5ff;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status{
+    min-height:36px;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 15px;
+
+    background:#111419;
+
+    border-top:1px solid #292e36;
+
+    color:#8e98a6;
+
+    font-size:12px;
+}
+
+.success{
+    color:#4ade80;
+}
+
+.error{
+    color:#ff6b6b;
+}
+
+/* =========================
+   SCROLLBARS
+========================= */
+
+textarea::-webkit-scrollbar,
+#console::-webkit-scrollbar{
+    width:10px;
+    height:10px;
+}
+
+textarea::-webkit-scrollbar-track,
+#console::-webkit-scrollbar-track{
+    background:#0b0d10;
+}
+
+textarea::-webkit-scrollbar-thumb,
+#console::-webkit-scrollbar-thumb{
+    background:#303640;
+    border-radius:10px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover,
+#console::-webkit-scrollbar-thumb:hover{
+    background:#464e59;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:800px){
+
+    body{
+        overflow:auto;
+    }
+
+    .topbar{
+        min-height:58px;
+
+        flex-wrap:wrap;
+
+        padding:10px;
+    }
+
+    .workspace{
+        display:flex;
+
+        flex-direction:column;
+
+        min-height:auto;
+    }
+
+    .editor{
+        min-height:65vh;
+
+        border-right:0;
+
+        border-bottom:1px solid #292e36;
+    }
+
+    .output{
+        min-height:65vh;
+    }
+
+    .editor-area{
+        min-height:60vh;
+    }
+
+    textarea{
+        min-height:60vh;
+    }
+
+    #console{
+        min-height:60vh;
+    }
+
+    .badge{
+        display:none;
+    }
+}
+
+/* =========================
+   FULLSCREEN
+========================= */
+
+:fullscreen{
+    background:#0d0f12;
+}
+
+:fullscreen .workspace{
+    min-height:calc(100vh - 64px);
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="logo">
+        lamacPy
+    </div>
+
+    <div
+        class="badge"
+        id="engineStatus"
+    >
+        Python wird geladen...
+    </div>
+
+    <div class="spacer"></div>
+
+    <button onclick="clearConsole()">
+        Clear
+    </button>
+
+    <button onclick="downloadCode()">
+        Speichern
+    </button>
+
+    <button onclick="toggleFullscreen()">
+        ⛶ Vollbild
+    </button>
+
+    <button
+        class="run"
+        id="runButton"
+        onclick="runPython()"
+        disabled
+    >
+        ▶ Ausführen
+    </button>
+
+</header>
+
+
+<main class="workspace">
+
+    <!-- =====================
+         EDITOR
+    ====================== -->
+
+    <section class="editor">
+
+        <div class="panel-title">
+            main.py
+        </div>
+
+        <div class="editor-area">
+
+            <div
+                class="line-numbers"
+                id="lineNumbers"
+            >
+                1
+            </div>
+
+<textarea
+id="code"
+spellcheck="false"
+autocomplete="off"
+autocorrect="off"
+autocapitalize="off">import random
+import time
+
+print("╔══════════════════════════════════════╗")
+print("║          lamacPy TERMINAL            ║")
+print("╚══════════════════════════════════════╝")
+print()
+
+print("Python läuft direkt im Browser!")
+print()
+
+chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+for i in range(25):
+    line = "".join(
+        random.choice(chars)
+        for _ in range(70)
+    )
+
+    print(line)
+
+    time.sleep(0.05)
+
+print()
+print("✓ Programm beendet.")</textarea>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================
+         TERMINAL
+    ====================== -->
+
+    <section class="output">
+
+        <div class="panel-title">
+            Terminal
+        </div>
+
+        <div id="console"></div>
+
+        <div
+            class="status"
+            id="status"
+        >
+            Python wird geladen...
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+/* =====================================================
+   GLOBALE VARIABLEN
+===================================================== */
+
+let pyodide = null;
+
+let running = false;
+
+
+/* =====================================================
+   ELEMENTE
+===================================================== */
+
+const codeEditor =
+    document.getElementById("code");
+
+const consoleElement =
+    document.getElementById("console");
+
+const statusElement =
+    document.getElementById("status");
+
+const lineNumbers =
+    document.getElementById("lineNumbers");
+
+const runButton =
+    document.getElementById("runButton");
+
+const engineStatus =
+    document.getElementById("engineStatus");
+
+
+/* =====================================================
+   PYTHON LADEN
+===================================================== */
+
+async function initPython(){
+
+    try{
+
+        engineStatus.textContent =
+            "Python wird geladen...";
+
+        statusElement.textContent =
+            "Python Engine wird geladen...";
+
+        pyodide =
+            await loadPyodide();
+
+        /*
+            stdout von Python abfangen
+        */
+
+        pyodide.setStdout({
+
+            batched(text){
+
+                writeConsole(text);
+            }
+
+        });
+
+        /*
+            stderr von Python abfangen
+        */
+
+        pyodide.setStderr({
+
+            batched(text){
+
+                writeConsole(
+                    text,
+                    "error"
+                );
+            }
+
+        });
+
+        engineStatus.textContent =
+            "Python 3 • bereit";
+
+        engineStatus.style.color =
+            "#4ade80";
+
+        statusElement.innerHTML =
+            '<span class="success">✓ Python bereit</span>';
+
+        runButton.disabled =
+            false;
+
+        writeConsole(
+            "✓ Python erfolgreich geladen.\n" +
+            "✓ Bereit zum Ausführen.\n\n",
+            "success"
+        );
+
+    }
+
+    catch(error){
+
+        engineStatus.textContent =
+            "Python-Fehler";
+
+        engineStatus.style.color =
+            "#ff6b6b";
+
+        statusElement.innerHTML =
+            '<span class="error">✕ Python konnte nicht geladen werden</span>';
+
+        writeConsole(
+            "FEHLER BEIM LADEN VON PYTHON\n\n" +
+            error +
+            "\n",
+            "error"
+        );
+    }
+}
+
+
+/* =====================================================
+   PYTHON AUSFÜHREN
+===================================================== */
+
+async function runPython(){
+
+    if(!pyodide){
+
+        writeConsole(
+            "Python ist noch nicht geladen.\n",
+            "error"
+        );
+
+        return;
+    }
+
+    if(running){
+
+        return;
+    }
+
+    running = true;
+
+    runButton.disabled =
+        true;
+
+    statusElement.textContent =
+        "Wird ausgeführt...";
+
+    clearConsole();
+
+    const code =
+        codeEditor.value;
+
+    try{
+
+        await pyodide.runPythonAsync(
+            code
+        );
+
+        statusElement.innerHTML =
+            '<span class="success">✓ Ausführung beendet</span>';
+
+    }
+
+    catch(error){
+
+        writeConsole(
+            "\n" +
+            error +
+            "\n",
+            "error"
+        );
+
+        statusElement.innerHTML =
+            '<span class="error">✕ Python-Fehler</span>';
+    }
+
+    finally{
+
+        running = false;
+
+        runButton.disabled =
+            false;
+    }
+}
+
+
+/* =====================================================
+   CONSOLE AUSGABE
+===================================================== */
+
+function writeConsole(
+    text,
+    type=""
+){
+
+    const span =
+        document.createElement("span");
+
+    span.textContent =
+        text;
+
+    if(type === "error"){
+
+        span.className =
+            "console-error";
+
+    }
+
+    else if(type === "success"){
+
+        span.className =
+            "console-success";
+
+    }
+
+    else if(type === "info"){
+
+        span.className =
+            "console-info";
+    }
+
+    consoleElement.appendChild(span);
+
+    /*
+        automatisch nach unten scrollen
+    */
+
+    consoleElement.scrollTop =
+        consoleElement.scrollHeight;
+}
+
+
+/* =====================================================
+   CONSOLE LEEREN
+===================================================== */
+
+function clearConsole(){
+
+    consoleElement.innerHTML = "";
+
+    statusElement.textContent =
+        "Bereit";
+}
+
+
+/* =====================================================
+   VOLLbild
+===================================================== */
+
+async function toggleFullscreen(){
+
+    try{
+
+        if(!document.fullscreenElement){
+
+            await document.documentElement.requestFullscreen();
+
+        }
+
+        else{
+
+            await document.exitFullscreen();
+        }
+
+    }
+
+    catch(error){
+
+        console.log(
+            "Fullscreen nicht verfügbar:",
+            error
+        );
+    }
+}
+
+
+/* =====================================================
+   CODE SPEICHERN
+===================================================== */
+
+function downloadCode(){
+
+    const code =
+        codeEditor.value;
+
+    const blob =
+        new Blob(
+            [code],
+            {
+                type:"text/plain;charset=utf-8"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href =
+        url;
+
+    link.download =
+        "main.py";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(url);
+}
+
+
+/* =====================================================
+   ZEILENNUMMERN
+===================================================== */
+
+function updateLineNumbers(){
+
+    const lineCount =
+        codeEditor.value
+        .split("\n")
+        .length;
+
+    let html = "";
+
+    for(
+        let i = 1;
+        i <= lineCount;
+        i++
+    ){
+
+        html += i + "<br>";
+    }
+
+    lineNumbers.innerHTML =
+        html;
+}
+
+
+/* =====================================================
+   EDITOR SCROLL
+===================================================== */
+
+codeEditor.addEventListener(
+    "scroll",
+    function(){
+
+        lineNumbers.scrollTop =
+            codeEditor.scrollTop;
+    }
+);
+
+
+/* =====================================================
+   EDITOR ÄNDERUNG
+===================================================== */
+
+codeEditor.addEventListener(
+    "input",
+    function(){
+
+        updateLineNumbers();
+    }
+);
+
+
+/* =====================================================
+   TAB EINRÜCKUNG
+===================================================== */
+
+codeEditor.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Tab"){
+
+            event.preventDefault();
+
+            const start =
+                this.selectionStart;
+
+            const end =
+                this.selectionEnd;
+
+            this.value =
+                this.value.substring(
+                    0,
+                    start
+                )
+                +
+                "    "
+                +
+                this.value.substring(
+                    end
+                );
+
+            this.selectionStart =
+                this.selectionEnd =
+                    start + 4;
+
+            updateLineNumbers();
+        }
+
+    }
+);
+
+
+/* =====================================================
+   STRG / CMD + ENTER
+===================================================== */
+
+codeEditor.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key === "Enter" &&
+            (event.ctrlKey || event.metaKey)
+        ){
+
+            event.preventDefault();
+
+            runPython();
+        }
+
+    }
+);
+
+
+/* =====================================================
+   INITIALISIERUNG
+===================================================== */
+
+updateLineNumbers();
+
+initPython();
+
+</script>
+
+</body>
+</html>
