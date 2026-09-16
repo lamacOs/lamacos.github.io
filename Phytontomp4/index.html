@@ -1,0 +1,102 @@
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>🐍 Python → MP4</h1>
+      <p>Python-Animation direkt im Browser rendern</p>
+    </div>
+    <div class="badge">CodePen Edition</div>
+  </div>
+
+  <div class="toolbar">
+    <button id="runBtn">▶️ MP4 erstellen</button>
+    <button id="exampleBtn">✨ Beispiel laden</button>
+    <button id="clearBtn">🗑️ Löschen</button>
+  </div>
+
+  <div class="layout">
+
+    <section class="editorBox">
+      <div class="boxTitle">
+        <span>🐍 Python-Code</span>
+        <span id="pythonStatus">Bereit</span>
+      </div>
+
+      <textarea id="pythonCode" spellcheck="false">from PIL import Image, ImageDraw
+import math
+
+WIDTH = 640
+HEIGHT = 360
+FPS = 24
+DURATION = 8
+
+def frame(t):
+    image = Image.new("RGB", (WIDTH, HEIGHT), (5, 5, 25))
+    draw = ImageDraw.Draw(image)
+
+    # Hintergrund
+    for y in range(0, HEIGHT, 6):
+        c = int(15 + 30 * y / HEIGHT)
+        draw.line(
+            [(0, y), (WIDTH, y)],
+            fill=(5, c // 2, c)
+        )
+
+    # Sterne
+    for i in range(80):
+        x = (i * 97) % WIDTH
+        y = (i * 53 + int(t * 30)) % HEIGHT
+        draw.ellipse(
+            [x, y, x + 2, y + 2],
+            fill=(150, 120, 255)
+        )
+
+    # Bewegende Kugel
+    x = WIDTH / 2 + math.sin(t * 2) * 180
+    y = HEIGHT / 2 + math.cos(t * 3) * 60
+
+    r = 35 + math.sin(t * 5) * 5
+
+    draw.ellipse(
+        [x-r, y-r, x+r, y+r],
+        fill=(100, 40, 220),
+        outline=(220, 180, 255),
+        width=4
+    )
+
+    # Titel
+    text = "NEON HORIZONS"
+    draw.text(
+        (WIDTH / 2 - 85, 25),
+        text,
+        fill=(220, 200, 255)
+    )
+
+    return image
+</textarea>
+    </section>
+
+    <section class="previewBox">
+      <div class="boxTitle">
+        <span>🎬 Ausgabe</span>
+        <span id="progressText">0%</span>
+      </div>
+
+      <div class="progressOuter">
+        <div id="progressBar"></div>
+      </div>
+
+      <div id="status">
+        Bereit. Klicke auf „MP4 erstellen“.
+      </div>
+
+      <video id="video" controls></video>
+
+      <a id="download" class="download" download="python_video.mp4">
+        ⬇️ MP4 herunterladen
+      </a>
+
+      <pre id="log"></pre>
+    </section>
+
+  </div>
+</div>
