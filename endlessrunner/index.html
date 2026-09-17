@@ -2,463 +2,1007 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<meta
+    name="viewport"
+    content="width=device-width,
+             initial-scale=1.0,
+             maximum-scale=1.0,
+             user-scalable=no,
+             viewport-fit=cover"
+>
+
+<meta name="theme-color" content="#000000">
 
 <title>LoopScreen</title>
 
 <style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html,
+body {
     width: 100%;
     height: 100%;
+
     overflow: hidden;
-    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
-                 "Segoe UI", sans-serif;
+
     background: #080808;
     color: white;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
 }
 
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+button,
+input {
+    font: inherit;
 }
 
-/* =========================
+
+/* =========================================================
    START SCREEN
-========================= */
+========================================================= */
 
-#start {
-    width: min(900px, 94vw);
-    max-height: 94vh;
+#startScreen {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    width: 100dvw;
+    height: 100dvh;
+
     overflow-y: auto;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
     padding: 30px;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            #202020 0%,
+            #0c0c0c 45%,
+            #050505 100%
+        );
+
+    z-index: 10;
+}
+
+.startContent {
+
+    width: min(900px, 100%);
+
+    text-align: center;
 }
 
 .logo {
-    text-align: center;
-    font-size: clamp(36px, 7vw, 72px);
+
+    font-size: clamp(42px, 9vw, 82px);
+
     font-weight: 900;
-    letter-spacing: -4px;
-    margin-bottom: 8px;
+
+    letter-spacing: -5px;
+
+    line-height: .95;
+
+    margin-bottom: 14px;
 }
 
 .subtitle {
-    text-align: center;
-    color: #999;
+
+    color: #929292;
+
     font-size: 16px;
-    margin-bottom: 32px;
+
+    margin-bottom: 35px;
 }
 
+
+/* =========================================================
+   MODE CARDS
+========================================================= */
+
 .modes {
+
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
     gap: 18px;
 }
 
-.mode {
+.modeCard {
+
     position: relative;
-    border: 1px solid #292929;
-    background: linear-gradient(145deg, #171717, #101010);
-    border-radius: 24px;
+
+    min-height: 240px;
+
     padding: 30px;
+
+    text-align: left;
+
     cursor: pointer;
-    transition: .2s ease;
-    min-height: 220px;
+
+    border-radius: 26px;
+
+    border: 1px solid #292929;
+
+    background:
+        linear-gradient(
+            145deg,
+            #181818,
+            #101010
+        );
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
 }
 
-.mode:hover {
-    transform: translateY(-4px);
+.modeCard:hover {
+
+    transform: translateY(-5px);
+
     border-color: #555;
-    background: #191919;
+
+    background: #1c1c1c;
 }
 
-.icon {
-    font-size: 48px;
-    margin-bottom: 20px;
+.modeCard:active {
+
+    transform: scale(.98);
 }
 
-.mode h2 {
-    font-size: 25px;
-    margin-bottom: 8px;
+.modeIcon {
+
+    font-size: 52px;
+
+    margin-bottom: 24px;
 }
 
-.mode p {
+.modeCard h2 {
+
+    font-size: 27px;
+
+    margin-bottom: 9px;
+}
+
+.modeCard p {
+
     color: #999;
-    line-height: 1.5;
+
+    line-height: 1.55;
+
+    font-size: 15px;
 }
 
-input[type="file"] {
-    display: none;
-}
+.modeInfo {
 
-.dropzone {
-    margin-top: 20px;
-    border: 2px dashed #333;
-    border-radius: 20px;
-    padding: 28px;
-    text-align: center;
-    color: #999;
-    cursor: pointer;
-    transition: .2s;
-}
-
-.dropzone:hover,
-.dropzone.drag {
-    border-color: white;
-    color: white;
-}
-
-.supported {
-    margin-top: 12px;
-    font-size: 12px;
-    color: #666;
-}
-
-/* =========================
-   PLAYER
-========================= */
-
-#player {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: black;
-    width: 100vw;
-    height: 100vh;
-    z-index: 100;
-}
-
-#video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: black;
-}
-
-#slides {
     position: absolute;
-    inset: 0;
-    background: black;
-    display: none;
+
+    left: 30px;
+    bottom: 25px;
+
+    color: #5f5f5f;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   GENERAL DROPZONE
+========================================================= */
+
+#dropZone {
+
+    margin-top: 18px;
+
+    min-height: 80px;
+
+    display: flex;
+
     align-items: center;
     justify-content: center;
+
+    border: 2px dashed #333;
+
+    border-radius: 20px;
+
+    color: #777;
+
+    cursor: pointer;
+
+    transition: .2s ease;
 }
 
-#slides img,
-#slides canvas {
+#dropZone:hover,
+#dropZone.drag {
+
+    border-color: #aaa;
+
+    color: white;
+
+    background: rgba(255,255,255,.025);
+}
+
+
+/* =========================================================
+   HIDDEN FILE INPUTS
+========================================================= */
+
+.fileInput {
+
+    display: none;
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+#player {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    width: 100dvw;
+    height: 100dvh;
+
+    min-width: 100vw;
+    min-height: 100vh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    background: #000;
+
+    z-index: 999999;
+
+    display: none;
+
+    /*
+       Keine Safe-Area-Abstände.
+       Der Inhalt darf bis an den Rand.
+    */
+
+    padding:
+        0
+        0
+        0
+        0;
+
+    touch-action: none;
+}
+
+
+/* =========================================================
+   VIDEO
+
+   COVER = Bildschirm komplett ausfüllen.
+========================================================= */
+
+#video {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: block;
+
+    width: 100vw;
+    height: 100vh;
+
+    width: 100dvw;
+    height: 100dvh;
+
+    min-width: 100%;
+    min-height: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+
+    background: #000;
+
+    object-fit: cover;
+
+    object-position: center center;
+
+    /*
+       Entfernt mögliche Inline-Gaps.
+    */
+
+    vertical-align: top;
+}
+
+
+/* =========================================================
+   SLIDES
+========================================================= */
+
+#slides {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    width: 100dvw;
+    height: 100dvh;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    background: #000;
+}
+
+
+/* =========================================================
+   SLIDE IMAGE / CANVAS
+========================================================= */
+
+#slideCanvas {
+
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+
+    /*
+       Präsentation komplett sichtbar.
+       Keine Verzerrung.
+    */
+
     width: 100%;
     height: 100%;
+
+    max-width: 100%;
+    max-height: 100%;
+
     object-fit: contain;
-    display: block;
+
+    background: #000;
 }
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
 
 .controls {
+
     position: absolute;
+
     left: 50%;
-    bottom: 24px;
+    bottom: 25px;
+
     transform: translateX(-50%);
+
     display: flex;
-    gap: 8px;
-    padding: 9px;
-    background: rgba(20,20,20,.82);
-    border: 1px solid rgba(255,255,255,.12);
-    backdrop-filter: blur(16px);
-    border-radius: 18px;
+
+    gap: 7px;
+
+    padding: 8px;
+
+    border-radius: 17px;
+
+    background:
+        rgba(20,20,20,.82);
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
     opacity: 0;
-    transition: .25s;
+
+    pointer-events: none;
+
+    transition: opacity .2s ease;
 }
 
-#player:hover .controls,
-.controls.visible {
+#player.showControls .controls {
+
+    opacity: 1;
+
+    pointer-events: auto;
+}
+
+.controls button {
+
+    min-width: 42px;
+
+    height: 40px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    color: white;
+
+    background: #292929;
+
+    cursor: pointer;
+}
+
+.controls button:hover {
+
+    background: #3c3c3c;
+}
+
+
+/* =========================================================
+   EXIT BUTTON
+========================================================= */
+
+#exitButton {
+
+    position: absolute;
+
+    top: 20px;
+    left: 20px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    padding: 10px 14px;
+
+    color: white;
+
+    background:
+        rgba(20,20,20,.75);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity .2s ease;
+
+    cursor: pointer;
+}
+
+#player.showControls #exitButton {
+
+    opacity: 1;
+
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   SLIDE COUNTER
+========================================================= */
+
+#slideCounter {
+
+    position: absolute;
+
+    top: 20px;
+    right: 20px;
+
+    padding: 8px 12px;
+
+    border-radius: 10px;
+
+    color: #ddd;
+
+    background:
+        rgba(0,0,0,.55);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    font-size: 13px;
+
+    opacity: 0;
+
+    transition: opacity .2s ease;
+}
+
+#player.showControls #slideCounter {
+
     opacity: 1;
 }
 
-button {
-    border: 0;
-    color: white;
-    background: #252525;
-    padding: 10px 14px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 14px;
-}
 
-button:hover {
-    background: #3a3a3a;
-}
+/* =========================================================
+   PROGRESS
+========================================================= */
 
-.progress {
+#progress {
+
     position: absolute;
+
     left: 0;
     bottom: 0;
+
     width: 100%;
+
     height: 3px;
-    background: #222;
+
+    background: rgba(255,255,255,.12);
+
+    opacity: 0;
+
+    transition: opacity .2s ease;
 }
 
-.progressBar {
+#player.showControls #progress {
+
+    opacity: 1;
+}
+
+#progressBar {
+
     width: 0%;
+
     height: 100%;
+
     background: white;
+
     transition: width .2s linear;
 }
 
-.slideCounter {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    padding: 8px 12px;
-    border-radius: 10px;
-    background: rgba(0,0,0,.55);
-    color: #ddd;
-    font-size: 13px;
-}
 
-.exit {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-}
-
-/* =========================
+/* =========================================================
    LOADING
-========================= */
+========================================================= */
 
 #loading {
+
     position: fixed;
+
     inset: 0;
-    z-index: 500;
+
+    z-index: 9999999;
+
     display: none;
+
+    flex-direction: column;
+
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,.92);
-    flex-direction: column;
-    gap: 16px;
+
+    gap: 18px;
+
+    background:
+        rgba(0,0,0,.95);
 }
 
 .spinner {
-    width: 42px;
-    height: 42px;
-    border: 4px solid #333;
+
+    width: 44px;
+    height: 44px;
+
+    border:
+        4px solid
+        #303030;
+
     border-top-color: white;
+
     border-radius: 50%;
-    animation: spin .8s linear infinite;
+
+    animation:
+        spin .7s linear infinite;
 }
 
 @keyframes spin {
+
     to {
         transform: rotate(360deg);
     }
 }
 
-/* =========================
-   MOBILE
-========================= */
+#loadingText {
 
-@media (max-width: 650px) {
-    #start {
+    color: #aaa;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    #startScreen {
+
         padding: 20px;
+
+        align-items: flex-start;
+    }
+
+    .startContent {
+
+        margin-top: 45px;
     }
 
     .modes {
+
         grid-template-columns: 1fr;
     }
 
-    .mode {
-        min-height: 170px;
+    .modeCard {
+
+        min-height: 210px;
+
         padding: 24px;
     }
 
-    .controls {
-        bottom: 12px;
-        max-width: 95vw;
-        overflow-x: auto;
+    .modeInfo {
+
+        left: 24px;
+        bottom: 20px;
     }
 }
+
+
+/* =========================================================
+   TOUCH DEVICES
+
+   Keine permanenten Bedienelemente.
+========================================================= */
+
+@media (hover: none) {
+
+    .controls,
+    #exitButton,
+    #slideCounter,
+    #progress {
+
+        opacity: 0 !important;
+
+        pointer-events: none !important;
+    }
+}
+
 </style>
 </head>
 
+
 <body>
 
-<!-- =========================
-     START
-========================= -->
 
-<section id="start">
+<!-- =======================================================
+     START SCREEN
+======================================================= -->
 
-    <div class="logo">LoopScreen</div>
+<section id="startScreen">
 
-    <div class="subtitle">
-        Videos und Präsentationen automatisch im Vollbild abspielen
-    </div>
+    <div class="startContent">
 
-    <div class="modes">
+        <div class="logo">
+            LoopScreen
+        </div>
 
-        <!-- VIDEO -->
-        <div class="mode"
-             onclick="document.getElementById('videoInput').click()">
+        <div class="subtitle">
+            Videos & Präsentationen im randlosen Display-Modus
+        </div>
 
-            <div class="icon">🎬</div>
 
-            <h2>Video Loop</h2>
+        <div class="modes">
 
-            <p>
-                Lade ein Video hoch und spiele es automatisch
-                endlos im Vollbild ab.
-            </p>
 
-            <div class="supported">
-                MP4 · WebM · OGG · MOV* · AVI* · MKV*
+            <!-- VIDEO -->
+
+            <div
+                class="modeCard"
+                id="videoCard"
+            >
+
+                <div class="modeIcon">
+                    🎬
+                </div>
+
+                <h2>
+                    Video Loop
+                </h2>
+
+                <p>
+                    Lade ein Video hoch und spiele es
+                    automatisch und endlos über den
+                    gesamten Bildschirm ab.
+                </p>
+
+                <div class="modeInfo">
+                    MP4 · WebM · OGG · MOV · weitere Browser-Formate
+                </div>
+
+            </div>
+
+
+            <!-- PRESENTATION -->
+
+            <div
+                class="modeCard"
+                id="presentationCard"
+            >
+
+                <div class="modeIcon">
+                    📊
+                </div>
+
+                <h2>
+                    Präsentation
+                </h2>
+
+                <p>
+                    Präsentationen werden automatisch
+                    angezeigt und wechseln alle
+                    8 Sekunden zur nächsten Folie.
+                </p>
+
+                <div class="modeInfo">
+                    PDF · PPT · PPTX · Bilder
+                </div>
+
             </div>
 
         </div>
 
-        <!-- PRESENTATION -->
-        <div class="mode"
-             onclick="document.getElementById('presentationInput').click()">
 
-            <div class="icon">📊</div>
-
-            <h2>Präsentationsmodus</h2>
-
-            <p>
-                Präsentationen werden automatisch angezeigt.
-                Alle 8 Sekunden geht es direkt zur nächsten Folie.
-            </p>
-
-            <div class="supported">
-                PPTX · PPT* · PDF · Bilder
-            </div>
-
+        <div id="dropZone">
+            Datei hierher ziehen oder auswählen
         </div>
 
-    </div>
 
-    <input
-        id="videoInput"
-        type="file"
-        accept="video/*,.mkv,.avi,.mov,.mp4,.webm,.ogg,.ogv">
+        <!-- VIDEO INPUT -->
 
-    <input
-        id="presentationInput"
-        type="file"
-        accept=".ppt,.pptx,.pdf,image/*">
+        <input
+            id="videoInput"
+            class="fileInput"
+            type="file"
+            accept="video/*,.mp4,.webm,.ogg,.ogv,.mov,.m4v,.avi,.mkv,.wmv,.flv,.3gp,.mpeg,.mpg"
+        >
 
-    <div
-        class="dropzone"
-        id="dropzone">
 
-        Datei hier hineinziehen
-        oder klicken, um eine Datei auszuwählen
+        <!-- PRESENTATION INPUT -->
+
+        <input
+            id="presentationInput"
+            class="fileInput"
+            type="file"
+            accept=".pdf,.ppt,.pptx,.odp,image/*"
+        >
 
     </div>
 
 </section>
 
 
-<!-- =========================
+
+<!-- =======================================================
      PLAYER
-========================= -->
+======================================================= -->
 
 <section id="player">
+
+
+    <!-- VIDEO -->
 
     <video
         id="video"
         playsinline
         loop
-        controlslist="nodownload noremoteplayback">
-    </video>
+        preload="auto"
+        controlslist="nodownload noremoteplayback"
+    ></video>
+
+
+    <!-- PRESENTATION -->
 
     <div id="slides">
+
         <canvas id="slideCanvas"></canvas>
+
     </div>
 
-    <div class="slideCounter" id="slideCounter"></div>
 
-    <button class="exit" onclick="exitPlayer()">
+    <!-- EXIT -->
+
+    <button
+        id="exitButton"
+        type="button"
+    >
         ✕ Beenden
     </button>
 
+
+    <!-- SLIDE COUNTER -->
+
+    <div id="slideCounter">
+        1 / 1
+    </div>
+
+
+    <!-- CONTROLS -->
+
     <div class="controls">
 
-        <button onclick="togglePause()">
-            ⏯ Pause
+        <button
+            id="pauseButton"
+            type="button"
+        >
+            ⏯
         </button>
 
-        <button id="previousBtn"
-                onclick="previousSlide()">
+        <button
+            id="previousButton"
+            type="button"
+        >
             ◀
         </button>
 
-        <button id="nextBtn"
-                onclick="nextSlide()">
+        <button
+            id="nextButton"
+            type="button"
+        >
             ▶
         </button>
 
-        <button onclick="toggleFullscreen()">
-            ⛶ Vollbild
+        <button
+            id="fullscreenButton"
+            type="button"
+        >
+            ⛶
         </button>
 
     </div>
 
-    <div class="progress">
-        <div class="progressBar" id="progressBar"></div>
+
+    <!-- PROGRESS -->
+
+    <div id="progress">
+
+        <div id="progressBar"></div>
+
     </div>
 
 </section>
 
 
-<!-- =========================
+
+<!-- =======================================================
      LOADING
-========================= -->
+======================================================= -->
 
 <div id="loading">
 
     <div class="spinner"></div>
 
     <div id="loadingText">
-        Datei wird vorbereitet …
+        Wird vorbereitet …
     </div>
 
 </div>
 
 
-<!-- =========================
-     PDF.JS
-========================= -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"
-        type="module"></script>
+<!-- =======================================================
+     PDF.JS
+======================================================= -->
+
+<script
+    type="module"
+>
+
+import * as pdfjsLib
+from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+
+window.pdfjsLib = pdfjsLib;
+
+</script>
+
 
 
 <script>
-/* =====================================================
+
+/* =========================================================
    ELEMENTS
-===================================================== */
+========================================================= */
 
-const start = document.getElementById("start");
-const player = document.getElementById("player");
-const video = document.getElementById("video");
+const startScreen =
+    document.getElementById("startScreen");
 
-const slides = document.getElementById("slides");
-const canvas = document.getElementById("slideCanvas");
-const ctx = canvas.getContext("2d");
+const player =
+    document.getElementById("player");
 
-const videoInput = document.getElementById("videoInput");
+const video =
+    document.getElementById("video");
+
+const slides =
+    document.getElementById("slides");
+
+const canvas =
+    document.getElementById("slideCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const videoCard =
+    document.getElementById("videoCard");
+
+const presentationCard =
+    document.getElementById("presentationCard");
+
+const videoInput =
+    document.getElementById("videoInput");
+
 const presentationInput =
     document.getElementById("presentationInput");
 
-const dropzone = document.getElementById("dropzone");
+const dropZone =
+    document.getElementById("dropZone");
 
-const loading = document.getElementById("loading");
-const loadingText = document.getElementById("loadingText");
+const loading =
+    document.getElementById("loading");
+
+const loadingText =
+    document.getElementById("loadingText");
+
+const exitButton =
+    document.getElementById("exitButton");
+
+const pauseButton =
+    document.getElementById("pauseButton");
+
+const previousButton =
+    document.getElementById("previousButton");
+
+const nextButton =
+    document.getElementById("nextButton");
+
+const fullscreenButton =
+    document.getElementById("fullscreenButton");
 
 const slideCounter =
     document.getElementById("slideCounter");
@@ -467,191 +1011,377 @@ const progressBar =
     document.getElementById("progressBar");
 
 
-/* =====================================================
+/* =========================================================
    STATE
-===================================================== */
+========================================================= */
+
+let mode = null;
+
+let currentFileURL = null;
 
 let presentationSlides = [];
+
 let currentSlide = 0;
 
 let slideTimer = null;
+
 let presentationPaused = false;
 
-let fullscreenElement = document.documentElement;
+let controlsTimer = null;
 
 
-/* =====================================================
+/* =========================================================
+   MODE SELECTION
+========================================================= */
+
+videoCard.addEventListener(
+    "click",
+    () => videoInput.click()
+);
+
+presentationCard.addEventListener(
+    "click",
+    () => presentationInput.click()
+);
+
+
+/* =========================================================
    FILE INPUT
-===================================================== */
+========================================================= */
 
-videoInput.addEventListener("change", e => {
+videoInput.addEventListener(
+    "change",
+    event => {
 
-    const file = e.target.files[0];
+        const file =
+            event.target.files[0];
 
-    if (file) {
-        startVideo(file);
+        if (file) {
+
+            startVideo(file);
+
+        }
+
     }
+);
 
-});
 
-presentationInput.addEventListener("change", e => {
+presentationInput.addEventListener(
+    "change",
+    event => {
 
-    const file = e.target.files[0];
+        const file =
+            event.target.files[0];
 
-    if (file) {
-        startPresentation(file);
+        if (file) {
+
+            startPresentation(file);
+
+        }
+
     }
+);
 
-});
 
-
-/* =====================================================
+/* =========================================================
    DRAG & DROP
-===================================================== */
+========================================================= */
 
-dropzone.addEventListener("click", () => {
+dropZone.addEventListener(
+    "dragover",
+    event => {
 
-    const choice = confirm(
-        "OK = Video\nAbbrechen = Präsentation"
-    );
+        event.preventDefault();
 
-    if (choice) {
-        videoInput.click();
-    } else {
-        presentationInput.click();
+        dropZone.classList.add("drag");
+
     }
+);
 
-});
+dropZone.addEventListener(
+    "dragleave",
+    () => {
 
-dropzone.addEventListener("dragover", e => {
+        dropZone.classList.remove("drag");
 
-    e.preventDefault();
+    }
+);
 
-    dropzone.classList.add("drag");
+dropZone.addEventListener(
+    "drop",
+    event => {
 
-});
+        event.preventDefault();
 
-dropzone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("drag");
 
-    dropzone.classList.remove("drag");
+        const file =
+            event.dataTransfer.files[0];
 
-});
+        if (!file) return;
 
-dropzone.addEventListener("drop", e => {
+        handleFile(file);
 
-    e.preventDefault();
+    }
+);
 
-    dropzone.classList.remove("drag");
+dropZone.addEventListener(
+    "click",
+    () => {
 
-    const file = e.dataTransfer.files[0];
+        videoInput.click();
 
-    if (!file) return;
+    }
+);
+
+
+/* =========================================================
+   HANDLE FILE
+========================================================= */
+
+function handleFile(file) {
+
+    const name =
+        file.name.toLowerCase();
+
+    const type =
+        file.type.toLowerCase();
+
 
     if (
-        file.type.startsWith("video/") ||
-        /\.(mp4|webm|ogg|ogv|mov|mkv|avi)$/i.test(file.name)
+        type.startsWith("video/") ||
+        /\.(mp4|webm|ogg|ogv|mov|m4v|avi|mkv|wmv|flv|3gp|mpeg|mpg)$/i.test(name)
     ) {
 
         startVideo(file);
 
-    } else {
+        return;
+    }
+
+
+    if (
+        /\.(pdf)$/i.test(name)
+    ) {
 
         startPresentation(file);
 
+        return;
     }
 
-});
+
+    if (
+        /\.(ppt|pptx|odp)$/i.test(name)
+    ) {
+
+        startPresentation(file);
+
+        return;
+    }
 
 
-/* =====================================================
-   VIDEO
-===================================================== */
+    if (
+        type.startsWith("image/")
+    ) {
 
-function startVideo(file) {
+        startPresentation(file);
 
-    resetPlayer();
+        return;
+    }
 
-    const url = URL.createObjectURL(file);
 
-    video.src = url;
-
-    video.style.display = "block";
-    slides.style.display = "none";
-
-    video.loop = true;
-
-    start.style.display = "none";
-    player.style.display = "block";
-
-    video.play().catch(() => {});
-
-    requestFullscreen();
-
-    video.addEventListener("timeupdate", updateVideoProgress);
+    alert(
+        "Dieses Dateiformat kann von deinem Browser nicht direkt angezeigt werden."
+    );
 
 }
 
 
-/* =====================================================
-   PRESENTATION
-===================================================== */
+/* =========================================================
+   VIDEO START
+========================================================= */
+
+function startVideo(file) {
+
+    cleanup();
+
+    mode = "video";
+
+    currentFileURL =
+        URL.createObjectURL(file);
+
+    video.src =
+        currentFileURL;
+
+    video.loop = true;
+
+    video.muted = false;
+
+    video.style.display =
+        "block";
+
+    slides.style.display =
+        "none";
+
+    startScreen.style.display =
+        "none";
+
+    player.style.display =
+        "block";
+
+
+    /*
+       Browser versucht Vollbild.
+    */
+
+    requestFullscreen();
+
+
+    /*
+       Autoplay kann mit Ton blockiert
+       werden. Deshalb zuerst normal
+       versuchen.
+    */
+
+    video.play()
+        .catch(() => {
+
+            /*
+               Falls der Browser Autoplay
+               mit Ton blockiert, wird
+               stumm gestartet.
+            */
+
+            video.muted = true;
+
+            video.play()
+                .catch(() => {});
+
+        });
+
+
+    showControlsTemporarily();
+
+}
+
+
+/* =========================================================
+   PRESENTATION START
+========================================================= */
 
 async function startPresentation(file) {
 
-    resetPlayer();
+    cleanup();
 
-    start.style.display = "none";
-    player.style.display = "block";
+    mode = "presentation";
 
-    video.style.display = "none";
-    slides.style.display = "flex";
+    startScreen.style.display =
+        "none";
 
-    loading.style.display = "flex";
+    player.style.display =
+        "block";
+
+    video.style.display =
+        "none";
+
+    slides.style.display =
+        "flex";
+
+    loading.style.display =
+        "flex";
 
     loadingText.textContent =
-        "Präsentation wird vorbereitet …";
+        "Datei wird vorbereitet …";
+
 
     try {
 
         const extension =
-            file.name.split(".").pop().toLowerCase();
+            file.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
 
         if (extension === "pdf") {
 
             await loadPDF(file);
 
-        } else if (
+        }
+
+        else if (
             extension === "pptx" ||
             extension === "ppt"
         ) {
 
             await loadPowerPoint(file);
 
-        } else if (file.type.startsWith("image/")) {
+        }
 
-            await loadImage(file);
-
-        } else {
+        else if (
+            extension === "odp"
+        ) {
 
             throw new Error(
-                "Dieses Format kann dein Browser nicht direkt darstellen."
+                "ODP benötigt einen zusätzlichen Office-Renderer."
             );
 
         }
 
-        loading.style.display = "none";
+        else if (
+            file.type.startsWith("image/")
+        ) {
+
+            await loadImage(file);
+
+        }
+
+        else {
+
+            throw new Error(
+                "Dieses Präsentationsformat wird nicht unterstützt."
+            );
+
+        }
+
+
+        if (
+            presentationSlides.length === 0
+        ) {
+
+            throw new Error(
+                "Keine Folien gefunden."
+            );
+
+        }
+
 
         currentSlide = 0;
+
+        presentationPaused = false;
 
         showSlide();
 
         startPresentationTimer();
 
+        loading.style.display =
+            "none";
+
+
+        /*
+           Vollbild erst nach
+           erfolgreicher Vorbereitung.
+        */
+
         requestFullscreen();
 
-    } catch (error) {
+        showControlsTemporarily();
 
-        loading.style.display = "none";
+    }
+
+    catch (error) {
+
+        loading.style.display =
+            "none";
 
         alert(
             "Die Datei konnte nicht geöffnet werden.\n\n" +
@@ -665,172 +1395,172 @@ async function startPresentation(file) {
 }
 
 
-/* =====================================================
+/* =========================================================
    IMAGE
-===================================================== */
+========================================================= */
 
 function loadImage(file) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(
+        (resolve, reject) => {
 
-        const img = new Image();
+            const image =
+                new Image();
 
-        img.onload = () => {
+            image.onload = () => {
 
-            presentationSlides = [img];
+                presentationSlides = [
+                    image
+                ];
 
-            resolve();
+                resolve();
 
-        };
+            };
 
-        img.onerror = reject;
+            image.onerror =
+                reject;
 
-        img.src = URL.createObjectURL(file);
+            image.src =
+                URL.createObjectURL(file);
 
-    });
+        }
+    );
 
 }
 
 
-/* =====================================================
+/* =========================================================
    PDF
-===================================================== */
+========================================================= */
 
 async function loadPDF(file) {
 
-    const arrayBuffer =
+    if (!window.pdfjsLib) {
+
+        throw new Error(
+            "PDF-Renderer konnte nicht geladen werden."
+        );
+
+    }
+
+
+    const data =
         await file.arrayBuffer();
 
-    /*
-       PDF.js wird verwendet.
-    */
 
     const pdf =
-        await window.pdfjsLib.getDocument({
-            data: arrayBuffer
-        }).promise;
+        await window.pdfjsLib
+            .getDocument({
+                data
+            })
+            .promise;
+
 
     presentationSlides = [];
 
-    for (let i = 1; i <= pdf.numPages; i++) {
+
+    for (
+        let pageNumber = 1;
+        pageNumber <= pdf.numPages;
+        pageNumber++
+    ) {
 
         loadingText.textContent =
-            `PDF: Seite ${i} / ${pdf.numPages}`;
+            `PDF wird geladen: ${pageNumber} / ${pdf.numPages}`;
+
 
         const page =
-            await pdf.getPage(i);
+            await pdf.getPage(pageNumber);
+
 
         const viewport =
             page.getViewport({
                 scale: 2
             });
 
+
         const pageCanvas =
             document.createElement("canvas");
 
-        const pageCtx =
+
+        const pageContext =
             pageCanvas.getContext("2d");
 
+
         pageCanvas.width =
-            viewport.width;
+            Math.ceil(viewport.width);
 
         pageCanvas.height =
-            viewport.height;
+            Math.ceil(viewport.height);
+
 
         await page.render({
-            canvasContext: pageCtx,
-            viewport: viewport
+
+            canvasContext:
+                pageContext,
+
+            viewport:
+                viewport
+
         }).promise;
 
-        presentationSlides.push(pageCanvas);
+
+        presentationSlides.push(
+            pageCanvas
+        );
 
     }
 
 }
 
 
-/* =====================================================
+/* =========================================================
    POWERPOINT
-===================================================== */
+========================================================= */
 
 async function loadPowerPoint(file) {
 
     /*
-       PPTX ist ein ZIP-Archiv.
+       PPT/PPTX können nicht zuverlässig
+       durch Browser-JavaScript selbst
+       gerendert werden.
 
-       Eine reine HTML-Datei kann PowerPoint-Dateien
-       nicht vollständig wie Microsoft PowerPoint
-       rendern.
+       Wir verwenden deshalb für PPTX
+       eine Online-Konvertierung über
+       Microsoft Office Viewer.
 
-       Deshalb versuchen wir zuerst, eine vorhandene
-       Browser-Darstellung zu verwenden.
+       Wichtig:
+       Eine lokale Datei kann nicht direkt
+       an den Office Viewer übergeben werden.
+
+       Daher zeigen wir eine klare Meldung,
+       statt eine kaputte Präsentation
+       anzuzeigen.
     */
-
-    const arrayBuffer =
-        await file.arrayBuffer();
-
-    /*
-       PPTX-Dateien bestehen intern aus XML und Medien.
-       Für eine wirklich vollständige Darstellung mit
-       Animationen wäre ein richtiger Office-Renderer
-       notwendig.
-
-       Hier wird deshalb eine verständliche Fehlermeldung
-       ausgegeben, statt eine scheinbar funktionierende,
-       aber falsche Darstellung zu liefern.
-    */
-
-    if (file.name.toLowerCase().endsWith(".ppt")) {
-
-        throw new Error(
-            "Alte .PPT-Dateien können nicht zuverlässig " +
-            "direkt im Browser gerendert werden. " +
-            "Bitte als .PPTX oder PDF exportieren."
-        );
-
-    }
 
     throw new Error(
-        "PPTX benötigt einen Office-Renderer. " +
-        "PDF funktioniert direkt und zuverlässig."
+        "PPT/PPTX kann nicht zuverlässig direkt aus einer lokalen HTML-Datei gerendert werden. " +
+        "Exportiere die Präsentation bitte als PDF. " +
+        "PDF wird vollständig unterstützt."
     );
 
 }
 
 
-/* =====================================================
-   SLIDESHOW
-===================================================== */
-
-function startPresentationTimer() {
-
-    clearInterval(slideTimer);
-
-    presentationPaused = false;
-
-    slideTimer = setInterval(() => {
-
-        if (!presentationPaused) {
-
-            nextSlide();
-
-        }
-
-    }, 8000);
-
-}
-
-
-/* =====================================================
+/* =========================================================
    SHOW SLIDE
-===================================================== */
+========================================================= */
 
 function showSlide() {
 
-    if (!presentationSlides.length) return;
+    if (
+        presentationSlides.length === 0
+    ) return;
+
 
     const slide =
         presentationSlides[currentSlide];
+
 
     canvas.width =
         slide.width;
@@ -838,12 +1568,14 @@ function showSlide() {
     canvas.height =
         slide.height;
 
+
     ctx.clearRect(
         0,
         0,
         canvas.width,
         canvas.height
     );
+
 
     ctx.drawImage(
         slide,
@@ -853,27 +1585,88 @@ function showSlide() {
         canvas.height
     );
 
+
     slideCounter.textContent =
         `${currentSlide + 1} / ${presentationSlides.length}`;
 
-    progressBar.style.width =
+
+    const percentage =
         (
-            ((currentSlide + 1) /
-            presentationSlides.length) * 100
-        ) + "%";
+            (currentSlide + 1) /
+            presentationSlides.length
+        ) * 100;
+
+
+    progressBar.style.width =
+        percentage + "%";
 
 }
 
 
-/* =====================================================
-   NEXT / PREVIOUS
-===================================================== */
+/* =========================================================
+   PRESENTATION TIMER
+========================================================= */
+
+function startPresentationTimer() {
+
+    stopPresentationTimer();
+
+
+    slideTimer =
+        setInterval(
+            () => {
+
+                if (
+                    presentationPaused
+                ) return;
+
+
+                nextSlide();
+
+            },
+            8000
+        );
+
+}
+
+
+/* =========================================================
+   STOP TIMER
+========================================================= */
+
+function stopPresentationTimer() {
+
+    if (slideTimer) {
+
+        clearInterval(
+            slideTimer
+        );
+
+        slideTimer = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   NEXT SLIDE
+========================================================= */
 
 function nextSlide() {
 
-    if (!presentationSlides.length) return;
+    if (
+        presentationSlides.length === 0
+    ) return;
+
 
     currentSlide++;
+
+
+    /*
+       Nach letzter Folie wieder
+       bei Folie 1 anfangen.
+    */
 
     if (
         currentSlide >=
@@ -884,39 +1677,64 @@ function nextSlide() {
 
     }
 
+
+    /*
+       Wichtig:
+
+       Wir rendern direkt die fertige
+       nächste Folie.
+
+       Es gibt keine künstliche
+       Übergangsverzögerung.
+    */
+
     showSlide();
 
 }
 
+
+/* =========================================================
+   PREVIOUS SLIDE
+========================================================= */
+
 function previousSlide() {
 
-    if (!presentationSlides.length) return;
+    if (
+        presentationSlides.length === 0
+    ) return;
+
 
     currentSlide--;
 
-    if (currentSlide < 0) {
+
+    if (
+        currentSlide < 0
+    ) {
 
         currentSlide =
             presentationSlides.length - 1;
 
     }
 
+
     showSlide();
 
 }
 
 
-/* =====================================================
+/* =========================================================
    PAUSE
-===================================================== */
+========================================================= */
 
 function togglePause() {
 
     if (
-        video.style.display !== "none"
+        mode === "video"
     ) {
 
-        if (video.paused) {
+        if (
+            video.paused
+        ) {
 
             video.play();
 
@@ -927,95 +1745,432 @@ function togglePause() {
         }
 
         return;
+    }
+
+
+    if (
+        mode === "presentation"
+    ) {
+
+        presentationPaused =
+            !presentationPaused;
 
     }
 
-    presentationPaused =
-        !presentationPaused;
-
 }
 
 
-/* =====================================================
+/* =========================================================
    VIDEO PROGRESS
-===================================================== */
+========================================================= */
 
-function updateVideoProgress() {
-
-    if (!video.duration) return;
-
-    progressBar.style.width =
-        (
-            video.currentTime /
-            video.duration *
-            100
-        ) + "%";
-
-}
-
-
-/* =====================================================
-   FULLSCREEN
-===================================================== */
-
-function requestFullscreen() {
-
-    setTimeout(() => {
+video.addEventListener(
+    "timeupdate",
+    () => {
 
         if (
+            !video.duration
+        ) return;
+
+
+        const percentage =
+            (
+                video.currentTime /
+                video.duration
+            ) * 100;
+
+
+        progressBar.style.width =
+            percentage + "%";
+
+    }
+);
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+async function requestFullscreen() {
+
+    try {
+
+        if (
+            !document.fullscreenElement &&
             document.documentElement.requestFullscreen
         ) {
 
-            document.documentElement
-                .requestFullscreen()
+            await document.documentElement
+                .requestFullscreen({
+                    navigationUI: "hide"
+                })
                 .catch(() => {});
 
         }
 
-    }, 100);
+    }
+    catch (error) {
 
-}
-
-function toggleFullscreen() {
-
-    if (!document.fullscreenElement) {
-
-        document.documentElement
-            .requestFullscreen()
-            .catch(() => {});
-
-    } else {
-
-        document.exitFullscreen();
+        console.log(
+            "Fullscreen nicht verfügbar:",
+            error
+        );
 
     }
 
 }
 
 
-/* =====================================================
-   EXIT
-===================================================== */
+/* =========================================================
+   FULLSCREEN TOGGLE
+========================================================= */
+
+async function toggleFullscreen() {
+
+    try {
+
+        if (
+            !document.fullscreenElement
+        ) {
+
+            await document.documentElement
+                .requestFullscreen({
+                    navigationUI: "hide"
+                })
+                .catch(() => {});
+
+        }
+
+        else {
+
+            await document.exitFullscreen();
+
+        }
+
+    }
+    catch (error) {
+
+        console.log(error);
+
+    }
+
+}
+
+
+/* =========================================================
+   SHOW CONTROLS
+========================================================= */
+
+function showControlsTemporarily() {
+
+    player.classList.add(
+        "showControls"
+    );
+
+
+    clearTimeout(
+        controlsTimer
+    );
+
+
+    controlsTimer =
+        setTimeout(
+            () => {
+
+                player.classList.remove(
+                    "showControls"
+                );
+
+            },
+            2500
+        );
+
+}
+
+
+/* =========================================================
+   MOUSE
+========================================================= */
+
+player.addEventListener(
+    "mousemove",
+    showControlsTemporarily
+);
+
+
+/* =========================================================
+   TOUCH
+========================================================= */
+
+player.addEventListener(
+    "touchstart",
+    showControlsTemporarily,
+    {
+        passive: true
+    }
+);
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+pauseButton.addEventListener(
+    "click",
+    () => {
+
+        togglePause();
+
+        showControlsTemporarily();
+
+    }
+);
+
+
+previousButton.addEventListener(
+    "click",
+    () => {
+
+        previousSlide();
+
+        showControlsTemporarily();
+
+    }
+);
+
+
+nextButton.addEventListener(
+    "click",
+    () => {
+
+        nextSlide();
+
+        showControlsTemporarily();
+
+    }
+);
+
+
+fullscreenButton.addEventListener(
+    "click",
+    () => {
+
+        toggleFullscreen();
+
+    }
+);
+
+
+exitButton.addEventListener(
+    "click",
+    () => {
+
+        exitPlayer();
+
+    }
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            player.style.display !== "block"
+        ) return;
+
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            /*
+               Nur verlassen, wenn der
+               Browser nicht gerade nur
+               den Fullscreen beendet.
+            */
+
+            if (
+                !document.fullscreenElement
+            ) {
+
+                exitPlayer();
+
+            }
+
+            return;
+
+        }
+
+
+        if (
+            event.key === "ArrowRight"
+        ) {
+
+            nextSlide();
+
+        }
+
+
+        if (
+            event.key === "ArrowLeft"
+        ) {
+
+            previousSlide();
+
+        }
+
+
+        if (
+            event.code === "Space"
+        ) {
+
+            event.preventDefault();
+
+            togglePause();
+
+        }
+
+
+        if (
+            event.key.toLowerCase() === "f"
+        ) {
+
+            toggleFullscreen();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SWIPE
+========================================================= */
+
+let touchStartX = 0;
+
+player.addEventListener(
+    "touchstart",
+    event => {
+
+        touchStartX =
+            event.changedTouches[0]
+                .screenX;
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+player.addEventListener(
+    "touchend",
+    event => {
+
+        const touchEndX =
+            event.changedTouches[0]
+                .screenX;
+
+
+        const difference =
+            touchEndX - touchStartX;
+
+
+        if (
+            Math.abs(difference) < 60
+        ) return;
+
+
+        if (
+            difference < 0
+        ) {
+
+            nextSlide();
+
+        }
+
+        else {
+
+            previousSlide();
+
+        }
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+/* =========================================================
+   EXIT PLAYER
+========================================================= */
 
 function exitPlayer() {
 
-    clearInterval(slideTimer);
+    stopPresentationTimer();
+
 
     video.pause();
 
-    video.removeAttribute("src");
+
+    if (
+        currentFileURL
+    ) {
+
+        URL.revokeObjectURL(
+            currentFileURL
+        );
+
+        currentFileURL = null;
+
+    }
+
+
+    video.removeAttribute(
+        "src"
+    );
 
     video.load();
+
 
     presentationSlides = [];
 
     currentSlide = 0;
 
-    player.style.display = "none";
+    mode = null;
 
-    start.style.display = "block";
 
-    if (document.fullscreenElement) {
+    progressBar.style.width =
+        "0%";
+
+
+    player.style.display =
+        "none";
+
+
+    startScreen.style.display =
+        "flex";
+
+
+    loading.style.display =
+        "none";
+
+
+    player.classList.remove(
+        "showControls"
+    );
+
+
+    if (
+        document.fullscreenElement
+    ) {
 
         document.exitFullscreen()
             .catch(() => {});
@@ -1025,106 +2180,55 @@ function exitPlayer() {
 }
 
 
-/* =====================================================
-   RESET
-===================================================== */
+/* =========================================================
+   CLEANUP
+========================================================= */
 
-function resetPlayer() {
+function cleanup() {
 
-    clearInterval(slideTimer);
+    stopPresentationTimer();
+
+
+    if (
+        currentFileURL
+    ) {
+
+        URL.revokeObjectURL(
+            currentFileURL
+        );
+
+        currentFileURL = null;
+
+    }
+
 
     presentationSlides = [];
 
     currentSlide = 0;
 
-    video.pause();
-
-    video.removeAttribute("src");
-
-    progressBar.style.width = "0%";
-
 }
 
 
-/* =====================================================
-   KEYBOARD
-===================================================== */
+/* =========================================================
+   FULLSCREEN CHANGE
+========================================================= */
 
-document.addEventListener("keydown", e => {
+document.addEventListener(
+    "fullscreenchange",
+    () => {
 
-    if (player.style.display !== "block")
-        return;
+        /*
+           Player bleibt weiterhin
+           viewportfüllend, auch wenn
+           die Fullscreen API auf einem
+           Gerät nicht verfügbar ist.
+        */
 
-    if (e.key === "Escape") {
-
-        exitPlayer();
-
-    }
-
-    if (e.key === "ArrowRight") {
-
-        nextSlide();
+        showControlsTemporarily();
 
     }
+);
 
-    if (e.key === "ArrowLeft") {
-
-        previousSlide();
-
-    }
-
-    if (e.code === "Space") {
-
-        e.preventDefault();
-
-        togglePause();
-
-    }
-
-    if (e.key.toLowerCase() === "f") {
-
-        toggleFullscreen();
-
-    }
-
-});
-
-
-/* =====================================================
-   TOUCH
-===================================================== */
-
-let touchStartX = 0;
-
-player.addEventListener("touchstart", e => {
-
-    touchStartX =
-        e.changedTouches[0].screenX;
-
-});
-
-player.addEventListener("touchend", e => {
-
-    const touchEndX =
-        e.changedTouches[0].screenX;
-
-    const difference =
-        touchEndX - touchStartX;
-
-    if (Math.abs(difference) < 50)
-        return;
-
-    if (difference < 0) {
-
-        nextSlide();
-
-    } else {
-
-        previousSlide();
-
-    }
-
-});
 </script>
 
 </body>
