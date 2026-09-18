@@ -1,0 +1,2742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,
+             initial-scale=1.0,
+             maximum-scale=1.0,
+             user-scalable=no,
+             viewport-fit=cover"
+>
+
+<meta name="theme-color" content="#000000">
+
+<title>LoopScreen</title>
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #080808;
+    color: white;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+
+/* =========================================================
+   START SCREEN
+========================================================= */
+
+#startScreen {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    width: 100dvw;
+    height: 100dvh;
+
+    overflow-y: auto;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 30px;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            #202020 0%,
+            #0c0c0c 45%,
+            #050505 100%
+        );
+
+    z-index: 10;
+}
+
+.startContent {
+
+    width: min(900px, 100%);
+
+    text-align: center;
+}
+
+.logo {
+
+    font-size: clamp(42px, 9vw, 82px);
+
+    font-weight: 900;
+
+    letter-spacing: -5px;
+
+    line-height: .95;
+
+    margin-bottom: 14px;
+}
+
+.subtitle {
+
+    color: #929292;
+
+    font-size: 16px;
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   MODE CARDS
+========================================================= */
+
+.modes {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.modeCard {
+
+    position: relative;
+
+    min-height: 240px;
+
+    padding: 30px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    border-radius: 26px;
+
+    border: 1px solid #292929;
+
+    background:
+        linear-gradient(
+            145deg,
+            #181818,
+            #101010
+        );
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
+}
+
+.modeCard:hover {
+
+    transform: translateY(-5px);
+
+    border-color: #555;
+
+    background: #1c1c1c;
+}
+
+.modeCard:active {
+
+    transform: scale(.98);
+}
+
+.modeIcon {
+
+    font-size: 52px;
+
+    margin-bottom: 24px;
+}
+
+.modeCard h2 {
+
+    font-size: 27px;
+
+    margin-bottom: 9px;
+}
+
+.modeCard p {
+
+    color: #999;
+
+    line-height: 1.55;
+
+    font-size: 15px;
+}
+
+.modeInfo {
+
+    position: absolute;
+
+    left: 30px;
+    bottom: 25px;
+
+    color: #5f5f5f;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   GENERAL DROPZONE
+========================================================= */
+
+#dropZone {
+
+    margin-top: 18px;
+
+    min-height: 80px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 2px dashed #333;
+
+    border-radius: 20px;
+
+    color: #777;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+#dropZone:hover,
+#dropZone.drag {
+
+    border-color: #aaa;
+
+    color: white;
+
+    background: rgba(255,255,255,.025);
+}
+
+
+/* =========================================================
+   HIDDEN FILE INPUTS
+========================================================= */
+
+.fileInput {
+
+    display: none;
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+#player {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    width: 100dvw;
+    height: 100dvh;
+
+    min-width: 100vw;
+    min-height: 100vh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    background: #000;
+
+    z-index: 999999;
+
+    display: none;
+
+    padding:
+        0
+        0
+        0
+        0;
+
+    touch-action: none;
+}
+
+
+/* =========================================================
+   VIDEO
+========================================================= */
+
+#video {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: block;
+
+    width: 100vw;
+    height: 100vh;
+
+    width: 100dvw;
+    height: 100dvh;
+
+    min-width: 100%;
+    min-height: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+
+    background: #000;
+
+    object-fit: cover;
+
+    object-position: center center;
+
+    vertical-align: top;
+}
+
+
+/* =========================================================
+   SLIDES
+========================================================= */
+
+#slides {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    width: 100dvw;
+    height: 100dvh;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    background: #000;
+}
+
+
+/* =========================================================
+   SLIDE IMAGE / CANVAS
+========================================================= */
+
+#slideCanvas {
+
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+
+    width: 100%;
+    height: 100%;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    object-fit: contain;
+
+    background: #000;
+}
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+.controls {
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 25px;
+
+    transform: translateX(-50%);
+
+    display: flex;
+
+    gap: 7px;
+
+    padding: 8px;
+
+    border-radius: 17px;
+
+    background:
+        rgba(20,20,20,.82);
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity .2s ease;
+}
+
+#player.showControls .controls {
+
+    opacity: 1;
+
+    pointer-events: auto;
+}
+
+.controls button {
+
+    min-width: 42px;
+
+    height: 40px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    color: white;
+
+    background: #292929;
+
+    cursor: pointer;
+}
+
+.controls button:hover {
+
+    background: #3c3c3c;
+}
+
+
+/* =========================================================
+   EXIT BUTTON
+========================================================= */
+
+#exitButton {
+
+    position: absolute;
+
+    top: 20px;
+    left: 20px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    padding: 10px 14px;
+
+    color: white;
+
+    background:
+        rgba(20,20,20,.75);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity .2s ease;
+
+    cursor: pointer;
+}
+
+#player.showControls #exitButton {
+
+    opacity: 1;
+
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   SLIDE COUNTER
+========================================================= */
+
+#slideCounter {
+
+    position: absolute;
+
+    top: 20px;
+    right: 20px;
+
+    padding: 8px 12px;
+
+    border-radius: 10px;
+
+    color: #ddd;
+
+    background:
+        rgba(0,0,0,.55);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    font-size: 13px;
+
+    opacity: 0;
+
+    transition: opacity .2s ease;
+}
+
+#player.showControls #slideCounter {
+
+    opacity: 1;
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+#progress {
+
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+
+    height: 3px;
+
+    background: rgba(255,255,255,.12);
+
+    opacity: 0;
+
+    transition: opacity .2s ease;
+}
+
+#player.showControls #progress {
+
+    opacity: 1;
+}
+
+#progressBar {
+
+    width: 0%;
+
+    height: 100%;
+
+    background: white;
+
+    transition: width .2s linear;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+#loading {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999999;
+
+    display: none;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    background:
+        rgba(0,0,0,.95);
+}
+
+.spinner {
+
+    width: 44px;
+    height: 44px;
+
+    border:
+        4px solid
+        #303030;
+
+    border-top-color: white;
+
+    border-radius: 50%;
+
+    animation:
+        spin .7s linear infinite;
+}
+
+@keyframes spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#loadingText {
+
+    color: #aaa;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    #startScreen {
+
+        padding: 20px;
+
+        align-items: flex-start;
+    }
+
+    .startContent {
+
+        margin-top: 45px;
+    }
+
+    .modes {
+
+        grid-template-columns: 1fr;
+    }
+
+    .modeCard {
+
+        min-height: 210px;
+
+        padding: 24px;
+    }
+
+    .modeInfo {
+
+        left: 24px;
+        bottom: 20px;
+    }
+}
+
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) {
+
+    .controls,
+    #exitButton,
+    #slideCounter,
+    #progress {
+
+        opacity: 0 !important;
+
+        pointer-events: none !important;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =======================================================
+     START SCREEN
+======================================================= -->
+
+<section id="startScreen">
+
+    <div class="startContent">
+
+        <div class="logo">
+            LoopScreen
+        </div>
+
+        <div class="subtitle">
+            Videos & Präsentationen im randlosen Display-Modus
+        </div>
+
+
+        <div class="modes">
+
+
+            <!-- VIDEO -->
+
+            <div
+                class="modeCard"
+                id="videoCard"
+            >
+
+                <div class="modeIcon">
+                    🎬
+                </div>
+
+                <h2>
+                    Video Loop
+                </h2>
+
+                <p>
+                    Lade ein Video hoch und spiele es
+                    automatisch und endlos über den
+                    gesamten Bildschirm ab.
+                </p>
+
+                <div class="modeInfo">
+                    MP4 · WebM · OGG · MOV · weitere Browser-Formate
+                </div>
+
+            </div>
+
+
+            <!-- PRESENTATION -->
+
+            <div
+                class="modeCard"
+                id="presentationCard"
+            >
+
+                <div class="modeIcon">
+                    📊
+                </div>
+
+                <h2>
+                    Präsentation
+                </h2>
+
+                <p>
+                    Präsentationen werden automatisch
+                    angezeigt und wechseln alle
+                    8 Sekunden zur nächsten Folie.
+                </p>
+
+                <div class="modeInfo">
+                    PDF · PPT · PPTX · Bilder
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div id="dropZone">
+            Datei hierher ziehen oder auswählen
+        </div>
+
+
+        <!-- VIDEO INPUT -->
+
+        <input
+            id="videoInput"
+            class="fileInput"
+            type="file"
+            accept="video/*,.mp4,.webm,.ogg,.ogv,.mov,.m4v,.avi,.mkv,.wmv,.flv,.3gp,.mpeg,.mpg"
+        >
+
+
+        <!-- PRESENTATION INPUT -->
+
+        <input
+            id="presentationInput"
+            class="fileInput"
+            type="file"
+            accept=".pdf,.ppt,.pptx,.odp,image/*"
+        >
+
+    </div>
+
+</section>
+
+
+
+<!-- =======================================================
+     PLAYER
+======================================================= -->
+
+<section id="player">
+
+
+    <!-- VIDEO -->
+
+    <video
+        id="video"
+        playsinline
+        loop
+        preload="auto"
+        controlslist="nodownload noremoteplayback"
+    ></video>
+
+
+    <!-- PRESENTATION -->
+
+    <div id="slides">
+
+        <canvas id="slideCanvas"></canvas>
+
+    </div>
+
+
+    <!-- EXIT -->
+
+    <button
+        id="exitButton"
+        type="button"
+    >
+        ✕ Beenden
+    </button>
+
+
+    <!-- SLIDE COUNTER -->
+
+    <div id="slideCounter">
+        1 / 1
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="controls">
+
+        <button
+            id="pauseButton"
+            type="button"
+        >
+            ⏯
+        </button>
+
+        <button
+            id="previousButton"
+            type="button"
+        >
+            ◀
+        </button>
+
+        <button
+            id="nextButton"
+            type="button"
+        >
+            ▶
+        </button>
+
+        <button
+            id="fullscreenButton"
+            type="button"
+        >
+            ⛶
+        </button>
+
+    </div>
+
+
+    <!-- PROGRESS -->
+
+    <div id="progress">
+
+        <div id="progressBar"></div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =======================================================
+     LOADING
+======================================================= -->
+
+<div id="loading">
+
+    <div class="spinner"></div>
+
+    <div id="loadingText">
+        Wird vorbereitet …
+    </div>
+
+</div>
+
+
+
+<!-- =======================================================
+     PDF.JS
+======================================================= -->
+
+<script
+    type="module"
+>
+
+import * as pdfjsLib
+from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+
+window.pdfjsLib = pdfjsLib;
+
+</script>
+
+
+<!-- =======================================================
+     JSZIP (für PPT/PPTX)
+======================================================= -->
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+></script>
+
+
+
+<script>
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const player =
+    document.getElementById("player");
+
+const video =
+    document.getElementById("video");
+
+const slides =
+    document.getElementById("slides");
+
+const canvas =
+    document.getElementById("slideCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const videoCard =
+    document.getElementById("videoCard");
+
+const presentationCard =
+    document.getElementById("presentationCard");
+
+const videoInput =
+    document.getElementById("videoInput");
+
+const presentationInput =
+    document.getElementById("presentationInput");
+
+const dropZone =
+    document.getElementById("dropZone");
+
+const loading =
+    document.getElementById("loading");
+
+const loadingText =
+    document.getElementById("loadingText");
+
+const exitButton =
+    document.getElementById("exitButton");
+
+const pauseButton =
+    document.getElementById("pauseButton");
+
+const previousButton =
+    document.getElementById("previousButton");
+
+const nextButton =
+    document.getElementById("nextButton");
+
+const fullscreenButton =
+    document.getElementById("fullscreenButton");
+
+const slideCounter =
+    document.getElementById("slideCounter");
+
+const progressBar =
+    document.getElementById("progressBar");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let mode = null;
+
+let currentFileURL = null;
+
+let presentationSlides = [];
+
+let currentSlide = 0;
+
+let slideTimer = null;
+
+let presentationPaused = false;
+
+let controlsTimer = null;
+
+
+/* =========================================================
+   MODE SELECTION
+========================================================= */
+
+videoCard.addEventListener(
+    "click",
+    () => videoInput.click()
+);
+
+presentationCard.addEventListener(
+    "click",
+    () => presentationInput.click()
+);
+
+
+/* =========================================================
+   FILE INPUT
+========================================================= */
+
+videoInput.addEventListener(
+    "change",
+    event => {
+
+        const file =
+            event.target.files[0];
+
+        if (file) {
+
+            startVideo(file);
+
+        }
+
+    }
+);
+
+
+presentationInput.addEventListener(
+    "change",
+    event => {
+
+        const file =
+            event.target.files[0];
+
+        if (file) {
+
+            startPresentation(file);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   DRAG & DROP
+========================================================= */
+
+dropZone.addEventListener(
+    "dragover",
+    event => {
+
+        event.preventDefault();
+
+        dropZone.classList.add("drag");
+
+    }
+);
+
+dropZone.addEventListener(
+    "dragleave",
+    () => {
+
+        dropZone.classList.remove("drag");
+
+    }
+);
+
+dropZone.addEventListener(
+    "drop",
+    event => {
+
+        event.preventDefault();
+
+        dropZone.classList.remove("drag");
+
+        const file =
+            event.dataTransfer.files[0];
+
+        if (!file) return;
+
+        handleFile(file);
+
+    }
+);
+
+dropZone.addEventListener(
+    "click",
+    () => {
+
+        videoInput.click();
+
+    }
+);
+
+
+/* =========================================================
+   HANDLE FILE
+========================================================= */
+
+function handleFile(file) {
+
+    const name =
+        file.name.toLowerCase();
+
+    const type =
+        file.type.toLowerCase();
+
+
+    if (
+        type.startsWith("video/") ||
+        /\.(mp4|webm|ogg|ogv|mov|m4v|avi|mkv|wmv|flv|3gp|mpeg|mpg)$/i.test(name)
+    ) {
+
+        startVideo(file);
+
+        return;
+    }
+
+
+    if (
+        /\.(pdf)$/i.test(name)
+    ) {
+
+        startPresentation(file);
+
+        return;
+    }
+
+
+    if (
+        /\.(ppt|pptx|odp)$/i.test(name)
+    ) {
+
+        startPresentation(file);
+
+        return;
+    }
+
+
+    if (
+        type.startsWith("image/")
+    ) {
+
+        startPresentation(file);
+
+        return;
+    }
+
+
+    alert(
+        "Dieses Dateiformat kann von deinem Browser nicht direkt angezeigt werden."
+    );
+
+}
+
+
+/* =========================================================
+   VIDEO START
+========================================================= */
+
+function startVideo(file) {
+
+    cleanup();
+
+    mode = "video";
+
+    currentFileURL =
+        URL.createObjectURL(file);
+
+    video.src =
+        currentFileURL;
+
+    video.loop = true;
+
+    video.muted = false;
+
+    video.style.display =
+        "block";
+
+    slides.style.display =
+        "none";
+
+    startScreen.style.display =
+        "none";
+
+    player.style.display =
+        "block";
+
+
+    requestFullscreen();
+
+
+    video.play()
+        .catch(() => {
+
+            video.muted = true;
+
+            video.play()
+                .catch(() => {});
+
+        });
+
+
+    showControlsTemporarily();
+
+}
+
+
+/* =========================================================
+   PRESENTATION START
+========================================================= */
+
+async function startPresentation(file) {
+
+    cleanup();
+
+    mode = "presentation";
+
+    startScreen.style.display =
+        "none";
+
+    player.style.display =
+        "block";
+
+    video.style.display =
+        "none";
+
+    slides.style.display =
+        "flex";
+
+    loading.style.display =
+        "flex";
+
+    loadingText.textContent =
+        "Datei wird vorbereitet …";
+
+
+    try {
+
+        const extension =
+            file.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+
+        if (extension === "pdf") {
+
+            await loadPDF(file);
+
+        }
+
+        else if (
+            extension === "pptx" ||
+            extension === "ppt"
+        ) {
+
+            await loadPowerPoint(file);
+
+        }
+
+        else if (
+            extension === "odp"
+        ) {
+
+            throw new Error(
+                "ODP wird aktuell nicht unterstützt. Bitte exportiere die Datei als PDF oder PPTX."
+            );
+
+        }
+
+        else if (
+            file.type.startsWith("image/")
+        ) {
+
+            await loadImage(file);
+
+        }
+
+        else {
+
+            throw new Error(
+                "Dieses Präsentationsformat wird nicht unterstützt."
+            );
+
+        }
+
+
+        if (
+            presentationSlides.length === 0
+        ) {
+
+            throw new Error(
+                "Keine Folien gefunden."
+            );
+
+        }
+
+
+        currentSlide = 0;
+
+        presentationPaused = false;
+
+        showSlide();
+
+        startPresentationTimer();
+
+        loading.style.display =
+            "none";
+
+
+        requestFullscreen();
+
+        showControlsTemporarily();
+
+    }
+
+    catch (error) {
+
+        loading.style.display =
+            "none";
+
+        alert(
+            "Die Datei konnte nicht geöffnet werden.\n\n" +
+            error.message
+        );
+
+        exitPlayer();
+
+    }
+
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+function loadImage(file) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const image =
+                new Image();
+
+            image.onload = () => {
+
+                presentationSlides = [
+                    image
+                ];
+
+                resolve();
+
+            };
+
+            image.onerror =
+                reject;
+
+            image.src =
+                URL.createObjectURL(file);
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   PDF
+========================================================= */
+
+async function loadPDF(file) {
+
+    if (!window.pdfjsLib) {
+
+        throw new Error(
+            "PDF-Renderer konnte nicht geladen werden."
+        );
+
+    }
+
+
+    const data =
+        await file.arrayBuffer();
+
+
+    const pdf =
+        await window.pdfjsLib
+            .getDocument({
+                data
+            })
+            .promise;
+
+
+    presentationSlides = [];
+
+
+    for (
+        let pageNumber = 1;
+        pageNumber <= pdf.numPages;
+        pageNumber++
+    ) {
+
+        loadingText.textContent =
+            `PDF wird geladen: ${pageNumber} / ${pdf.numPages}`;
+
+
+        const page =
+            await pdf.getPage(pageNumber);
+
+
+        const viewport =
+            page.getViewport({
+                scale: 2
+            });
+
+
+        const pageCanvas =
+            document.createElement("canvas");
+
+
+        const pageContext =
+            pageCanvas.getContext("2d");
+
+
+        pageCanvas.width =
+            Math.ceil(viewport.width);
+
+        pageCanvas.height =
+            Math.ceil(viewport.height);
+
+
+        await page.render({
+
+            canvasContext:
+                pageContext,
+
+            viewport:
+                viewport
+
+        }).promise;
+
+
+        presentationSlides.push(
+            pageCanvas
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   POWERPOINT (PPT / PPTX)
+
+   PPTX ist ein ZIP-Container mit XML-Dateien.
+   Wir lesen ihn direkt im Browser aus (JSZip)
+   und zeichnen jede Folie (Text + Bilder) auf
+   ein Canvas.
+
+   Hinweis: Es handelt sich um ein bestmögliches
+   Rendering. Sehr komplexe Folien (SmartArt,
+   Diagramme, Animationen, eingebettete Videos)
+   werden nicht vollständig unterstützt.
+
+   Das alte Format .ppt (Binär-Format vor 2007)
+   wird nicht unterstützt, nur das moderne
+   .pptx-XML-Format.
+========================================================= */
+
+async function loadPowerPoint(file) {
+
+    if (!window.JSZip) {
+
+        throw new Error(
+            "PPTX-Renderer konnte nicht geladen werden."
+        );
+
+    }
+
+
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+    if (extension === "ppt") {
+
+        throw new Error(
+            "Das alte .ppt-Format wird nicht unterstützt. " +
+            "Bitte speichere die Datei als .pptx (PowerPoint ab 2007) und lade sie erneut hoch."
+        );
+
+    }
+
+
+    loadingText.textContent =
+        "Präsentation wird entpackt …";
+
+
+    const arrayBuffer =
+        await file.arrayBuffer();
+
+    const zip =
+        await window.JSZip.loadAsync(arrayBuffer);
+
+
+    const presFile =
+        zip.file("ppt/presentation.xml");
+
+    const presRelsFile =
+        zip.file("ppt/_rels/presentation.xml.rels");
+
+    if (!presFile || !presRelsFile) {
+
+        throw new Error(
+            "Die Datei ist keine gültige PPTX-Datei."
+        );
+
+    }
+
+
+    const parser =
+        new DOMParser();
+
+
+    const presDoc =
+        parser.parseFromString(
+            await presFile.async("text"),
+            "application/xml"
+        );
+
+    const presRelsDoc =
+        parser.parseFromString(
+            await presRelsFile.async("text"),
+            "application/xml"
+        );
+
+
+    const relMap = {};
+
+    Array.from(
+        presRelsDoc.getElementsByTagName("Relationship")
+    ).forEach(rel => {
+
+        relMap[rel.getAttribute("Id")] =
+            rel.getAttribute("Target");
+
+    });
+
+
+    const sldSzEl =
+        presDoc.getElementsByTagName("p:sldSz")[0];
+
+    const slideWidthEmu =
+        sldSzEl ? parseInt(sldSzEl.getAttribute("cx")) : 9144000;
+
+    const slideHeightEmu =
+        sldSzEl ? parseInt(sldSzEl.getAttribute("cy")) : 6858000;
+
+
+    const sldIdLst =
+        presDoc.getElementsByTagName("p:sldIdLst")[0];
+
+    if (!sldIdLst) {
+
+        throw new Error(
+            "In der Präsentation wurden keine Folien gefunden."
+        );
+
+    }
+
+
+    const slideRefs =
+        Array.from(
+            sldIdLst.getElementsByTagName("p:sldId")
+        ).map(el => {
+
+            const rId =
+                el.getAttribute("r:id");
+
+            return relMap[rId];
+
+        }).filter(Boolean);
+
+
+    presentationSlides = [];
+
+
+    const canvasWidth = 1920;
+
+    const scale =
+        canvasWidth / slideWidthEmu;
+
+    const canvasHeight =
+        Math.round(slideHeightEmu * scale);
+
+
+    for (
+        let i = 0;
+        i < slideRefs.length;
+        i++
+    ) {
+
+        loadingText.textContent =
+            `Folie wird geladen: ${i + 1} / ${slideRefs.length}`;
+
+
+        const slidePath =
+            resolveOoxmlPath("ppt/", slideRefs[i]);
+
+        const slideFile =
+            zip.file(slidePath);
+
+        if (!slideFile) continue;
+
+
+        const slideDoc =
+            parser.parseFromString(
+                await slideFile.async("text"),
+                "application/xml"
+            );
+
+
+        const slideName =
+            slidePath.split("/").pop();
+
+        const slideRelsPath =
+            "ppt/slides/_rels/" + slideName + ".rels";
+
+        let slideRelMap = {};
+
+        const slideRelsFile =
+            zip.file(slideRelsPath);
+
+        if (slideRelsFile) {
+
+            const slideRelsDoc =
+                parser.parseFromString(
+                    await slideRelsFile.async("text"),
+                    "application/xml"
+                );
+
+            Array.from(
+                slideRelsDoc.getElementsByTagName("Relationship")
+            ).forEach(rel => {
+
+                slideRelMap[rel.getAttribute("Id")] =
+                    rel.getAttribute("Target");
+
+            });
+
+        }
+
+
+        const slideCanvas =
+            document.createElement("canvas");
+
+        slideCanvas.width = canvasWidth;
+        slideCanvas.height = canvasHeight;
+
+        const sctx =
+            slideCanvas.getContext("2d");
+
+        sctx.fillStyle = "#ffffff";
+
+        sctx.fillRect(
+            0, 0, canvasWidth, canvasHeight
+        );
+
+
+        const spTree =
+            slideDoc.getElementsByTagName("p:spTree")[0];
+
+        if (spTree) {
+
+            const nodes =
+                Array.from(spTree.children);
+
+            for (const node of nodes) {
+
+                await renderOoxmlNode(
+                    node, sctx, scale, zip, slideRelMap
+                );
+
+            }
+
+        }
+
+
+        presentationSlides.push(
+            slideCanvas
+        );
+
+    }
+
+}
+
+
+/* -- resolve relative OOXML paths (../ etc.) -------------- */
+
+function resolveOoxmlPath(basePath, relativePath) {
+
+    const baseParts =
+        basePath.split("/").filter(Boolean);
+
+    const relParts =
+        relativePath.split("/");
+
+    for (const part of relParts) {
+
+        if (part === "..") {
+
+            baseParts.pop();
+
+        }
+
+        else if (part === "." || part === "") {
+
+            continue;
+
+        }
+
+        else {
+
+            baseParts.push(part);
+
+        }
+
+    }
+
+    return baseParts.join("/");
+
+}
+
+
+/* -- render a single shape / picture / group --------------- */
+
+async function renderOoxmlNode(node, sctx, scale, zip, slideRelMap) {
+
+    const tag = node.tagName;
+
+    if (tag === "p:pic") {
+
+        await renderOoxmlPicture(
+            node, sctx, scale, zip, slideRelMap
+        );
+
+    }
+
+    else if (tag === "p:sp") {
+
+        renderOoxmlText(
+            node, sctx, scale
+        );
+
+    }
+
+    else if (tag === "p:grpSp") {
+
+        const children =
+            Array.from(node.children);
+
+        for (const child of children) {
+
+            await renderOoxmlNode(
+                child, sctx, scale, zip, slideRelMap
+            );
+
+        }
+
+    }
+
+}
+
+
+/* -- read position/size (a:xfrm) of a shape ----------------- */
+
+function getOoxmlXfrm(node) {
+
+    const spPr =
+        node.getElementsByTagName("p:spPr")[0] ||
+        node.getElementsByTagName("p:grpSpPr")[0];
+
+    if (!spPr) return null;
+
+    const xfrm =
+        spPr.getElementsByTagName("a:xfrm")[0];
+
+    if (!xfrm) return null;
+
+    const off =
+        xfrm.getElementsByTagName("a:off")[0];
+
+    const ext =
+        xfrm.getElementsByTagName("a:ext")[0];
+
+    if (!off || !ext) return null;
+
+    return {
+
+        x: parseInt(off.getAttribute("x")),
+        y: parseInt(off.getAttribute("y")),
+        cx: parseInt(ext.getAttribute("cx")),
+        cy: parseInt(ext.getAttribute("cy"))
+
+    };
+
+}
+
+
+/* -- draw text of a p:sp shape, with basic word-wrap -------- */
+
+function renderOoxmlText(node, sctx, scale) {
+
+    const xfrm =
+        getOoxmlXfrm(node);
+
+    if (!xfrm) return;
+
+    const x = xfrm.x * scale;
+    const y = xfrm.y * scale;
+    const w = xfrm.cx * scale;
+    const h = xfrm.cy * scale;
+
+    const maxY = y + h;
+
+    const txBody =
+        node.getElementsByTagName("p:txBody")[0];
+
+    if (!txBody) return;
+
+    const paragraphs =
+        Array.from(txBody.getElementsByTagName("a:p"));
+
+    let cursorY = y + 4;
+
+    for (const p of paragraphs) {
+
+        const runs =
+            Array.from(p.getElementsByTagName("a:r"));
+
+        const text =
+            runs.map(r => {
+
+                const t =
+                    r.getElementsByTagName("a:t")[0];
+
+                return t ? t.textContent : "";
+
+            }).join("");
+
+
+        let sz = 1800;
+        let bold = false;
+        let italic = false;
+        let color = "#000000";
+
+        const firstRPr =
+            runs.length ?
+                runs[0].getElementsByTagName("a:rPr")[0] :
+                null;
+
+        if (firstRPr) {
+
+            if (firstRPr.getAttribute("sz")) {
+
+                sz = parseInt(firstRPr.getAttribute("sz"));
+
+            }
+
+            if (firstRPr.getAttribute("b") === "1") bold = true;
+            if (firstRPr.getAttribute("i") === "1") italic = true;
+
+            const fill =
+                firstRPr.getElementsByTagName("a:solidFill")[0];
+
+            if (fill) {
+
+                const srgb =
+                    fill.getElementsByTagName("a:srgbClr")[0];
+
+                if (srgb) {
+
+                    color = "#" + srgb.getAttribute("val");
+
+                }
+
+            }
+
+        }
+
+
+        const fontPx =
+            Math.max(10, (sz / 100) * 12700 * scale);
+
+        sctx.font =
+            `${italic ? "italic " : ""}${bold ? "bold " : ""}${fontPx}px Arial, sans-serif`;
+
+        sctx.fillStyle = color;
+        sctx.textBaseline = "top";
+
+
+        if (!text.trim()) {
+
+            cursorY += fontPx * 1.3;
+
+            continue;
+
+        }
+
+
+        const words =
+            text.split(" ");
+
+        let line = "";
+
+        for (const word of words) {
+
+            const testLine =
+                line ? line + " " + word : word;
+
+            if (
+                sctx.measureText(testLine).width > (w - 8) &&
+                line
+            ) {
+
+                if (cursorY < maxY) {
+
+                    sctx.fillText(line, x + 4, cursorY);
+
+                }
+
+                cursorY += fontPx * 1.3;
+
+                line = word;
+
+            }
+
+            else {
+
+                line = testLine;
+
+            }
+
+        }
+
+        if (line && cursorY < maxY) {
+
+            sctx.fillText(line, x + 4, cursorY);
+
+            cursorY += fontPx * 1.3;
+
+        }
+
+    }
+
+}
+
+
+/* -- draw an image (p:pic) shape ---------------------------- */
+
+async function renderOoxmlPicture(node, sctx, scale, zip, slideRelMap) {
+
+    const xfrm =
+        getOoxmlXfrm(node);
+
+    if (!xfrm) return;
+
+    const blipFill =
+        node.getElementsByTagName("p:blipFill")[0];
+
+    if (!blipFill) return;
+
+    const blip =
+        blipFill.getElementsByTagName("a:blip")[0];
+
+    if (!blip) return;
+
+    const rEmbed =
+        blip.getAttribute("r:embed");
+
+    if (!rEmbed) return;
+
+    const target =
+        slideRelMap[rEmbed];
+
+    if (!target) return;
+
+
+    const mediaPath =
+        resolveOoxmlPath("ppt/slides/", target);
+
+    const imgFile =
+        zip.file(mediaPath);
+
+    if (!imgFile) return;
+
+
+    try {
+
+        const blob =
+            await imgFile.async("blob");
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const img =
+            await new Promise((resolve, reject) => {
+
+                const image = new Image();
+
+                image.onload = () => resolve(image);
+                image.onerror = reject;
+
+                image.src = url;
+
+            });
+
+        sctx.drawImage(
+            img,
+            xfrm.x * scale,
+            xfrm.y * scale,
+            xfrm.cx * scale,
+            xfrm.cy * scale
+        );
+
+        URL.revokeObjectURL(url);
+
+    }
+
+    catch (error) {
+
+        /*
+           Nicht unterstützte Bildformate
+           (z. B. EMF/WMF) einfach überspringen,
+           statt die ganze Folie abzubrechen.
+        */
+
+        console.log(
+            "Bild konnte nicht gerendert werden:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SHOW SLIDE
+========================================================= */
+
+function showSlide() {
+
+    if (
+        presentationSlides.length === 0
+    ) return;
+
+
+    const slide =
+        presentationSlides[currentSlide];
+
+
+    canvas.width =
+        slide.width;
+
+    canvas.height =
+        slide.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    ctx.drawImage(
+        slide,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    slideCounter.textContent =
+        `${currentSlide + 1} / ${presentationSlides.length}`;
+
+
+    const percentage =
+        (
+            (currentSlide + 1) /
+            presentationSlides.length
+        ) * 100;
+
+
+    progressBar.style.width =
+        percentage + "%";
+
+}
+
+
+/* =========================================================
+   PRESENTATION TIMER
+========================================================= */
+
+function startPresentationTimer() {
+
+    stopPresentationTimer();
+
+
+    slideTimer =
+        setInterval(
+            () => {
+
+                if (
+                    presentationPaused
+                ) return;
+
+
+                nextSlide();
+
+            },
+            8000
+        );
+
+}
+
+
+/* =========================================================
+   STOP TIMER
+========================================================= */
+
+function stopPresentationTimer() {
+
+    if (slideTimer) {
+
+        clearInterval(
+            slideTimer
+        );
+
+        slideTimer = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   NEXT SLIDE
+========================================================= */
+
+function nextSlide() {
+
+    if (
+        presentationSlides.length === 0
+    ) return;
+
+
+    currentSlide++;
+
+
+    if (
+        currentSlide >=
+        presentationSlides.length
+    ) {
+
+        currentSlide = 0;
+
+    }
+
+
+    showSlide();
+
+}
+
+
+/* =========================================================
+   PREVIOUS SLIDE
+========================================================= */
+
+function previousSlide() {
+
+    if (
+        presentationSlides.length === 0
+    ) return;
+
+
+    currentSlide--;
+
+
+    if (
+        currentSlide < 0
+    ) {
+
+        currentSlide =
+            presentationSlides.length - 1;
+
+    }
+
+
+    showSlide();
+
+}
+
+
+/* =========================================================
+   PAUSE
+========================================================= */
+
+function togglePause() {
+
+    if (
+        mode === "video"
+    ) {
+
+        if (
+            video.paused
+        ) {
+
+            video.play();
+
+        } else {
+
+            video.pause();
+
+        }
+
+        return;
+    }
+
+
+    if (
+        mode === "presentation"
+    ) {
+
+        presentationPaused =
+            !presentationPaused;
+
+    }
+
+}
+
+
+/* =========================================================
+   VIDEO PROGRESS
+========================================================= */
+
+video.addEventListener(
+    "timeupdate",
+    () => {
+
+        if (
+            !video.duration
+        ) return;
+
+
+        const percentage =
+            (
+                video.currentTime /
+                video.duration
+            ) * 100;
+
+
+        progressBar.style.width =
+            percentage + "%";
+
+    }
+);
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+async function requestFullscreen() {
+
+    try {
+
+        if (
+            !document.fullscreenElement &&
+            document.documentElement.requestFullscreen
+        ) {
+
+            await document.documentElement
+                .requestFullscreen({
+                    navigationUI: "hide"
+                })
+                .catch(() => {});
+
+        }
+
+    }
+    catch (error) {
+
+        console.log(
+            "Fullscreen nicht verfügbar:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   FULLSCREEN TOGGLE
+========================================================= */
+
+async function toggleFullscreen() {
+
+    try {
+
+        if (
+            !document.fullscreenElement
+        ) {
+
+            await document.documentElement
+                .requestFullscreen({
+                    navigationUI: "hide"
+                })
+                .catch(() => {});
+
+        }
+
+        else {
+
+            await document.exitFullscreen();
+
+        }
+
+    }
+    catch (error) {
+
+        console.log(error);
+
+    }
+
+}
+
+
+/* =========================================================
+   SHOW CONTROLS
+========================================================= */
+
+function showControlsTemporarily() {
+
+    player.classList.add(
+        "showControls"
+    );
+
+
+    clearTimeout(
+        controlsTimer
+    );
+
+
+    controlsTimer =
+        setTimeout(
+            () => {
+
+                player.classList.remove(
+                    "showControls"
+                );
+
+            },
+            2500
+        );
+
+}
+
+
+/* =========================================================
+   MOUSE
+========================================================= */
+
+player.addEventListener(
+    "mousemove",
+    showControlsTemporarily
+);
+
+
+/* =========================================================
+   TOUCH
+========================================================= */
+
+player.addEventListener(
+    "touchstart",
+    showControlsTemporarily,
+    {
+        passive: true
+    }
+);
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+pauseButton.addEventListener(
+    "click",
+    () => {
+
+        togglePause();
+
+        showControlsTemporarily();
+
+    }
+);
+
+
+previousButton.addEventListener(
+    "click",
+    () => {
+
+        previousSlide();
+
+        showControlsTemporarily();
+
+    }
+);
+
+
+nextButton.addEventListener(
+    "click",
+    () => {
+
+        nextSlide();
+
+        showControlsTemporarily();
+
+    }
+);
+
+
+fullscreenButton.addEventListener(
+    "click",
+    () => {
+
+        toggleFullscreen();
+
+    }
+);
+
+
+exitButton.addEventListener(
+    "click",
+    () => {
+
+        exitPlayer();
+
+    }
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            player.style.display !== "block"
+        ) return;
+
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            if (
+                !document.fullscreenElement
+            ) {
+
+                exitPlayer();
+
+            }
+
+            return;
+
+        }
+
+
+        if (
+            event.key === "ArrowRight"
+        ) {
+
+            nextSlide();
+
+        }
+
+
+        if (
+            event.key === "ArrowLeft"
+        ) {
+
+            previousSlide();
+
+        }
+
+
+        if (
+            event.code === "Space"
+        ) {
+
+            event.preventDefault();
+
+            togglePause();
+
+        }
+
+
+        if (
+            event.key.toLowerCase() === "f"
+        ) {
+
+            toggleFullscreen();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SWIPE
+========================================================= */
+
+let touchStartX = 0;
+
+player.addEventListener(
+    "touchstart",
+    event => {
+
+        touchStartX =
+            event.changedTouches[0]
+                .screenX;
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+player.addEventListener(
+    "touchend",
+    event => {
+
+        const touchEndX =
+            event.changedTouches[0]
+                .screenX;
+
+
+        const difference =
+            touchEndX - touchStartX;
+
+
+        if (
+            Math.abs(difference) < 60
+        ) return;
+
+
+        if (
+            difference < 0
+        ) {
+
+            nextSlide();
+
+        }
+
+        else {
+
+            previousSlide();
+
+        }
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+/* =========================================================
+   EXIT PLAYER
+========================================================= */
+
+function exitPlayer() {
+
+    stopPresentationTimer();
+
+
+    video.pause();
+
+
+    if (
+        currentFileURL
+    ) {
+
+        URL.revokeObjectURL(
+            currentFileURL
+        );
+
+        currentFileURL = null;
+
+    }
+
+
+    video.removeAttribute(
+        "src"
+    );
+
+    video.load();
+
+
+    presentationSlides = [];
+
+    currentSlide = 0;
+
+    mode = null;
+
+
+    progressBar.style.width =
+        "0%";
+
+
+    player.style.display =
+        "none";
+
+
+    startScreen.style.display =
+        "flex";
+
+
+    loading.style.display =
+        "none";
+
+
+    player.classList.remove(
+        "showControls"
+    );
+
+
+    if (
+        document.fullscreenElement
+    ) {
+
+        document.exitFullscreen()
+            .catch(() => {});
+
+    }
+
+}
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+function cleanup() {
+
+    stopPresentationTimer();
+
+
+    if (
+        currentFileURL
+    ) {
+
+        URL.revokeObjectURL(
+            currentFileURL
+        );
+
+        currentFileURL = null;
+
+    }
+
+
+    presentationSlides = [];
+
+    currentSlide = 0;
+
+}
+
+
+/* =========================================================
+   FULLSCREEN CHANGE
+========================================================= */
+
+document.addEventListener(
+    "fullscreenchange",
+    () => {
+
+        showControlsTemporarily();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
