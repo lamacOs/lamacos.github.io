@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -11,13 +10,17 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     width: 100%;
     min-height: 100%;
     font-family: Arial, sans-serif;
     background: #10131a;
     color: white;
+
+    /* Normalen Mauszeiger auf der gesamten Website ausblenden */
+    cursor: none !important;
 }
 
 body {
@@ -50,6 +53,7 @@ input {
     background: #1d222c;
     color: white;
     outline: none;
+    cursor: none !important;
 }
 
 input:focus {
@@ -65,7 +69,7 @@ button {
     color: white;
     font-size: 16px;
     font-weight: bold;
-    cursor: pointer;
+    cursor: none !important;
 }
 
 button:hover {
@@ -95,23 +99,30 @@ button:hover {
     display: block;
 }
 
-/* Eigener Mauszeiger */
+/*
+ * Eigener Mauszeiger
+ *
+ * Das Bild ist ungefähr dreimal so groß:
+ * vorher: 32px
+ * jetzt: 96px
+ */
 #customCursor {
-    display: none;
+    display: block;
     position: fixed;
     left: 0;
     top: 0;
-    width: 32px;
-    height: 32px;
+    width: 96px;
+    height: 96px;
     object-fit: contain;
     pointer-events: none;
     z-index: 999999;
-    transform: translate(-2px, -2px);
+    transform: translate(-8px, -8px);
 }
 
 /* Während der Player aktiv ist, wird der echte Cursor versteckt */
 .player-active,
-.player-active * {
+.player-active *,
+.player-active iframe {
     cursor: none !important;
 }
 
@@ -127,6 +138,7 @@ button:hover {
     background: rgba(20, 20, 20, 0.75);
     border: 1px solid #555;
     font-size: 13px;
+    cursor: none !important;
 }
 
 #exitButton:hover {
@@ -195,6 +207,12 @@ const customCursor = document.getElementById("customCursor");
 const exitButton = document.getElementById("exitButton");
 
 let playerOpen = false;
+
+/*
+ * Eigener Mauszeiger wird immer angezeigt,
+ * sobald die Website geöffnet ist.
+ */
+customCursor.style.display = "block";
 
 /*
  * Ermittelt die Scratch-Projekt-ID aus einem Link.
@@ -268,7 +286,7 @@ async function closeProject() {
     playerOpen = false;
 
     document.body.classList.remove("player-active");
-    customCursor.style.display = "none";
+    customCursor.style.display = "block";
     exitButton.style.display = "none";
     player.style.display = "none";
 
@@ -285,13 +303,19 @@ async function closeProject() {
 
 /*
  * Eigener Mauszeiger:
- * Das Bild folgt der echten Mausposition.
+ * Das Bild folgt immer der echten Mausposition.
  */
 document.addEventListener("mousemove", function(event) {
-    if (!playerOpen) return;
-
     customCursor.style.left = event.clientX + "px";
     customCursor.style.top = event.clientY + "px";
+});
+
+/*
+ * Wenn die Maus die Website wieder betritt,
+ * wird der eigene Mauszeiger erneut eingeblendet.
+ */
+document.addEventListener("mouseenter", function() {
+    customCursor.style.display = "block";
 });
 
 /*
@@ -306,7 +330,7 @@ document.addEventListener("keydown", function(event) {
         event.preventDefault();
 
         /*
-         * Scratch Embed-Nachricht zum Starten.
+         * Scratch-Embed-Nachricht zum Starten.
          */
         scratchFrame.contentWindow.postMessage(
             {
@@ -320,7 +344,7 @@ document.addEventListener("keydown", function(event) {
         event.preventDefault();
 
         /*
-         * Scratch Embed-Nachricht zum Stoppen.
+         * Scratch-Embed-Nachricht zum Stoppen.
          */
         scratchFrame.contentWindow.postMessage(
             {
