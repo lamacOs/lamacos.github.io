@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BOOST Control · LEGO Move Hub Steuerung</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --accent:#FF6A00;
+  --accent-2:#FFB020;
+  --accent-ink:#B84E00;
+  --bg:#F7F6F4;
+  --bg-elevated:#FFFFFF;
+  --surface:rgba(255,255,255,0.72);
+  --surface-solid:#FFFFFF;
+  --border:rgba(20,18,15,0.09);
+  --border-strong:rgba(20,18,15,0.16);
+  --text:#1A1714;
+  --text-secondary:#726B63;
+  --text-tertiary:#A69D92;
+  --success:#1E8E5A;
+  --danger:#D8402C;
+  --warning:#C98A00;
+  --shadow-sm:0 1px 2px rgba(20,18,15,0.06), 0 1px 1px rgba(20,18,15,0.04);
+  --shadow-md:0 8px 24px -8px rgba(20,18,15,0.16), 0 2px 8px -2px rgba(20,18,15,0.08);
+  --shadow-lg:0 24px 60px -16px rgba(20,18,15,0.28), 0 8px 24px -8px rgba(20,18,15,0.14);
+  --radius-s:12px;
+  --radius-m:18px;
+  --radius-l:26px;
+  --sidebar-w:264px;
+  --topbar-h:72px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+:root[data-theme="dark"]{
+  --bg:#121110;
+  --bg-elevated:#1B1918;
+  --surface:rgba(30,28,26,0.66);
+  --surface-solid:#211F1D;
+  --border:rgba(255,255,255,0.08);
+  --border-strong:rgba(255,255,255,0.14);
+  --text:#F5F2EE;
+  --text-secondary:#B6ADA2;
+  --text-tertiary:#7C766D;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:0 8px 24px -8px rgba(0,0,0,0.5), 0 2px 8px -2px rgba(0,0,0,0.3);
+  --shadow-lg:0 24px 60px -16px rgba(0,0,0,0.6);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:
+    radial-gradient(1200px 700px at 100% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background-color .4s var(--ease), color .4s var(--ease);
+}
+::selection{background:color-mix(in srgb, var(--accent) 30%, transparent);}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+a{color:inherit;}
+button{font-family:inherit;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px;}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app{display:flex;min-height:100vh;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  width:var(--sidebar-w);
+  flex-shrink:0;
+  padding:22px 16px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  border-right:1px solid var(--border);
+  background:var(--surface);
+  backdrop-filter:blur(24px) saturate(160%);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+  z-index:40;
+}
+.brand{
+  display:flex;align-items:center;gap:12px;
+  padding:8px 10px 22px 10px;
+}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(150deg,var(--accent),var(--accent-2));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-sm);
+  flex-shrink:0;
+}
+.brand-mark svg{width:22px;height:22px;}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;}
+.brand-text b{font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
+.brand-text span{font-size:11.5px;color:var(--text-secondary);}
+
+.nav-group{margin-top:14px;}
+.nav-group-label{font-size:11px;color:var(--text-tertiary);padding:0 12px 6px;font-weight:600;letter-spacing:.02em;}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:13px;
+  cursor:pointer;user-select:none;
+  color:var(--text-secondary);
+  font-size:14px;font-weight:520;
+  transition:background-color .18s var(--ease),color .18s var(--ease),transform .18s var(--ease);
+  position:relative;
+}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;}
+.nav-item:hover{background:color-mix(in srgb, var(--accent) 7%, transparent);color:var(--text);}
+.nav-item.active{background:color-mix(in srgb, var(--accent) 13%, transparent);color:var(--accent-ink);font-weight:650;}
+:root[data-theme="dark"] .nav-item.active{color:var(--accent-2);}
+.nav-item .badge{
+  margin-left:auto;font-size:10.5px;background:var(--accent);color:#fff;
+  padding:1px 7px;border-radius:20px;font-weight:700;
+}
+.sidebar-foot{margin-top:auto;padding:10px;}
+.mini-status{
+  display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;
+  background:var(--surface-solid);border:1px solid var(--border);box-shadow:var(--shadow-sm);
+  font-size:12.5px;
+}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--text-tertiary);flex-shrink:0;box-shadow:0 0 0 3px transparent;transition:.3s;}
+.dot.on{background:var(--success);box-shadow:0 0 0 3px color-mix(in srgb, var(--success) 25%, transparent);animation:pulseDot 2s infinite;}
+.dot.err{background:var(--danger);box-shadow:0 0 0 3px color-mix(in srgb, var(--danger) 25%, transparent);}
+@keyframes pulseDot{0%,100%{opacity:1;}50%{opacity:.55;}}
+
+/* ---------- Main ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{
+  height:var(--topbar-h);flex-shrink:0;
+  display:flex;align-items:center;gap:16px;
+  padding:0 28px;
+  position:sticky;top:0;z-index:30;
+  background:var(--surface);
+  backdrop-filter:blur(24px) saturate(160%);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+  border-bottom:1px solid var(--border);
+}
+.page-title{font-size:20px;font-weight:750;letter-spacing:-.015em;}
+.page-sub{font-size:12.5px;color:var(--text-secondary);margin-top:1px;}
+.topbar-spacer{flex:1;}
+.chip{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 13px;border-radius:100px;
+  background:var(--surface-solid);border:1px solid var(--border);
+  font-size:12.5px;font-weight:600;color:var(--text-secondary);
+  box-shadow:var(--shadow-sm);
+}
+.chip svg{width:14px;height:14px;}
+.chip.good{color:var(--success);}
+.chip.warn{color:var(--warning);}
+.chip.bad{color:var(--danger);}
+.icon-btn{
+  width:38px;height:38px;border-radius:12px;border:1px solid var(--border);
+  background:var(--surface-solid);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .15s var(--ease),background .15s;
+  color:var(--text-secondary);
+}
+.icon-btn:hover{transform:translateY(-1px);color:var(--text);}
+.icon-btn svg{width:17px;height:17px;}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;justify-content:center;
+  padding:10px 18px;border-radius:13px;border:1px solid transparent;
+  font-size:13.5px;font-weight:650;cursor:pointer;
+  transition:transform .15s var(--ease), box-shadow .15s var(--ease), opacity .15s;
+  white-space:nowrap;
+}
+.btn svg{width:15px;height:15px;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 6px 18px -6px color-mix(in srgb, var(--accent) 70%, transparent);}
+.btn-primary:hover{box-shadow:0 8px 22px -6px color-mix(in srgb, var(--accent) 80%, transparent);transform:translateY(-1px);}
+.btn-secondary{background:var(--surface-solid);border-color:var(--border-strong);color:var(--text);}
+.btn-secondary:hover{border-color:var(--accent);}
+.btn-danger{background:color-mix(in srgb, var(--danger) 12%, transparent);color:var(--danger);}
+.btn-danger:hover{background:color-mix(in srgb, var(--danger) 20%, transparent);}
+.btn-ghost{background:transparent;color:var(--text-secondary);}
+.btn-ghost:hover{color:var(--text);background:color-mix(in srgb, var(--text) 6%, transparent);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
+.btn.sm{padding:7px 13px;font-size:12.5px;border-radius:10px;}
+
+.content{padding:26px 28px 60px;max-width:1360px;width:100%;margin:0 auto;}
+.view{display:none;animation:viewIn .35s var(--ease);}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+.grid{display:grid;gap:18px;}
+.grid.cols-2{grid-template-columns:repeat(2,1fr);}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-4{grid-template-columns:repeat(4,1fr);}
+@media (max-width:1180px){.grid.cols-4{grid-template-columns:repeat(2,1fr);}.grid.cols-3{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:760px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr;}}
+
+/* ---------- Cards ---------- */
+.card{
+  background:var(--surface-solid);
+  border:1px solid var(--border);
+  border-radius:var(--radius-m);
+  padding:22px;
+  box-shadow:var(--shadow-sm);
+  transition:box-shadow .25s var(--ease), transform .25s var(--ease), border-color .25s;
+}
+.card.hoverable:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--border-strong);}
+.card.glass{background:var(--surface);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);}
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.card-head h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.01em;}
+.card-head .sub{font-size:12px;color:var(--text-secondary);margin-top:2px;}
+.card-icon{
+  width:36px;height:36px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb, var(--accent) 14%, transparent);color:var(--accent-ink);
+}
+:root[data-theme="dark"] .card-icon{color:var(--accent-2);}
+.card-icon svg{width:18px;height:18px;}
+.card-head .grow{flex:1;}
+
+.stat-value{font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1;}
+.stat-label{font-size:12.5px;color:var(--text-secondary);margin-top:6px;}
+.stat-trend{font-size:11.5px;font-weight:700;margin-top:8px;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;}
+.stat-trend.up{color:var(--success);background:color-mix(in srgb, var(--success) 12%, transparent);}
+.stat-trend.down{color:var(--danger);background:color-mix(in srgb, var(--danger) 12%, transparent);}
+
+.progress-track{height:8px;border-radius:100px;background:color-mix(in srgb, var(--text) 8%, transparent);overflow:hidden;}
+.progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .4s var(--ease);}
+
+hr.sep{border:none;border-top:1px solid var(--border);margin:18px 0;}
+.label{font-size:11.5px;font-weight:650;color:var(--text-secondary);text-transform:none;margin-bottom:8px;display:block;}
+.field{margin-bottom:16px;}
+select,input[type=text],input[type=number],textarea{
+  width:100%;padding:10px 13px;border-radius:11px;border:1px solid var(--border-strong);
+  background:var(--bg-elevated);color:var(--text);font-size:13.5px;font-family:inherit;
+  transition:border-color .15s;
+}
+select:focus,input:focus,textarea:focus{border-color:var(--accent);}
+input[type=range]{width:100%;accent-color:var(--accent);}
+textarea{resize:vertical;line-height:1.5;}
+.row{display:flex;gap:10px;align-items:center;}
+.row.wrap{flex-wrap:wrap;}
+.row.between{justify-content:space-between;}
+.tiny{font-size:11.5px;color:var(--text-tertiary);}
+.mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;}
+
+.switch{position:relative;display:inline-block;width:42px;height:25px;flex-shrink:0;}
+.switch input{opacity:0;width:0;height:0;}
+.slider-ui{position:absolute;inset:0;background:color-mix(in srgb, var(--text) 15%, transparent);border-radius:100px;cursor:pointer;transition:.25s;}
+.slider-ui:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.switch input:checked + .slider-ui{background:linear-gradient(135deg,var(--accent),var(--accent-2));}
+.switch input:checked + .slider-ui:before{transform:translateX(17px);}
+
+.tabbar{display:flex;gap:6px;background:color-mix(in srgb, var(--text) 5%, transparent);padding:5px;border-radius:13px;margin-bottom:18px;width:fit-content;}
+.tabbar button{padding:8px 16px;border-radius:9px;border:none;background:transparent;color:var(--text-secondary);font-size:12.5px;font-weight:650;cursor:pointer;transition:.18s;}
+.tabbar button.active{background:var(--surface-solid);color:var(--text);box-shadow:var(--shadow-sm);}
+
+/* ---------- Motors ---------- */
+.motor-card{position:relative;overflow:hidden;}
+.motor-card .accent-bar{position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--accent),var(--accent-2));}
+.dial-wrap{display:flex;align-items:center;justify-content:center;padding:6px 0 14px;}
+.speed-readout{font-size:26px;font-weight:800;text-align:center;}
+.btn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.btn-grid .btn{width:100%;}
+
+/* ---------- Sensors ---------- */
+.sensor-tile{display:flex;flex-direction:column;gap:4px;}
+.sensor-value{font-size:24px;font-weight:800;}
+.sensor-unit{font-size:12px;color:var(--text-tertiary);font-weight:600;}
+.spark{width:100%;height:46px;display:block;margin-top:8px;}
+
+/* ---------- LED ---------- */
+.color-swatch-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
+.swatch{
+  aspect-ratio:1;border-radius:13px;cursor:pointer;border:2px solid transparent;
+  transition:transform .15s var(--ease),border-color .15s;box-shadow:var(--shadow-sm);
+}
+.swatch:hover{transform:scale(1.08);}
+.swatch.selected{border-color:var(--text);}
+.led-preview{
+  width:100%;height:90px;border-radius:16px;margin-bottom:16px;
+  box-shadow:inset 0 0 0 1px var(--border), var(--shadow-md);
+  transition:background .2s;
+}
+
+/* ---------- Remote ---------- */
+.dpad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:6px;margin:0 auto;width:fit-content;}
+.dpad button{border-radius:14px;border:1px solid var(--border-strong);background:var(--surface-solid);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);color:var(--text);transition:.12s;}
+.dpad button:active,.dpad button.pressed{background:var(--accent);color:#fff;transform:scale(.94);}
+.dpad button svg{width:20px;height:20px;}
+.joystick-base{
+  width:190px;height:190px;border-radius:50%;position:relative;margin:0 auto;
+  background:radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--text) 5%, transparent), color-mix(in srgb, var(--text) 10%, transparent));
+  border:1px solid var(--border-strong);box-shadow:inset 0 4px 14px rgba(0,0,0,.08);
+  touch-action:none;
+}
+.joystick-knob{
+  width:74px;height:74px;border-radius:50%;position:absolute;left:58px;top:58px;
+  background:linear-gradient(150deg,var(--accent),var(--accent-2));box-shadow:var(--shadow-md);
+  display:flex;align-items:center;justify-content:center;cursor:grab;
+}
+.joystick-knob svg{width:26px;height:26px;color:#fff;}
+.kbd{
+  display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;padding:0 6px;
+  border-radius:6px;border:1px solid var(--border-strong);background:var(--bg-elevated);
+  font-size:11px;font-weight:700;box-shadow:0 1px 0 var(--border-strong);
+}
+
+/* ---------- Automation / Macro builder ---------- */
+.step-list{display:flex;flex-direction:column;gap:8px;min-height:60px;}
+.step{
+  display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:13px;
+  background:var(--bg-elevated);border:1px solid var(--border);cursor:grab;
+}
+.step.dragging{opacity:.4;}
+.step .step-num{width:22px;height:22px;border-radius:7px;background:color-mix(in srgb, var(--accent) 16%, transparent);color:var(--accent-ink);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+:root[data-theme="dark"] .step .step-num{color:var(--accent-2);}
+.step .step-body{flex:1;min-width:0;}
+.step .step-title{font-size:13px;font-weight:650;}
+.step .step-meta{font-size:11.5px;color:var(--text-secondary);}
+.step-actions{display:flex;gap:4px;}
+.step-actions button{width:26px;height:26px;border-radius:8px;border:none;background:transparent;color:var(--text-tertiary);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.step-actions button:hover{background:color-mix(in srgb, var(--text) 8%, transparent);color:var(--text);}
+.step-actions svg{width:14px;height:14px;}
+.empty-hint{padding:26px;text-align:center;color:var(--text-tertiary);font-size:13px;border:1.5px dashed var(--border-strong);border-radius:14px;}
+
+/* ---------- Programming ---------- */
+.code-shell{border-radius:16px;overflow:hidden;border:1px solid var(--border);background:#1E1B18;}
+.code-toolbar{display:flex;align-items:center;gap:8px;padding:9px 13px;background:#151311;border-bottom:1px solid rgba(255,255,255,.06);}
+.code-dot{width:10px;height:10px;border-radius:50%;}
+#jsEditor{
+  width:100%;min-height:340px;background:#1E1B18;color:#F1E9DF;border:none;padding:16px;
+  font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:12.8px;line-height:1.65;
+  resize:vertical;
+}
+#jsEditor:focus{outline:none;}
+.console-out{
+  background:#141210;color:#D7CFC4;padding:12px 16px;font-family:ui-monospace,monospace;font-size:12px;
+  max-height:180px;overflow-y:auto;border-top:1px solid rgba(255,255,255,.06);
+}
+.console-out .l-err{color:#FF8A75;}
+.console-out .l-ok{color:#8CE0A6;}
+.console-out .l-info{color:#8FB8FF;}
+
+/* ---------- Block editor ---------- */
+.palette{display:flex;flex-wrap:wrap;gap:8px;}
+.palette-item{
+  padding:9px 13px;border-radius:11px;background:var(--bg-elevated);border:1px solid var(--border-strong);
+  font-size:12.5px;font-weight:650;cursor:grab;display:flex;align-items:center;gap:6px;
+  transition:.15s;
+}
+.palette-item:hover{border-color:var(--accent);color:var(--accent-ink);}
+.palette-item .sw{width:9px;height:9px;border-radius:3px;}
+.block{
+  display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:12px;color:#fff;
+  cursor:grab;box-shadow:var(--shadow-sm);
+}
+.block.dragging{opacity:.45;}
+.block-drop{border:2px dashed var(--border-strong);border-radius:14px;min-height:120px;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.block-drop.dragover{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 5%, transparent);}
+.block select,.block input{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 8px;border-radius:7px;font-size:12px;}
+.block .block-label{font-weight:700;font-size:12.5px;white-space:nowrap;}
+.block .rm{margin-left:auto;background:rgba(0,0,0,.18);border:none;color:#fff;width:22px;height:22px;border-radius:7px;cursor:pointer;flex-shrink:0;}
+
+/* ---------- Dev tools ---------- */
+.log-console{
+  background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;
+  height:320px;overflow-y:auto;padding:10px 4px;font-family:ui-monospace,monospace;font-size:11.8px;
+}
+.log-row{display:grid;grid-template-columns:70px 46px 1fr;gap:10px;padding:5px 12px;border-radius:8px;align-items:start;}
+.log-row:hover{background:color-mix(in srgb, var(--text) 5%, transparent);}
+.log-row .t{color:var(--text-tertiary);}
+.log-row .dir{font-weight:800;}
+.log-row .dir.tx{color:var(--accent-ink);}
+:root[data-theme="dark"] .log-row .dir.tx{color:var(--accent-2);}
+.log-row .dir.rx{color:var(--success);}
+.log-row .hex{word-break:break-all;color:var(--text-secondary);}
+.hexviewer{font-family:ui-monospace,monospace;font-size:11.5px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:12px;white-space:pre;overflow-x:auto;}
+
+/* ---------- Toast ---------- */
+#toastHost{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:10px;z-index:200;}
+.toast{
+  display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:14px;
+  background:var(--surface-solid);border:1px solid var(--border-strong);box-shadow:var(--shadow-lg);
+  font-size:13px;font-weight:600;max-width:340px;animation:toastIn .3s var(--ease);
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.96);}to{opacity:1;transform:none;}}
+.toast.ok svg{color:var(--success);}
+.toast.err svg{color:var(--danger);}
+.toast.info svg{color:var(--accent);}
+.toast svg{width:18px;height:18px;flex-shrink:0;}
+
+/* ---------- Modal ---------- */
+.modal-backdrop{position:fixed;inset:0;background:rgba(10,9,8,.5);backdrop-filter:blur(4px);z-index:150;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-backdrop.show{display:flex;}
+.modal{background:var(--surface-solid);border-radius:var(--radius-l);padding:26px;max-width:440px;width:100%;box-shadow:var(--shadow-lg);border:1px solid var(--border);}
+.modal h3{margin:0 0 8px;font-size:17px;}
+.modal p{color:var(--text-secondary);font-size:13.5px;line-height:1.55;}
+
+@media (max-width:920px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .3s var(--ease);box-shadow:var(--shadow-lg);}
+  .sidebar.open{transform:none;}
+  .content{padding:20px 16px 60px;}
+  .topbar{padding:0 14px;}
+  .grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============================================================ SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="18" height="10" rx="2" fill="#fff"/><rect x="6" y="6" width="4" height="4" rx="1" fill="#fff"/><rect x="14" y="6" width="4" height="4" rx="1" fill="#fff"/></svg>
+      </div>
+      <div class="brand-text"><b>BOOST Control</b><span>Move Hub Steuerzentrale</span></div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Übersicht</div>
+      <div class="nav-item active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg><span>Dashboard</span></div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Steuerung</div>
+      <div class="nav-item" data-view="motors"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span>Motoren</span></div>
+      <div class="nav-item" data-view="sensors"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 0 1 18 0"/><path d="M12 12l5-4"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg><span>Sensoren</span></div>
+      <div class="nav-item" data-view="led"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.5.4.8 1 .8 1.6v.2h4.4v-.2c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg><span>LED &amp; Licht</span></div>
+      <div class="nav-item" data-view="remote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M9 8h.01M15 8h.01M12 12v4"/></svg><span>Fernsteuerung</span></div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Automatisierung</div>
+      <div class="nav-item" data-view="automation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg><span>Makros</span></div>
+      <div class="nav-item" data-view="programming"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg><span>Programmierung</span></div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">System</div>
+      <div class="nav-item" data-view="files"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span>Dateien</span></div>
+      <div class="nav-item" data-view="devtools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v12H4z"/><path d="M8 20h8M10 16v4M14 16v4"/></svg><span>Entwicklertools</span><span class="badge">DEV</span></div>
+      <div class="nav-item" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.6 1.6 0 0 0-1.5 1z"/></svg><span>Einstellungen</span></div>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="mini-status">
+        <span class="dot" id="sideDot"></span>
+        <div style="min-width:0;">
+          <div id="sideStatusText" style="font-weight:650;">Nicht verbunden</div>
+          <div class="tiny" id="sideStatusSub">Move Hub via Bluetooth</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================================================ MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn" id="menuToggle" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-sub" id="pageSub">Live-Status deines LEGO BOOST Move Hub</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="chip" id="battChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="8" width="18" height="8" rx="2"/><path d="M22 11v2"/></svg><span id="battChipText">—</span></div>
+      <div class="chip" id="rssiChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12a15 15 0 0 1 20 0M5.5 15.5a10 10 0 0 1 13 0M9 19a5 5 0 0 1 6 0"/><circle cx="12" cy="21.5" r="1" fill="currentColor" stroke="none"/></svg><span id="rssiChipText">—</span></div>
+      <button class="icon-btn" id="themeToggle" title="Design wechseln">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" id="themeIcon"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+      </button>
+      <button class="btn btn-secondary" id="disconnectBtn" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.4 5.6a9 9 0 1 1-12.8 0M12 2v10"/></svg>Trennen</button>
+      <button class="btn btn-primary" id="connectBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11"/></svg>Hub verbinden</button>
+    </header>
+
+    <main class="content">
+
+      <!-- ================= DASHBOARD ================= -->
+      <section class="view active" id="view-dashboard">
+        <div class="grid cols-4">
+          <div class="card hoverable">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="8" width="18" height="8" rx="2"/><path d="M22 11v2"/></svg></div><div class="grow"><h3>Akkustand</h3></div></div>
+            <div class="stat-value" id="dashBattery">—</div>
+            <div class="progress-track" style="margin-top:12px;"><div class="progress-fill" id="dashBatteryFill" style="width:0%"></div></div>
+            <div class="stat-label" id="dashBatteryVolt">Spannung unbekannt</div>
+          </div>
+          <div class="card hoverable">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12a15 15 0 0 1 20 0M5.5 15.5a10 10 0 0 1 13 0M9 19a5 5 0 0 1 6 0"/></svg></div><div class="grow"><h3>Signalstärke</h3></div></div>
+            <div class="stat-value" id="dashRssi">—</div>
+            <div class="stat-label">RSSI in dBm</div>
+          </div>
+          <div class="card hoverable">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 12h8M12 8v8"/></svg></div><div class="grow"><h3>Firmware</h3></div></div>
+            <div class="stat-value" id="dashFw" style="font-size:20px;">—</div>
+            <div class="stat-label" id="dashHw">Hardware —</div>
+          </div>
+          <div class="card hoverable">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></div><div class="grow"><h3>Verbindung</h3></div></div>
+            <div class="stat-value" id="dashConn" style="font-size:20px;">Getrennt</div>
+            <div class="stat-label" id="dashConnSub">Bereit zum Verbinden</div>
+          </div>
+        </div>
+
+        <div class="grid cols-3" style="margin-top:18px;">
+          <div class="card hoverable" style="grid-column:span 2;">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l4-6 4 3 4-8 6 11"/></svg></div><div class="grow"><h3>Live-Telemetrie</h3><div class="sub">Akku &amp; Signal über Zeit</div></div></div>
+            <canvas id="telemetryChart" height="180" style="width:100%;display:block;"></canvas>
+          </div>
+          <div class="card hoverable">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/></svg></div><div class="grow"><h3>Motorstatus</h3></div></div>
+            <div id="dashMotorStatus" style="display:flex;flex-direction:column;gap:12px;"></div>
+          </div>
+        </div>
+
+        <div class="grid cols-2" style="margin-top:18px;">
+          <div class="card hoverable">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 0 1 18 0"/></svg></div><div class="grow"><h3>Sensorwerte</h3></div></div>
+            <div class="grid cols-2" id="dashSensorGrid" style="gap:12px;"></div>
+          </div>
+          <div class="card hoverable">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16M8 19V9M14 19V5"/></svg></div><div class="grow"><h3>Ereignisse &amp; Log</h3></div></div>
+            <div id="dashEvents" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= MOTORS ================= -->
+      <section class="view" id="view-motors">
+        <div class="tabbar">
+          <button class="active" data-motortab="single">Einzelmotoren</button>
+          <button data-motortab="sync">A+B Synchron</button>
+          <button data-motortab="advanced">Erweitert</button>
+        </div>
+
+        <div id="motorTab-single" class="grid cols-3">
+          <!-- generated per port A/B/C/D -->
+        </div>
+
+        <div id="motorTab-sync" class="grid cols-2" style="display:none;">
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="12" r="4"/><circle cx="16" cy="12" r="4"/></svg></div><div class="grow"><h3>Motor A + B synchron</h3><div class="sub">Virtueller kombinierter Antrieb</div></div></div>
+            <div class="field"><span class="label">Geschwindigkeit: <b id="syncSpeedVal">50</b>%</span><input type="range" id="syncSpeed" min="-100" max="100" value="50"></div>
+            <div class="field"><span class="label">Lenkung / Differenz: <b id="syncSteerVal">0</b></span><input type="range" id="syncSteer" min="-100" max="100" value="0"></div>
+            <div class="row wrap">
+              <button class="btn btn-primary" id="syncStart">Starten</button>
+              <button class="btn btn-secondary" id="syncBrake">Bremsen</button>
+              <button class="btn btn-secondary" id="syncCoast">Ausrollen</button>
+            </div>
+            <div class="tiny" style="margin-top:10px;">Nutzt Virtual Port Setup (0x61) zur Kopplung von Port A und B.</div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v6M12 16v6M4 12H2M22 12h-2"/></svg></div><div class="grow"><h3>Für Zeit / Grad fahren</h3></div></div>
+            <div class="field"><span class="label">Modus</span>
+              <select id="syncMode"><option value="time">Zeitgesteuert (ms)</option><option value="degrees">Gradgesteuert (°)</option></select>
+            </div>
+            <div class="field"><span class="label">Wert</span><input type="number" id="syncModeValue" value="1000"></div>
+            <div class="field"><span class="label">Geschwindigkeit: <b id="syncModeSpeedVal">50</b>%</span><input type="range" id="syncModeSpeed" min="-100" max="100" value="50"></div>
+            <button class="btn btn-primary" id="syncModeRun" style="width:100%;">Ausführen</button>
+          </div>
+        </div>
+
+        <div id="motorTab-advanced" class="grid cols-2" style="display:none;">
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 6-7"/></svg></div><div class="grow"><h3>Rampenprofil</h3><div class="sub">Beschleunigungs- &amp; Bremsrampe pro Motor</div></div></div>
+            <div class="field"><span class="label">Port</span><select id="rampPort"></select></div>
+            <div class="field"><span class="label">Beschleunigungszeit: <b id="rampAccVal">500</b> ms → 100%</span><input type="range" id="rampAcc" min="0" max="5000" step="50" value="500"></div>
+            <div class="field"><span class="label">Bremszeit: <b id="rampDecVal">500</b> ms → 0%</span><input type="range" id="rampDec" min="0" max="5000" step="50" value="500"></div>
+            <button class="btn btn-primary" id="rampApply" style="width:100%;">Rampe übernehmen</button>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div class="grow"><h3>Positionssteuerung</h3><div class="sub">Absolute Winkelposition anfahren</div></div></div>
+            <div class="field"><span class="label">Port</span><select id="posPort"></select></div>
+            <div class="field"><span class="label">Zielposition (°): <b id="posTargetVal">0</b></span><input type="range" id="posTarget" min="-360" max="360" value="0"></div>
+            <div class="field"><span class="label">Geschwindigkeit: <b id="posSpeedVal">40</b>%</span><input type="range" id="posSpeed" min="1" max="100" value="40"></div>
+            <div class="row wrap">
+              <button class="btn btn-primary" id="posGoto">Position anfahren</button>
+              <button class="btn btn-secondary" id="posZero">Encoder auf 0 setzen</button>
+            </div>
+          </div>
+          <div class="card" style="grid-column:span 2;">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 18L18 6M6 6l12 12"/></svg></div><div class="grow"><h3>Not-Aus</h3><div class="sub">Stoppt sofort alle Motoren (Bremsen)</div></div></div>
+            <button class="btn btn-danger" id="emergencyStop" style="width:100%;padding:16px;font-size:15px;">⏹ NOT-AUS — ALLE MOTOREN STOPPEN</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SENSORS ================= -->
+      <section class="view" id="view-sensors">
+        <div class="row between" style="margin-bottom:16px;">
+          <div class="tiny">Werte aktualisieren sich live, sobald ein passender Sensor an Port C oder D erkannt wird.</div>
+          <label class="row" style="gap:8px;"><span class="tiny">Live-Aktualisierung</span><span class="switch"><input type="checkbox" id="sensorLiveToggle" checked><span class="slider-ui"></span></span></label>
+        </div>
+        <div class="grid cols-4" id="sensorGrid"></div>
+
+        <div class="card" style="margin-top:18px;">
+          <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16M8 19V9M14 19V5"/></svg></div><div class="grow"><h3>Sensor-Verlauf</h3></div></div>
+          <canvas id="sensorHistoryChart" height="160" style="width:100%;display:block;"></canvas>
+        </div>
+      </section>
+
+      <!-- ================= LED ================= -->
+      <section class="view" id="view-led">
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a6 6 0 0 0-3 11.2c.5.4.8 1 .8 1.6v.2h4.4v-.2c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg></div><div class="grow"><h3>RGB Farbwähler</h3><div class="sub">Hub-LED direkt steuern</div></div></div>
+            <div class="led-preview" id="ledPreview"></div>
+            <div class="field"><span class="label">Rot: <b id="rVal">255</b></span><input type="range" id="rSlider" min="0" max="255" value="255"></div>
+            <div class="field"><span class="label">Grün: <b id="gVal">106</b></span><input type="range" id="gSlider" min="0" max="255" value="106"></div>
+            <div class="field"><span class="label">Blau: <b id="bVal">0</b></span><input type="range" id="bSlider" min="0" max="255" value="0"></div>
+            <button class="btn btn-primary" id="applyRgb" style="width:100%;">Farbe senden</button>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></div><div class="grow"><h3>Farbpalette</h3><div class="sub">LEGO Standardfarben (Index-Modus)</div></div></div>
+            <div class="color-swatch-grid" id="paletteGrid"></div>
+            <hr class="sep">
+            <div class="card-head" style="margin-bottom:10px;"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></div><div class="grow"><h3>Animationen</h3></div></div>
+            <div class="row wrap">
+              <button class="btn btn-secondary sm" id="animBlink">Blinken</button>
+              <button class="btn btn-secondary sm" id="animPulse">Pulsieren</button>
+              <button class="btn btn-secondary sm" id="animRainbow">Regenbogen</button>
+              <button class="btn btn-danger sm" id="animStop">Stopp</button>
+            </div>
+            <div class="field" style="margin-top:14px;"><span class="label">Helligkeit / Geschwindigkeit: <b id="animSpeedVal">5</b></span><input type="range" id="animSpeed" min="1" max="10" value="5"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= REMOTE ================= -->
+      <section class="view" id="view-remote">
+        <div class="grid cols-3">
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/></svg></div><div class="grow"><h3>Tastatur</h3><div class="sub">WASD oder Pfeiltasten</div></div></div>
+            <div class="row" style="justify-content:center;gap:26px;margin-bottom:18px;">
+              <div style="text-align:center;"><span class="kbd">W</span><div class="tiny" style="margin-top:6px;">Vorwärts</div></div>
+              <div style="text-align:center;"><span class="kbd">S</span><div class="tiny" style="margin-top:6px;">Rückwärts</div></div>
+              <div style="text-align:center;"><span class="kbd">A</span><span class="kbd">D</span><div class="tiny" style="margin-top:6px;">Lenken</div></div>
+            </div>
+            <div class="dpad">
+              <div></div>
+              <button data-dir="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+              <div></div>
+              <button data-dir="left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+              <button data-dir="stop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+              <button data-dir="right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+              <div></div>
+              <button data-dir="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
+              <div></div>
+            </div>
+            <div class="field" style="margin-top:18px;"><span class="label">Fahrgeschwindigkeit: <b id="remoteSpeedVal">60</b>%</span><input type="range" id="remoteSpeed" min="10" max="100" value="60"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg></div><div class="grow"><h3>Virtueller Joystick</h3><div class="sub">Touch- oder Maussteuerung</div></div></div>
+            <div class="joystick-base" id="joystickBase">
+              <div class="joystick-knob" id="joystickKnob"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/></svg></div>
+            </div>
+            <div class="row between" style="margin-top:16px;">
+              <div class="tiny">X: <b id="joyX" class="mono">0</b></div>
+              <div class="tiny">Y: <b id="joyY" class="mono">0</b></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="10" rx="4"/><circle cx="7" cy="12" r="1.4" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><circle cx="17" cy="14" r="1" fill="currentColor"/></svg></div><div class="grow"><h3>Gamepad</h3><div class="sub">Gamepad API</div></div></div>
+            <div id="gamepadStatus" class="tiny" style="margin-bottom:14px;">Kein Gamepad erkannt — Taste am Controller drücken.</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div class="row between"><span class="tiny">Linker Stick Y → Antrieb</span><span class="mono tiny" id="gpAxis0">0.00</span></div>
+              <div class="progress-track"><div class="progress-fill" id="gpAxis0Fill" style="width:50%"></div></div>
+              <div class="row between"><span class="tiny">Linker Stick X → Lenkung</span><span class="mono tiny" id="gpAxis1">0.00</span></div>
+              <div class="progress-track"><div class="progress-fill" id="gpAxis1Fill" style="width:50%"></div></div>
+            </div>
+            <button class="btn btn-secondary sm" id="gamepadRescan" style="margin-top:16px;width:100%;">Neu suchen</button>
+          </div>
+
+          <div class="card" style="grid-column:span 3;">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/></svg></div><div class="grow"><h3>Touch-Steuerkreuz (Mobil)</h3></div></div>
+            <div class="grid cols-4">
+              <button class="btn btn-secondary" data-touch="fwd">▲ Vorwärts</button>
+              <button class="btn btn-secondary" data-touch="back">▼ Rückwärts</button>
+              <button class="btn btn-secondary" data-touch="left">◀ Links</button>
+              <button class="btn btn-secondary" data-touch="right">▶ Rechts</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= AUTOMATION ================= -->
+      <section class="view" id="view-automation">
+        <div class="grid cols-3">
+          <div class="card" style="grid-column:span 2;">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg></div><div class="grow"><h3>Makro-Editor</h3><div class="sub">Sequenz aus Aktionen, Timern und Bedingungen</div></div>
+              <button class="btn btn-secondary sm" id="macroClear">Leeren</button>
+            </div>
+            <div class="row wrap" style="margin-bottom:14px;">
+              <select id="macroActionType" style="max-width:220px;">
+                <option value="motor">Motor-Aktion</option>
+                <option value="led">LED-Aktion</option>
+                <option value="wait">Warten (Timer)</option>
+                <option value="condition">Bedingung (Sensor)</option>
+                <option value="repeat">Wiederholung starten</option>
+                <option value="endrepeat">Wiederholung Ende</option>
+              </select>
+              <button class="btn btn-primary sm" id="macroAddStep">+ Schritt hinzufügen</button>
+            </div>
+            <div class="step-list" id="macroSteps"></div>
+            <div class="row" style="margin-top:16px;">
+              <button class="btn btn-primary" id="macroRun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Ausführen</button>
+              <button class="btn btn-secondary" id="macroStopRun">Stopp</button>
+              <button class="btn btn-secondary" id="macroSave">Als Datei speichern</button>
+              <label class="btn btn-secondary" style="cursor:pointer;">Laden<input type="file" id="macroLoad" accept="application/json" style="display:none;"></label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16M8 19V9M14 19V5"/></svg></div><div class="grow"><h3>Ausführungs-Log</h3></div></div>
+            <div id="macroLog" style="display:flex;flex-direction:column;gap:6px;max-height:420px;overflow-y:auto;font-size:12.5px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PROGRAMMING ================= -->
+      <section class="view" id="view-programming">
+        <div class="tabbar">
+          <button class="active" data-progtab="blocks">Block-Editor</button>
+          <button data-progtab="js">JavaScript-Editor</button>
+        </div>
+
+        <div id="progTab-blocks">
+          <div class="grid cols-3">
+            <div class="card">
+              <div class="card-head"><h3>Baustein-Palette</h3></div>
+              <div class="palette" id="blockPalette"></div>
+              <div class="tiny" style="margin-top:14px;">Ziehe Bausteine per Drag &amp; Drop in die Ablage rechts, oder klicke zum Hinzufügen.</div>
+            </div>
+            <div class="card" style="grid-column:span 2;">
+              <div class="card-head"><div class="grow"><h3>Programmablage</h3></div><button class="btn btn-secondary sm" id="blockClear">Leeren</button></div>
+              <div class="block-drop" id="blockDrop"></div>
+              <div class="row" style="margin-top:16px;">
+                <button class="btn btn-primary" id="blockRun">▶ Ausführen</button>
+                <button class="btn btn-secondary" id="blockToJs">In JS-Code umwandeln</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="progTab-js" style="display:none;">
+          <div class="grid cols-3">
+            <div class="card" style="grid-column:span 2;">
+              <div class="card-head"><div class="grow"><h3>JavaScript-Editor</h3><div class="sub">Zugriff über das globale Objekt <code class="mono">robot</code></div></div></div>
+              <div class="code-shell">
+                <div class="code-toolbar">
+                  <span class="code-dot" style="background:#FF5F57;"></span><span class="code-dot" style="background:#FEBC2E;"></span><span class="code-dot" style="background:#28C840;"></span>
+                  <span class="tiny" style="margin-left:8px;color:#9C948A;">programm.js</span>
+                </div>
+                <textarea id="jsEditor" spellcheck="false">// Beispiel: fahre 2 Sekunden vorwärts, dann drehe
+await robot.motor('A').speed(60);
+await robot.motor('B').speed(60);
+await robot.wait(2000);
+await robot.motor('A').speed(-60);
+await robot.motor('B').speed(60);
+await robot.wait(800);
+await robot.motor('A').brake();
+await robot.motor('B').brake();
+await robot.led.rgb(255, 106, 0);
+robot.log('Programm beendet.');</textarea>
+                <div class="console-out" id="consoleOut"></div>
+              </div>
+              <div class="row" style="margin-top:14px;">
+                <button class="btn btn-primary" id="jsRun">▶ Ausführen</button>
+                <button class="btn btn-secondary" id="jsStop">Stopp</button>
+                <button class="btn btn-secondary" id="jsFormat">Konsole leeren</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>API-Referenz</h3></div>
+              <div class="tiny mono" style="line-height:2;white-space:pre-wrap;">
+robot.motor('A'|'B'|'C'|'D')
+  .power(-100..100)
+  .speed(-100..100)
+  .forTime(speed,ms)
+  .forDegrees(speed,deg)
+  .gotoAngle(deg,speed)
+  .brake() / .coast()
+robot.led.rgb(r,g,b)
+robot.led.color(index)
+robot.sensor('C'|'D').read()
+robot.wait(ms)
+robot.log(text)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px;">
+          <div class="card-head"><div class="grow"><h3>Projekte verwalten</h3></div></div>
+          <div class="row wrap">
+            <button class="btn btn-secondary" id="projSaveJs">JS-Projekt speichern</button>
+            <label class="btn btn-secondary" style="cursor:pointer;">JS-Projekt laden<input type="file" id="projLoadJs" accept="application/json,.js" style="display:none;"></label>
+            <button class="btn btn-secondary" id="projSaveBlocks">Block-Projekt speichern</button>
+            <label class="btn btn-secondary" style="cursor:pointer;">Block-Projekt laden<input type="file" id="projLoadBlocks" accept="application/json" style="display:none;"></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FILES ================= -->
+      <section class="view" id="view-files">
+        <div class="grid cols-3">
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16"/></svg></div><div class="grow"><h3>Export</h3></div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-secondary" id="exportSettingsJson">Einstellungen (.json)</button>
+              <button class="btn btn-secondary" id="exportMacroJson">Makros (.json)</button>
+              <button class="btn btn-secondary" id="exportLogCsv">Ereignis-Log (.csv)</button>
+              <button class="btn btn-secondary" id="exportSensorCsv">Sensordaten (.csv)</button>
+              <button class="btn btn-secondary" id="exportAllJson">Vollständiges Projekt (.json)</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21V9m0 0l-4 4m4-4l4 4M4 5h16"/></svg></div><div class="grow"><h3>Import</h3></div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <label class="btn btn-secondary" style="cursor:pointer;">Vollständiges Projekt laden<input type="file" id="importAllJson" accept="application/json" style="display:none;"></label>
+              <label class="btn btn-secondary" style="cursor:pointer;">Einstellungen laden<input type="file" id="importSettingsJson" accept="application/json" style="display:none;"></label>
+            </div>
+            <div class="tiny" style="margin-top:14px;">Importierte Dateien werden validiert, bevor sie angewendet werden.</div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg></div><div class="grow"><h3>Letzte Aktion</h3></div></div>
+            <div id="fileOpStatus" class="tiny">Noch keine Datei-Operation durchgeführt.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= DEVTOOLS ================= -->
+      <section class="view" id="view-devtools">
+        <div class="tabbar">
+          <button class="active" data-devtab="monitor">BLE Monitor</button>
+          <button data-devtab="raw">Rohdaten</button>
+          <button data-devtab="explorer">UUID Explorer</button>
+          <button data-devtab="hex">HEX Viewer</button>
+        </div>
+
+        <div id="devTab-monitor">
+          <div class="card">
+            <div class="card-head"><div class="grow"><h3>Nachrichten-Logger</h3><div class="sub">Alle gesendeten (TX) und empfangenen (RX) LWP-Nachrichten</div></div>
+              <button class="btn btn-secondary sm" id="clearLog">Log leeren</button>
+              <button class="btn btn-secondary sm" id="exportLogJson">Exportieren</button>
+            </div>
+            <div class="log-console" id="bleLog"></div>
+          </div>
+        </div>
+
+        <div id="devTab-raw" style="display:none;">
+          <div class="card">
+            <div class="card-head"><div class="grow"><h3>Rohdaten senden</h3><div class="sub">Bytes als Hex, getrennt durch Leerzeichen, an die Steuer-Characteristic senden</div></div></div>
+            <div class="field"><input type="text" id="rawHexInput" class="mono" placeholder="z.B. 0A 00 81 32 11 51 01 FF 6A 00" value="05 00 01 05 05"></div>
+            <div class="row">
+              <button class="btn btn-primary" id="rawSend">Senden</button>
+              <button class="btn btn-secondary" id="rawClear">Feld leeren</button>
+            </div>
+            <div class="tiny" style="margin-top:10px;">Beispiel oben: Hub-Eigenschaft „Button" (0x05), Anfrage-Update — nützlich zum Testen der Rohübertragung.</div>
+            <hr class="sep">
+            <h3 style="font-size:14px;margin-bottom:10px;">Zuletzt empfangen</h3>
+            <div class="hexviewer" id="rawReceived">—</div>
+          </div>
+        </div>
+
+        <div id="devTab-explorer" style="display:none;">
+          <div class="card">
+            <div class="card-head"><div class="grow"><h3>UUID / Characteristic Explorer</h3><div class="sub">Alle GATT Services &amp; Characteristics des verbundenen Geräts</div></div>
+              <button class="btn btn-secondary sm" id="refreshExplorer">Aktualisieren</button>
+            </div>
+            <div id="uuidExplorer"></div>
+          </div>
+        </div>
+
+        <div id="devTab-hex" style="display:none;">
+          <div class="card">
+            <div class="card-head"><div class="grow"><h3>HEX Viewer</h3><div class="sub">Wähle eine Nachricht aus dem Monitor oder füge Bytes manuell ein</div></div></div>
+            <div class="field"><input type="text" id="hexViewerInput" class="mono" placeholder="Hex-Bytes eingeben..."></div>
+            <div class="hexviewer" id="hexViewerOut">Keine Daten.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SETTINGS ================= -->
+      <section class="view" id="view-settings">
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/></svg></div><div class="grow"><h3>Verbindung</h3></div></div>
+            <div class="field row between"><span>Automatisch wiederverbinden</span><span class="switch"><input type="checkbox" id="autoReconnectToggle" checked><span class="slider-ui"></span></span></div>
+            <div class="field row between"><span>Benachrichtigungen (Toasts)</span><span class="switch"><input type="checkbox" id="toastsToggle" checked><span class="slider-ui"></span></span></div>
+            <div class="field row between"><span>Sound bei Verbindung</span><span class="switch"><input type="checkbox" id="soundToggle"><span class="slider-ui"></span></span></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a6 6 0 0 0-3 11.2c.5.4.8 1 .8 1.6v.2h4.4v-.2c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg></div><div class="grow"><h3>Darstellung</h3></div></div>
+            <div class="field"><span class="label">Design</span>
+              <select id="themeSelect"><option value="light">Hell</option><option value="dark">Dunkel</option><option value="auto">System</option></select>
+            </div>
+            <div class="field row between"><span>Reduzierte Bewegung</span><span class="switch"><input type="checkbox" id="reduceMotionToggle"><span class="slider-ui"></span></span></div>
+          </div>
+          <div class="card" style="grid-column:span 2;">
+            <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v5m0 4h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><div class="grow"><h3>Über diese Anwendung</h3></div></div>
+            <p class="tiny" style="line-height:1.7;">BOOST Control ist eine eigenständige Single-Page-Anwendung zur vollständigen Steuerung eines LEGO® BOOST Move Hub (88006) über die Web Bluetooth API und das LEGO Wireless Protocol (LWP3). Es werden ausschließlich HTML5, CSS3 und Vanilla-JavaScript verwendet — keine Frameworks, Bibliotheken oder externen Ressourcen. LEGO® ist eine Marke der LEGO Group, die diese Anwendung weder unterstützt noch autorisiert.</p>
+            <div class="tiny" style="margin-top:10px;">Version 1.0.0 · Läuft vollständig lokal im Browser.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <h3 id="modalTitle">Web Bluetooth nicht verfügbar</h3>
+    <p id="modalBody">Dein Browser unterstützt die Web Bluetooth API nicht oder sie ist deaktiviert. Nutze z.B. Google Chrome oder Microsoft Edge auf Desktop oder Android, über HTTPS oder localhost.</p>
+    <div class="row" style="justify-content:flex-end;margin-top:10px;">
+      <button class="btn btn-primary" id="modalClose">Verstanden</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================================================================================
+   BOOST CONTROL — LEGO BOOST Move Hub Steuerzentrale
+   Reines Vanilla JavaScript, keine Frameworks, keine externen Bibliotheken.
+   Implementiert das LEGO Wireless Protocol 3.0 (LWP3) über Web Bluetooth.
+   ================================================================================ */
+
+/* ============================== 1. LWP PROTOCOL-KONSTANTEN ============================== */
+const LWP = {
+  SERVICE_UUID: '00001623-1212-efde-1623-785feabcd123',
+  CHAR_UUID:    '00001624-1212-efde-1623-785feabcd123',
+
+  // Feste Port-Zuordnung des LEGO BOOST Move Hub
+  PORT: { A:0x00, B:0x01, C:0x02, D:0x03, AB:0x10, LED:0x32, TILT:0x3A, CURRENT:0x3B, VOLTAGE:0x3C },
+  PORT_NAME: { 0x00:'A', 0x01:'B', 0x02:'C', 0x03:'D', 0x10:'A+B', 0x32:'LED', 0x3A:'TILT', 0x3B:'CURRENT', 0x3C:'VOLTAGE' },
+
+  MSG: {
+    HUB_PROPERTIES: 0x01, HUB_ACTIONS: 0x02, HUB_ALERTS: 0x03, HUB_ATTACHED_IO: 0x04,
+    GENERIC_ERROR: 0x05, PORT_INFO_REQ: 0x21, PORT_MODE_INFO_REQ: 0x22,
+    PORT_INPUT_FORMAT_SINGLE: 0x41, PORT_INPUT_FORMAT_COMBINED: 0x42,
+    PORT_INFORMATION: 0x43, PORT_MODE_INFORMATION: 0x44,
+    PORT_VALUE_SINGLE: 0x45, PORT_VALUE_COMBINED: 0x46,
+    PORT_INPUT_FORMAT_SINGLE_ACK: 0x47, PORT_INPUT_FORMAT_COMBINED_ACK: 0x48,
+    VIRTUAL_PORT_SETUP: 0x61, PORT_OUTPUT_COMMAND: 0x81, PORT_OUTPUT_FEEDBACK: 0x82
+  },
+
+  HUB_PROP: {
+    NAME:0x01, BUTTON:0x02, FW_VERSION:0x03, HW_VERSION:0x04, RSSI:0x05,
+    BATTERY_VOLTAGE:0x06, BATTERY_TYPE:0x07, MANUFACTURER:0x08, RADIO_FW:0x09,
+    LWP_VERSION:0x0A, SYSTEM_TYPE_ID:0x0B, HW_NETWORK_ID:0x0C, PRIMARY_MAC:0x0D
+  },
+  HUB_PROP_OP: { SET:0x01, ENABLE:0x02, DISABLE:0x03, RESET:0x04, REQUEST:0x05, UPDATE:0x06 },
+
+  IO_TYPE: {
+    MOTOR:0x0001, TRAIN_MOTOR:0x0002, LIGHT:0x0008, VOLTAGE:0x0014, CURRENT:0x0015,
+    PIEZO:0x0016, HUB_LED:0x0017, TILT_SENSOR:0x0022, MOTION_SENSOR:0x0023,
+    COLOR_DISTANCE_SENSOR:0x0025, MEDIUM_LINEAR_MOTOR:0x0026, MOVE_HUB_MOTOR:0x0027,
+    MOVE_HUB_TILT:0x0028
+  },
+
+  SUBCMD: {
+    START_POWER:0x01, START_POWER_SYNC:0x02, SET_ACC_TIME:0x05, SET_DEC_TIME:0x06,
+    START_SPEED:0x07, START_SPEED_SYNC:0x08, START_SPEED_FOR_TIME:0x09, START_SPEED_FOR_TIME_SYNC:0x0A,
+    START_SPEED_FOR_DEGREES:0x0B, START_SPEED_FOR_DEGREES_SYNC:0x0C,
+    GOTO_ABSOLUTE_POSITION:0x0D, GOTO_ABSOLUTE_POSITION_SYNC:0x0E, PRESET_ENCODER:0x10,
+    WRITE_DIRECT_MODE_DATA:0x51
+  },
+
+  END_STATE: { FLOAT:0x00, HOLD:0x7E, BRAKE:0x7F },
+  USE_PROFILE: { NONE:0x00, ACCEL:0x01, DECEL:0x02, BOTH:0x03 },
+
+  COLOR_PALETTE: [
+    {i:0,name:'Aus',hex:'#000000'},{i:1,name:'Pink',hex:'#FF00A0'},{i:2,name:'Violett',hex:'#8A2BE2'},
+    {i:3,name:'Blau',hex:'#0057E7'},{i:4,name:'Hellblau',hex:'#33C7FF'},{i:5,name:'Cyan',hex:'#00E5D4'},
+    {i:6,name:'Grün',hex:'#12B84C'},{i:7,name:'Gelb',hex:'#FFE100'},{i:8,name:'Orange',hex:'#FF6A00'},
+    {i:9,name:'Rot',hex:'#E8221E'},{i:10,name:'Weiß',hex:'#FFFFFF'}
+  ]
+};
+
+/* ============================== 2. BYTE-HILFSFUNKTIONEN ============================== */
+const Bytes = {
+  u8(v){ return v & 0xFF; },
+  i8(v){ v = Math.round(v); if(v<-128)v=-128; if(v>127)v=127; return v<0? v+256 : v; },
+  u16le(v){ return [v & 0xFF, (v>>8)&0xFF]; },
+  i16le(v){ if(v<0) v = 0x10000+v; return [v & 0xFF, (v>>8)&0xFF]; },
+  u32le(v){ return [v&0xFF,(v>>8)&0xFF,(v>>16)&0xFF,(v>>24)&0xFF]; },
+  i32le(v){ if(v<0) v = 0x100000000+v; return Bytes.u32le(v); },
+  readI8(dv,o){ let v=dv.getUint8(o); return v>127? v-256 : v; },
+  readI16(dv,o){ return dv.getInt16(o,true); },
+  readI32(dv,o){ return dv.getInt32(o,true); },
+  readU16(dv,o){ return dv.getUint16(o,true); },
+  readU32(dv,o){ return dv.getUint32(o,true); },
+  toHex(bytes){ return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0').toUpperCase()).join(' '); },
+  fromHex(str){
+    const parts = str.trim().split(/[\s,]+/).filter(Boolean);
+    return new Uint8Array(parts.map(p=>parseInt(p,16)&0xFF));
+  }
+};
+
+/* Baut eine vollständige LWP-Nachricht inkl. Längen-Präfix (Common Message Header) */
+function buildMessage(messageType, payloadBytes){
+  const body = [messageType, ...payloadBytes];
+  const totalLen = body.length + 1; // +1 für das Längenbyte selbst (kurze Form < 127 Bytes)
+  return new Uint8Array([totalLen, 0x00, ...body]); // HubID immer 0x00
+}
+
+function buildPortOutput(port, subCommandBytes, wantFeedback=false){
+  const info = wantFeedback ? 0x01 : 0x11; // Bit0=Feedback, Bit4=ExecuteImmediately
+  return buildMessage(LWP.MSG.PORT_OUTPUT_COMMAND, [port, info, ...subCommandBytes]);
+}
+
+/* ============================== 3. EVENT-EMITTER BASISKLASSE ============================== */
+class Emitter {
+  constructor(){ this._listeners = {}; }
+  on(evt, fn){ (this._listeners[evt] ||= []).push(fn); return this; }
+  off(evt, fn){ if(this._listeners[evt]) this._listeners[evt] = this._listeners[evt].filter(f=>f!==fn); }
+  emit(evt, ...args){ (this._listeners[evt]||[]).forEach(fn=>{ try{ fn(...args); }catch(e){ console.error(e); } }); }
+}
+
+/* ============================== 4. BLE-VERBINDUNGSMANAGER ============================== */
+class BLEManager extends Emitter {
+  constructor(){
+    super();
+    this.device = null;
+    this.server = null;
+    this.characteristic = null;
+    this.connected = false;
+    this.autoReconnect = true;
+    this._reconnectAttempts = 0;
+    this._reconnectTimer = null;
+  }
+
+  isSupported(){ return !!navigator.bluetooth; }
+
+  async connect(){
+    if(!this.isSupported()) throw new Error('WEB_BLUETOOTH_UNSUPPORTED');
+    try{
+      this.device = await navigator.bluetooth.requestDevice({
+        filters: [{ services: [LWP.SERVICE_UUID] }],
+        optionalServices: [LWP.SERVICE_UUID]
+      });
+    }catch(err){
+      if(err.name === 'NotFoundError') throw new Error('USER_CANCELLED');
+      throw err;
+    }
+    this.device.addEventListener('gattserverdisconnected', () => this._onDisconnected());
+    await this._gattConnect();
+    return this.device;
+  }
+
+  async _gattConnect(){
+    this.server = await this.device.gatt.connect();
+    const service = await this.server.getPrimaryService(LWP.SERVICE_UUID);
+    this.characteristic = await service.getCharacteristic(LWP.CHAR_UUID);
+    await this.characteristic.startNotifications();
+    this.characteristic.addEventListener('characteristicvaluechanged', (e)=>{
+      const dv = e.target.value;
+      const bytes = new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength);
+      this.emit('data', bytes, dv);
+    });
+    this.connected = true;
+    this._reconnectAttempts = 0;
+    this.emit('connected');
+  }
+
+  async _onDisconnected(){
+    this.connected = false;
+    this.emit('disconnected');
+    if(this.autoReconnect && this.device && this._reconnectAttempts < 8){
+      this._reconnectAttempts++;
+      const delay = Math.min(1000 * this._reconnectAttempts, 6000);
+      this.emit('reconnecting', this._reconnectAttempts, delay);
+      clearTimeout(this._reconnectTimer);
+      this._reconnectTimer = setTimeout(async ()=>{
+        try{ await this._gattConnect(); }
+        catch(e){ this._onDisconnected(); }
+      }, delay);
+    }
+  }
+
+  async disconnect(){
+    this.autoReconnect = false;
+    clearTimeout(this._reconnectTimer);
+    if(this.device && this.device.gatt.connected){ this.device.gatt.disconnect(); }
+    this.connected = false;
+  }
+
+  async send(bytes){
+    if(!this.characteristic) throw new Error('NOT_CONNECTED');
+    try{
+      await this.characteristic.writeValueWithoutResponse(bytes);
+    }catch(e){
+      await this.characteristic.writeValue(bytes);
+    }
+    this.emit('tx', bytes);
+  }
+
+  async listAllServicesAndCharacteristics(){
+    if(!this.server) return [];
+    const services = await this.server.getPrimaryServices();
+    const result = [];
+    for(const svc of services){
+      const chars = await svc.getCharacteristics();
+      result.push({ uuid: svc.uuid, characteristics: chars.map(c=>({ uuid:c.uuid, properties:c.properties })) });
+    }
+    return result;
+  }
+}
+
+/* ============================== 5. HUB-GERÄTEMODELL ============================== */
+class HubDevice extends Emitter {
+  constructor(ble){
+    super();
+    this.ble = ble;
+    this.battery = null;      // Prozent
+    this.batteryVoltage = null;
+    this.rssi = null;
+    this.firmware = null;
+    this.hardware = null;
+    this.name = null;
+    this.buttonPressed = false;
+    this.ports = {};          // portId -> { ioType, name, modes:{} }
+    ble.on('data', (bytes)=> this._handleIncoming(bytes));
+  }
+
+  async initialize(){
+    // Eigenschaften abfragen + Updates abonnieren
+    const props = [LWP.HUB_PROP.BATTERY_VOLTAGE, LWP.HUB_PROP.RSSI, LWP.HUB_PROP.FW_VERSION,
+                    LWP.HUB_PROP.HW_VERSION, LWP.HUB_PROP.NAME, LWP.HUB_PROP.BUTTON];
+    for(const p of props){
+      await this.ble.send(buildMessage(LWP.MSG.HUB_PROPERTIES, [p, LWP.HUB_PROP_OP.REQUEST]));
+      await this.ble.send(buildMessage(LWP.MSG.HUB_PROPERTIES, [p, LWP.HUB_PROP_OP.ENABLE]));
+    }
+  }
+
+  _handleIncoming(bytes){
+    if(bytes.length < 3) return;
+    const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const msgType = bytes[2];
+
+    switch(msgType){
+      case LWP.MSG.HUB_PROPERTIES: this._handleHubProperty(bytes); break;
+      case LWP.MSG.HUB_ATTACHED_IO: this._handleAttachedIO(bytes); break;
+      case LWP.MSG.PORT_VALUE_SINGLE: this._handlePortValue(bytes, dv); break;
+      case LWP.MSG.GENERIC_ERROR: this.emit('error', bytes); break;
+      default: break;
+    }
+  }
+
+  _handleHubProperty(bytes){
+    const prop = bytes[3];
+    const op = bytes[4];
+    const payload = bytes.slice(5);
+    if(op !== LWP.HUB_PROP_OP.UPDATE) return;
+    switch(prop){
+      case LWP.HUB_PROP.BATTERY_VOLTAGE:
+        this.battery = payload[0];
+        this.emit('battery', this.battery);
+        break;
+      case LWP.HUB_PROP.RSSI:
+        this.rssi = (payload[0] > 127) ? payload[0]-256 : payload[0];
+        this.emit('rssi', this.rssi);
+        break;
+      case LWP.HUB_PROP.FW_VERSION:
+        this.firmware = HubDevice._parseVersion(payload);
+        this.emit('firmware', this.firmware);
+        break;
+      case LWP.HUB_PROP.HW_VERSION:
+        this.hardware = HubDevice._parseVersion(payload);
+        this.emit('hardware', this.hardware);
+        break;
+      case LWP.HUB_PROP.NAME:
+        this.name = new TextDecoder().decode(payload).replace(/\0+$/,'');
+        this.emit('name', this.name);
+        break;
+      case LWP.HUB_PROP.BUTTON:
+        this.buttonPressed = !!payload[0];
+        this.emit('button', this.buttonPressed);
+        break;
+    }
+  }
+
+  static _parseVersion(payload){
+    if(payload.length < 4) return '—';
+    const v = payload[3], vv = payload[2] >> 4, vvv = (payload[2]&0x0F)*10 + (payload[1]>>4), bbb = payload[0];
+    return `${v}.${vv}.${vvv}.${bbb.toString().padStart(2,'0')}`;
+  }
+
+  _handleAttachedIO(bytes){
+    const port = bytes[3];
+    const event = bytes[4];
+    if(event === 0x00){
+      delete this.ports[port];
+      this.emit('detached', port);
+    } else {
+      const ioType = bytes[5] | (bytes[6] << 8);
+      this.ports[port] = { ioType, name: LWP.PORT_NAME[port] || ('0x'+port.toString(16)) };
+      this.emit('attached', port, ioType);
+    }
+  }
+
+  _handlePortValue(bytes, dv){
+    const port = bytes[3];
+    const raw = bytes.slice(4);
+    this.emit('portvalue', port, raw, dv);
+  }
+
+  async setPortInputFormat(port, mode, deltaInterval=1, notify=true){
+    const payload = [port, mode, ...Bytes.u32le(deltaInterval), notify?0x01:0x00];
+    await this.ble.send(buildMessage(LWP.MSG.PORT_INPUT_FORMAT_SINGLE, payload));
+  }
+
+  async requestPortInfo(port){
+    await this.ble.send(buildMessage(LWP.MSG.PORT_INFO_REQ, [port, 0x00]));
+  }
+}
+
+/* ============================== 6. MOTORSTEUERUNG ============================== */
+class MotorController {
+  constructor(ble){ this.ble = ble; this.rampAcc = {}; this.rampDec = {}; }
+
+  async setPower(port, power){
+    await this.ble.send(buildPortOutput(port, [LWP.SUBCMD.START_POWER, Bytes.i8(power)]));
+  }
+  async setSpeed(port, speed, maxPower=100, useProfile=LWP.USE_PROFILE.BOTH){
+    await this.ble.send(buildPortOutput(port, [LWP.SUBCMD.START_SPEED, Bytes.i8(speed), Bytes.u8(maxPower), useProfile]));
+  }
+  async runForTime(port, timeMs, speed, maxPower=100, endState=LWP.END_STATE.BRAKE, useProfile=LWP.USE_PROFILE.BOTH){
+    const payload = [LWP.SUBCMD.START_SPEED_FOR_TIME, ...Bytes.u16le(timeMs), Bytes.i8(speed), Bytes.u8(maxPower), endState, useProfile];
+    await this.ble.send(buildPortOutput(port, payload, true));
+  }
+  async runForDegrees(port, degrees, speed, maxPower=100, endState=LWP.END_STATE.BRAKE, useProfile=LWP.USE_PROFILE.BOTH){
+    const payload = [LWP.SUBCMD.START_SPEED_FOR_DEGREES, ...Bytes.u32le(Math.abs(Math.round(degrees))), Bytes.i8(degrees<0?-speed:speed), Bytes.u8(maxPower), endState, useProfile];
+    await this.ble.send(buildPortOutput(port, payload, true));
+  }
+  async gotoAbsolutePosition(port, position, speed, maxPower=100, endState=LWP.END_STATE.HOLD, useProfile=LWP.USE_PROFILE.BOTH){
+    const payload = [LWP.SUBCMD.GOTO_ABSOLUTE_POSITION, ...Bytes.i32le(Math.round(position)), Bytes.i8(speed), Bytes.u8(maxPower), endState, useProfile];
+    await this.ble.send(buildPortOutput(port, payload, true));
+  }
+  async presetEncoder(port, position=0){
+    await this.ble.send(buildPortOutput(port, [LWP.SUBCMD.PRESET_ENCODER, ...Bytes.i32le(position)]));
+  }
+  async setAccelerationTime(port, ms){ await this.ble.send(buildPortOutput(port, [LWP.SUBCMD.SET_ACC_TIME, ...Bytes.u16le(ms), 0x00])); }
+  async setDecelerationTime(port, ms){ await this.ble.send(buildPortOutput(port, [LWP.SUBCMD.SET_DEC_TIME, ...Bytes.u16le(ms), 0x00])); }
+  async brake(port){ await this.setPower(port, 0x7F <= 100 ? 127 : 127); await this._directPower(port, 127); }
+  async _directPower(port, v){ await this.ble.send(buildPortOutput(port, [LWP.SUBCMD.START_POWER, v])); }
+  async coast(port){ await this.setPower(port, 0); }
+
+  // Virtueller kombinierter Port A+B
+  async setupVirtualAB(){
+    await this.ble.send(buildMessage(LWP.MSG.VIRTUAL_PORT_SETUP, [0x01, LWP.PORT.A, LWP.PORT.B]));
+  }
+  async syncSpeed(speedA, speedB, maxPower=100){
+    await this.ble.send(buildPortOutput(LWP.PORT.AB, [LWP.SUBCMD.START_SPEED_SYNC, Bytes.i8(speedA), Bytes.i8(speedB), Bytes.u8(maxPower), LWP.USE_PROFILE.BOTH]));
+  }
+  async syncForTime(timeMs, speedA, speedB, maxPower=100, endState=LWP.END_STATE.BRAKE){
+    const payload=[LWP.SUBCMD.START_SPEED_FOR_TIME_SYNC, ...Bytes.u16le(timeMs), Bytes.i8(speedA), Bytes.i8(speedB), Bytes.u8(maxPower), endState, LWP.USE_PROFILE.BOTH];
+    await this.ble.send(buildPortOutput(LWP.PORT.AB, payload, true));
+  }
+  async syncForDegrees(degrees, speedA, speedB, maxPower=100, endState=LWP.END_STATE.BRAKE){
+    const payload=[LWP.SUBCMD.START_SPEED_FOR_DEGREES_SYNC, ...Bytes.u32le(Math.abs(Math.round(degrees))), Bytes.i8(speedA), Bytes.i8(speedB), Bytes.u8(maxPower), endState, LWP.USE_PROFILE.BOTH];
+    await this.ble.send(buildPortOutput(LWP.PORT.AB, payload, true));
+  }
+  async syncBrake(){ await this.ble.send(buildPortOutput(LWP.PORT.AB, [LWP.SUBCMD.START_POWER_SYNC, 127, 127])); }
+  async syncCoast(){ await this.ble.send(buildPortOutput(LWP.PORT.AB, [LWP.SUBCMD.START_POWER_SYNC, 0, 0])); }
+}
+
+/* ============================== 7. LED-STEUERUNG ============================== */
+class LEDController {
+  constructor(ble){ this.ble = ble; this._animTimer = null; }
+  async setRGB(r,g,b){
+    await this.ble.send(buildPortOutput(LWP.PORT.LED, [LWP.SUBCMD.WRITE_DIRECT_MODE_DATA, 0x01, Bytes.u8(r), Bytes.u8(g), Bytes.u8(b)]));
+  }
+  async setColorIndex(index){
+    await this.ble.send(buildPortOutput(LWP.PORT.LED, [LWP.SUBCMD.WRITE_DIRECT_MODE_DATA, 0x00, Bytes.u8(index)]));
+  }
+  stopAnimation(){ clearInterval(this._animTimer); this._animTimer = null; }
+  animateBlink(hex, speedLevel=5){
+    this.stopAnimation();
+    const [r,g,b] = LEDController.hexToRgb(hex);
+    let on = false;
+    const interval = 650 - speedLevel*55;
+    this._animTimer = setInterval(()=>{
+      on = !on;
+      this.setRGB(on?r:0, on?g:0, on?b:0);
+    }, Math.max(interval,60));
+  }
+  animatePulse(hex, speedLevel=5){
+    this.stopAnimation();
+    const [r,g,b] = LEDController.hexToRgb(hex);
+    let t = 0;
+    const step = 0.06 + speedLevel*0.02;
+    this._animTimer = setInterval(()=>{
+      t += step;
+      const f = (Math.sin(t)+1)/2;
+      this.setRGB(Math.round(r*f), Math.round(g*f), Math.round(b*f));
+    }, 80);
+  }
+  animateRainbow(speedLevel=5){
+    this.stopAnimation();
+    let h = 0;
+    const step = 4 + speedLevel*3;
+    this._animTimer = setInterval(()=>{
+      h = (h+step) % 360;
+      const [r,g,b] = LEDController.hsvToRgb(h,1,1);
+      this.setRGB(r,g,b);
+    }, 90);
+  }
+  static hexToRgb(hex){
+    const n = parseInt(hex.replace('#',''),16);
+    return [(n>>16)&0xFF, (n>>8)&0xFF, n&0xFF];
+  }
+  static hsvToRgb(h,s,v){
+    const c = v*s, x = c*(1-Math.abs((h/60)%2-1)), m = v-c;
+    let r,g,b;
+    if(h<60){r=c;g=x;b=0;} else if(h<120){r=x;g=c;b=0;} else if(h<180){r=0;g=c;b=x;}
+    else if(h<240){r=0;g=x;b=c;} else if(h<300){r=x;g=0;b=c;} else {r=c;g=0;b=x;}
+    return [Math.round((r+m)*255), Math.round((g+m)*255), Math.round((b+m)*255)];
+  }
+}
+
+/* ============================== 8. SENSOR-DEKODIERUNG ============================== */
+const SensorDecoder = {
+  // Interpretiert Rohbytes je nach IO-Typ und Standardmodus (Mode 0 sofern nicht anders gesetzt)
+  decode(ioType, mode, raw, dv){
+    switch(ioType){
+      case LWP.IO_TYPE.COLOR_DISTANCE_SENSOR:
+        if(mode===0) return { label:'Farbe', value: SensorDecoder.colorName(raw[0]), raw:raw[0], unit:'' };
+        if(mode===1) return { label:'Abstand', value: raw[0], unit:'(0-10)' };
+        if(mode===3) return { label:'Reflektiertes Licht', value: raw[0], unit:'%' };
+        if(mode===4) return { label:'Helligkeit (Umgebung)', value: raw[0], unit:'%' };
+        return { label:'Farb-/Abstandssensor', value: raw[0], unit:'' };
+      case LWP.IO_TYPE.MOVE_HUB_TILT:
+      case LWP.IO_TYPE.TILT_SENSOR:
+        if(raw.length>=2) return { label:'Neigung', value:`${Bytes.readI8({getUint8:(o)=>raw[o]},0)}° / ${Bytes.readI8({getUint8:(o)=>raw[o]},1)}°`, unit:'Pitch/Roll' };
+        return { label:'Neigung', value: raw[0], unit:'' };
+      case LWP.IO_TYPE.MOVE_HUB_MOTOR:
+      case LWP.IO_TYPE.MEDIUM_LINEAR_MOTOR:
+      case LWP.IO_TYPE.MOTOR:
+        if(raw.length>=4) return { label:'Motorposition', value: dv? dv.getInt32(dv.byteLength-raw.length,true) : 0, unit:'°' };
+        return { label:'Motorwert', value: raw[0], unit:'' };
+      default:
+        return { label:'Rohwert', value: Bytes.toHex(raw), unit:'' };
+    }
+  },
+  colorName(idx){
+    const names = ['Schwarz','Pink','Violett','Blau','Hellblau','Cyan','Grün','Gelb','Orange','Rot','Weiß'];
+    return names[idx] !== undefined ? names[idx] : ('Unbekannt ('+idx+')');
+  }
+};
+
+/* ============================== 9. LOGGER ============================== */
+class Logger extends Emitter {
+  constructor(maxEntries=500){ super(); this.entries = []; this.max = maxEntries; }
+  add(direction, bytes, note=''){
+    const entry = { time:new Date(), direction, bytes:Array.from(bytes), note };
+    this.entries.push(entry);
+    if(this.entries.length > this.max) this.entries.shift();
+    this.emit('entry', entry);
+    return entry;
+  }
+  clear(){ this.entries = []; this.emit('cleared'); }
+  toCSV(){
+    const rows = ['time,direction,bytes,note'];
+    this.entries.forEach(e=> rows.push(`${e.time.toISOString()},${e.direction},"${Bytes.toHex(e.bytes)}","${e.note}"`));
+    return rows.join('\n');
+  }
+  toJSON(){ return JSON.stringify(this.entries.map(e=>({time:e.time.toISOString(),direction:e.direction,hex:Bytes.toHex(e.bytes),note:e.note})), null, 2); }
+}
+
+/* ============================== 10. UI-HILFSFUNKTIONEN ============================== */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+function toast(kind, text){
+  if(!State.settings.toasts) return;
+  const host = $('#toastHost');
+  const el = document.createElement('div');
+  el.className = 'toast ' + kind;
+  const icons = {
+    ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>',
+    err:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>',
+    info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 12v4"/></svg>'
+  };
+  el.innerHTML = icons[kind] + '<span>' + text + '</span>';
+  host.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s, transform .3s'; el.style.opacity='0'; el.style.transform='translateY(6px)'; setTimeout(()=>el.remove(), 320); }, 3600);
+}
+
+function fmtTime(d){ return d.toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+
+function downloadFile(filename, content, mime='application/json'){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+
+function readFileAsText(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = () => rej(r.error);
+    r.readAsText(file);
+  });
+}
+
+/* ============================== 11. GLOBALER ANWENDUNGSZUSTAND ============================== */
+const ble = new BLEManager();
+const hub = new HubDevice(ble);
+const motors = new MotorController(ble);
+const led = new LEDController(ble);
+const logger = new Logger();
+
+const State = {
+  settings: { toasts:true, sound:false, autoReconnect:true, theme:'light', reduceMotion:false },
+  sensorHistory: {}, // port -> [{t, value}]
+  telemetryHistory: { battery:[], rssi:[] },
+  events: [],
+  macro: { steps: [], running:false, stopRequested:false },
+  block: { steps: [] },
+  jsRunning: false,
+  joystick: { x:0, y:0, active:false },
+  gamepadIndex: null
+};
+
+ble.on('tx', (bytes)=> { logger.add('TX', bytes); renderLogEntry({direction:'TX', bytes, time:new Date()}); });
+ble.on('data', (bytes)=> { logger.add('RX', bytes); renderLogEntry({direction:'RX', bytes, time:new Date()}); $('#rawReceived').textContent = hexDump(bytes); });
+
+function pushEvent(text, kind='info'){
+  State.events.unshift({ text, time:new Date(), kind });
+  if(State.events.length>80) State.events.pop();
+  renderEvents();
+}
+
+/* ============================== 12. VERBINDUNGS-UI ============================== */
+async function handleConnect(){
+  if(!ble.isSupported()){
+    $('#modalBackdrop').classList.add('show');
+    return;
+  }
+  try{
+    setSideStatus('connecting');
+    await ble.connect();
+  }catch(err){
+    if(err.message === 'USER_CANCELLED'){ setSideStatus('idle'); return; }
+    console.error(err);
+    toast('err', 'Verbindung fehlgeschlagen: ' + err.message);
+    setSideStatus('error');
+  }
+}
+
+ble.on('connected', async ()=>{
+  setSideStatus('connected');
+  $('#connectBtn').style.display = 'none';
+  $('#disconnectBtn').style.display = 'inline-flex';
+  toast('ok', 'Move Hub verbunden' + (ble.device?.name? (': '+ble.device.name) : ''));
+  pushEvent('Hub verbunden' + (ble.device?.name? (' ('+ble.device.name+')'):''), 'ok');
+  $('#dashConn').textContent = 'Verbunden';
+  $('#dashConnSub').textContent = ble.device?.name || 'LEGO Move Hub';
+  try{ await hub.initialize(); }catch(e){ console.error(e); }
+});
+
+ble.on('disconnected', ()=>{
+  setSideStatus('idle');
+  $('#connectBtn').style.display = 'inline-flex';
+  $('#disconnectBtn').style.display = 'none';
+  toast('info', 'Verbindung getrennt');
+  pushEvent('Verbindung getrennt', 'warn');
+  $('#dashConn').textContent = 'Getrennt';
+  $('#dashConnSub').textContent = 'Bereit zum Verbinden';
+});
+
+ble.on('reconnecting', (attempt, delay)=>{
+  setSideStatus('connecting');
+  pushEvent(`Automatisches Wiederverbinden (Versuch ${attempt})…`, 'warn');
+});
+
+function setSideStatus(state){
+  const dot = $('#sideDot'), text = $('#sideStatusText'), sub = $('#sideStatusSub');
+  dot.className = 'dot';
+  if(state==='connected'){ dot.classList.add('on'); text.textContent='Verbunden'; sub.textContent = ble.device?.name || 'Move Hub'; }
+  else if(state==='connecting'){ text.textContent='Verbinde…'; sub.textContent='Bitte warten'; }
+  else if(state==='error'){ dot.classList.add('err'); text.textContent='Fehler'; sub.textContent='Verbindung fehlgeschlagen'; }
+  else { text.textContent='Nicht verbunden'; sub.textContent='Move Hub via Bluetooth'; }
+}
+
+$('#connectBtn').addEventListener('click', handleConnect);
+$('#disconnectBtn').addEventListener('click', ()=> ble.disconnect());
+$('#modalClose').addEventListener('click', ()=> $('#modalBackdrop').classList.remove('show'));
+
+/* ============================== 13. HUB-DATEN → UI ============================== */
+hub.on('battery', (v)=>{
+  $('#dashBattery').textContent = v+'%';
+  $('#dashBatteryFill').style.width = v+'%';
+  $('#battChipText').textContent = v+'%';
+  $('#battChip').className = 'chip ' + (v<20?'bad':v<50?'warn':'good');
+  pushTelemetry('battery', v);
+});
+hub.on('rssi', (v)=>{
+  $('#dashRssi').textContent = v+' dBm';
+  $('#rssiChipText').textContent = v+' dBm';
+  $('#rssiChip').className = 'chip ' + (v<-85?'bad':v<-70?'warn':'good');
+  pushTelemetry('rssi', v);
+});
+hub.on('firmware', (v)=> $('#dashFw').textContent = 'v'+v);
+hub.on('hardware', (v)=> $('#dashHw').textContent = 'Hardware v'+v);
+hub.on('name', (v)=> {});
+hub.on('button', (pressed)=> pushEvent('Hub-Taste ' + (pressed?'gedrückt':'losgelassen'), 'info'));
+hub.on('attached', (port, ioType)=>{
+  pushEvent(`Gerät an Port ${LWP.PORT_NAME[port]||port} verbunden (Typ 0x${ioType.toString(16)})`, 'ok');
+  renderSensorGrid();
+  autoSubscribeSensor(port, ioType);
+});
+hub.on('detached', (port)=>{
+  pushEvent(`Gerät an Port ${LWP.PORT_NAME[port]||port} getrennt`, 'warn');
+  renderSensorGrid();
+});
+hub.on('portvalue', (port, raw, dv)=>{
+  const info = hub.ports[port];
+  const ioType = info? info.ioType : null;
+  const decoded = SensorDecoder.decode(ioType, State._sensorModes?.[port] ?? 0, raw, dv);
+  updateSensorTile(port, decoded);
+  pushSensorHistory(port, typeof decoded.value === 'number' ? decoded.value : (raw[0]||0));
+});
+
+async function autoSubscribeSensor(port, ioType){
+  if(port===LWP.PORT.C || port===LWP.PORT.D){
+    await hub.setPortInputFormat(port, 0, 1, true);
+    (State._sensorModes ||= {})[port] = 0;
+  }
+}
+
+function pushTelemetry(key, value){
+  const arr = State.telemetryHistory[key];
+  arr.push(value); if(arr.length>60) arr.shift();
+  drawTelemetryChart();
+}
+function pushSensorHistory(port, value){
+  const arr = (State.sensorHistory[port] ||= []);
+  arr.push(value); if(arr.length>60) arr.shift();
+  drawSensorHistoryChart();
+}
+
+/* ============================== 14. NAVIGATION ============================== */
+const titles = {
+  dashboard:['Dashboard','Live-Status deines LEGO BOOST Move Hub'],
+  motors:['Motoren','Vollständige Steuerung von Port A, B, C, D'],
+  sensors:['Sensoren','Live-Werte aller angeschlossenen Sensoren'],
+  led:['LED & Licht','RGB-Farbwahl, Palette und Animationen'],
+  remote:['Fernsteuerung','Tastatur, Touch, Joystick und Gamepad'],
+  automation:['Makros','Sequenzen, Timer und Bedingungen'],
+  programming:['Programmierung','Block-Editor und JavaScript-Konsole'],
+  files:['Dateien','Import und Export von Projekten und Daten'],
+  devtools:['Entwicklertools','BLE-Monitor, Rohdaten und UUID-Explorer'],
+  settings:['Einstellungen','Verbindung, Darstellung und Info']
+};
+$$('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    const view = item.dataset.view;
+    $$('.nav-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    $$('.view').forEach(v=>v.classList.remove('active'));
+    $('#view-'+view).classList.add('active');
+    $('#pageTitle').textContent = titles[view][0];
+    $('#pageSub').textContent = titles[view][1];
+    if(window.innerWidth<=920) $('#sidebar').classList.remove('open');
+  });
+});
+$('#menuToggle').addEventListener('click', ()=> $('#sidebar').classList.toggle('open'));
+if(window.innerWidth<=920) $('#menuToggle').style.display='flex';
+window.addEventListener('resize', ()=>{ $('#menuToggle').style.display = window.innerWidth<=920?'flex':'none'; });
+
+/* ============================== 15. THEME ============================== */
+function applyTheme(mode){
+  let effective = mode;
+  if(mode==='auto') effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light';
+  document.documentElement.setAttribute('data-theme', effective);
+  State.settings.theme = mode;
+  $('#themeSelect').value = mode;
+}
+$('#themeToggle').addEventListener('click', ()=>{
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current==='dark' ? 'light':'dark');
+});
+$('#themeSelect').addEventListener('change', (e)=> applyTheme(e.target.value));
+applyTheme('light');
+
+/* ============================== 16. DASHBOARD RENDERING ============================== */
+function renderEvents(){
+  const host = $('#dashEvents');
+  host.innerHTML = State.events.slice(0,12).map(e=>`
+    <div class="row" style="gap:10px;">
+      <span class="dot ${e.kind==='ok'?'on':e.kind==='warn'?'err':''}" style="flex-shrink:0;"></span>
+      <div style="flex:1;min-width:0;"><div style="font-size:12.5px;">${escapeHtml(e.text)}</div><div class="tiny">${fmtTime(e.time)}</div></div>
+    </div>`).join('') || '<div class="tiny">Noch keine Ereignisse.</div>';
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function drawTelemetryChart(){
+  const canvas = $('#telemetryChart'); if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.clientWidth || 500, h = 180;
+  canvas.width = w * devicePixelRatio; canvas.height = h * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,w,h);
+  drawLine(ctx, w, h, State.telemetryHistory.battery, 0, 100, getCss('--accent'));
+  const rssiNorm = State.telemetryHistory.rssi.map(v=> ((v+100)/70)*100 );
+  drawLine(ctx, w, h, rssiNorm, 0, 100, getCss('--accent-2'));
+}
+function drawSensorHistoryChart(){
+  const canvas = $('#sensorHistoryChart'); if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.clientWidth || 500, h = 160;
+  canvas.width = w*devicePixelRatio; canvas.height = h*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,w,h);
+  const colors = [getCss('--accent'), getCss('--accent-2'), '#1E8E5A', '#D8402C'];
+  let idx=0;
+  for(const port in State.sensorHistory){
+    const data = State.sensorHistory[port];
+    const max = Math.max(10, ...data);
+    drawLine(ctx, w, h, data, 0, max, colors[idx % colors.length]);
+    idx++;
+  }
+}
+function drawLine(ctx, w, h, data, min, max, color){
+  if(!data || data.length<2) return;
+  ctx.beginPath();
+  ctx.strokeStyle = color; ctx.lineWidth = 2.4; ctx.lineJoin='round'; ctx.lineCap='round';
+  data.forEach((v,i)=>{
+    const x = (i/(data.length-1)) * (w-8) + 4;
+    const norm = Math.max(0,Math.min(1,(v-min)/((max-min)||1)));
+    const y = h - 8 - norm*(h-16);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+function getCss(varName){ return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || '#FF6A00'; }
+
+function renderDashMotorStatus(){
+  const host = $('#dashMotorStatus');
+  host.innerHTML = ['A','B','C','D'].map(p=>{
+    const attached = Object.entries(LWP.PORT_NAME).find(([k,v])=>v===p);
+    const on = attached && hub.ports[attached[0]];
+    return `<div class="row between"><span class="tiny">Port ${p}</span><span class="chip ${on?'good':''}" style="padding:4px 10px;">${on?'Aktiv':'—'}</span></div>`;
+  }).join('');
+}
+setInterval(renderDashMotorStatus, 1500);
+
+/* ============================== 17. MOTOREN-UI ============================== */
+function buildMotorCard(port, label){
+  const div = document.createElement('div');
+  div.className = 'card motor-card hoverable';
+  div.innerHTML = `
+    <div class="accent-bar"></div>
+    <div class="card-head"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></div><div class="grow"><h3>Motor ${label}</h3><div class="sub">Port ${label}</div></div></div>
+    <div class="dial-wrap"><div class="speed-readout" id="speedVal-${port}">0%</div></div>
+    <input type="range" min="-100" max="100" value="0" id="speedSlider-${port}">
+    <div class="btn-grid">
+      <button class="btn btn-primary sm" id="run-${port}">Start</button>
+      <button class="btn btn-secondary sm" id="brake-${port}">Bremsen</button>
+      <button class="btn btn-secondary sm" id="coast-${port}">Ausrollen</button>
+      <button class="btn btn-secondary sm" id="reverse-${port}">Richtung ⇄</button>
+    </div>
+    <hr class="sep">
+    <div class="row wrap">
+      <input type="number" id="timeInput-${port}" placeholder="ms" value="1000" style="max-width:90px;">
+      <button class="btn btn-secondary sm" id="forTime-${port}">Für Zeit</button>
+      <input type="number" id="degInput-${port}" placeholder="Grad" value="360" style="max-width:90px;">
+      <button class="btn btn-secondary sm" id="forDeg-${port}">Für Grad</button>
+    </div>
+  `;
+  return div;
+}
+function initMotorUI(){
+  const host = $('#motorTab-single');
+  host.innerHTML = '';
+  const map = [[LWP.PORT.A,'A'],[LWP.PORT.B,'B'],[LWP.PORT.C,'C'],[LWP.PORT.D,'D']];
+  map.forEach(([port,label])=>{
+    host.appendChild(buildMotorCard(port,label));
+  });
+  map.forEach(([port,label])=>{
+    const slider = $('#speedSlider-'+port), val = $('#speedVal-'+port);
+    let currentSpeed = 0;
+    slider.addEventListener('input', ()=>{ currentSpeed = +slider.value; val.textContent = currentSpeed+'%'; });
+    $('#run-'+port).addEventListener('click', ()=> guarded(()=>motors.setSpeed(port,currentSpeed), `Motor ${label}: ${currentSpeed}%`));
+    $('#brake-'+port).addEventListener('click', ()=> guarded(()=>motors.brake(port), `Motor ${label}: Bremse`));
+    $('#coast-'+port).addEventListener('click', ()=> guarded(()=>motors.coast(port), `Motor ${label}: Ausrollen`));
+    $('#reverse-'+port).addEventListener('click', ()=>{ currentSpeed = -currentSpeed; slider.value = currentSpeed; val.textContent = currentSpeed+'%'; guarded(()=>motors.setSpeed(port,currentSpeed), `Motor ${label}: Richtung gewechselt`); });
+    $('#forTime-'+port).addEventListener('click', ()=>{
+      const ms = +$('#timeInput-'+port).value || 1000;
+      guarded(()=>motors.runForTime(port, ms, currentSpeed||50), `Motor ${label}: ${ms}ms bei ${currentSpeed||50}%`);
+    });
+    $('#forDeg-'+port).addEventListener('click', ()=>{
+      const deg = +$('#degInput-'+port).value || 360;
+      guarded(()=>motors.runForDegrees(port, deg, currentSpeed||50), `Motor ${label}: ${deg}° bei ${currentSpeed||50}%`);
+    });
+  });
+  // Port-Selects für erweiterte Steuerung
+  ['rampPort','posPort'].forEach(id=>{
+    const sel = $('#'+id); sel.innerHTML = map.map(([port,label])=>`<option value="${port}">Port ${label}</option>`).join('');
+  });
+}
+function guarded(fn, note){
+  if(!ble.connected){ toast('err','Nicht verbunden — bitte zuerst Hub verbinden.'); return; }
+  fn().then(()=> pushEvent(note,'ok')).catch(e=>{ console.error(e); toast('err','Fehler: '+e.message); pushEvent('Fehler: '+note,'warn'); });
+}
+
+$$('[data-motortab]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    $$('[data-motortab]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    ['single','sync','advanced'].forEach(t=> $('#motorTab-'+t).style.display = (t===btn.dataset.motortab)?'grid':'none');
+  });
+});
+
+// Sync UI
+$('#syncSpeed').addEventListener('input', e=> $('#syncSpeedVal').textContent = e.target.value);
+$('#syncSteer').addEventListener('input', e=> $('#syncSteerVal').textContent = e.target.value);
+$('#syncStart').addEventListener('click', ()=>{
+  const base = +$('#syncSpeed').value, steer = +$('#syncSteer').value;
+  guarded(async ()=>{ await motors.setupVirtualAB(); await motors.syncSpeed(base+steer, base-steer); }, `Synchronantrieb: ${base}% / Lenkung ${steer}`);
+});
+$('#syncBrake').addEventListener('click', ()=> guarded(()=>motors.syncBrake(), 'Sync-Bremse'));
+$('#syncCoast').addEventListener('click', ()=> guarded(()=>motors.syncCoast(), 'Sync-Ausrollen'));
+$('#syncModeSpeed').addEventListener('input', e=> $('#syncModeSpeedVal').textContent = e.target.value);
+$('#syncModeRun').addEventListener('click', ()=>{
+  const mode = $('#syncMode').value, value = +$('#syncModeValue').value, speed = +$('#syncModeSpeed').value;
+  guarded(async ()=>{
+    await motors.setupVirtualAB();
+    if(mode==='time') await motors.syncForTime(value, speed, speed);
+    else await motors.syncForDegrees(value, speed, speed);
+  }, `Sync ${mode}: ${value}`);
+});
+
+// Advanced: Ramp
+$('#rampAcc').addEventListener('input', e=> $('#rampAccVal').textContent = e.target.value);
+$('#rampDec').addEventListener('input', e=> $('#rampDecVal').textContent = e.target.value);
+$('#rampApply').addEventListener('click', ()=>{
+  const port = +$('#rampPort').value, acc = +$('#rampAcc').value, dec = +$('#rampDec').value;
+  guarded(async ()=>{ await motors.setAccelerationTime(port, acc); await motors.setDecelerationTime(port, dec); }, `Rampe gesetzt (${acc}/${dec}ms)`);
+});
+// Advanced: Position
+$('#posTarget').addEventListener('input', e=> $('#posTargetVal').textContent = e.target.value);
+$('#posSpeed').addEventListener('input', e=> $('#posSpeedVal').textContent = e.target.value);
+$('#posGoto').addEventListener('click', ()=>{
+  const port = +$('#posPort').value, target = +$('#posTarget').value, speed = +$('#posSpeed').value;
+  guarded(()=>motors.gotoAbsolutePosition(port, target, speed), `Position ${target}° angefahren`);
+});
+$('#posZero').addEventListener('click', ()=>{
+  const port = +$('#posPort').value;
+  guarded(()=>motors.presetEncoder(port,0), 'Encoder auf 0 gesetzt');
+});
+$('#emergencyStop').addEventListener('click', ()=>{
+  if(!ble.connected){ toast('err','Nicht verbunden.'); return; }
+  [LWP.PORT.A,LWP.PORT.B,LWP.PORT.C,LWP.PORT.D].forEach(p=> motors.brake(p).catch(()=>{}));
+  led.stopAnimation();
+  toast('info','Not-Aus ausgelöst — alle Motoren gebremst.');
+  pushEvent('NOT-AUS ausgelöst', 'warn');
+});
+
+/* ============================== 18. SENSOREN-UI ============================== */
+const SENSOR_DEFS = [
+  {port:LWP.PORT.C, label:'Port C — Farbe', icon:'color'},
+  {port:LWP.PORT.C, label:'Port C — Abstand', icon:'dist', mode:1},
+  {port:LWP.PORT.D, label:'Port D — Reflektiert', icon:'refl', mode:3},
+  {port:LWP.PORT.D, label:'Port D — Helligkeit', icon:'ambi', mode:4},
+  {port:LWP.PORT.TILT, label:'Neigung', icon:'tilt'},
+  {port:LWP.PORT.A, label:'Motor A Position', icon:'pos', mode:2},
+  {port:LWP.PORT.B, label:'Motor B Position', icon:'pos', mode:2},
+  {port:'button', label:'Hub-Taste', icon:'btn'}
+];
+function renderSensorGrid(){
+  const host = $('#sensorGrid'); if(!host) return;
+  host.innerHTML = SENSOR_DEFS.map((s,i)=>`
+    <div class="card sensor-tile hoverable" id="sensorTile-${i}">
+      <div class="tiny">${s.label}</div>
+      <div class="sensor-value" id="sensorVal-${i}">—</div>
+      <canvas class="spark" id="sensorSpark-${i}" height="46"></canvas>
+    </div>`).join('');
+  const dashHost = $('#dashSensorGrid');
+  if(dashHost) dashHost.innerHTML = SENSOR_DEFS.slice(0,4).map((s,i)=>`
+    <div><div class="tiny">${s.label}</div><div class="sensor-value" style="font-size:18px;" id="dashSensorVal-${i}">—</div></div>`).join('');
+}
+function updateSensorTile(port, decoded){
+  SENSOR_DEFS.forEach((s,i)=>{
+    if(s.port === port){
+      const el = $('#sensorVal-'+i);
+      if(el) el.textContent = decoded.value + (decoded.unit?(' '+decoded.unit):'');
+      const dEl = $('#dashSensorVal-'+i);
+      if(dEl) dEl.textContent = decoded.value + (decoded.unit?(' '+decoded.unit):'');
+    }
+  });
+}
+hub.on('button', (pressed)=>{
+  const i = SENSOR_DEFS.findIndex(s=>s.port==='button');
+  const el = $('#sensorVal-'+i);
+  if(el) el.textContent = pressed ? 'Gedrückt' : 'Losgelassen';
+});
+$('#sensorLiveToggle').addEventListener('change', (e)=>{
+  pushEvent('Live-Aktualisierung ' + (e.target.checked?'aktiviert':'deaktiviert'), 'info');
+});
+
+/* ============================== 19. LED-UI ============================== */
+function updateLedPreview(r,g,b){ $('#ledPreview').style.background = `rgb(${r},${g},${b})`; }
+['r','g','b'].forEach(ch=>{
+  $('#'+ch+'Slider').addEventListener('input', (e)=>{
+    $('#'+ch+'Val').textContent = e.target.value;
+    updateLedPreview(+$('#rSlider').value, +$('#gSlider').value, +$('#bSlider').value);
+  });
+});
+updateLedPreview(255,106,0);
+$('#applyRgb').addEventListener('click', ()=>{
+  const r=+$('#rSlider').value,g=+$('#gSlider').value,b=+$('#bSlider').value;
+  guarded(()=>led.setRGB(r,g,b), `LED-Farbe RGB(${r},${g},${b})`);
+});
+function renderPalette(){
+  $('#paletteGrid').innerHTML = LWP.COLOR_PALETTE.map(c=>`<div class="swatch" title="${c.name}" data-idx="${c.i}" style="background:${c.hex};${c.hex==='#FFFFFF'?'box-shadow:inset 0 0 0 1px var(--border);':''}"></div>`).join('');
+  $$('.swatch').forEach(sw=> sw.addEventListener('click', ()=>{
+    $$('.swatch').forEach(s=>s.classList.remove('selected'));
+    sw.classList.add('selected');
+    const idx = +sw.dataset.idx;
+    guarded(()=>led.setColorIndex(idx), 'LED-Palettenfarbe ' + idx);
+  }));
+}
+renderPalette();
+$('#animSpeed').addEventListener('input', e=> $('#animSpeedVal').textContent = e.target.value);
+$('#animBlink').addEventListener('click', ()=> guarded(async()=>led.animateBlink('#FF6A00', +$('#animSpeed').value), 'LED: Blinken'));
+$('#animPulse').addEventListener('click', ()=> guarded(async()=>led.animatePulse('#FF6A00', +$('#animSpeed').value), 'LED: Pulsieren'));
+$('#animRainbow').addEventListener('click', ()=> guarded(async()=>led.animateRainbow(+$('#animSpeed').value), 'LED: Regenbogen'));
+$('#animStop').addEventListener('click', ()=>{ led.stopAnimation(); pushEvent('LED-Animation gestoppt','info'); });
+
+/* ============================== 20. FERNSTEUERUNG ============================== */
+let driveState = { fwd:false, back:false, left:false, right:false };
+function updateDrive(){
+  if(!ble.connected) return;
+  const speed = +$('#remoteSpeed').value;
+  let base = 0, steer = 0;
+  if(driveState.fwd) base = speed;
+  if(driveState.back) base = -speed;
+  if(driveState.left) steer = -Math.round(speed*0.6);
+  if(driveState.right) steer = Math.round(speed*0.6);
+  if(!driveState.fwd && !driveState.back && !driveState.left && !driveState.right){
+    motors.brake(LWP.PORT.A).catch(()=>{}); motors.brake(LWP.PORT.B).catch(()=>{});
+    return;
+  }
+  motors.setSpeed(LWP.PORT.A, base+steer).catch(()=>{});
+  motors.setSpeed(LWP.PORT.B, base-steer).catch(()=>{});
+}
+$('#remoteSpeed').addEventListener('input', e=> $('#remoteSpeedVal').textContent = e.target.value);
+const KEY_MAP = { w:'fwd', arrowup:'fwd', s:'back', arrowdown:'back', a:'left', arrowleft:'left', d:'right', arrowright:'right' };
+window.addEventListener('keydown', (e)=>{
+  const k = e.key.toLowerCase();
+  if(KEY_MAP[k] && $('#view-remote').classList.contains('active')){ driveState[KEY_MAP[k]] = true; highlightDpad(); updateDrive(); }
+});
+window.addEventListener('keyup', (e)=>{
+  const k = e.key.toLowerCase();
+  if(KEY_MAP[k]){ driveState[KEY_MAP[k]] = false; highlightDpad(); updateDrive(); }
+});
+function highlightDpad(){
+  $$('.dpad button').forEach(b=>b.classList.remove('pressed'));
+  if(driveState.fwd) $('.dpad [data-dir=up]')?.classList.add('pressed');
+  if(driveState.back) $('.dpad [data-dir=down]')?.classList.add('pressed');
+  if(driveState.left) $('.dpad [data-dir=left]')?.classList.add('pressed');
+  if(driveState.right) $('.dpad [data-dir=right]')?.classList.add('pressed');
+}
+$$('.dpad button').forEach(btn=>{
+  const dir = btn.dataset.dir;
+  const map = { up:'fwd', down:'back', left:'left', right:'right' };
+  if(dir==='stop'){ btn.addEventListener('click', ()=>{ driveState={fwd:false,back:false,left:false,right:false}; highlightDpad(); updateDrive(); }); return; }
+  const key = map[dir];
+  ['mousedown','touchstart'].forEach(evt=> btn.addEventListener(evt, (e)=>{ e.preventDefault(); driveState[key]=true; highlightDpad(); updateDrive(); }));
+  ['mouseup','mouseleave','touchend'].forEach(evt=> btn.addEventListener(evt, ()=>{ driveState[key]=false; highlightDpad(); updateDrive(); }));
+});
+$$('[data-touch]').forEach(btn=>{
+  const map = { fwd:'fwd', back:'back', left:'left', right:'right' };
+  const key = map[btn.dataset.touch];
+  ['mousedown','touchstart'].forEach(evt=> btn.addEventListener(evt, (e)=>{ e.preventDefault(); driveState[key]=true; updateDrive(); }));
+  ['mouseup','mouseleave','touchend'].forEach(evt=> btn.addEventListener(evt, ()=>{ driveState[key]=false; updateDrive(); }));
+});
+
+// Virtueller Joystick
+(function initJoystick(){
+  const base = $('#joystickBase'), knob = $('#joystickKnob');
+  let dragging = false;
+  const radius = 58;
+  function setKnob(dx,dy){
+    const dist = Math.min(radius, Math.hypot(dx,dy));
+    const ang = Math.atan2(dy,dx);
+    const x = Math.cos(ang)*dist, y = Math.sin(ang)*dist;
+    knob.style.left = (58+x)+'px'; knob.style.top = (58+y)+'px';
+    State.joystick.x = Math.round((x/radius)*100);
+    State.joystick.y = Math.round((-y/radius)*100);
+    $('#joyX').textContent = State.joystick.x;
+    $('#joyY').textContent = State.joystick.y;
+    if(ble.connected){
+      const fwd = State.joystick.y, steer = State.joystick.x;
+      motors.setSpeed(LWP.PORT.A, Math.max(-100,Math.min(100, fwd+steer*0.5))).catch(()=>{});
+      motors.setSpeed(LWP.PORT.B, Math.max(-100,Math.min(100, fwd-steer*0.5))).catch(()=>{});
+    }
+  }
+  function reset(){ knob.style.left='58px'; knob.style.top='58px'; State.joystick.x=0; State.joystick.y=0; $('#joyX').textContent='0'; $('#joyY').textContent='0'; if(ble.connected){ motors.brake(LWP.PORT.A).catch(()=>{}); motors.brake(LWP.PORT.B).catch(()=>{}); } }
+  function getPos(e){ const t = e.touches? e.touches[0] : e; const rect = base.getBoundingClientRect(); return { x: t.clientX-rect.left-95, y: t.clientY-rect.top-95 }; }
+  knob.addEventListener('mousedown', ()=> dragging=true);
+  knob.addEventListener('touchstart', (e)=>{ dragging=true; e.preventDefault(); }, {passive:false});
+  window.addEventListener('mousemove', (e)=>{ if(dragging){ const p=getPos(e); setKnob(p.x,p.y); } });
+  window.addEventListener('touchmove', (e)=>{ if(dragging){ const p=getPos(e); setKnob(p.x,p.y); e.preventDefault(); } }, {passive:false});
+  window.addEventListener('mouseup', ()=>{ if(dragging){ dragging=false; reset(); } });
+  window.addEventListener('touchend', ()=>{ if(dragging){ dragging=false; reset(); } });
+})();
+
+// Gamepad API
+window.addEventListener('gamepadconnected', (e)=>{ State.gamepadIndex = e.gamepad.index; $('#gamepadStatus').textContent = 'Verbunden: ' + e.gamepad.id; });
+window.addEventListener('gamepaddisconnected', ()=>{ State.gamepadIndex = null; $('#gamepadStatus').textContent = 'Kein Gamepad erkannt.'; });
+$('#gamepadRescan').addEventListener('click', ()=>{
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  const found = Array.from(pads).find(Boolean);
+  if(found){ State.gamepadIndex = found.index; $('#gamepadStatus').textContent = 'Verbunden: '+found.id; toast('ok','Gamepad gefunden'); }
+  else toast('info','Kein Gamepad gefunden — Taste drücken und erneut versuchen.');
+});
+function pollGamepad(){
+  if(State.gamepadIndex!==null){
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    const gp = pads[State.gamepadIndex];
+    if(gp){
+      const ax0 = gp.axes[1]||0, ax1 = gp.axes[0]||0; // Y invertiert typischerweise
+      $('#gpAxis0').textContent = ax0.toFixed(2);
+      $('#gpAxis1').textContent = ax1.toFixed(2);
+      $('#gpAxis0Fill').style.width = ((1-ax0)/2*100)+'%';
+      $('#gpAxis1Fill').style.width = ((ax1+1)/2*100)+'%';
+      if(ble.connected && (Math.abs(ax0)>0.08 || Math.abs(ax1)>0.08)){
+        const fwd = Math.round(-ax0*100), steer = Math.round(ax1*60);
+        motors.setSpeed(LWP.PORT.A, Math.max(-100,Math.min(100,fwd+steer))).catch(()=>{});
+        motors.setSpeed(LWP.PORT.B, Math.max(-100,Math.min(100,fwd-steer))).catch(()=>{});
+      }
+    }
+  }
+  requestAnimationFrame(pollGamepad);
+}
+requestAnimationFrame(pollGamepad);
+
+/* ============================== 21. AUTOMATISIERUNG / MAKROS ============================== */
+function renderMacroSteps(){
+  const host = $('#macroSteps');
+  if(State.macro.steps.length===0){ host.innerHTML = '<div class="empty-hint">Noch keine Schritte — füge oben einen Schritt hinzu.</div>'; return; }
+  host.innerHTML = State.macro.steps.map((s,i)=>`
+    <div class="step" draggable="true" data-idx="${i}">
+      <div class="step-num">${i+1}</div>
+      <div class="step-body"><div class="step-title">${macroStepTitle(s)}</div><div class="step-meta">${macroStepMeta(s)}</div></div>
+      <div class="step-actions">
+        <button data-act="up" title="Nach oben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+        <button data-act="down" title="Nach unten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
+        <button data-act="del" title="Löschen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M6 18L18 6"/></svg></button>
+      </div>
+    </div>`).join('');
+  $$('.step', host).forEach(el=>{
+    const idx = +el.dataset.idx;
+    el.querySelector('[data-act=up]').addEventListener('click', ()=>{ if(idx>0){ [State.macro.steps[idx-1],State.macro.steps[idx]]=[State.macro.steps[idx],State.macro.steps[idx-1]]; renderMacroSteps(); }});
+    el.querySelector('[data-act=down]').addEventListener('click', ()=>{ if(idx<State.macro.steps.length-1){ [State.macro.steps[idx+1],State.macro.steps[idx]]=[State.macro.steps[idx],State.macro.steps[idx+1]]; renderMacroSteps(); }});
+    el.querySelector('[data-act=del]').addEventListener('click', ()=>{ State.macro.steps.splice(idx,1); renderMacroSteps(); });
+    el.addEventListener('dragstart', ()=> el.classList.add('dragging'));
+    el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
+  });
+  host.ondragover = (e)=>{
+    e.preventDefault();
+    const dragging = host.querySelector('.dragging'); if(!dragging) return;
+    const after = [...host.querySelectorAll('.step:not(.dragging)')].find(el=> e.clientY < el.getBoundingClientRect().top + el.offsetHeight/2 );
+    if(after) host.insertBefore(dragging, after); else host.appendChild(dragging);
+  };
+  host.ondrop = ()=>{
+    const newOrder = [...host.querySelectorAll('.step')].map(el=> State.macro.steps[+el.dataset.idx]);
+    State.macro.steps = newOrder; renderMacroSteps();
+  };
+}
+function macroStepTitle(s){
+  const titles = { motor:'Motor-Aktion', led:'LED-Aktion', wait:'Warten', condition:'Bedingung (Sensor)', repeat:'Wiederholung Start', endrepeat:'Wiederholung Ende' };
+  return titles[s.type] || s.type;
+}
+function macroStepMeta(s){
+  if(s.type==='motor') return `Port ${LWP.PORT_NAME[s.port]}: ${s.speed}% für ${s.ms}ms`;
+  if(s.type==='led') return `RGB(${s.r},${s.g},${s.b})`;
+  if(s.type==='wait') return `${s.ms} ms`;
+  if(s.type==='condition') return `Wenn Sensor ${s.port} ${s.op} ${s.value}`;
+  if(s.type==='repeat') return `${s.count}× wiederholen`;
+  if(s.type==='endrepeat') return 'Schließt die Wiederholung';
+  return '';
+}
+$('#macroAddStep').addEventListener('click', ()=>{
+  const type = $('#macroActionType').value;
+  let step = { type };
+  if(type==='motor') Object.assign(step, { port:LWP.PORT.A, speed:60, ms:1000 });
+  if(type==='led') Object.assign(step, { r:255,g:106,b:0 });
+  if(type==='wait') Object.assign(step, { ms:500 });
+  if(type==='condition') Object.assign(step, { port:LWP.PORT.C, op:'>', value:5 });
+  if(type==='repeat') Object.assign(step, { count:3 });
+  State.macro.steps.push(step);
+  renderMacroSteps();
+});
+$('#macroClear').addEventListener('click', ()=>{ State.macro.steps=[]; renderMacroSteps(); });
+
+function macroLog(text, kind='info'){
+  const host = $('#macroLog');
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.innerHTML = `<span class="tiny mono">${fmtTime(new Date())}</span><span>${escapeHtml(text)}</span>`;
+  host.prepend(div);
+}
+async function runMacroSteps(steps){
+  for(let i=0;i<steps.length;i++){
+    if(State.macro.stopRequested) { macroLog('Abgebrochen.', 'warn'); break; }
+    const s = steps[i];
+    if(s.type==='repeat'){
+      const endIdx = findMatchingEnd(steps, i);
+      const inner = steps.slice(i+1, endIdx);
+      for(let r=0;r<s.count;r++){
+        if(State.macro.stopRequested) break;
+        macroLog(`Wiederholung ${r+1}/${s.count}`);
+        await runMacroSteps(inner);
+      }
+      i = endIdx;
+      continue;
+    }
+    if(s.type==='endrepeat') continue;
+    if(s.type==='motor'){
+      macroLog(macroStepTitle(s)+': '+macroStepMeta(s));
+      if(ble.connected) await motors.runForTime(s.port, s.ms, s.speed);
+      await sleep(s.ms + 60);
+    } else if(s.type==='led'){
+      macroLog(macroStepTitle(s)+': '+macroStepMeta(s));
+      if(ble.connected) await led.setRGB(s.r,s.g,s.b);
+    } else if(s.type==='wait'){
+      macroLog('Warte '+s.ms+'ms');
+      await sleep(s.ms);
+    } else if(s.type==='condition'){
+      const history = State.sensorHistory[s.port] || [];
+      const last = history[history.length-1] ?? 0;
+      const ok = evalOp(last, s.op, s.value);
+      macroLog(`Bedingung Port ${s.port} ${s.op} ${s.value} → letzter Wert ${last} → ${ok?'wahr':'falsch'}`);
+      if(!ok){ macroLog('Bedingung nicht erfüllt — Sequenz gestoppt.', 'warn'); break; }
+    }
+  }
+}
+function findMatchingEnd(steps, startIdx){
+  let depth=0;
+  for(let j=startIdx;j<steps.length;j++){
+    if(steps[j].type==='repeat') depth++;
+    if(steps[j].type==='endrepeat'){ depth--; if(depth===0) return j; }
+  }
+  return steps.length-1;
+}
+function evalOp(a,op,b){ switch(op){case '>':return a>b;case '<':return a<b;case '==':return a==b;case '>=':return a>=b;case '<=':return a<=b;default:return false;} }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+$('#macroRun').addEventListener('click', async ()=>{
+  if(State.macro.steps.length===0){ toast('info','Keine Schritte vorhanden.'); return; }
+  State.macro.running = true; State.macro.stopRequested = false;
+  macroLog('▶ Makro gestartet', 'ok');
+  await runMacroSteps(State.macro.steps);
+  macroLog('■ Makro beendet', 'ok');
+  State.macro.running = false;
+});
+$('#macroStopRun').addEventListener('click', ()=>{ State.macro.stopRequested = true; });
+$('#macroSave').addEventListener('click', ()=> { downloadFile('makro.json', JSON.stringify(State.macro.steps,null,2)); logFileOp('Makro als makro.json exportiert.'); });
+$('#macroLoad').addEventListener('change', async (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  try{ const text = await readFileAsText(file); const data = JSON.parse(text); if(!Array.isArray(data)) throw new Error('Ungültiges Format'); State.macro.steps = data; renderMacroSteps(); toast('ok','Makro geladen.'); }
+  catch(err){ toast('err','Makro konnte nicht geladen werden: '+err.message); }
+  e.target.value='';
+});
+renderMacroSteps();
+
+/* ============================== 22. PROGRAMMIERUNG: BLOCK-EDITOR ============================== */
+const BLOCK_DEFS = [
+  { id:'motorSpeed', label:'Motor Geschwindigkeit', color:'#FF6A00' },
+  { id:'motorTime', label:'Motor für Zeit', color:'#FF8A3D' },
+  { id:'motorDeg', label:'Motor für Grad', color:'#FFB020' },
+  { id:'motorBrake', label:'Motor bremsen', color:'#C98A00' },
+  { id:'ledRgb', label:'LED Farbe (RGB)', color:'#1E8E5A' },
+  { id:'wait', label:'Warten (ms)', color:'#5B7FE0' },
+  { id:'log', label:'Log-Ausgabe', color:'#8A6BD1' },
+  { id:'repeat', label:'Wiederholen (Anzahl)', color:'#D8402C' }
+];
+function renderBlockPalette(){
+  $('#blockPalette').innerHTML = BLOCK_DEFS.map(b=>`<div class="palette-item" draggable="true" data-id="${b.id}"><span class="sw" style="background:${b.color};"></span>${b.label}</div>`).join('');
+  $$('.palette-item').forEach(p=>{
+    p.addEventListener('dragstart', (e)=> e.dataTransfer.setData('text/plain', p.dataset.id));
+    p.addEventListener('click', ()=> addBlock(p.dataset.id));
+  });
+}
+function addBlock(id){
+  const def = BLOCK_DEFS.find(b=>b.id===id);
+  const params = defaultParamsFor(id);
+  State.block.steps.push({ id, params });
+  renderBlockDrop();
+}
+function defaultParamsFor(id){
+  switch(id){
+    case 'motorSpeed': return { port:'A', speed:60 };
+    case 'motorTime': return { port:'A', speed:60, ms:1000 };
+    case 'motorDeg': return { port:'A', speed:60, deg:360 };
+    case 'motorBrake': return { port:'A' };
+    case 'ledRgb': return { r:255, g:106, b:0 };
+    case 'wait': return { ms:500 };
+    case 'log': return { text:'Status' };
+    case 'repeat': return { count:3 };
+    default: return {};
+  }
+}
+function renderBlockDrop(){
+  const host = $('#blockDrop');
+  if(State.block.steps.length===0){ host.innerHTML = '<div class="empty-hint">Bausteine hierher ziehen oder in der Palette anklicken.</div>'; return; }
+  host.innerHTML = '';
+  State.block.steps.forEach((s,i)=>{
+    const def = BLOCK_DEFS.find(b=>b.id===s.id);
+    const el = document.createElement('div');
+    el.className = 'block'; el.style.background = def.color; el.draggable = true; el.dataset.idx = i;
+    el.innerHTML = blockInnerHtml(s, i);
+    host.appendChild(el);
+    el.addEventListener('dragstart', ()=> el.classList.add('dragging'));
+    el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
+    el.querySelector('.rm').addEventListener('click', ()=>{ State.block.steps.splice(i,1); renderBlockDrop(); });
+    el.querySelectorAll('[data-param]').forEach(input=>{
+      input.addEventListener('change', ()=>{ s.params[input.dataset.param] = input.type==='number'? +input.value : input.value; });
+    });
+  });
+  host.ondragover = (e)=>{ e.preventDefault(); host.classList.add('dragover'); };
+  host.ondragleave = ()=> host.classList.remove('dragover');
+  host.ondrop = (e)=>{
+    e.preventDefault(); host.classList.remove('dragover');
+    const dragging = host.querySelector('.dragging');
+    if(dragging){
+      const after = [...host.querySelectorAll('.block:not(.dragging)')].find(el=> e.clientY < el.getBoundingClientRect().top + el.offsetHeight/2 );
+      if(after) host.insertBefore(dragging, after); else host.appendChild(dragging);
+      const newOrder = [...host.querySelectorAll('.block')].map(el=> State.block.steps[+el.dataset.idx]);
+      State.block.steps = newOrder; renderBlockDrop();
+    } else {
+      const id = e.dataTransfer.getData('text/plain');
+      if(id) addBlock(id);
+    }
+  };
+}
+function blockInnerHtml(s,i){
+  const p = s.params;
+  const portOpts = ['A','B','C','D'].map(x=>`<option ${p.port===x?'selected':''} value="${x}">${x}</option>`).join('');
+  switch(s.id){
+    case 'motorSpeed': return `<span class="block-label">Motor</span><select data-param="port">${portOpts}</select><span class="block-label">Speed</span><input type="number" data-param="speed" value="${p.speed}" style="width:60px;"><button class="rm">✕</button>`;
+    case 'motorTime': return `<span class="block-label">Motor</span><select data-param="port">${portOpts}</select><input type="number" data-param="speed" value="${p.speed}" style="width:55px;" title="Speed"><span class="block-label">für</span><input type="number" data-param="ms" value="${p.ms}" style="width:70px;">ms<button class="rm">✕</button>`;
+    case 'motorDeg': return `<span class="block-label">Motor</span><select data-param="port">${portOpts}</select><input type="number" data-param="speed" value="${p.speed}" style="width:55px;">%<span class="block-label">für</span><input type="number" data-param="deg" value="${p.deg}" style="width:65px;">°<button class="rm">✕</button>`;
+    case 'motorBrake': return `<span class="block-label">Bremse Motor</span><select data-param="port">${portOpts}</select><button class="rm">✕</button>`;
+    case 'ledRgb': return `<span class="block-label">LED RGB</span><input type="number" data-param="r" value="${p.r}" style="width:52px;">R<input type="number" data-param="g" value="${p.g}" style="width:52px;">G<input type="number" data-param="b" value="${p.b}" style="width:52px;">B<button class="rm">✕</button>`;
+    case 'wait': return `<span class="block-label">Warte</span><input type="number" data-param="ms" value="${p.ms}" style="width:75px;">ms<button class="rm">✕</button>`;
+    case 'log': return `<span class="block-label">Log</span><input type="text" data-param="text" value="${p.text}" style="width:140px;"><button class="rm">✕</button>`;
+    case 'repeat': return `<span class="block-label">Wiederhole</span><input type="number" data-param="count" value="${p.count}" style="width:55px;">×<button class="rm">✕</button>`;
+    default: return '';
+  }
+}
+renderBlockPalette(); renderBlockDrop();
+$('#blockClear').addEventListener('click', ()=>{ State.block.steps=[]; renderBlockDrop(); });
+$('#blockRun').addEventListener('click', async ()=>{
+  consoleLog('▶ Block-Programm gestartet', 'info');
+  for(const s of State.block.steps){
+    try{ await executeBlock(s); } catch(e){ consoleLog('Fehler: '+e.message,'err'); }
+  }
+  consoleLog('■ Block-Programm beendet', 'ok');
+});
+async function executeBlock(s){
+  const p = s.params, portMap = { A:LWP.PORT.A, B:LWP.PORT.B, C:LWP.PORT.C, D:LWP.PORT.D };
+  switch(s.id){
+    case 'motorSpeed': if(ble.connected) await motors.setSpeed(portMap[p.port], p.speed); break;
+    case 'motorTime': if(ble.connected) await motors.runForTime(portMap[p.port], p.ms, p.speed); await sleep(p.ms); break;
+    case 'motorDeg': if(ble.connected) await motors.runForDegrees(portMap[p.port], p.deg, p.speed); break;
+    case 'motorBrake': if(ble.connected) await motors.brake(portMap[p.port]); break;
+    case 'ledRgb': if(ble.connected) await led.setRGB(p.r,p.g,p.b); break;
+    case 'wait': await sleep(p.ms); break;
+    case 'log': consoleLog(p.text, 'info'); break;
+    case 'repeat': break; // Einfache lineare Ausführung — Wiederholung wird als Hinweis geloggt
+  }
+}
+$('#blockToJs').addEventListener('click', ()=>{
+  const lines = State.block.steps.map(s=>{
+    const p = s.params;
+    switch(s.id){
+      case 'motorSpeed': return `await robot.motor('${p.port}').speed(${p.speed});`;
+      case 'motorTime': return `await robot.motor('${p.port}').forTime(${p.speed}, ${p.ms});`;
+      case 'motorDeg': return `await robot.motor('${p.port}').forDegrees(${p.speed}, ${p.deg});`;
+      case 'motorBrake': return `await robot.motor('${p.port}').brake();`;
+      case 'ledRgb': return `await robot.led.rgb(${p.r}, ${p.g}, ${p.b});`;
+      case 'wait': return `await robot.wait(${p.ms});`;
+      case 'log': return `robot.log(${JSON.stringify(p.text)});`;
+      case 'repeat': return `// Wiederhole ${p.count}× — Block manuell duplizieren oder Schleife im JS-Editor nutzen`;
+      default: return '';
+    }
+  });
+  $('#jsEditor').value = lines.join('\n');
+  $$('[data-progtab]')[1].click();
+  toast('ok', 'In JavaScript umgewandelt.');
+});
+
+$$('[data-progtab]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    $$('[data-progtab]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    $('#progTab-blocks').style.display = btn.dataset.progtab==='blocks' ? 'block':'none';
+    $('#progTab-js').style.display = btn.dataset.progtab==='js' ? 'block':'none';
+  });
+});
+
+/* ============================== 23. PROGRAMMIERUNG: JS-EDITOR / SANDBOX ============================== */
+function consoleLog(text, kind='info'){
+  const host = $('#consoleOut');
+  const div = document.createElement('div');
+  div.className = 'l-'+(kind==='err'?'err':kind==='ok'?'ok':'info');
+  div.textContent = '['+fmtTime(new Date())+'] ' + text;
+  host.appendChild(div);
+  host.scrollTop = host.scrollHeight;
+}
+function makeRobotAPI(){
+  const portMap = { A:LWP.PORT.A, B:LWP.PORT.B, C:LWP.PORT.C, D:LWP.PORT.D };
+  return {
+    motor(name){
+      const port = portMap[name.toUpperCase()];
+      if(port===undefined) throw new Error('Unbekannter Motor-Port: '+name);
+      return {
+        power: async (v)=>{ if(ble.connected) await motors.setPower(port, v); },
+        speed: async (v)=>{ if(ble.connected) await motors.setSpeed(port, v); },
+        forTime: async (speed, ms)=>{ if(ble.connected) await motors.runForTime(port, ms, speed); },
+        forDegrees: async (speed, deg)=>{ if(ble.connected) await motors.runForDegrees(port, deg, speed); },
+        gotoAngle: async (deg, speed)=>{ if(ble.connected) await motors.gotoAbsolutePosition(port, deg, speed); },
+        brake: async ()=>{ if(ble.connected) await motors.brake(port); },
+        coast: async ()=>{ if(ble.connected) await motors.coast(port); }
+      };
+    },
+    led: {
+      rgb: async (r,g,b)=>{ if(ble.connected) await led.setRGB(r,g,b); },
+      color: async (idx)=>{ if(ble.connected) await led.setColorIndex(idx); }
+    },
+    sensor(name){
+      const port = portMap[name.toUpperCase()];
+      const history = State.sensorHistory[port] || [];
+      return { read: ()=> history[history.length-1] ?? null };
+    },
+    wait: (ms)=> sleep(ms),
+    log: (text)=> consoleLog(String(text), 'ok')
+  };
+}
+$('#jsRun').addEventListener('click', async ()=>{
+  if(State.jsRunning){ toast('info','Es läuft bereits ein Programm.'); return; }
+  State.jsRunning = true;
+  const code = $('#jsEditor').value;
+  const robot = makeRobotAPI();
+  try{
+    consoleLog('▶ Programm gestartet', 'info');
+    const fn = new Function('robot', `return (async () => { ${code} })();`);
+    await fn(robot);
+    consoleLog('■ Programm erfolgreich beendet', 'ok');
+  }catch(err){
+    consoleLog('Fehler: ' + err.message, 'err');
+  } finally { State.jsRunning = false; }
+});
+$('#jsStop').addEventListener('click', ()=>{ State.jsRunning = false; consoleLog('Manuell gestoppt (laufende Motoren bitte über Not-Aus stoppen).', 'err'); });
+$('#jsFormat').addEventListener('click', ()=> $('#consoleOut').innerHTML='');
+
+// Projektverwaltung
+$('#projSaveJs').addEventListener('click', ()=>{ downloadFile('programm.json', JSON.stringify({type:'js', code:$('#jsEditor').value})); logFileOp('JS-Projekt gespeichert.'); });
+$('#projLoadJs').addEventListener('change', async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const text = await readFileAsText(f);
+  try{ const data = JSON.parse(text); $('#jsEditor').value = data.code || text; }
+  catch{ $('#jsEditor').value = text; }
+  toast('ok','JS-Projekt geladen.'); e.target.value='';
+});
+$('#projSaveBlocks').addEventListener('click', ()=>{ downloadFile('bloecke.json', JSON.stringify(State.block.steps,null,2)); logFileOp('Block-Projekt gespeichert.'); });
+$('#projLoadBlocks').addEventListener('change', async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  try{ const data = JSON.parse(await readFileAsText(f)); State.block.steps = data; renderBlockDrop(); toast('ok','Block-Projekt geladen.'); }
+  catch(err){ toast('err','Fehler beim Laden: '+err.message); }
+  e.target.value='';
+});
+
+/* ============================== 24. DATEIEN ============================== */
+function logFileOp(text){ $('#fileOpStatus').textContent = text + ' (' + fmtTime(new Date()) + ')'; }
+$('#exportSettingsJson').addEventListener('click', ()=>{ downloadFile('einstellungen.json', JSON.stringify(State.settings,null,2)); logFileOp('Einstellungen exportiert.'); });
+$('#exportMacroJson').addEventListener('click', ()=>{ downloadFile('makros.json', JSON.stringify(State.macro.steps,null,2)); logFileOp('Makros exportiert.'); });
+$('#exportLogCsv').addEventListener('click', ()=>{ downloadFile('ereignis-log.csv', logger.toCSV(), 'text/csv'); logFileOp('Ereignis-Log exportiert.'); });
+$('#exportSensorCsv').addEventListener('click', ()=>{
+  const rows = ['port,index,value'];
+  Object.entries(State.sensorHistory).forEach(([port,arr])=> arr.forEach((v,i)=> rows.push(`${port},${i},${v}`)));
+  downloadFile('sensordaten.csv', rows.join('\n'), 'text/csv'); logFileOp('Sensordaten exportiert.');
+});
+$('#exportAllJson').addEventListener('click', ()=>{
+  const project = { settings:State.settings, macro:State.macro.steps, block:State.block.steps, jsCode:$('#jsEditor').value, exportedAt:new Date().toISOString() };
+  downloadFile('boost-control-projekt.json', JSON.stringify(project,null,2)); logFileOp('Vollständiges Projekt exportiert.');
+});
+$('#importAllJson').addEventListener('change', async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    const data = JSON.parse(await readFileAsText(f));
+    if(data.settings) Object.assign(State.settings, data.settings);
+    if(Array.isArray(data.macro)) { State.macro.steps = data.macro; renderMacroSteps(); }
+    if(Array.isArray(data.block)) { State.block.steps = data.block; renderBlockDrop(); }
+    if(data.jsCode) $('#jsEditor').value = data.jsCode;
+    applySettingsToUI();
+    toast('ok','Projekt importiert.'); logFileOp('Vollständiges Projekt importiert.');
+  }catch(err){ toast('err','Import fehlgeschlagen: '+err.message); }
+  e.target.value='';
+});
+$('#importSettingsJson').addEventListener('change', async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  try{ const data = JSON.parse(await readFileAsText(f)); Object.assign(State.settings, data); applySettingsToUI(); toast('ok','Einstellungen importiert.'); logFileOp('Einstellungen importiert.'); }
+  catch(err){ toast('err','Import fehlgeschlagen: '+err.message); }
+  e.target.value='';
+});
+function applySettingsToUI(){
+  $('#autoReconnectToggle').checked = State.settings.autoReconnect;
+  $('#toastsToggle').checked = State.settings.toasts;
+  $('#soundToggle').checked = State.settings.sound;
+  applyTheme(State.settings.theme || 'light');
+  ble.autoReconnect = State.settings.autoReconnect;
+}
+
+/* ============================== 25. EINSTELLUNGEN-UI ============================== */
+$('#autoReconnectToggle').addEventListener('change', e=>{ State.settings.autoReconnect = e.target.checked; ble.autoReconnect = e.target.checked; });
+$('#toastsToggle').addEventListener('change', e=> State.settings.toasts = e.target.checked);
+$('#soundToggle').addEventListener('change', e=> State.settings.sound = e.target.checked);
+$('#reduceMotionToggle').addEventListener('change', e=>{
+  State.settings.reduceMotion = e.target.checked;
+  document.body.style.setProperty('--ease', e.target.checked ? 'linear' : 'cubic-bezier(.22,1,.36,1)');
+});
+
+/* ============================== 26. DEV TOOLS ============================== */
+function hexDump(bytes){
+  let out = '';
+  for(let i=0;i<bytes.length;i+=16){
+    const chunk = bytes.slice(i,i+16);
+    const hex = Array.from(chunk).map(b=>b.toString(16).padStart(2,'0')).join(' ');
+    const ascii = Array.from(chunk).map(b=> (b>=32&&b<127)? String.fromCharCode(b):'.').join('');
+    out += i.toString(16).padStart(4,'0') + '  ' + hex.padEnd(47,' ') + '  ' + ascii + '\n';
+  }
+  return out || '(leer)';
+}
+function renderLogEntry(entry){
+  const host = $('#bleLog');
+  const div = document.createElement('div');
+  div.className = 'log-row';
+  const meta = decodeMessageForLog(entry.bytes);
+  div.innerHTML = `<span class="t">${fmtTime(entry.time)}</span><span class="dir ${entry.direction.toLowerCase()}">${entry.direction}</span><span class="hex">${Bytes.toHex(entry.bytes)}${meta?(' — '+meta):''}</span>`;
+  host.prepend(div);
+  while(host.children.length>400) host.removeChild(host.lastChild);
+}
+function decodeMessageForLog(bytes){
+  if(bytes.length<3) return '';
+  const mt = bytes[2];
+  const names = { 0x01:'Hub Property', 0x02:'Hub Action', 0x03:'Hub Alert', 0x04:'Attached I/O', 0x05:'Error', 0x21:'Port Info Req', 0x41:'Port Input Format', 0x45:'Port Value', 0x81:'Port Output Cmd', 0x82:'Port Output Feedback' };
+  return names[mt] || ('Typ 0x'+mt.toString(16));
+}
+$('#clearLog').addEventListener('click', ()=>{ logger.clear(); $('#bleLog').innerHTML=''; });
+$('#exportLogJson').addEventListener('click', ()=>{ downloadFile('ble-log.json', logger.toJSON()); });
+
+$$('[data-devtab]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    $$('[data-devtab]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    ['monitor','raw','explorer','hex'].forEach(t=> $('#devTab-'+t).style.display = (t===btn.dataset.devtab)?'block':'none');
+    if(btn.dataset.devtab==='explorer') refreshExplorer();
+  });
+});
+$('#rawSend').addEventListener('click', async ()=>{
+  if(!ble.connected){ toast('err','Nicht verbunden.'); return; }
+  try{ const bytes = Bytes.fromHex($('#rawHexInput').value); await ble.send(bytes); }
+  catch(e){ toast('err','Ungültige Hex-Daten: '+e.message); }
+});
+$('#rawClear').addEventListener('click', ()=> $('#rawHexInput').value='');
+
+async function refreshExplorer(){
+  const host = $('#uuidExplorer');
+  if(!ble.connected){ host.innerHTML = '<div class="tiny">Nicht verbunden — bitte zuerst Hub verbinden.</div>'; return; }
+  host.innerHTML = '<div class="tiny">Lade Services…</div>';
+  try{
+    const services = await ble.listAllServicesAndCharacteristics();
+    host.innerHTML = services.map(s=>`
+      <div class="field">
+        <div class="label mono">${s.uuid}</div>
+        ${s.characteristics.map(c=>`<div class="tiny mono" style="padding:4px 0;">↳ ${c.uuid} — ${Object.entries(c.properties).filter(([k,v])=>v).map(([k])=>k).join(', ')}</div>`).join('')}
+      </div>`).join('') || '<div class="tiny">Keine Services gefunden.</div>';
+  }catch(e){ host.innerHTML = '<div class="tiny">Fehler: '+e.message+'</div>'; }
+}
+$('#refreshExplorer').addEventListener('click', refreshExplorer);
+$('#hexViewerInput').addEventListener('input', (e)=>{
+  try{ const bytes = Bytes.fromHex(e.target.value); $('#hexViewerOut').textContent = hexDump(bytes); }
+  catch{ $('#hexViewerOut').textContent = 'Ungültige Eingabe.'; }
+});
+
+/* ============================== 27. INITIALISIERUNG ============================== */
+function init(){
+  initMotorUI();
+  renderSensorGrid();
+  renderEvents();
+  applySettingsToUI();
+  pushEvent('Anwendung geladen — bereit zum Verbinden.', 'info');
+  if(!navigator.bluetooth){
+    pushEvent('Web Bluetooth API in diesem Browser nicht verfügbar.', 'warn');
+  }
+  window.addEventListener('resize', ()=>{ drawTelemetryChart(); drawSensorHistoryChart(); });
+}
+init();
+</script>
+</body>
+</html>
