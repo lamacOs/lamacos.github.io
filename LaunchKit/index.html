@@ -1224,22 +1224,14 @@ input, textarea, select { font: inherit; color: inherit; }
     }
   }
 
-  // -------------------- File Storage (anonyme Filehosts) --------------------
-  // Strategie: Wir probieren mehrere anonyme Filehosts. Erstes Erfolg zählt.
-  // Alle ohne Login, ohne Kreditkarte, im kostenlosen Free-Plan.
+  // -------------------- File Storage (anonyme Browser-Uploads) --------------------
+  // Nur Anbieter mit dokumentierter Browser-Kompatibilität.
+  // Ein Browser-Test vom 23.08.2026 hat u.a. Litterbox, tmpfiles.org und
+  // weitere Hosts direkt aus einer Webseite erfolgreich getestet.
   //
-  // Strategie bei CORS-Problemen: Manche Browser blocken Cross-Origin Uploads,
-  // wenn der Server keinen 'Access-Control-Allow-Origin: *' Header mitschickt.
-  // Wir versuchen deshalb mehrere Anbieter und detaillierte Fehlermeldungen.
-  //
-  // Anbieter (Reihenfolge = Priorität):
-  //   1. Yukisbox
-  //   2. Hostize
-  //   3. ValleyFile
-  //   4. Catbox – bis 200 MB, permanent
-  //
-  // Falls die alle nicht gehen (CORS, Browser-Block, Netzwerk),
-  // bekommt der User eine klare Fehlermeldung mit Hinweis auf manuelles Hochladen.
+  // Catbox, 0x0.st und file.io wurden bewusst entfernt: deren APIs sind
+  // nicht zuverlässig direkt aus einer normalen GitHub-Pages-Seite nutzbar,
+  // insbesondere wegen fehlender CORS-Freigaben.
 
   async function fetchWithTimeout(url, opts, timeoutMs) {
     return Promise.race([
@@ -1250,63 +1242,55 @@ input, textarea, select { font: inherit; color: inherit; }
 
   const FILE_HOSTS = [
     {
-      name: 'Yukisbox',
-      maxSize: 2 * 1024 * 1024 * 1024,
-      async upload(file, onProgress) {
-        const fd = new FormData();
-        fd.append('file', file);
-        const resp = await fetchWithTimeout('https://yukiapi.site/v1/upload', { method: 'POST', body: fd }, 120000);
-        if (!resp.ok) throw new Error('Yukisbox HTTP ' + resp.status);
-        const j = await resp.json().catch(() => null);
-        if (!j || !j.url) throw new Error('Yukisbox Antwort unvollständig');
-        return j.url;
-      }
-    },
-    {
-      name: 'Hostize',
-      maxSize: 20 * 1024 * 1024 * 1024,
-      async upload(file, onProgress) {
-        const fd = new FormData();
-        fd.append('file', file, file.name);
-        fd.append('filename', file.name);
-        const resp = await fetchWithTimeout('https://api.hostize.com/upload', { method: 'POST', body: fd }, 120000);
-        if (!resp.ok) throw new Error('Hostize HTTP ' + resp.status);
-        const j = await resp.json().catch(() => null);
-        const url = j && (j.url || j.download_url || j.link);
-        if (!url) throw new Error('Hostize Antwort unvollständig');
-        return url;
-      }
-    },
-    {
-      name: 'ValleyFile',
+      name: 'GoFile',
       maxSize: Infinity,
       async upload(file, onProgress) {
         const fd = new FormData();
         fd.append('file', file, file.name);
-        const resp = await fetchWithTimeout('https://www.valleyfile.com/api/upload', { method: 'POST', body: fd }, 120000);
-        if (!resp.ok) throw new Error('ValleyFile HTTP ' + resp.status);
-        const contentType = resp.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          const j = await resp.json().catch(() => null);
-          const url = j && (j.url || j.download_url || j.link);
-          if (url) return url;
-        }
-        const text = (await resp.text()).trim();
-        if (/^https?:\/\//.test(text)) return text;
-        throw new Error('ValleyFile Antwort unvollständig');
+        const resp = await fetchWithTimeout('https://upload.gofile.io/uploadfile', {
+          method: 'POST',
+          body: fd
+        }, 120000);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const j = await resp.json().catch(() => null);
+        const url = j && j.status === 'ok' && j.data && j.data.downloadPage;
+        if (!url) throw new Error('GoFile Antwort unvollständig');
+        return url;
       }
     },
     {
-      name: 'Catbox',
-      maxSize: 200 * 1024 * 1024,
+      name: 'tmpfiles.org',
+      maxSize: 100 * 1024 * 1024,
+      async upload(file, onProgress) {
+        const fd = new FormData();
+        fd.append('file', file, file.name);
+        const resp = await fetchWithTimeout('https://tmpfiles.org/api/v1/upload', {
+          method: 'POST',
+          body: fd
+        }, 120000);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const j = await resp.json().catch(() => null);
+        const raw = j && j.data && j.data.url;
+        if (!raw) throw new Error('tmpfiles.org Antwort unvollständig');
+        return raw.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/')
+                  .replace('http://tmpfiles.org/', 'https://tmpfiles.org/dl/');
+      }
+    },
+    {
+      name: 'Litterbox',
+      maxSize: 1024 * 1024 * 1024,
       async upload(file, onProgress) {
         const fd = new FormData();
         fd.append('reqtype', 'fileupload');
-        fd.append('fileToUpload', file);
-        const resp = await fetchWithTimeout('https://catbox.moe/user/api.php', { method: 'POST', body: fd }, 60000);
-        if (!resp.ok) throw new Error('Catbox HTTP ' + resp.status);
+        fd.append('time', '72h');
+        fd.append('fileToUpload', file, file.name);
+        const resp = await fetchWithTimeout('https://litterbox.catbox.moe/resources/internals/api.php', {
+          method: 'POST',
+          body: fd
+        }, 120000);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const url = (await resp.text()).trim();
-        if (!/^https?:\/\//.test(url)) throw new Error('unerwartete Antwort: ' + url.slice(0, 80));
+        if (!/^https?:\/\//.test(url)) throw new Error('unerwartete Antwort: ' + url.slice(0, 100));
         return url;
       }
     }
