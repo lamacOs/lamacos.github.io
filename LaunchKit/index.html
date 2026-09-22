@@ -943,6 +943,47 @@ input, textarea, select { font: inherit; color: inherit; }
   let PRODUCTS = [];
   const FIND_PRODUCT = (id) => PRODUCTS.find(p => p.id === id) || null;
 
+  // -------------------- Produkt-Normalisierung --------------------
+  // WICHTIG: Firebase Realtime Database speichert leere Arrays/Objekte ([] bzw. {})
+  // NICHT als eigene Keys - der Pfad bleibt schlicht leer (null), wenn man beim
+  // Schreiben ein leeres Array übergibt. Dadurch fehlten beim Lesen Felder wie
+  // "tags", "features" oder "screenshots" komplett (undefined statt []), was in
+  // .map()-Aufrufen zu Laufzeitfehlern führte und das Rendern der kompletten
+  // Produktliste abbrach. normalizeProduct() füllt daher IMMER sinnvolle
+  // Default-Werte, egal was aus der Datenbank zurückkommt.
+  function normalizeProduct(raw, id, source) {
+    const p = raw || {};
+    return {
+      id,
+      _source: source,
+      name: p.name || 'Unbenanntes Produkt',
+      tagline: p.tagline || '',
+      description: p.description || '',
+      developer: p.developer || '',
+      initials: p.initials || (p.name ? p.name[0].toUpperCase() : '?'),
+      category: p.category || 'Sonstiges',
+      tags: Array.isArray(p.tags) ? p.tags : [],
+      short: p.short || p.tagline || '',
+      platform: p.platform || 'Alle',
+      version: p.version || '1.0.0',
+      versions: Array.isArray(p.versions) ? p.versions : [],
+      license: p.license || 'Proprietär',
+      releasedAt: p.releasedAt || new Date().toISOString().slice(0, 10),
+      downloads: typeof p.downloads === 'number' ? p.downloads : 0,
+      views: typeof p.views === 'number' ? p.views : 0,
+      rating: typeof p.rating === 'number' ? p.rating : 0,
+      size: p.size || '',
+      downloadUrl: p.downloadUrl || '',
+      logoDataUrl: p.logoDataUrl || '',
+      screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
+      requirements: Array.isArray(p.requirements) ? p.requirements : [],
+      features: Array.isArray(p.features) ? p.features : [],
+      authorUid: p.authorUid || '',
+      authorEmail: p.authorEmail || '',
+      createdAt: p.createdAt || Date.now()
+    };
+  }
+
   // -------------------- SVG Icons --------------------
   const I = {
     sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
@@ -1309,7 +1350,7 @@ input, textarea, select { font: inherit; color: inherit; }
       try {
         const snap = await LK.db.ref('publicProducts').once('value');
         const obj = snap.val() || {};
-        Object.keys(obj).forEach(k => map.set(k, Object.assign({ id: k, _source: 'public' }, obj[k])));
+        Object.keys(obj).forEach(k => map.set(k, normalizeProduct(obj[k], k, 'public')));
       } catch (e) { console.warn('publicProducts nicht lesbar:', e); }
 
       // 2. Eigene Sites aus /users/{uid}/sites (IMMER laden, falls vorhanden)
@@ -1321,35 +1362,8 @@ input, textarea, select { font: inherit; color: inherit; }
           Object.keys(myObj).forEach(k => {
             if (!map.has(k)) {
               const site = myObj[k] || {};
-              map.set(k, Object.assign({
-                id: k,
-                _source: 'sites',
-                name: site.meta?.siteName || (site.data?.name || k),
-                tagline: site.data?.tagline || '',
-                description: site.data?.description || '',
-                developer: site.data?.developer || '',
-                initials: site.data?.initials || '',
-                category: site.data?.category || '',
-                short: site.data?.short || '',
-                platform: site.data?.platform || '',
-                version: site.data?.version || '',
-                license: site.data?.license || '',
-                releasedAt: site.data?.releasedAt || '',
-                downloads: site.data?.downloads || 0,
-                views: site.data?.views || 0,
-                rating: site.data?.rating || 0,
-                size: site.data?.size || '',
-                downloadUrl: site.data?.downloadUrl || '',
-                logoDataUrl: site.data?.logoDataUrl || '',
-                screenshots: site.data?.screenshots || [],
-                requirements: site.data?.requirements || [],
-                features: site.data?.features || [],
-                versions: site.data?.versions || [],
-                tags: site.data?.tags || [],
-                authorUid: u.uid,
-                authorEmail: u.email,
-                createdAt: site.meta?.createdAt || Date.now()
-              }, site.data || {}));
+              const merged = Object.assign({ name: site.meta?.siteName }, site.data || {});
+              map.set(k, normalizeProduct(merged, k, 'sites'));
             }
           });
         } catch (e) { console.warn('eigene Sites nicht lesbar:', e); }
@@ -1368,7 +1382,7 @@ input, textarea, select { font: inherit; color: inherit; }
     try {
       const snap = await LK.db.ref('users/' + u.uid + '/sites').once('value');
       const obj = snap.val() || {};
-      const list = Object.keys(obj).map(k => Object.assign({ id: k, _source: 'sites' }, obj[k]?.data || obj[k]));
+      const list = Object.keys(obj).map(k => normalizeProduct(obj[k]?.data || obj[k], k, 'sites'));
       return list;
     } catch (e) { return []; }
   }
@@ -1411,6 +1425,10 @@ input, textarea, select { font: inherit; color: inherit; }
       await LK.db.ref('users/' + u.uid + '/sites/' + siteKey + '/data').set(dataClean);
 
       // 3. Globaler /publicProducts/{pid} Knoten (laut deiner Regel global lesbar)
+      // Hinweis: Felder, die leer sein können (tags, features, screenshots, ...)
+      // werden NICHT mit "|| ''" auf einen String zurückgesetzt, sondern behalten
+      // ihren Array-Typ. Firebase speichert leere Arrays zwar nicht als Key, aber
+      // normalizeProduct() beim Lesen füllt das wieder korrekt mit [] auf.
       const pub = {
         pid: product.id,
         name: product.name,
@@ -1419,11 +1437,11 @@ input, textarea, select { font: inherit; color: inherit; }
         developer: product.developer || '',
         initials: product.initials || '',
         category: product.category || 'Sonstiges',
-        tags: product.tags || '',
+        tags: product.tags || [],
         short: product.short || '',
         platform: product.platform || '',
         version: product.version || '',
-        versions: product.versions || '',
+        versions: product.versions || [],
         license: product.license || '',
         releasedAt: product.releasedAt || '',
         downloads: 0,
@@ -1432,9 +1450,9 @@ input, textarea, select { font: inherit; color: inherit; }
         size: product.size || '',
         downloadUrl: product.downloadUrl || '',
         logoDataUrl: product.logoDataUrl || '',
-        screenshots: product.screenshots || '',
-        requirements: product.requirements || '',
-        features: product.features || '',
+        screenshots: product.screenshots || [],
+        requirements: product.requirements || [],
+        features: product.features || [],
         authorUid: u.uid,
         authorEmail: u.email,
         createdAt: Date.now()
@@ -1571,20 +1589,21 @@ input, textarea, select { font: inherit; color: inherit; }
       const term = q.value.trim().toLowerCase();
       let list = PRODUCTS.slice();
       if (cat.value) list = list.filter(p => p.category === cat.value);
-      if (plat.value) list = list.filter(p => p.platform.toLowerCase().includes(plat.value.toLowerCase()));
-      if (lic.value === 'Open Source') list = list.filter(p => /MIT|Apache|GPL/.test(p.license));
-      if (lic.value === 'Proprietär') list = list.filter(p => !/MIT|Apache|GPL/.test(p.license));
+      if (plat.value) list = list.filter(p => (p.platform || '').toLowerCase().includes(plat.value.toLowerCase()));
+      if (lic.value === 'Open Source') list = list.filter(p => /MIT|Apache|GPL/.test(p.license || ''));
+      if (lic.value === 'Proprietär') list = list.filter(p => !/MIT|Apache|GPL/.test(p.license || ''));
       if (term) list = list.filter(p => (p.name + ' ' + p.short + ' ' + p.developer).toLowerCase().includes(term));
-      if (sort.value === 'pop') list.sort((a, b) => b.downloads - a.downloads);
+      if (sort.value === 'pop') list.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
       else list.sort((a, b) => new Date(b.releasedAt) - new Date(a.releasedAt));
       grid.innerHTML = '';
       if (!list.length) { empty.style.display = ''; return; }
       empty.style.display = 'none';
       list.forEach(p => {
+        const tags = Array.isArray(p.tags) ? p.tags : [];
         const card = el(`<a class="product-card" href="#/product?id=${p.id}">
           <div class="head"><div class="logo">${p.logoDataUrl ? '<img src="' + p.logoDataUrl + '" style="width:100%;height:100%;object-fit:contain;border-radius:14px;" />' : p.initials}</div><div class="meta"><div class="t">${p.name}</div><div class="s">${p.developer}</div></div></div>
           <div class="desc">${p.short}</div>
-          <div class="tags"><span class="tag brand">${p.category}</span>${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <div class="tags"><span class="tag brand">${p.category}</span>${tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
           <div class="foot"><span class="ver">v${p.version} · ${fmtNum(p.downloads)} Downloads</span><span class="btn btn-primary btn-sm">Öffnen</span></div>
         </a>`);
         grid.appendChild(card);
@@ -1646,7 +1665,7 @@ input, textarea, select { font: inherit; color: inherit; }
         </div>
         <div class="two-col mt-8">
           <div class="panel"><div class="panel-head"><h3>Highlights</h3></div>
-            <ul class="feature-list">${p.features.map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>${f}</span></li>`).join('')}</ul>
+            <ul class="feature-list">${(p.features || []).map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>${f}</span></li>`).join('') || '<li class="muted" style="grid-column:1/-1;list-style:none;">Keine Highlights hinterlegt.</li>'}</ul>
           </div>
           <div class="panel"><div class="panel-head"><h3>Quick Facts</h3></div>
             <table class="spec-table">
@@ -1663,20 +1682,21 @@ input, textarea, select { font: inherit; color: inherit; }
       </div>`;
     }
     function htmlFeatures() {
-      const half = Math.ceil(p.features.length / 2);
+      const feats = p.features || [];
+      const half = Math.ceil(feats.length / 2);
       return `<div class="reveal visible"><h2>Features im Detail</h2>
         <div class="two-col mt-4">
-          <div class="panel"><h3 class="h4">Produktivität</h3><ul class="feature-list mt-3">${p.features.slice(0, half).map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>${f}</span></li>`).join('')}</ul></div>
-          <div class="panel"><h3 class="h4">Workflow</h3><ul class="feature-list mt-3">${p.features.slice(half).map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>${f}</span></li>`).join('')}</ul></div>
+          <div class="panel"><h3 class="h4">Produktivität</h3><ul class="feature-list mt-3">${feats.slice(0, half).map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>${f}</span></li>`).join('')}</ul></div>
+          <div class="panel"><h3 class="h4">Workflow</h3><ul class="feature-list mt-3">${feats.slice(half).map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>${f}</span></li>`).join('')}</ul></div>
         </div></div>`;
     }
     function htmlSpecs() {
       return `<div class="reveal visible"><h2>Systemanforderungen</h2>
-        <div class="panel mt-4"><table class="spec-table">${p.requirements.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table></div></div>`;
+        <div class="panel mt-4"><table class="spec-table">${(p.requirements || []).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table></div></div>`;
     }
     function htmlChangelog() {
       return `<div class="reveal visible"><h2>Changelog</h2>
-        <div class="timeline mt-4">${p.versions.map(v => `<article class="entry"><div class="head"><span class="v">v${v.v}</span><span class="d">${fmtDate(v.date)}</span></div><ul>${v.notes.map(n => `<li>${n}</li>`).join('')}</ul></article>`).join('')}</div></div>`;
+        <div class="timeline mt-4">${(p.versions || []).map(v => `<article class="entry"><div class="head"><span class="v">v${v.v}</span><span class="d">${fmtDate(v.date)}</span></div><ul>${(v.notes || []).map(n => `<li>${n}</li>`).join('')}</ul></article>`).join('') || '<p class="muted">Noch keine Versionen veröffentlicht.</p>'}</div></div>`;
     }
     function htmlDocs() {
       return `<div class="reveal visible"><h2>Dokumentation</h2>
@@ -1941,15 +1961,15 @@ input, textarea, select { font: inherit; color: inherit; }
       main.innerHTML = `<div class="dash-head reveal visible"><div><h1>Versionen</h1><p>Übersicht aller veröffentlichten Versionen.</p></div></div>
         <div class="panel reveal visible"><div class="panel-head"><h3>Versionsverlauf</h3></div><div class="timeline" id="list"></div></div>`;
       const list = document.getElementById('list');
-      PRODUCTS.forEach(p => p.versions.forEach(v => list.appendChild(el(`<article class="entry"><div class="head"><span class="row" style="gap:10px;"><div class="avatar" style="width:28px;height:28px;font-size:11px;border-radius:8px;">${p.initials}</div><span>${p.name}</span><span class="v">v${v.v}</span></span><span class="d">${fmtDate(v.date)}</span></div><ul>${v.notes.map(n => `<li>${n}</li>`).join('')}</ul></article>`))));
+      PRODUCTS.forEach(p => (p.versions || []).forEach(v => list.appendChild(el(`<article class="entry"><div class="head"><span class="row" style="gap:10px;"><div class="avatar" style="width:28px;height:28px;font-size:11px;border-radius:8px;">${p.initials}</div><span>${p.name}</span><span class="v">v${v.v}</span></span><span class="d">${fmtDate(v.date)}</span></div><ul>${(v.notes || []).map(n => `<li>${n}</li>`).join('')}</ul></article>`))));
     } else if (sub === 'changelog') {
       main.innerHTML = `<div class="dash-head reveal visible"><div><h1>Changelog</h1><p>Alle Release-Notes deiner Produkte.</p></div></div>
         <div class="panel reveal visible"><div class="panel-head"><h3>Letzte Änderungen</h3></div><div class="timeline" id="list"></div></div>`;
       const list = document.getElementById('list');
       const all = [];
-      PRODUCTS.forEach(p => p.versions.forEach(v => all.push({ p, v })));
+      PRODUCTS.forEach(p => (p.versions || []).forEach(v => all.push({ p, v })));
       all.sort((a, b) => new Date(b.v.date) - new Date(a.v.date));
-      all.forEach(({ p, v }) => list.appendChild(el(`<article class="entry"><div class="head"><span class="row" style="gap:10px;"><div class="avatar" style="width:28px;height:28px;font-size:11px;border-radius:8px;">${p.initials}</div><span>${p.name}</span><span class="v">v${v.v}</span></span><span class="d">${fmtDate(v.date)}</span></div><ul>${v.notes.map(n => `<li>${n}</li>`).join('')}</ul></article>`)));
+      all.forEach(({ p, v }) => list.appendChild(el(`<article class="entry"><div class="head"><span class="row" style="gap:10px;"><div class="avatar" style="width:28px;height:28px;font-size:11px;border-radius:8px;">${p.initials}</div><span>${p.name}</span><span class="v">v${v.v}</span></span><span class="d">${fmtDate(v.date)}</span></div><ul>${(v.notes || []).map(n => `<li>${n}</li>`).join('')}</ul></article>`)));
     } else if (sub === 'settings') {
       main.innerHTML = `
         <div class="dash-head reveal visible"><div><h1>Einstellungen</h1><p>Profil, Sicherheit und Benachrichtigungen.</p></div></div>
@@ -2127,7 +2147,7 @@ input, textarea, select { font: inherit; color: inherit; }
       const logo = wizardState.name ? wizardState.name.split(/\s+/).slice(0,2).map(s=>s[0]).join('').toUpperCase() : 'N';
       inner = `<h2>Vorschau</h2><p class="lede">So wird deine Produktseite aussehen.</p>
       <div class="preview-card mt-4">
-        <div class="logo">${logo}</div>
+        <div class="logo">${wizardState.logoDataUrl ? '<img src="' + wizardState.logoDataUrl + '" style="width:100%;height:100%;object-fit:contain;border-radius:16px;" />' : logo}</div>
         <div><div class="t">${wizardState.name || 'Dein Produktname'}</div><div class="s">${wizardState.tagline || 'Kurzbeschreibung'}</div>
           <div class="mt-3 row" style="gap:6px;flex-wrap:wrap;">
             <span style="background:rgba(255,122,0,0.10);color:var(--brand);border:1px solid rgba(255,122,0,0.25);padding:6px 12px;border-radius:999px;font-size:12.5px;">${wizardState.category || 'Kategorie'}</span>
@@ -2304,6 +2324,8 @@ input, textarea, select { font: inherit; color: inherit; }
       downloads: 0, views: 0, rating: 0,
       size: wizardState.size,
       downloadUrl: wizardState.downloadUrl,
+      logoDataUrl: wizardState.logoDataUrl,
+      screenshots: wizardState.screensDataUrls.filter(Boolean),
       requirements: [
         ['Plattform', wizardState.platform || '—'],
         ['Arbeitsspeicher', wizardState.minRam || '—'],
