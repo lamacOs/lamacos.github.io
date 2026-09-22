@@ -1233,9 +1233,10 @@ input, textarea, select { font: inherit; color: inherit; }
   // Wir versuchen deshalb mehrere Anbieter und detaillierte Fehlermeldungen.
   //
   // Anbieter (Reihenfolge = Priorität):
-  //   1. Yukisbox   – bis 2 GB
-  //   2. Hostize    – bis 20 GB im kostenlosen Tarif
-  //   3. ValleyFile – kostenloses anonymes Hosting
+  //   1. Yukisbox
+  //   2. Hostize
+  //   3. ValleyFile
+  //   4. Catbox – bis 200 MB, permanent
   //
   // Falls die alle nicht gehen (CORS, Browser-Block, Netzwerk),
   // bekommt der User eine klare Fehlermeldung mit Hinweis auf manuelles Hochladen.
@@ -1254,10 +1255,7 @@ input, textarea, select { font: inherit; color: inherit; }
       async upload(file, onProgress) {
         const fd = new FormData();
         fd.append('file', file);
-        const resp = await fetchWithTimeout('https://yukiapi.site/v1/upload', {
-          method: 'POST',
-          body: fd
-        }, 120000);
+        const resp = await fetchWithTimeout('https://yukiapi.site/v1/upload', { method: 'POST', body: fd }, 120000);
         if (!resp.ok) throw new Error('Yukisbox HTTP ' + resp.status);
         const j = await resp.json().catch(() => null);
         if (!j || !j.url) throw new Error('Yukisbox Antwort unvollständig');
@@ -1271,10 +1269,7 @@ input, textarea, select { font: inherit; color: inherit; }
         const fd = new FormData();
         fd.append('file', file, file.name);
         fd.append('filename', file.name);
-        const resp = await fetchWithTimeout('https://api.hostize.com/upload', {
-          method: 'POST',
-          body: fd
-        }, 120000);
+        const resp = await fetchWithTimeout('https://api.hostize.com/upload', { method: 'POST', body: fd }, 120000);
         if (!resp.ok) throw new Error('Hostize HTTP ' + resp.status);
         const j = await resp.json().catch(() => null);
         const url = j && (j.url || j.download_url || j.link);
@@ -1288,30 +1283,31 @@ input, textarea, select { font: inherit; color: inherit; }
       async upload(file, onProgress) {
         const fd = new FormData();
         fd.append('file', file, file.name);
-
-        /*
-         * ValleyFile stellt öffentliches, anonymes Browser-Uploading bereit.
-         * Der Upload-Endpunkt wird hier zentral gehalten, damit er bei einer
-         * API-Änderung leicht angepasst werden kann.
-         */
-        const resp = await fetchWithTimeout('https://www.valleyfile.com/api/upload', {
-          method: 'POST',
-          body: fd
-        }, 120000);
-
+        const resp = await fetchWithTimeout('https://www.valleyfile.com/api/upload', { method: 'POST', body: fd }, 120000);
         if (!resp.ok) throw new Error('ValleyFile HTTP ' + resp.status);
-
         const contentType = resp.headers.get('content-type') || '';
         if (contentType.includes('application/json')) {
           const j = await resp.json().catch(() => null);
           const url = j && (j.url || j.download_url || j.link);
           if (url) return url;
         }
-
         const text = (await resp.text()).trim();
         if (/^https?:\/\//.test(text)) return text;
-
         throw new Error('ValleyFile Antwort unvollständig');
+      }
+    },
+    {
+      name: 'Catbox',
+      maxSize: 200 * 1024 * 1024,
+      async upload(file, onProgress) {
+        const fd = new FormData();
+        fd.append('reqtype', 'fileupload');
+        fd.append('fileToUpload', file);
+        const resp = await fetchWithTimeout('https://catbox.moe/user/api.php', { method: 'POST', body: fd }, 60000);
+        if (!resp.ok) throw new Error('Catbox HTTP ' + resp.status);
+        const url = (await resp.text()).trim();
+        if (!/^https?:\/\//.test(url)) throw new Error('unerwartete Antwort: ' + url.slice(0, 80));
+        return url;
       }
     }
   ];
