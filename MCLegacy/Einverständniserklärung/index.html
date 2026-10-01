@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF anzeigen</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .pdf-container {
+      width: 100%;
+      height: 100vh;
+      padding: 10px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 10px;
+      background: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="pdf-container">
+    <iframe
+      src="https://DEINE-DOMAIN.de/deine-datei.pdf"
+      title="PDF-Dokument">
+    </iframe>
+  </div>
+
+</body>
+</html>
