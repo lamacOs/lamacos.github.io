@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="lamacHub Audio2MIDI – Piano Audio direkt im Browser in MIDI umwandeln.">
+<title>Audio2MIDI · lamacHub</title>
+
+<style>
+:root{
+  --accent:#ff7a00;
+  --accent2:#01C7FC;
+  --bg:#f5f5f7;
+  --card:rgba(255,255,255,.82);
+  --card-solid:#fff;
+  --text:#171717;
+  --muted:#737373;
+  --border:rgba(0,0,0,.09);
+  --shadow:0 18px 60px rgba(0,0,0,.08);
+  --radius:16px;
+  --success:#22a447;
+  --danger:#e53935;
+}
+
+html.dark{
+  --bg:#0c0c0e;
+  --card:rgba(25,25,28,.86);
+  --card-solid:#19191c;
+  --text:#f5f5f7;
+  --muted:#a4a4aa;
+  --border:rgba(255,255,255,.10);
+  --shadow:0 20px 70px rgba(0,0,0,.35);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(255,122,0,.08),transparent 30%),
+    radial-gradient(circle at 90% 10%,rgba(1,199,252,.08),transparent 30%),
+    var(--bg);
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:50;
+  height:68px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 22px;
+  border-bottom:1px solid var(--border);
+  background:color-mix(in srgb,var(--card-solid) 82%,transparent);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-weight:800;
+  letter-spacing:-.4px;
+}
+
+.logo{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  color:white;
+  background:linear-gradient(135deg,var(--accent),#ff9b4a);
+  box-shadow:0 7px 20px rgba(255,122,0,.25);
+  font-size:17px;
+}
+
+.brand span{
+  font-size:17px;
+}
+
+.actions{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.icon-btn{
+  width:39px;
+  height:39px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--card);
+  color:var(--text);
+  display:grid;
+  place-items:center;
+  transition:.2s;
+}
+
+.icon-btn:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,122,0,.35);
+}
+
+.container{
+  width:min(1180px,calc(100% - 30px));
+  margin:0 auto;
+  padding:42px 0 70px;
+}
+
+.hero{
+  text-align:center;
+  margin-bottom:32px;
+}
+
+.hero h1{
+  margin:0;
+  color:var(--accent);
+  font-size:clamp(34px,6vw,62px);
+  line-height:1;
+  letter-spacing:-2.8px;
+  font-weight:850;
+}
+
+.hero p{
+  max-width:670px;
+  margin:17px auto 0;
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.6;
+}
+
+.card{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--card);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+}
+
+.upload-card{
+  padding:25px;
+}
+
+.dropzone{
+  min-height:270px;
+  border:2px dashed rgba(255,122,0,.35);
+  border-radius:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+  transition:.2s;
+}
+
+.dropzone.drag{
+  border-color:var(--accent);
+  background:rgba(255,122,0,.06);
+  transform:scale(1.005);
+}
+
+.upload-icon{
+  width:70px;
+  height:70px;
+  border-radius:20px;
+  display:grid;
+  place-items:center;
+  color:white;
+  font-size:30px;
+  background:linear-gradient(135deg,var(--accent),#ffad68);
+  box-shadow:0 15px 35px rgba(255,122,0,.22);
+  margin-bottom:18px;
+}
+
+.dropzone h2{
+  margin:0;
+  font-size:22px;
+  letter-spacing:-.5px;
+}
+
+.dropzone p{
+  margin:8px 0 19px;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.primary{
+  border:0;
+  border-radius:12px;
+  padding:12px 19px;
+  color:#fff;
+  background:var(--accent);
+  font-weight:750;
+  box-shadow:0 8px 22px rgba(255,122,0,.23);
+  transition:.2s;
+}
+
+.primary:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.primary:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.secondary{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:11px 17px;
+  color:var(--text);
+  background:var(--card-solid);
+  font-weight:650;
+}
+
+.file-info{
+  display:none;
+  margin-top:17px;
+  padding:15px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--card-solid);
+}
+
+.file-info.visible{
+  display:block;
+}
+
+.file-row{
+  display:flex;
+  align-items:center;
+  gap:13px;
+}
+
+.file-icon{
+  width:43px;
+  height:43px;
+  border-radius:12px;
+  background:rgba(255,122,0,.11);
+  color:var(--accent);
+  display:grid;
+  place-items:center;
+  font-weight:800;
+}
+
+.file-name{
+  font-weight:750;
+  word-break:break-word;
+}
+
+.file-meta{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:3px;
+}
+
+.workspace{
+  display:none;
+  margin-top:22px;
+  gap:22px;
+}
+
+.workspace.visible{
+  display:grid;
+  grid-template-columns:300px minmax(0,1fr);
+}
+
+.panel{
+  padding:21px;
+}
+
+.panel h3{
+  margin:0 0 17px;
+  color:var(--accent);
+  font-size:17px;
+}
+
+.control{
+  margin-bottom:18px;
+}
+
+.control:last-child{
+  margin-bottom:0;
+}
+
+.control label{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.value{
+  color:var(--accent);
+}
+
+input[type="range"]{
+  width:100%;
+  accent-color:var(--accent);
+}
+
+select{
+  width:100%;
+  padding:10px 11px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--card-solid);
+  color:var(--text);
+  outline:none;
+}
+
+.info-box{
+  padding:13px;
+  border-radius:12px;
+  background:rgba(1,199,252,.07);
+  border:1px solid rgba(1,199,252,.18);
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+}
+
+.analyze{
+  margin-top:20px;
+}
+
+.status{
+  display:none;
+  margin-top:22px;
+  padding:18px;
+}
+
+.status.visible{
+  display:block;
+}
+
+.status-top{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:11px;
+  font-size:14px;
+  font-weight:750;
+}
+
+.progress{
+  height:9px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(127,127,127,.16);
+}
+
+.progress-bar{
+  width:0%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  transition:width .25s;
+}
+
+.log{
+  max-height:150px;
+  overflow:auto;
+  margin-top:13px;
+  color:var(--muted);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;
+  line-height:1.6;
+}
+
+.roll-card{
+  min-width:0;
+  padding:21px;
+}
+
+.roll-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:15px;
+}
+
+.roll-header h3{
+  margin:0;
+  color:var(--accent);
+  font-size:17px;
+}
+
+.roll-actions{
+  display:flex;
+  gap:8px;
+}
+
+.piano-wrap{
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:#0b0b0d;
+}
+
+.piano{
+  position:relative;
+  width:100%;
+  min-width:680px;
+  height:520px;
+  overflow:hidden;
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(255,255,255,.045) 0,
+      rgba(255,255,255,.045) 1px,
+      transparent 1px,
+      transparent 30px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.035) 0,
+      rgba(255,255,255,.035) 1px,
+      transparent 1px,
+      transparent 25px
+    );
+}
+
+.note{
+  position:absolute;
+  border-radius:4px;
+  background:linear-gradient(90deg,var(--accent),#ffae66);
+  box-shadow:0 0 8px rgba(255,122,0,.2);
+  min-width:2px;
+}
+
+.empty-roll{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:#888;
+  text-align:center;
+  padding:30px;
+}
+
+.audio-card{
+  margin-top:22px;
+  padding:21px;
+}
+
+.audio-card h3{
+  margin:0 0 13px;
+  color:var(--accent);
+}
+
+audio{
+  width:100%;
+}
+
+.bottom-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:17px;
+  flex-wrap:wrap;
+}
+
+.footer{
+  margin-top:40px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:750;
+  background:rgba(34,164,71,.10);
+  color:var(--success);
+}
+
+.spinner{
+  width:16px;
+  height:16px;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  display:inline-block;
+  vertical-align:-3px;
+  margin-right:6px;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+.hidden{
+  display:none!important;
+}
+
+@media(max-width:850px){
+  .workspace.visible{
+    grid-template-columns:1fr;
+  }
+
+  .container{
+    width:min(100% - 20px,1180px);
+    padding-top:28px;
+  }
+
+  .upload-card,
+  .panel,
+  .roll-card,
+  .audio-card{
+    padding:16px;
+  }
+}
+
+@media(max-width:550px){
+  .topbar{
+    padding:0 13px;
+  }
+
+  .brand span{
+    font-size:15px;
+  }
+
+  .hero h1{
+    letter-spacing:-1.8px;
+  }
+
+  .dropzone{
+    min-height:235px;
+    padding:20px;
+  }
+
+  .bottom-actions>*{
+    width:100%;
+  }
+
+  .roll-header{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">L</div>
+    <span>lamacHub Audio2MIDI</span>
+  </div>
+
+  <div class="actions">
+    <button class="icon-btn" id="themeBtn" title="Darstellung wechseln">☾</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+    <h1>Audio → MIDI</h1>
+    <p>
+      Piano-Aufnahmen automatisch erkennen und direkt im Browser
+      in eine MIDI-Datei umwandeln.
+    </p>
+  </section>
+
+  <section class="card upload-card">
+
+    <div class="dropzone" id="dropzone">
+
+      <div class="upload-icon">♫</div>
+
+      <h2>Piano-Datei auswählen</h2>
+
+      <p>
+        MP3, WAV, M4A, OGG oder FLAC hier hineinziehen
+        oder eine Datei auswählen.
+      </p>
+
+      <button class="primary" id="chooseBtn">
+        Datei auswählen
+      </button>
+
+      <input
+        id="fileInput"
+        type="file"
+        accept=".mp3,.wav,.m4a,.ogg,.flac,audio/*"
+        hidden
+      >
+
+    </div>
+
+    <div class="file-info" id="fileInfo">
+
+      <div class="file-row">
+
+        <div class="file-icon">♫</div>
+
+        <div style="min-width:0;flex:1">
+          <div class="file-name" id="fileName">–</div>
+          <div class="file-meta" id="fileMeta">–</div>
+        </div>
+
+        <span class="badge">
+          ● bereit
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="workspace" id="workspace">
+
+    <aside class="card panel">
+
+      <h3>Transkription</h3>
+
+      <div class="control">
+        <label>
+          Mindestlautstärke
+          <span class="value" id="thresholdValue">0.25</span>
+        </label>
+
+        <input
+          id="threshold"
+          type="range"
+          min="0.05"
+          max="0.8"
+          step="0.05"
+          value="0.25"
+        >
+      </div>
+
+      <div class="control">
+        <label>
+          Quantisierung
+          <span class="value" id="quantValue">1/16</span>
+        </label>
+
+        <select id="quant">
+          <option value="0">Keine</option>
+          <option value="4">1/4</option>
+          <option value="8">1/8</option>
+          <option value="16" selected>1/16</option>
+          <option value="32">1/32</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label>
+          MIDI-Tempo
+          <span class="value" id="tempoValue">120 BPM</span>
+        </label>
+
+        <input
+          id="tempo"
+          type="range"
+          min="40"
+          max="240"
+          value="120"
+        >
+      </div>
+
+      <div class="info-box">
+        Die Analyse läuft lokal im Browser.
+        Deine Audio-Datei wird nicht an einen eigenen lamacHub-Server
+        hochgeladen.
+      </div>
+
+      <button class="primary analyze" id="analyzeBtn" disabled>
+        Piano analysieren
+      </button>
+
+    </aside>
+
+    <section class="card roll-card">
+
+      <div class="roll-header">
+
+        <h3>Piano Roll</h3>
+
+        <div class="roll-actions">
+          <button class="secondary" id="clearBtn">
+            Leeren
+          </button>
+        </div>
+
+      </div>
+
+      <div class="piano-wrap">
+        <div class="piano" id="piano">
+          <div class="empty-roll" id="emptyRoll">
+            Nach der Analyse erscheinen hier die erkannten Noten.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </section>
+
+  <section class="card status" id="status">
+
+    <div class="status-top">
+      <span id="statusText">Bereite Analyse vor …</span>
+      <span id="statusPercent">0 %</span>
+    </div>
+
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="log" id="log"></div>
+
+  </section>
+
+  <section class="card audio-card hidden" id="audioCard">
+
+    <h3>Audio</h3>
+
+    <audio id="audioPlayer" controls></audio>
+
+    <div class="bottom-actions">
+
+      <button class="secondary" id="playBtn">
+        ▶ Wiedergabe
+      </button>
+
+      <button class="primary" id="downloadBtn" disabled>
+        MIDI exportieren
+      </button>
+
+    </div>
+
+  </section>
+
+  <footer class="footer">
+    © 2026 lamacHub · Audio2MIDI
+  </footer>
+
+</main>
+
+
+<script type="module">
+
+/*
+  ============================================================
+  lamacHub Audio2MIDI
+  ============================================================
+
+  ECHTE AUDIO-TRANSKRIPTION
+
+  Dieses Projekt verwendet Spotify Basic Pitch als
+  Machine-Learning-Modell zur automatischen Erkennung
+  von Noten aus Audio.
+
+  Die Bibliothek wird zur Laufzeit aus jsDelivr geladen.
+
+  Wichtig:
+  - Das Repository braucht nur diese index.html.
+  - Beim ersten Start werden Bibliothek + ML-Modell geladen.
+  - Die eigentliche Audioanalyse läuft im Browser.
+*/
+
+
+/* ============================================================
+   IMPORTS
+   ============================================================ */
+
+import {
+  BasicPitch,
+  noteFramesToTime,
+  outputToNotesPoly,
+  addPitchBendsToNoteEvents
+} from "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm";
+
+
+/* ============================================================
+   ELEMENTE
+   ============================================================ */
+
+const fileInput       = document.getElementById("fileInput");
+const chooseBtn       = document.getElementById("chooseBtn");
+const dropzone        = document.getElementById("dropzone");
+const fileInfo        = document.getElementById("fileInfo");
+const fileName        = document.getElementById("fileName");
+const fileMeta        = document.getElementById("fileMeta");
+
+const workspace       = document.getElementById("workspace");
+const analyzeBtn      = document.getElementById("analyzeBtn");
+
+const threshold       = document.getElementById("threshold");
+const thresholdValue  = document.getElementById("thresholdValue");
+
+const quant            = document.getElementById("quant");
+const quantValue       = document.getElementById("quantValue");
+
+const tempo            = document.getElementById("tempo");
+const tempoValue       = document.getElementById("tempoValue");
+
+const status           = document.getElementById("status");
+const statusText       = document.getElementById("statusText");
+const statusPercent    = document.getElementById("statusPercent");
+const progressBar      = document.getElementById("progressBar");
+const log              = document.getElementById("log");
+
+const piano            = document.getElementById("piano");
+const emptyRoll        = document.getElementById("emptyRoll");
+
+const audioCard        = document.getElementById("audioCard");
+const audioPlayer      = document.getElementById("audioPlayer");
+const playBtn          = document.getElementById("playBtn");
+
+const downloadBtn      = document.getElementById("downloadBtn");
+const clearBtn         = document.getElementById("clearBtn");
+
+const themeBtn         = document.getElementById("themeBtn");
+
+
+/* ============================================================
+   APP STATE
+   ============================================================ */
+
+let selectedFile = null;
+let audioBuffer = null;
+let audioURL = null;
+let detectedNotes = [];
+let midiBlob = null;
+
+
+/* ============================================================
+   BASIC PITCH MODEL
+   ============================================================
+
+   Spotify veröffentlicht das Modell zusammen mit Basic Pitch.
+   Die JS-Version ist für automatische Musiktranskription
+   gedacht und kann polyphone Instrumente erkennen.
+
+   Die genaue Modell-URL wird von der Bibliothek selbst
+   verwendet.
+   ============================================================ */
+
+const MODEL_URL =
+  "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json";
+
+
+/* ============================================================
+   HILFSFUNKTIONEN
+   ============================================================ */
+
+function setProgress(percent, message){
+
+  const p = Math.max(0, Math.min(100, percent));
+
+  progressBar.style.width = p + "%";
+  statusPercent.textContent = Math.round(p) + " %";
+  statusText.textContent = message;
+}
+
+
+function showStatus(message = "Bereit"){
+
+  status.classList.add("visible");
+
+  if(message){
+    statusText.textContent = message;
+  }
+}
+
+
+function addLog(message){
+
+  const line = document.createElement("div");
+
+  const time = new Date().toLocaleTimeString("de-DE", {
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit"
+  });
+
+  line.textContent = `[${time}] ${message}`;
+
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+
+function formatBytes(bytes){
+
+  if(bytes < 1024){
+    return bytes + " B";
+  }
+
+  if(bytes < 1024 * 1024){
+    return (bytes / 1024).toFixed(1) + " KB";
+  }
+
+  return (bytes / 1024 / 1024).toFixed(2) + " MB";
+}
+
+
+function formatTime(seconds){
+
+  if(!Number.isFinite(seconds)){
+    return "–";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2,"0");
+
+  return `${minutes}:${secs}`;
+}
+
+
+function clamp(value,min,max){
+
+  return Math.max(min,Math.min(max,value));
+
+}
+
+
+/* ============================================================
+   DATEI
+   ============================================================ */
+
+function handleFile(file){
+
+  if(!file){
+    return;
+  }
+
+  const allowed = [
+    "audio/mpeg",
+    "audio/wav",
+    "audio/wave",
+    "audio/x-wav",
+    "audio/ogg",
+    "audio/flac",
+    "audio/mp4",
+    "audio/x-m4a"
+  ];
+
+  const extension = file.name
+    .split(".")
+    .pop()
+    .toLowerCase();
+
+  const allowedExtensions = [
+    "mp3",
+    "wav",
+    "m4a",
+    "ogg",
+    "flac"
+  ];
+
+  if(!allowed.includes(file.type) && !allowedExtensions.includes(extension)){
+
+    alert(
+      "Dieses Dateiformat wird nicht unterstützt.\n\n" +
+      "Erlaubt sind MP3, WAV, M4A, OGG und FLAC."
+    );
+
+    return;
+  }
+
+  selectedFile = file;
+
+  if(audioURL){
+    URL.revokeObjectURL(audioURL);
+  }
+
+  audioURL = URL.createObjectURL(file);
+
+  audioPlayer.src = audioURL;
+
+  fileName.textContent = file.name;
+
+  fileMeta.textContent =
+    `${formatBytes(file.size)} · ${file.type || extension.toUpperCase()}`;
+
+  fileInfo.classList.add("visible");
+  workspace.classList.add("visible");
+  audioCard.classList.remove("hidden");
+
+  analyzeBtn.disabled = false;
+
+  detectedNotes = [];
+  midiBlob = null;
+
+  downloadBtn.disabled = true;
+
+  clearRoll();
+
+  showStatus("Datei bereit");
+
+  progressBar.style.width = "0%";
+  statusPercent.textContent = "0 %";
+
+  log.innerHTML = "";
+
+  addLog(`Datei geladen: ${file.name}`);
+  addLog(`Größe: ${formatBytes(file.size)}`);
+}
+
+
+/* ============================================================
+   AUDIO DECODIEREN
+   ============================================================ */
+
+async function decodeAudio(file){
+
+  const AudioContextClass =
+    window.AudioContext ||
+    window.webkitAudioContext;
+
+  if(!AudioContextClass){
+
+    throw new Error(
+      "Dieser Browser unterstützt Web Audio API nicht."
+    );
+  }
+
+  const ctx = new AudioContextClass();
+
+  try{
+
+    const arrayBuffer = await file.arrayBuffer();
+
+    addLog("Audio wird dekodiert …");
+
+    const decoded =
+      await ctx.decodeAudioData(arrayBuffer);
+
+    addLog(
+      `Audio: ${formatTime(decoded.duration)}, ` +
+      `${decoded.sampleRate} Hz, ` +
+      `${decoded.numberOfChannels} Kanal/Kanäle`
+    );
+
+    return decoded;
+
+  }finally{
+
+    try{
+      await ctx.close();
+    }catch{}
+
+  }
+}
+
+
+/* ============================================================
+   PROGRESS CALLBACK
+   ============================================================ */
+
+function modelProgress(value){
+
+  /*
+    Basic Pitch meldet den Modellfortschritt als Wert
+    zwischen 0 und 1.
+
+    Wir reservieren:
+      0–10%  = Vorbereitung
+      10–95% = ML
+      95–100% = MIDI
+  */
+
+  const p = 10 + value * 85;
+
+  setProgress(
+    p,
+    `KI analysiert Piano …`
+  );
+}
+
+
+/* ============================================================
+   NOTE-ERKENNUNG
+   ============================================================ */
+
+async function transcribe(){
+
+  if(!selectedFile){
+    return;
+  }
+
+  analyzeBtn.disabled = true;
+  downloadBtn.disabled = true;
+
+  showStatus("Audio wird vorbereitet …");
+
+  log.innerHTML = "";
+
+  setProgress(2,"Audio wird vorbereitet …");
+
+  try{
+
+    audioBuffer = await decodeAudio(selectedFile);
+
+    setProgress(8,"KI-Modell wird geladen …");
+
+    addLog("Basic-Pitch-Modell wird initialisiert …");
+
+    /*
+      BasicPitch bekommt die Modell-URL.
+    */
+
+    const basicPitch = new BasicPitch(MODEL_URL);
+
+    addLog("Modell bereit.");
+    addLog("Starte automatische Piano-Transkription …");
+
+    setProgress(10,"KI analysiert Piano …");
+
+    const frames = [];
+    const onsets = [];
+    const contours = [];
+
+    /*
+      evaluateModel verarbeitet das Audio und liefert
+      Frame-, Onset- und Pitch-Contour-Daten.
+    */
+
+    await basicPitch.evaluateModel(
+
+      audioBuffer,
+
+      (f,o,c)=>{
+
+        if(Array.isArray(f)){
+          frames.push(...f);
+        }
+
+        if(Array.isArray(o)){
+          onsets.push(...o);
+        }
+
+        if(Array.isArray(c)){
+          contours.push(...c);
+        }
+
+      },
+
+      modelProgress
+
+    );
+
+
+    addLog(
+      `Modellanalyse abgeschlossen. ` +
+      `${frames.length} Frame-Blöcke verarbeitet.`
+    );
+
+
+    /* ========================================================
+       NOTE EXTRACTION
+       ======================================================== */
+
+    setProgress(
+      96,
+      "Erkannte Noten werden berechnet …"
+    );
+
+    addLog("Erzeuge MIDI-Noten aus Modellresultat …");
+
+    const thresholdValueNumber =
+      Number(threshold.value);
+
+
+    /*
+      outputToNotesPoly ist der eigentliche Schritt,
+      der aus den Frame-/Onset-Ausgaben Note-Events erzeugt.
+
+      Die Werte 0.25 / 0.25 / 5 sind die üblichen
+      Basic-Pitch-Parameter:
+        onset threshold
+        frame threshold
+        minimum note length
+    */
+
+    let rawNotes =
+      outputToNotesPoly(
+        frames,
+        onsets,
+        thresholdValueNumber,
+        thresholdValueNumber,
+        5
+      );
+
+
+    /*
+      Pitch-Bends hinzufügen.
+    */
+
+    rawNotes =
+      addPitchBendsToNoteEvents(
+        contours,
+        rawNotes
+      );
+
+
+    /*
+      Frame-Zeitpunkte -> Sekunden
+    */
+
+    let notes =
+      noteFramesToTime(rawNotes);
+
+
+    /*
+      Nur sinnvolle Piano-Noten.
+    */
+
+    notes = notes
+      .filter(note => {
+
+        const midi =
+          Number(
+            note.pitch ??
+            note.midi ??
+            note.note ??
+            60
+          );
+
+        const start =
+          Number(
+            note.startTime ??
+            note.start ??
+            0
+          );
+
+        const end =
+          Number(
+            note.endTime ??
+            note.end ??
+            start
+          );
+
+        return (
+          Number.isFinite(midi) &&
+          midi >= 21 &&
+          midi <= 108 &&
+          Number.isFinite(start) &&
+          Number.isFinite(end) &&
+          end > start
+        );
+
+      })
+      .map(note => {
+
+        const pitch =
+          Number(
+            note.pitch ??
+            note.midi ??
+            note.note ??
+            60
+          );
+
+        const start =
+          Number(
+            note.startTime ??
+            note.start ??
+            0
+          );
+
+        const end =
+          Number(
+            note.endTime ??
+            note.end ??
+            start
+          );
+
+        return {
+          pitch: Math.round(pitch),
+          start,
+          end,
+          velocity: clamp(
+            Math.round(
+              Number(
+                note.velocity ??
+                note.amplitude ??
+                80
+              ) * (
+                Number(note.velocity ?? 1) <= 1
+                  ? 127
+                  : 1
+              )
+            ),
+            1,
+            127
+          )
+        };
+
+      });
+
+
+    /*
+      Nach Startzeit sortieren.
+    */
+
+    notes.sort(
+      (a,b) =>
+        a.start - b.start ||
+        a.pitch - b.pitch
+    );
+
+
+    /*
+      Quantisierung.
+    */
+
+    notes =
+      quantizeNotes(
+        notes,
+        Number(quant.value),
+        Number(tempo.value)
+      );
+
+
+    detectedNotes = notes;
+
+
+    setProgress(
+      100,
+      `${notes.length} Noten erkannt`
+    );
+
+    addLog(
+      `Fertig: ${notes.length} Piano-Noten erkannt.`
+    );
+
+
+    drawPianoRoll(notes);
+
+    midiBlob =
+      createMIDI(
+        notes,
+        Number(tempo.value)
+      );
+
+    downloadBtn.disabled =
+      notes.length === 0;
+
+    analyzeBtn.disabled = false;
+
+    if(notes.length === 0){
+
+      addLog(
+        "Keine ausreichend deutlichen Piano-Noten gefunden."
+      );
+
+      statusText.textContent =
+        "Keine Noten erkannt";
+
+    }else{
+
+      statusText.textContent =
+        `${notes.length} Noten erkannt`;
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    setProgress(
+      0,
+      "Fehler bei der Analyse"
+    );
+
+    addLog(
+      "FEHLER: " +
+      (error?.message || String(error))
+    );
+
+    alert(
+      "Die Audioanalyse konnte nicht durchgeführt werden.\n\n" +
+      (error?.message || String(error))
+    );
+
+    analyzeBtn.disabled = false;
+
+  }
+
+}
+
+
+/* ============================================================
+   QUANTISIERUNG
+   ============================================================ */
+
+function quantizeNotes(notes,division,bpm){
+
+  if(!division){
+    return notes;
+  }
+
+  /*
+    Viertelnote in Sekunden.
+  */
+
+  const beat =
+    60 / bpm;
+
+  /*
+    division = 4  -> Viertel
+    division = 8  -> Achtel
+    division = 16 -> Sechzehntel
+    division = 32 -> Zweiunddreißigstel
+  */
+
+  const step =
+    beat * (4 / division);
+
+  return notes.map(note => {
+
+    const start =
+      Math.round(note.start / step) * step;
+
+    let end =
+      Math.round(note.end / step) * step;
+
+    /*
+      Eine Note darf nach Quantisierung nicht
+      0 Sekunden lang werden.
+    */
+
+    if(end <= start){
+      end = start + step;
+    }
+
+    return {
+      ...note,
+      start,
+      end
+    };
+
+  });
+
+}
+
+
+/* ============================================================
+   PIANO ROLL
+   ============================================================ */
+
+function clearRoll(){
+
+  piano
+    .querySelectorAll(".note")
+    .forEach(element => element.remove());
+
+  emptyRoll.style.display = "grid";
+
+}
+
+
+function drawPianoRoll(notes){
+
+  piano
+    .querySelectorAll(".note")
+    .forEach(element => element.remove());
+
+  if(!notes.length){
+
+    emptyRoll.style.display = "grid";
+
+    return;
+  }
+
+  emptyRoll.style.display = "none";
+
+
+  const minPitch = 21;
+  const maxPitch = 108;
+
+  const rows =
+    maxPitch - minPitch + 1;
+
+  const rowHeight =
+    Math.max(
+      5,
+      Math.min(
+        13,
+        500 / rows
+      )
+    );
+
+  const maxEnd =
+    Math.max(
+      ...notes.map(n => n.end),
+      1
+    );
+
+  const minWidth =
+    Math.max(
+      piano.clientWidth || 700,
+      700
+    );
+
+  const width =
+    Math.max(
+      minWidth,
+      maxEnd * 80
+    );
+
+  piano.style.width =
+    width + "px";
+
+  piano.style.height =
+    (rows * rowHeight) + "px";
+
+
+  for(const note of notes){
+
+    const element =
+      document.createElement("div");
+
+    element.className = "note";
+
+    const x =
+      note.start * 80;
+
+    const w =
+      Math.max(
+        2,
+        (note.end - note.start) * 80
+      );
+
+    /*
+      Höhere MIDI-Noten weiter oben.
+    */
+
+    const y =
+      (maxPitch - note.pitch) *
+      rowHeight;
+
+    element.style.left =
+      x + "px";
+
+    element.style.top =
+      y + "px";
+
+    element.style.width =
+      w + "px";
+
+    element.style.height =
+      Math.max(
+        3,
+        rowHeight - 1
+      ) + "px";
+
+    element.title =
+      `MIDI ${note.pitch} · ` +
+      `Start ${note.start.toFixed(2)} s · ` +
+      `Ende ${note.end.toFixed(2)} s`;
+
+    piano.appendChild(element);
+
+  }
+
+}
+
+
+/* ============================================================
+   MIDI WRITER
+   ============================================================ */
+
+function writeVarLen(value){
+
+  value =
+    Math.max(
+      0,
+      Math.floor(value)
+    );
+
+  let buffer =
+    value & 0x7F;
+
+  const bytes = [];
+
+  while(
+    (value >>= 7)
+  ){
+
+    buffer <<= 8;
+
+    buffer |=
+      ((value & 0x7F) | 0x80);
+
+  }
+
+  while(true){
+
+    bytes.push(
+      buffer & 0xFF
+    );
+
+    if(buffer & 0x80){
+
+      buffer >>= 8;
+
+    }else{
+
+      break;
+
+    }
+
+  }
+
+  return bytes;
+}
+
+
+function pushBytes(target,...values){
+
+  for(const value of values){
+    target.push(value & 255);
+  }
+
+}
+
+
+function stringBytes(text){
+
+  return Array.from(
+    new TextEncoder().encode(text)
+  );
+
+}
+
+
+function createMIDI(notes,bpm){
+
+  /*
+    MIDI PPQ
+  */
+
+  const PPQ = 480;
+
+  const tempoMicro =
+    Math.round(
+      60000000 / bpm
+    );
+
+  const events = [];
+
+
+  /*
+    Tempo Event
+  */
+
+  events.push({
+    tick:0,
+    priority:0,
+    bytes:[
+      0xFF,
+      0x51,
+      0x03,
+      (tempoMicro >> 16) & 255,
+      (tempoMicro >> 8) & 255,
+      tempoMicro & 255
+    ]
+  });
+
+
+  /*
+    Program Change:
+    Acoustic Grand Piano
+  */
+
+  events.push({
+    tick:0,
+    priority:1,
+    bytes:[
+      0xC0,
+      0
+    ]
+  });
+
+
+  /*
+    Sustain pedal initial state
+  */
+
+  events.push({
+    tick:0,
+    priority:1,
+    bytes:[
+      0xB0,
+      64,
+      0
+    ]
+  });
+
+
+  /*
+    Notes
+  */
+
+  for(const note of notes){
+
+    const startTick =
+      Math.max(
+        0,
+        Math.round(
+          note.start *
+          (bpm / 60) *
+          PPQ
+        )
+      );
+
+    const endTick =
+      Math.max(
+        startTick + 1,
+        Math.round(
+          note.end *
+          (bpm / 60) *
+          PPQ
+        )
+      );
+
+
+    events.push({
+      tick:startTick,
+      priority:2,
+      bytes:[
+        0x90,
+        clamp(note.pitch,0,127),
+        clamp(note.velocity || 80,1,127)
+      ]
+    });
+
+
+    events.push({
+      tick:endTick,
+      priority:1,
+      bytes:[
+        0x80,
+        clamp(note.pitch,0,127),
+        0
+      ]
+    });
+
+  }
+
+
+  /*
+    Events sortieren.
+  */
+
+  events.sort(
+    (a,b) =>
+      a.tick - b.tick ||
+      a.priority - b.priority
+  );
+
+
+  const track = [];
+
+  let previousTick = 0;
+
+  for(const event of events){
+
+    const delta =
+      event.tick - previousTick;
+
+    previousTick =
+      event.tick;
+
+    track.push(
+      ...writeVarLen(delta),
+      ...event.bytes
+    );
+
+  }
+
+
+  /*
+    End-of-track
+  */
+
+  track.push(
+    0x00,
+    0xFF,
+    0x2F,
+    0x00
+  );
+
+
+  /*
+    MThd
+  */
+
+  const header = [
+    0x4D,0x54,0x68,0x64,
+    0x00,0x00,0x00,0x06,
+    0x00,0x00,
+    0x00,0x01,
+    (PPQ >> 8) & 255,
+    PPQ & 255
+  ];
+
+
+  /*
+    MTrk
+  */
+
+  const trackHeader = [
+    0x4D,0x54,0x72,0x6B,
+    (track.length >>> 24) & 255,
+    (track.length >>> 16) & 255,
+    (track.length >>> 8) & 255,
+    track.length & 255
+  ];
+
+
+  return new Blob(
+    [
+      new Uint8Array(header),
+      new Uint8Array(trackHeader),
+      new Uint8Array(track)
+    ],
+    {
+      type:"audio/midi"
+    }
+  );
+
+}
+
+
+/* ============================================================
+   DOWNLOAD
+   ============================================================ */
+
+function downloadMIDI(){
+
+  if(!midiBlob){
+    return;
+  }
+
+  const original =
+    selectedFile
+      ? selectedFile.name
+      : "audio";
+
+  const base =
+    original
+      .replace(/\.[^/.]+$/,"")
+      .replace(/[^\wäöüÄÖÜß\- ]+/g,"")
+      .trim()
+      || "piano";
+
+  const url =
+    URL.createObjectURL(midiBlob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+
+  a.download =
+    `${base}.mid`;
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  setTimeout(
+    () => URL.revokeObjectURL(url),
+    1000
+  );
+
+}
+
+
+/* ============================================================
+   THEME
+   ============================================================ */
+
+function updateThemeIcon(){
+
+  const dark =
+    document.documentElement.classList.contains("dark");
+
+  themeBtn.textContent =
+    dark ? "☀" : "☾";
+
+}
+
+
+function loadTheme(){
+
+  const saved =
+    localStorage.getItem("lamachub-theme");
+
+  if(saved === "dark"){
+
+    document.documentElement.classList.add("dark");
+
+  }
+
+  updateThemeIcon();
+
+}
+
+
+themeBtn.addEventListener("click",()=>{
+
+  document.documentElement.classList.toggle("dark");
+
+  const dark =
+    document.documentElement.classList.contains("dark");
+
+  localStorage.setItem(
+    "lamachub-theme",
+    dark ? "dark" : "light"
+  );
+
+  updateThemeIcon();
+
+});
+
+
+/* ============================================================
+   UI EVENTS
+   ============================================================ */
+
+chooseBtn.addEventListener(
+  "click",
+  () => fileInput.click()
+);
+
+
+fileInput.addEventListener(
+  "change",
+  event => {
+
+    const file =
+      event.target.files?.[0];
+
+    handleFile(file);
+
+  }
+);
+
+
+dropzone.addEventListener(
+  "dragover",
+  event => {
+
+    event.preventDefault();
+
+    dropzone.classList.add("drag");
+
+  }
+);
+
+
+dropzone.addEventListener(
+  "dragleave",
+  () => {
+
+    dropzone.classList.remove("drag");
+
+  }
+);
+
+
+dropzone.addEventListener(
+  "drop",
+  event => {
+
+    event.preventDefault();
+
+    dropzone.classList.remove("drag");
+
+    const file =
+      event.dataTransfer.files?.[0];
+
+    handleFile(file);
+
+  }
+);
+
+
+analyzeBtn.addEventListener(
+  "click",
+  transcribe
+);
+
+
+downloadBtn.addEventListener(
+  "click",
+  downloadMIDI
+);
+
+
+clearBtn.addEventListener(
+  "click",
+  () => {
+
+    detectedNotes = [];
+    midiBlob = null;
+
+    downloadBtn.disabled = true;
+
+    clearRoll();
+
+    showStatus("Piano Roll geleert");
+
+    setProgress(
+      0,
+      "Bereit"
+    );
+
+  }
+);
+
+
+playBtn.addEventListener(
+  "click",
+  () => {
+
+    if(!audioPlayer.src){
+      return;
+    }
+
+    if(audioPlayer.paused){
+
+      audioPlayer.play();
+
+      playBtn.textContent =
+        "⏸ Pause";
+
+    }else{
+
+      audioPlayer.pause();
+
+      playBtn.textContent =
+        "▶ Wiedergabe";
+
+    }
+
+  }
+);
+
+
+audioPlayer.addEventListener(
+  "play",
+  () => {
+    playBtn.textContent = "⏸ Pause";
+  }
+);
+
+
+audioPlayer.addEventListener(
+  "pause",
+  () => {
+    playBtn.textContent = "▶ Wiedergabe";
+  }
+);
+
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+
+threshold.addEventListener(
+  "input",
+  () => {
+
+    thresholdValue.textContent =
+      Number(threshold.value).toFixed(2);
+
+  }
+);
+
+
+quant.addEventListener(
+  "change",
+  () => {
+
+    quantValue.textContent =
+      quant.options[quant.selectedIndex].text;
+
+    if(detectedNotes.length){
+
+      /*
+        Erneut quantisieren auf Basis der
+        ursprünglichen Daten wäre besser.
+        Deshalb zeigen wir hier nur die Einstellung
+        für die nächste Analyse.
+      */
+
+      addLog(
+        "Quantisierung geändert – bei der nächsten Analyse aktiv."
+      );
+
+    }
+
+  }
+);
+
+
+tempo.addEventListener(
+  "input",
+  () => {
+
+    tempoValue.textContent =
+      `${tempo.value} BPM`;
+
+  }
+);
+
+
+/* ============================================================
+   START
+   ============================================================ */
+
+loadTheme();
+
+addLog("lamacHub Audio2MIDI gestartet.");
+addLog("Warte auf eine Piano-Datei …");
+
+</script>
+
+</body>
+</html>
