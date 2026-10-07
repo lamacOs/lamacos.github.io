@@ -12,7 +12,7 @@
   --accent:#ff7a00;
   --accent2:#01C7FC;
   --bg:#f5f5f7;
-  --card:rgba(255,255,255,.82);
+  --card:rgba(255,255,255,.84);
   --card-solid:#fff;
   --text:#171717;
   --muted:#737373;
@@ -25,7 +25,7 @@
 
 html.dark{
   --bg:#0c0c0e;
-  --card:rgba(25,25,28,.86);
+  --card:rgba(25,25,28,.88);
   --card-solid:#19191c;
   --text:#f5f5f7;
   --muted:#a4a4aa;
@@ -44,7 +44,8 @@ html{
 body{
   margin:0;
   min-height:100vh;
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,
+    "SF Pro Display","Segoe UI",sans-serif;
   color:var(--text);
   background:
     radial-gradient(circle at 10% 0%,rgba(255,122,0,.08),transparent 30%),
@@ -91,7 +92,7 @@ button{
   border-radius:10px;
   display:grid;
   place-items:center;
-  color:white;
+  color:#fff;
   background:linear-gradient(135deg,var(--accent),#ff9b4a);
   box-shadow:0 7px 20px rgba(255,122,0,.25);
   font-size:17px;
@@ -190,7 +191,7 @@ button{
   border-radius:20px;
   display:grid;
   place-items:center;
-  color:white;
+  color:#fff;
   font-size:30px;
   background:linear-gradient(135deg,var(--accent),#ffad68);
   box-shadow:0 15px 35px rgba(255,122,0,.22);
@@ -349,6 +350,7 @@ select{
 }
 
 .analyze{
+  width:100%;
   margin-top:20px;
 }
 
@@ -509,22 +511,6 @@ audio{
   color:var(--success);
 }
 
-.spinner{
-  width:16px;
-  height:16px;
-  border:2px solid rgba(255,255,255,.35);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:spin .7s linear infinite;
-  display:inline-block;
-  vertical-align:-3px;
-  margin-right:6px;
-}
-
-@keyframes spin{
-  to{transform:rotate(360deg)}
-}
-
 .hidden{
   display:none!important;
 }
@@ -655,7 +641,7 @@ audio{
 
       <div class="control">
         <label>
-          Mindestlautstärke
+          Erkennungsschwelle
           <span class="value" id="thresholdValue">0.25</span>
         </label>
 
@@ -700,9 +686,8 @@ audio{
       </div>
 
       <div class="info-box">
-        Die Analyse läuft lokal im Browser.
-        Deine Audio-Datei wird nicht an einen eigenen lamacHub-Server
-        hochgeladen.
+        Die Audioanalyse läuft lokal in deinem Browser.
+        Die Datei wird nicht an einen lamacHub-Server hochgeladen.
       </div>
 
       <button class="primary analyze" id="analyzeBtn" disabled>
@@ -727,9 +712,11 @@ audio{
 
       <div class="piano-wrap">
         <div class="piano" id="piano">
+
           <div class="empty-roll" id="emptyRoll">
             Nach der Analyse erscheinen hier die erkannten Noten.
           </div>
+
         </div>
       </div>
 
@@ -740,7 +727,7 @@ audio{
   <section class="card status" id="status">
 
     <div class="status-top">
-      <span id="statusText">Bereite Analyse vor …</span>
+      <span id="statusText">Bereit</span>
       <span id="statusPercent">0 %</span>
     </div>
 
@@ -782,27 +769,27 @@ audio{
 <script type="module">
 
 /*
-  ============================================================
-  lamacHub Audio2MIDI
-  ============================================================
+============================================================
+lamacHub Audio2MIDI
+============================================================
 
-  ECHTE AUDIO-TRANSKRIPTION
+Echte automatische Audio → MIDI Transkription
+mit Spotify Basic Pitch.
 
-  Dieses Projekt verwendet Spotify Basic Pitch als
-  Machine-Learning-Modell zur automatischen Erkennung
-  von Noten aus Audio.
+Wichtig:
+Basic Pitch arbeitet intern mit 22050 Hz.
 
-  Die Bibliothek wird zur Laufzeit aus jsDelivr geladen.
+Die Datei wird deshalb nach dem Decodieren
+automatisch auf exakt 22050 Hz resampled.
 
-  Wichtig:
-  - Das Repository braucht nur diese index.html.
-  - Beim ersten Start werden Bibliothek + ML-Modell geladen.
-  - Die eigentliche Audioanalyse läuft im Browser.
+Das Projekt selbst besteht weiterhin nur aus
+dieser index.html.
+============================================================
 */
 
 
 /* ============================================================
-   IMPORTS
+   BASIC PITCH
    ============================================================ */
 
 import {
@@ -817,46 +804,90 @@ import {
    ELEMENTE
    ============================================================ */
 
-const fileInput       = document.getElementById("fileInput");
-const chooseBtn       = document.getElementById("chooseBtn");
-const dropzone        = document.getElementById("dropzone");
-const fileInfo        = document.getElementById("fileInfo");
-const fileName        = document.getElementById("fileName");
-const fileMeta        = document.getElementById("fileMeta");
+const fileInput =
+  document.getElementById("fileInput");
 
-const workspace       = document.getElementById("workspace");
-const analyzeBtn      = document.getElementById("analyzeBtn");
+const chooseBtn =
+  document.getElementById("chooseBtn");
 
-const threshold       = document.getElementById("threshold");
-const thresholdValue  = document.getElementById("thresholdValue");
+const dropzone =
+  document.getElementById("dropzone");
 
-const quant            = document.getElementById("quant");
-const quantValue       = document.getElementById("quantValue");
+const fileInfo =
+  document.getElementById("fileInfo");
 
-const tempo            = document.getElementById("tempo");
-const tempoValue       = document.getElementById("tempoValue");
+const fileName =
+  document.getElementById("fileName");
 
-const status           = document.getElementById("status");
-const statusText       = document.getElementById("statusText");
-const statusPercent    = document.getElementById("statusPercent");
-const progressBar      = document.getElementById("progressBar");
-const log              = document.getElementById("log");
+const fileMeta =
+  document.getElementById("fileMeta");
 
-const piano            = document.getElementById("piano");
-const emptyRoll        = document.getElementById("emptyRoll");
+const workspace =
+  document.getElementById("workspace");
 
-const audioCard        = document.getElementById("audioCard");
-const audioPlayer      = document.getElementById("audioPlayer");
-const playBtn          = document.getElementById("playBtn");
+const analyzeBtn =
+  document.getElementById("analyzeBtn");
 
-const downloadBtn      = document.getElementById("downloadBtn");
-const clearBtn         = document.getElementById("clearBtn");
+const threshold =
+  document.getElementById("threshold");
 
-const themeBtn         = document.getElementById("themeBtn");
+const thresholdValue =
+  document.getElementById("thresholdValue");
+
+const quant =
+  document.getElementById("quant");
+
+const quantValue =
+  document.getElementById("quantValue");
+
+const tempo =
+  document.getElementById("tempo");
+
+const tempoValue =
+  document.getElementById("tempoValue");
+
+const status =
+  document.getElementById("status");
+
+const statusText =
+  document.getElementById("statusText");
+
+const statusPercent =
+  document.getElementById("statusPercent");
+
+const progressBar =
+  document.getElementById("progressBar");
+
+const log =
+  document.getElementById("log");
+
+const piano =
+  document.getElementById("piano");
+
+const emptyRoll =
+  document.getElementById("emptyRoll");
+
+const audioCard =
+  document.getElementById("audioCard");
+
+const audioPlayer =
+  document.getElementById("audioPlayer");
+
+const playBtn =
+  document.getElementById("playBtn");
+
+const downloadBtn =
+  document.getElementById("downloadBtn");
+
+const clearBtn =
+  document.getElementById("clearBtn");
+
+const themeBtn =
+  document.getElementById("themeBtn");
 
 
 /* ============================================================
-   APP STATE
+   STATE
    ============================================================ */
 
 let selectedFile = null;
@@ -866,74 +897,84 @@ let detectedNotes = [];
 let midiBlob = null;
 
 
-/* ============================================================
-   BASIC PITCH MODEL
-   ============================================================
-
-   Spotify veröffentlicht das Modell zusammen mit Basic Pitch.
-   Die JS-Version ist für automatische Musiktranskription
-   gedacht und kann polyphone Instrumente erkennen.
-
-   Die genaue Modell-URL wird von der Bibliothek selbst
-   verwendet.
-   ============================================================ */
+/*
+  Das Modell liegt im npm-Paket.
+*/
 
 const MODEL_URL =
   "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json";
 
 
 /* ============================================================
-   HILFSFUNKTIONEN
+   HELPERS
    ============================================================ */
 
-function setProgress(percent, message){
+function setProgress(percent,message){
 
-  const p = Math.max(0, Math.min(100, percent));
+  const p =
+    Math.max(
+      0,
+      Math.min(100,percent)
+    );
 
-  progressBar.style.width = p + "%";
-  statusPercent.textContent = Math.round(p) + " %";
-  statusText.textContent = message;
+  progressBar.style.width =
+    p + "%";
+
+  statusPercent.textContent =
+    Math.round(p) + " %";
+
+  statusText.textContent =
+    message;
 }
 
 
-function showStatus(message = "Bereit"){
+function showStatus(message){
 
   status.classList.add("visible");
 
   if(message){
-    statusText.textContent = message;
+    statusText.textContent =
+      message;
   }
 }
 
 
 function addLog(message){
 
-  const line = document.createElement("div");
+  const line =
+    document.createElement("div");
 
-  const time = new Date().toLocaleTimeString("de-DE", {
-    hour:"2-digit",
-    minute:"2-digit",
-    second:"2-digit"
-  });
+  const time =
+    new Date().toLocaleTimeString(
+      "de-DE",
+      {
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit"
+      }
+    );
 
-  line.textContent = `[${time}] ${message}`;
+  line.textContent =
+    `[${time}] ${message}`;
 
   log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
+
+  log.scrollTop =
+    log.scrollHeight;
 }
 
 
 function formatBytes(bytes){
 
   if(bytes < 1024){
-    return bytes + " B";
+    return `${bytes} B`;
   }
 
   if(bytes < 1024 * 1024){
-    return (bytes / 1024).toFixed(1) + " KB";
+    return `${(bytes / 1024).toFixed(1)} KB`;
   }
 
-  return (bytes / 1024 / 1024).toFixed(2) + " MB";
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
 
@@ -943,10 +984,13 @@ function formatTime(seconds){
     return "–";
   }
 
-  const minutes = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60)
-    .toString()
-    .padStart(2,"0");
+  const minutes =
+    Math.floor(seconds / 60);
+
+  const secs =
+    Math.floor(seconds % 60)
+      .toString()
+      .padStart(2,"0");
 
   return `${minutes}:${secs}`;
 }
@@ -954,13 +998,15 @@ function formatTime(seconds){
 
 function clamp(value,min,max){
 
-  return Math.max(min,Math.min(max,value));
-
+  return Math.max(
+    min,
+    Math.min(max,value)
+  );
 }
 
 
 /* ============================================================
-   DATEI
+   FILE
    ============================================================ */
 
 function handleFile(file){
@@ -969,21 +1015,11 @@ function handleFile(file){
     return;
   }
 
-  const allowed = [
-    "audio/mpeg",
-    "audio/wav",
-    "audio/wave",
-    "audio/x-wav",
-    "audio/ogg",
-    "audio/flac",
-    "audio/mp4",
-    "audio/x-m4a"
-  ];
-
-  const extension = file.name
-    .split(".")
-    .pop()
-    .toLowerCase();
+  const extension =
+    file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
 
   const allowedExtensions = [
     "mp3",
@@ -993,58 +1029,88 @@ function handleFile(file){
     "flac"
   ];
 
-  if(!allowed.includes(file.type) && !allowedExtensions.includes(extension)){
+  if(!allowedExtensions.includes(extension)){
 
     alert(
       "Dieses Dateiformat wird nicht unterstützt.\n\n" +
-      "Erlaubt sind MP3, WAV, M4A, OGG und FLAC."
+      "Erlaubt: MP3, WAV, M4A, OGG und FLAC."
     );
 
     return;
   }
 
-  selectedFile = file;
+  selectedFile =
+    file;
 
   if(audioURL){
-    URL.revokeObjectURL(audioURL);
+
+    URL.revokeObjectURL(
+      audioURL
+    );
+
   }
 
-  audioURL = URL.createObjectURL(file);
+  audioURL =
+    URL.createObjectURL(file);
 
-  audioPlayer.src = audioURL;
+  audioPlayer.src =
+    audioURL;
 
-  fileName.textContent = file.name;
+  fileName.textContent =
+    file.name;
 
   fileMeta.textContent =
-    `${formatBytes(file.size)} · ${file.type || extension.toUpperCase()}`;
+    `${formatBytes(file.size)} · ${
+      file.type || extension.toUpperCase()
+    }`;
 
-  fileInfo.classList.add("visible");
-  workspace.classList.add("visible");
-  audioCard.classList.remove("hidden");
+  fileInfo.classList.add(
+    "visible"
+  );
 
-  analyzeBtn.disabled = false;
+  workspace.classList.add(
+    "visible"
+  );
+
+  audioCard.classList.remove(
+    "hidden"
+  );
+
+  analyzeBtn.disabled =
+    false;
 
   detectedNotes = [];
+
   midiBlob = null;
 
-  downloadBtn.disabled = true;
+  downloadBtn.disabled =
+    true;
 
   clearRoll();
 
-  showStatus("Datei bereit");
+  showStatus(
+    "Datei bereit"
+  );
 
-  progressBar.style.width = "0%";
-  statusPercent.textContent = "0 %";
+  setProgress(
+    0,
+    "Bereit"
+  );
 
   log.innerHTML = "";
 
-  addLog(`Datei geladen: ${file.name}`);
-  addLog(`Größe: ${formatBytes(file.size)}`);
+  addLog(
+    `Datei geladen: ${file.name}`
+  );
+
+  addLog(
+    `Größe: ${formatBytes(file.size)}`
+  );
 }
 
 
 /* ============================================================
-   AUDIO DECODIEREN
+   AUDIO DECODIEREN + RESAMPLING
    ============================================================ */
 
 async function decodeAudio(file){
@@ -1056,28 +1122,141 @@ async function decodeAudio(file){
   if(!AudioContextClass){
 
     throw new Error(
-      "Dieser Browser unterstützt Web Audio API nicht."
+      "Dieser Browser unterstützt die Web Audio API nicht."
     );
+
   }
 
-  const ctx = new AudioContextClass();
+  const ctx =
+    new AudioContextClass();
 
   try{
 
-    const arrayBuffer = await file.arrayBuffer();
-
-    addLog("Audio wird dekodiert …");
-
-    const decoded =
-      await ctx.decodeAudioData(arrayBuffer);
+    const arrayBuffer =
+      await file.arrayBuffer();
 
     addLog(
-      `Audio: ${formatTime(decoded.duration)}, ` +
+      "Audio wird dekodiert …"
+    );
+
+    const decoded =
+      await ctx.decodeAudioData(
+        arrayBuffer
+      );
+
+    addLog(
+      `Original: ${formatTime(decoded.duration)}, ` +
       `${decoded.sampleRate} Hz, ` +
       `${decoded.numberOfChannels} Kanal/Kanäle`
     );
 
-    return decoded;
+
+    /*
+    ============================================================
+    WICHTIGER FIX
+
+    Basic Pitch erwartet für die Modellverarbeitung
+    22050 Hz.
+
+    Die Eingangsdatei kann aber z.B. 44100 Hz haben.
+
+    Deshalb wird hier automatisch resampled.
+    ============================================================
+    */
+
+    const TARGET_SAMPLE_RATE =
+      22050;
+
+
+    /*
+      Falls bereits korrekt:
+      nichts verändern.
+    */
+
+    if(
+      decoded.sampleRate ===
+      TARGET_SAMPLE_RATE
+    ){
+
+      addLog(
+        "Audio ist bereits 22050 Hz."
+      );
+
+      return decoded;
+    }
+
+
+    addLog(
+      `Resampling: ${decoded.sampleRate} Hz → ` +
+      `${TARGET_SAMPLE_RATE} Hz …`
+    );
+
+
+    /*
+      Neue Sample-Anzahl berechnen.
+    */
+
+    const targetLength =
+      Math.ceil(
+        decoded.duration *
+        TARGET_SAMPLE_RATE
+      );
+
+
+    /*
+      OfflineAudioContext führt das
+      hochwertige Browser-Resampling durch.
+    */
+
+    const offline =
+      new OfflineAudioContext(
+        decoded.numberOfChannels,
+        targetLength,
+        TARGET_SAMPLE_RATE
+      );
+
+
+    const source =
+      offline.createBufferSource();
+
+    source.buffer =
+      decoded;
+
+    source.connect(
+      offline.destination
+    );
+
+    source.start(0);
+
+
+    const resampled =
+      await offline.startRendering();
+
+
+    addLog(
+      `Resampling fertig: ${resampled.sampleRate} Hz`
+    );
+
+
+    /*
+      Sicherheitsprüfung.
+    */
+
+    if(
+      resampled.sampleRate !==
+      TARGET_SAMPLE_RATE
+    ){
+
+      throw new Error(
+        `Resampling fehlgeschlagen: ` +
+        `${resampled.sampleRate} Hz statt ` +
+        `${TARGET_SAMPLE_RATE} Hz.`
+      );
+
+    }
+
+
+    return resampled;
 
   }finally{
 
@@ -1090,32 +1269,7 @@ async function decodeAudio(file){
 
 
 /* ============================================================
-   PROGRESS CALLBACK
-   ============================================================ */
-
-function modelProgress(value){
-
-  /*
-    Basic Pitch meldet den Modellfortschritt als Wert
-    zwischen 0 und 1.
-
-    Wir reservieren:
-      0–10%  = Vorbereitung
-      10–95% = ML
-      95–100% = MIDI
-  */
-
-  const p = 10 + value * 85;
-
-  setProgress(
-    p,
-    `KI analysiert Piano …`
-  );
-}
-
-
-/* ============================================================
-   NOTE-ERKENNUNG
+   ANALYSE
    ============================================================ */
 
 async function transcribe(){
@@ -1124,115 +1278,165 @@ async function transcribe(){
     return;
   }
 
-  analyzeBtn.disabled = true;
-  downloadBtn.disabled = true;
+  analyzeBtn.disabled =
+    true;
 
-  showStatus("Audio wird vorbereitet …");
+  downloadBtn.disabled =
+    true;
+
+  showStatus(
+    "Audio wird vorbereitet …"
+  );
 
   log.innerHTML = "";
 
-  setProgress(2,"Audio wird vorbereitet …");
+  setProgress(
+    2,
+    "Audio wird vorbereitet …"
+  );
+
 
   try{
 
-    audioBuffer = await decodeAudio(selectedFile);
-
-    setProgress(8,"KI-Modell wird geladen …");
-
-    addLog("Basic-Pitch-Modell wird initialisiert …");
-
     /*
-      BasicPitch bekommt die Modell-URL.
+      Audio laden + resamplen.
     */
 
-    const basicPitch = new BasicPitch(MODEL_URL);
+    audioBuffer =
+      await decodeAudio(
+        selectedFile
+      );
 
-    addLog("Modell bereit.");
-    addLog("Starte automatische Piano-Transkription …");
 
-    setProgress(10,"KI analysiert Piano …");
+    /*
+      ABSOLUTE SICHERHEIT:
+      Basic Pitch bekommt niemals 44100 Hz.
+    */
+
+    if(
+      audioBuffer.sampleRate !==
+      22050
+    ){
+
+      throw new Error(
+        `Input audio buffer is not at correct ` +
+        `sample rate! Is ${audioBuffer.sampleRate}. ` +
+        `Should be 22050.`
+      );
+
+    }
+
+
+    setProgress(
+      8,
+      "KI-Modell wird geladen …"
+    );
+
+    addLog(
+      "Basic-Pitch-Modell wird initialisiert …"
+    );
+
+
+    const basicPitch =
+      new BasicPitch(
+        MODEL_URL
+      );
+
+
+    addLog(
+      "Modell bereit."
+    );
+
+    addLog(
+      "Starte automatische Piano-Transkription …"
+    );
+
+
+    setProgress(
+      10,
+      "KI analysiert Piano …"
+    );
+
 
     const frames = [];
     const onsets = [];
     const contours = [];
 
+
     /*
-      evaluateModel verarbeitet das Audio und liefert
-      Frame-, Onset- und Pitch-Contour-Daten.
+      Basic Pitch Modell ausführen.
     */
 
     await basicPitch.evaluateModel(
 
       audioBuffer,
 
-      (f,o,c)=>{
+      (
+        f,
+        o,
+        c
+      ) => {
 
-        if(Array.isArray(f)){
-          frames.push(...f);
-        }
+        frames.push(
+          ...f
+        );
 
-        if(Array.isArray(o)){
-          onsets.push(...o);
-        }
+        onsets.push(
+          ...o
+        );
 
-        if(Array.isArray(c)){
-          contours.push(...c);
-        }
+        contours.push(
+          ...c
+        );
 
       },
 
-      modelProgress
+      progress => {
+
+        const p =
+          10 +
+          progress * 85;
+
+        setProgress(
+          p,
+          "KI analysiert Piano …"
+        );
+
+      }
 
     );
 
 
     addLog(
-      `Modellanalyse abgeschlossen. ` +
-      `${frames.length} Frame-Blöcke verarbeitet.`
+      "Modellanalyse abgeschlossen."
     );
 
-
-    /* ========================================================
-       NOTE EXTRACTION
-       ======================================================== */
 
     setProgress(
       96,
-      "Erkannte Noten werden berechnet …"
+      "Noten werden berechnet …"
     );
-
-    addLog("Erzeuge MIDI-Noten aus Modellresultat …");
-
-    const thresholdValueNumber =
-      Number(threshold.value);
 
 
     /*
-      outputToNotesPoly ist der eigentliche Schritt,
-      der aus den Frame-/Onset-Ausgaben Note-Events erzeugt.
-
-      Die Werte 0.25 / 0.25 / 5 sind die üblichen
-      Basic-Pitch-Parameter:
-        onset threshold
-        frame threshold
-        minimum note length
+      Note Events erzeugen.
     */
 
-    let rawNotes =
+    const rawNotes =
       outputToNotesPoly(
         frames,
         onsets,
-        thresholdValueNumber,
-        thresholdValueNumber,
+        Number(threshold.value),
+        Number(threshold.value),
         5
       );
 
 
     /*
-      Pitch-Bends hinzufügen.
+      Pitch Bends ergänzen.
     */
 
-    rawNotes =
+    const notesWithBends =
       addPitchBendsToNoteEvents(
         contours,
         rawNotes
@@ -1240,98 +1444,98 @@ async function transcribe(){
 
 
     /*
-      Frame-Zeitpunkte -> Sekunden
+      Frames → Sekunden.
     */
 
     let notes =
-      noteFramesToTime(rawNotes);
+      noteFramesToTime(
+        notesWithBends
+      );
 
 
     /*
-      Nur sinnvolle Piano-Noten.
+      Basic Pitch liefert:
+        startTimeSeconds
+        durationSeconds
+        pitchMidi
+        amplitude
     */
 
-    notes = notes
-      .filter(note => {
+    notes =
+      notes
+        .filter(note => {
 
-        const midi =
-          Number(
-            note.pitch ??
-            note.midi ??
-            note.note ??
-            60
+          const pitch =
+            Number(
+              note.pitchMidi
+            );
+
+          const start =
+            Number(
+              note.startTimeSeconds
+            );
+
+          const duration =
+            Number(
+              note.durationSeconds
+            );
+
+          return (
+            Number.isFinite(pitch) &&
+            pitch >= 21 &&
+            pitch <= 108 &&
+            Number.isFinite(start) &&
+            Number.isFinite(duration) &&
+            duration > 0
           );
 
-        const start =
-          Number(
-            note.startTime ??
-            note.start ??
-            0
-          );
+        })
+        .map(note => {
 
-        const end =
-          Number(
-            note.endTime ??
-            note.end ??
-            start
-          );
+          const amplitude =
+            Number(
+              note.amplitude
+            );
 
-        return (
-          Number.isFinite(midi) &&
-          midi >= 21 &&
-          midi <= 108 &&
-          Number.isFinite(start) &&
-          Number.isFinite(end) &&
-          end > start
-        );
+          return {
 
-      })
-      .map(note => {
+            pitch:
+              Math.round(
+                note.pitchMidi
+              ),
 
-        const pitch =
-          Number(
-            note.pitch ??
-            note.midi ??
-            note.note ??
-            60
-          );
-
-        const start =
-          Number(
-            note.startTime ??
-            note.start ??
-            0
-          );
-
-        const end =
-          Number(
-            note.endTime ??
-            note.end ??
-            start
-          );
-
-        return {
-          pitch: Math.round(pitch),
-          start,
-          end,
-          velocity: clamp(
-            Math.round(
+            start:
               Number(
-                note.velocity ??
-                note.amplitude ??
-                80
-              ) * (
-                Number(note.velocity ?? 1) <= 1
-                  ? 127
-                  : 1
-              )
-            ),
-            1,
-            127
-          )
-        };
+                note.startTimeSeconds
+              ),
 
-      });
+            end:
+              Number(
+                note.startTimeSeconds
+              ) +
+              Number(
+                note.durationSeconds
+              ),
+
+            velocity:
+              clamp(
+                Math.round(
+                  (
+                    Number.isFinite(amplitude)
+                      ? amplitude
+                      : 0.7
+                  ) * 127
+                ),
+                1,
+                127
+              ),
+
+            pitchBends:
+              note.pitchBends || []
+
+          };
+
+        });
 
 
     /*
@@ -1357,7 +1561,8 @@ async function transcribe(){
       );
 
 
-    detectedNotes = notes;
+    detectedNotes =
+      notes;
 
 
     setProgress(
@@ -1365,12 +1570,16 @@ async function transcribe(){
       `${notes.length} Noten erkannt`
     );
 
+
     addLog(
       `Fertig: ${notes.length} Piano-Noten erkannt.`
     );
 
 
-    drawPianoRoll(notes);
+    drawPianoRoll(
+      notes
+    );
+
 
     midiBlob =
       createMIDI(
@@ -1378,19 +1587,19 @@ async function transcribe(){
         Number(tempo.value)
       );
 
+
     downloadBtn.disabled =
       notes.length === 0;
 
-    analyzeBtn.disabled = false;
 
     if(notes.length === 0){
+
+      statusText.textContent =
+        "Keine Noten erkannt";
 
       addLog(
         "Keine ausreichend deutlichen Piano-Noten gefunden."
       );
-
-      statusText.textContent =
-        "Keine Noten erkannt";
 
     }else{
 
@@ -1399,9 +1608,12 @@ async function transcribe(){
 
     }
 
+
   }catch(error){
 
-    console.error(error);
+    console.error(
+      error
+    );
 
     setProgress(
       0,
@@ -1410,15 +1622,24 @@ async function transcribe(){
 
     addLog(
       "FEHLER: " +
-      (error?.message || String(error))
+      (
+        error?.message ||
+        String(error)
+      )
     );
 
     alert(
       "Die Audioanalyse konnte nicht durchgeführt werden.\n\n" +
-      (error?.message || String(error))
+      (
+        error?.message ||
+        String(error)
+      )
     );
 
-    analyzeBtn.disabled = false;
+  }finally{
+
+    analyzeBtn.disabled =
+      false;
 
   }
 
@@ -1429,53 +1650,55 @@ async function transcribe(){
    QUANTISIERUNG
    ============================================================ */
 
-function quantizeNotes(notes,division,bpm){
+function quantizeNotes(
+  notes,
+  division,
+  bpm
+){
 
   if(!division){
     return notes;
   }
 
-  /*
-    Viertelnote in Sekunden.
-  */
-
   const beat =
     60 / bpm;
 
-  /*
-    division = 4  -> Viertel
-    division = 8  -> Achtel
-    division = 16 -> Sechzehntel
-    division = 32 -> Zweiunddreißigstel
-  */
-
   const step =
-    beat * (4 / division);
+    beat *
+    (4 / division);
 
-  return notes.map(note => {
 
-    const start =
-      Math.round(note.start / step) * step;
+  return notes.map(
+    note => {
 
-    let end =
-      Math.round(note.end / step) * step;
+      const start =
+        Math.round(
+          note.start / step
+        ) * step;
 
-    /*
-      Eine Note darf nach Quantisierung nicht
-      0 Sekunden lang werden.
-    */
 
-    if(end <= start){
-      end = start + step;
+      let end =
+        Math.round(
+          note.end / step
+        ) * step;
+
+
+      if(end <= start){
+
+        end =
+          start + step;
+
+      }
+
+
+      return {
+        ...note,
+        start,
+        end
+      };
+
     }
-
-    return {
-      ...note,
-      start,
-      end
-    };
-
-  });
+  );
 
 }
 
@@ -1487,35 +1710,59 @@ function quantizeNotes(notes,division,bpm){
 function clearRoll(){
 
   piano
-    .querySelectorAll(".note")
-    .forEach(element => element.remove());
+    .querySelectorAll(
+      ".note"
+    )
+    .forEach(
+      element =>
+        element.remove()
+    );
 
-  emptyRoll.style.display = "grid";
+  emptyRoll.style.display =
+    "grid";
 
 }
 
 
-function drawPianoRoll(notes){
+function drawPianoRoll(
+  notes
+){
 
   piano
-    .querySelectorAll(".note")
-    .forEach(element => element.remove());
+    .querySelectorAll(
+      ".note"
+    )
+    .forEach(
+      element =>
+        element.remove()
+    );
+
 
   if(!notes.length){
 
-    emptyRoll.style.display = "grid";
+    emptyRoll.style.display =
+      "grid";
 
     return;
+
   }
 
-  emptyRoll.style.display = "none";
+
+  emptyRoll.style.display =
+    "none";
 
 
-  const minPitch = 21;
-  const maxPitch = 108;
+  const minPitch =
+    21;
+
+  const maxPitch =
+    108;
 
   const rows =
-    maxPitch - minPitch + 1;
+    maxPitch -
+    minPitch +
+    1;
+
 
   const rowHeight =
     Math.max(
@@ -1526,54 +1773,68 @@ function drawPianoRoll(notes){
       )
     );
 
+
   const maxEnd =
     Math.max(
-      ...notes.map(n => n.end),
+      ...notes.map(
+        n => n.end
+      ),
       1
     );
 
-  const minWidth =
-    Math.max(
-      piano.clientWidth || 700,
-      700
-    );
 
   const width =
     Math.max(
-      minWidth,
-      maxEnd * 80
+      piano.clientWidth || 700,
+      maxEnd * 80,
+      700
     );
+
 
   piano.style.width =
     width + "px";
 
   piano.style.height =
-    (rows * rowHeight) + "px";
+    rows *
+    rowHeight +
+    "px";
 
 
-  for(const note of notes){
+  for(
+    const note of notes
+  ){
 
     const element =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
-    element.className = "note";
+    element.className =
+      "note";
+
 
     const x =
-      note.start * 80;
+      note.start *
+      80;
+
 
     const w =
       Math.max(
         2,
-        (note.end - note.start) * 80
+        (
+          note.end -
+          note.start
+        ) * 80
       );
 
-    /*
-      Höhere MIDI-Noten weiter oben.
-    */
 
     const y =
-      (maxPitch - note.pitch) *
+      (
+        maxPitch -
+        note.pitch
+      ) *
       rowHeight;
+
 
     element.style.left =
       x + "px";
@@ -1590,12 +1851,16 @@ function drawPianoRoll(notes){
         rowHeight - 1
       ) + "px";
 
+
     element.title =
       `MIDI ${note.pitch} · ` +
       `Start ${note.start.toFixed(2)} s · ` +
       `Ende ${note.end.toFixed(2)} s`;
 
-    piano.appendChild(element);
+
+    piano.appendChild(
+      element
+    );
 
   }
 
@@ -1603,10 +1868,12 @@ function drawPianoRoll(notes){
 
 
 /* ============================================================
-   MIDI WRITER
+   MIDI
    ============================================================ */
 
-function writeVarLen(value){
+function writeVarLen(
+  value
+){
 
   value =
     Math.max(
@@ -1614,10 +1881,12 @@ function writeVarLen(value){
       Math.floor(value)
     );
 
+
   let buffer =
     value & 0x7F;
 
   const bytes = [];
+
 
   while(
     (value >>= 7)
@@ -1626,9 +1895,14 @@ function writeVarLen(value){
     buffer <<= 8;
 
     buffer |=
-      ((value & 0x7F) | 0x80);
+      (
+        value &
+        0x7F
+      ) |
+      0x80;
 
   }
+
 
   while(true){
 
@@ -1636,7 +1910,10 @@ function writeVarLen(value){
       buffer & 0xFF
     );
 
-    if(buffer & 0x80){
+
+    if(
+      buffer & 0x80
+    ){
 
       buffer >>= 8;
 
@@ -1648,51 +1925,40 @@ function writeVarLen(value){
 
   }
 
+
   return bytes;
 }
 
 
-function pushBytes(target,...values){
+function createMIDI(
+  notes,
+  bpm
+){
 
-  for(const value of values){
-    target.push(value & 255);
-  }
+  const PPQ =
+    480;
 
-}
-
-
-function stringBytes(text){
-
-  return Array.from(
-    new TextEncoder().encode(text)
-  );
-
-}
-
-
-function createMIDI(notes,bpm){
-
-  /*
-    MIDI PPQ
-  */
-
-  const PPQ = 480;
 
   const tempoMicro =
     Math.round(
-      60000000 / bpm
+      60000000 /
+      bpm
     );
+
 
   const events = [];
 
 
   /*
-    Tempo Event
+    Tempo
   */
 
   events.push({
+
     tick:0,
+
     priority:0,
+
     bytes:[
       0xFF,
       0x51,
@@ -1701,36 +1967,25 @@ function createMIDI(notes,bpm){
       (tempoMicro >> 8) & 255,
       tempoMicro & 255
     ]
+
   });
 
 
   /*
-    Program Change:
     Acoustic Grand Piano
   */
 
   events.push({
+
     tick:0,
+
     priority:1,
+
     bytes:[
       0xC0,
       0
     ]
-  });
 
-
-  /*
-    Sustain pedal initial state
-  */
-
-  events.push({
-    tick:0,
-    priority:1,
-    bytes:[
-      0xB0,
-      64,
-      0
-    ]
   });
 
 
@@ -1738,7 +1993,9 @@ function createMIDI(notes,bpm){
     Notes
   */
 
-  for(const note of notes){
+  for(
+    const note of notes
+  ){
 
     const startTick =
       Math.max(
@@ -1749,6 +2006,7 @@ function createMIDI(notes,bpm){
           PPQ
         )
       );
+
 
     const endTick =
       Math.max(
@@ -1762,32 +2020,48 @@ function createMIDI(notes,bpm){
 
 
     events.push({
+
       tick:startTick,
+
       priority:2,
+
       bytes:[
         0x90,
-        clamp(note.pitch,0,127),
-        clamp(note.velocity || 80,1,127)
+        clamp(
+          note.pitch,
+          0,
+          127
+        ),
+        clamp(
+          note.velocity || 80,
+          1,
+          127
+        )
       ]
+
     });
 
 
     events.push({
+
       tick:endTick,
+
       priority:1,
+
       bytes:[
         0x80,
-        clamp(note.pitch,0,127),
+        clamp(
+          note.pitch,
+          0,
+          127
+        ),
         0
       ]
+
     });
 
   }
 
-
-  /*
-    Events sortieren.
-  */
 
   events.sort(
     (a,b) =>
@@ -1798,18 +2072,26 @@ function createMIDI(notes,bpm){
 
   const track = [];
 
-  let previousTick = 0;
+  let previousTick =
+    0;
 
-  for(const event of events){
+
+  for(
+    const event of events
+  ){
 
     const delta =
-      event.tick - previousTick;
+      event.tick -
+      previousTick;
 
     previousTick =
       event.tick;
 
+
     track.push(
-      ...writeVarLen(delta),
+      ...writeVarLen(
+        delta
+      ),
       ...event.bytes
     );
 
@@ -1817,7 +2099,7 @@ function createMIDI(notes,bpm){
 
 
   /*
-    End-of-track
+    End of Track
   */
 
   track.push(
@@ -1829,41 +2111,72 @@ function createMIDI(notes,bpm){
 
 
   /*
-    MThd
+    MIDI Header
   */
 
   const header = [
-    0x4D,0x54,0x68,0x64,
-    0x00,0x00,0x00,0x06,
-    0x00,0x00,
-    0x00,0x01,
+
+    0x4D,
+    0x54,
+    0x68,
+    0x64,
+
+    0x00,
+    0x00,
+    0x00,
+    0x06,
+
+    0x00,
+    0x00,
+
+    0x00,
+    0x01,
+
     (PPQ >> 8) & 255,
     PPQ & 255
+
   ];
 
 
   /*
-    MTrk
+    Track Header
   */
 
   const trackHeader = [
-    0x4D,0x54,0x72,0x6B,
+
+    0x4D,
+    0x54,
+    0x72,
+    0x6B,
+
     (track.length >>> 24) & 255,
     (track.length >>> 16) & 255,
     (track.length >>> 8) & 255,
     track.length & 255
+
   ];
 
 
   return new Blob(
+
     [
-      new Uint8Array(header),
-      new Uint8Array(trackHeader),
-      new Uint8Array(track)
+      new Uint8Array(
+        header
+      ),
+
+      new Uint8Array(
+        trackHeader
+      ),
+
+      new Uint8Array(
+        track
+      )
     ],
+
     {
       type:"audio/midi"
     }
+
   );
 
 }
@@ -1879,37 +2192,62 @@ function downloadMIDI(){
     return;
   }
 
+
   const original =
     selectedFile
       ? selectedFile.name
       : "audio";
 
+
   const base =
     original
-      .replace(/\.[^/.]+$/,"")
-      .replace(/[^\wäöüÄÖÜß\- ]+/g,"")
+      .replace(
+        /\.[^/.]+$/,
+        ""
+      )
+      .replace(
+        /[^\wäöüÄÖÜß\- ]+/g,
+        ""
+      )
       .trim()
-      || "piano";
+      ||
+      "piano";
+
 
   const url =
-    URL.createObjectURL(midiBlob);
+    URL.createObjectURL(
+      midiBlob
+    );
+
 
   const a =
-    document.createElement("a");
+    document.createElement(
+      "a"
+    );
 
-  a.href = url;
+
+  a.href =
+    url;
 
   a.download =
     `${base}.mid`;
 
-  document.body.appendChild(a);
+
+  document.body.appendChild(
+    a
+  );
+
 
   a.click();
 
   a.remove();
 
+
   setTimeout(
-    () => URL.revokeObjectURL(url),
+    () =>
+      URL.revokeObjectURL(
+        url
+      ),
     1000
   );
 
@@ -1923,10 +2261,15 @@ function downloadMIDI(){
 function updateThemeIcon(){
 
   const dark =
-    document.documentElement.classList.contains("dark");
+    document.documentElement
+      .classList
+      .contains("dark");
+
 
   themeBtn.textContent =
-    dark ? "☀" : "☾";
+    dark
+      ? "☀"
+      : "☾";
 
 }
 
@@ -1934,43 +2277,62 @@ function updateThemeIcon(){
 function loadTheme(){
 
   const saved =
-    localStorage.getItem("lamachub-theme");
+    localStorage.getItem(
+      "lamachub-theme"
+    );
+
 
   if(saved === "dark"){
 
-    document.documentElement.classList.add("dark");
+    document.documentElement
+      .classList
+      .add("dark");
 
   }
+
 
   updateThemeIcon();
 
 }
 
 
-themeBtn.addEventListener("click",()=>{
+themeBtn.addEventListener(
+  "click",
+  () => {
 
-  document.documentElement.classList.toggle("dark");
+    document.documentElement
+      .classList
+      .toggle("dark");
 
-  const dark =
-    document.documentElement.classList.contains("dark");
 
-  localStorage.setItem(
-    "lamachub-theme",
-    dark ? "dark" : "light"
-  );
+    const dark =
+      document.documentElement
+        .classList
+        .contains("dark");
 
-  updateThemeIcon();
 
-});
+    localStorage.setItem(
+      "lamachub-theme",
+      dark
+        ? "dark"
+        : "light"
+    );
+
+
+    updateThemeIcon();
+
+  }
+);
 
 
 /* ============================================================
-   UI EVENTS
+   FILE EVENTS
    ============================================================ */
 
 chooseBtn.addEventListener(
   "click",
-  () => fileInput.click()
+  () =>
+    fileInput.click()
 );
 
 
@@ -1981,7 +2343,9 @@ fileInput.addEventListener(
     const file =
       event.target.files?.[0];
 
-    handleFile(file);
+    handleFile(
+      file
+    );
 
   }
 );
@@ -1993,7 +2357,9 @@ dropzone.addEventListener(
 
     event.preventDefault();
 
-    dropzone.classList.add("drag");
+    dropzone.classList.add(
+      "drag"
+    );
 
   }
 );
@@ -2003,7 +2369,9 @@ dropzone.addEventListener(
   "dragleave",
   () => {
 
-    dropzone.classList.remove("drag");
+    dropzone.classList.remove(
+      "drag"
+    );
 
   }
 );
@@ -2015,16 +2383,25 @@ dropzone.addEventListener(
 
     event.preventDefault();
 
-    dropzone.classList.remove("drag");
+    dropzone.classList.remove(
+      "drag"
+    );
+
 
     const file =
       event.dataTransfer.files?.[0];
 
-    handleFile(file);
+    handleFile(
+      file
+    );
 
   }
 );
 
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
 analyzeBtn.addEventListener(
   "click",
@@ -2043,17 +2420,21 @@ clearBtn.addEventListener(
   () => {
 
     detectedNotes = [];
+
     midiBlob = null;
 
-    downloadBtn.disabled = true;
+    downloadBtn.disabled =
+      true;
 
     clearRoll();
-
-    showStatus("Piano Roll geleert");
 
     setProgress(
       0,
       "Bereit"
+    );
+
+    addLog(
+      "Piano Roll geleert."
     );
 
   }
@@ -2068,19 +2449,16 @@ playBtn.addEventListener(
       return;
     }
 
-    if(audioPlayer.paused){
+
+    if(
+      audioPlayer.paused
+    ){
 
       audioPlayer.play();
-
-      playBtn.textContent =
-        "⏸ Pause";
 
     }else{
 
       audioPlayer.pause();
-
-      playBtn.textContent =
-        "▶ Wiedergabe";
 
     }
 
@@ -2091,7 +2469,10 @@ playBtn.addEventListener(
 audioPlayer.addEventListener(
   "play",
   () => {
-    playBtn.textContent = "⏸ Pause";
+
+    playBtn.textContent =
+      "⏸ Pause";
+
   }
 );
 
@@ -2099,7 +2480,10 @@ audioPlayer.addEventListener(
 audioPlayer.addEventListener(
   "pause",
   () => {
-    playBtn.textContent = "▶ Wiedergabe";
+
+    playBtn.textContent =
+      "▶ Wiedergabe";
+
   }
 );
 
@@ -2113,7 +2497,9 @@ threshold.addEventListener(
   () => {
 
     thresholdValue.textContent =
-      Number(threshold.value).toFixed(2);
+      Number(
+        threshold.value
+      ).toFixed(2);
 
   }
 );
@@ -2124,22 +2510,9 @@ quant.addEventListener(
   () => {
 
     quantValue.textContent =
-      quant.options[quant.selectedIndex].text;
-
-    if(detectedNotes.length){
-
-      /*
-        Erneut quantisieren auf Basis der
-        ursprünglichen Daten wäre besser.
-        Deshalb zeigen wir hier nur die Einstellung
-        für die nächste Analyse.
-      */
-
-      addLog(
-        "Quantisierung geändert – bei der nächsten Analyse aktiv."
-      );
-
-    }
+      quant.options[
+        quant.selectedIndex
+      ].text;
 
   }
 );
@@ -2162,8 +2535,17 @@ tempo.addEventListener(
 
 loadTheme();
 
-addLog("lamacHub Audio2MIDI gestartet.");
-addLog("Warte auf eine Piano-Datei …");
+showStatus(
+  "Bereit"
+);
+
+addLog(
+  "lamacHub Audio2MIDI gestartet."
+);
+
+addLog(
+  "Warte auf eine Piano-Datei …"
+);
 
 </script>
 
