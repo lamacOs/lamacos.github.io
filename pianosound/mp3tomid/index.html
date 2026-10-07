@@ -11,7 +11,7 @@
   --accent:#ff7a00;
   --cyan:#01C7FC;
   --bg:#f5f5f7;
-  --card:rgba(255,255,255,.86);
+  --card:rgba(255,255,255,.88);
   --solid:#fff;
   --text:#171717;
   --muted:#737373;
@@ -22,7 +22,7 @@
 
 html.dark{
   --bg:#0c0c0e;
-  --card:rgba(25,25,28,.88);
+  --card:rgba(25,25,28,.9);
   --solid:#19191c;
   --text:#f5f5f7;
   --muted:#a4a4aa;
@@ -130,7 +130,7 @@ button{
 }
 
 .hero p{
-  max-width:680px;
+  max-width:720px;
   margin:17px auto 0;
   color:var(--muted);
   line-height:1.6;
@@ -370,7 +370,7 @@ select{
 }
 
 .log{
-  max-height:150px;
+  max-height:180px;
   overflow:auto;
   margin-top:13px;
   color:var(--muted);
@@ -463,6 +463,7 @@ audio{
 }
 
 @media(max-width:850px){
+
   .workspace.visible{
     grid-template-columns:1fr;
   }
@@ -471,9 +472,11 @@ audio{
     width:calc(100% - 20px);
     padding-top:28px;
   }
+
 }
 
 @media(max-width:550px){
+
   .topbar{
     padding:0 13px;
   }
@@ -491,6 +494,7 @@ audio{
     align-items:flex-start;
     flex-direction:column;
   }
+
 }
 </style>
 </head>
@@ -500,16 +504,27 @@ audio{
 <header class="topbar">
 
   <div class="brand">
-    <div class="logo">L</div>
-    <span>lamacHub Audio2MIDI</span>
+
+    <div class="logo">
+      L
+    </div>
+
+    <span>
+      lamacHub Audio2MIDI
+    </span>
+
   </div>
 
   <div class="actions">
+
     <button
       class="icon-btn"
       id="themeBtn"
       title="Darstellung wechseln"
-    >☾</button>
+    >
+      ☾
+    </button>
+
   </div>
 
 </header>
@@ -519,12 +534,15 @@ audio{
 
   <section class="hero">
 
-    <h1>Audio → MIDI</h1>
+    <h1>
+      Audio → MIDI
+    </h1>
 
     <p>
       Piano-Aufnahmen automatisch erkennen und
       direkt im Browser in eine MIDI-Datei umwandeln.
-      Die gesamte Ausgabe wird auf einen MIDI-Kanal gelegt.
+      Die Audiodatei wird vor der Analyse automatisch
+      in das benötigte Mono- und 22050-Hz-Format konvertiert.
     </p>
 
   </section>
@@ -532,11 +550,18 @@ audio{
 
   <section class="card upload-card">
 
-    <div class="dropzone" id="dropzone">
+    <div
+      class="dropzone"
+      id="dropzone"
+    >
 
-      <div class="upload-icon">♫</div>
+      <div class="upload-icon">
+        ♫
+      </div>
 
-      <h2>Piano-Datei auswählen</h2>
+      <h2>
+        Piano-Datei auswählen
+      </h2>
 
       <p>
         MP3, WAV, M4A, OGG oder FLAC hier hineinziehen
@@ -560,23 +585,34 @@ audio{
     </div>
 
 
-    <div class="file-info" id="fileInfo">
+    <div
+      class="file-info"
+      id="fileInfo"
+    >
 
       <div class="file-row">
 
-        <div class="file-icon">♫</div>
+        <div class="file-icon">
+          ♫
+        </div>
 
-        <div style="min-width:0;flex:1">
+        <div
+          style="min-width:0;flex:1"
+        >
 
           <div
             class="file-name"
             id="fileName"
-          >–</div>
+          >
+            –
+          </div>
 
           <div
             class="file-meta"
             id="fileMeta"
-          >–</div>
+          >
+            –
+          </div>
 
         </div>
 
@@ -598,17 +634,24 @@ audio{
 
     <aside class="card panel">
 
-      <h3>Transkription</h3>
+      <h3>
+        Transkription
+      </h3>
 
 
       <div class="control">
 
         <label>
+
           Erkennungsschwelle
+
           <span
             class="value"
             id="thresholdValue"
-          >0.25</span>
+          >
+            0.25
+          </span>
+
         </label>
 
         <input
@@ -626,11 +669,16 @@ audio{
       <div class="control">
 
         <label>
+
           Quantisierung
+
           <span
             class="value"
             id="quantValue"
-          >1/16</span>
+          >
+            1/16
+          </span>
+
         </label>
 
         <select id="quant">
@@ -666,11 +714,16 @@ audio{
       <div class="control">
 
         <label>
+
           MIDI-Tempo
+
           <span
             class="value"
             id="tempoValue"
-          >120 BPM</span>
+          >
+            120 BPM
+          </span>
+
         </label>
 
         <input
@@ -686,11 +739,20 @@ audio{
 
       <div class="info-box">
 
-        <b>Ein MIDI-Kanal</b><br>
+        <b>Automatische Audio-Konvertierung</b>
+        <br><br>
 
-        Alle erkannten Piano-Noten werden automatisch
-        auf MIDI-Kanal 1 exportiert. Es werden keine
-        zusätzlichen MIDI-Kanäle erzeugt.
+        Die Eingabe wird vor der KI automatisch auf
+        <b>Mono · 22050 Hz</b> umgerechnet.
+
+        <br><br>
+
+        Stereo, Mehrkanal und andere Sample-Raten
+        werden dadurch automatisch angepasst.
+
+        <br><br>
+
+        <b>MIDI:</b> 1 Track · Channel 1
 
       </div>
 
@@ -710,7 +772,9 @@ audio{
 
       <div class="roll-header">
 
-        <h3>Piano Roll</h3>
+        <h3>
+          Piano Roll
+        </h3>
 
         <button
           class="secondary"
@@ -733,8 +797,10 @@ audio{
             class="empty-roll"
             id="emptyRoll"
           >
+
             Nach der Analyse erscheinen hier
-            die erkannten Noten.
+            die erkannten Piano-Noten.
+
           </div>
 
         </div>
@@ -787,7 +853,9 @@ audio{
     id="audioCard"
   >
 
-    <h3>Audio</h3>
+    <h3>
+      Audio
+    </h3>
 
     <audio
       id="audioPlayer"
@@ -827,7 +895,7 @@ audio{
 <script type="module">
 
 /* ============================================================
-   SPOTIFY BASIC PITCH
+   BASIC PITCH
    ============================================================ */
 
 import {
@@ -838,12 +906,24 @@ import {
 } from "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm";
 
 
-/* ============================================================
-   MODELL
-   ============================================================ */
-
 const MODEL_URL =
   "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json";
+
+
+/* ============================================================
+   KONSTANTEN
+   ============================================================ */
+
+const BASIC_PITCH_SAMPLE_RATE = 22050;
+
+const MIDI_CHANNEL = 0;
+/*
+  Technisch:
+  Channel 0 = MIDI Channel 1
+*/
+
+
+const MIDI_PPQ = 480;
 
 
 /* ============================================================
@@ -987,7 +1067,10 @@ function showStatus(message){
 function addLog(message){
 
   const line =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   const time =
     new Date().toLocaleTimeString(
@@ -999,12 +1082,15 @@ function addLog(message){
       }
     );
 
+
   line.textContent =
     `[${time}] ${message}`;
+
 
   log.appendChild(
     line
   );
+
 
   log.scrollTop =
     log.scrollHeight;
@@ -1025,33 +1111,337 @@ function formatBytes(bytes){
 }
 
 
-function formatTime(seconds){
+/* ============================================================
+   AUDIO ANALYSE
+   ============================================================ */
 
-  if(!Number.isFinite(seconds))
-    return "–";
+function getAudioContext(){
 
-  const min =
-    Math.floor(seconds / 60);
+  const AudioContextClass =
+    window.AudioContext ||
+    window.webkitAudioContext;
 
-  const sec =
-    Math.floor(seconds % 60)
-      .toString()
-      .padStart(2,"0");
 
-  return `${min}:${sec}`;
+  if(!AudioContextClass){
+
+    throw new Error(
+      "Dieser Browser unterstützt die Web Audio API nicht."
+    );
+
+  }
+
+
+  return new AudioContextClass();
 
 }
 
 
-function clamp(value,min,max){
+/* ============================================================
+   AUDIO → MONO
+   ============================================================ */
 
-  return Math.max(
-    min,
-    Math.min(
-      max,
-      value
-    )
+function convertToMono(
+  sourceBuffer
+){
+
+  const channels =
+    sourceBuffer.numberOfChannels;
+
+
+  /*
+    Bereits Mono:
+    Wir können den Buffer direkt
+    zurückgeben.
+  */
+
+  if(channels === 1){
+
+    return sourceBuffer;
+
+  }
+
+
+  /*
+    Bei Stereo / Mehrkanal:
+    alle Kanäle werden zu einem Mono-Signal
+    gemischt.
+
+    Wir mitteln die Samples aller Kanäle.
+    Dadurch wird das Ergebnis nicht einfach
+    nur aus dem linken oder rechten Kanal
+    genommen.
+  */
+
+  const mono =
+    new Float32Array(
+      sourceBuffer.length
+    );
+
+
+  for(
+    let channel = 0;
+    channel < channels;
+    channel++
+  ){
+
+    const data =
+      sourceBuffer.getChannelData(
+        channel
+      );
+
+
+    for(
+      let i = 0;
+      i < data.length;
+      i++
+    ){
+
+      mono[i] +=
+        data[i] / channels;
+
+    }
+
+  }
+
+
+  const result =
+    new AudioBuffer({
+
+      length:
+        sourceBuffer.length,
+
+      numberOfChannels:
+        1,
+
+      sampleRate:
+        sourceBuffer.sampleRate
+
+    });
+
+
+  result.copyToChannel(
+    mono,
+    0
   );
+
+
+  return result;
+
+}
+
+
+/* ============================================================
+   AUDIO → 22050 HZ
+   ============================================================ */
+
+async function resampleTo22050(
+  sourceBuffer
+){
+
+  if(
+    sourceBuffer.sampleRate ===
+    BASIC_PITCH_SAMPLE_RATE
+  ){
+
+    return sourceBuffer;
+
+  }
+
+
+  addLog(
+    `${sourceBuffer.sampleRate} Hz → 22050 Hz`
+  );
+
+
+  const targetLength =
+    Math.max(
+      1,
+      Math.ceil(
+        sourceBuffer.duration *
+        BASIC_PITCH_SAMPLE_RATE
+      )
+    );
+
+
+  const offlineContext =
+    new OfflineAudioContext(
+      1,
+      targetLength,
+      BASIC_PITCH_SAMPLE_RATE
+    );
+
+
+  const source =
+    offlineContext.createBufferSource();
+
+
+  source.buffer =
+    sourceBuffer;
+
+
+  source.connect(
+    offlineContext.destination
+  );
+
+
+  source.start(
+    0
+  );
+
+
+  const rendered =
+    await offlineContext.startRendering();
+
+
+  /*
+    Falls der Browser trotz OfflineAudioContext
+    etwas anderes zurückgibt, machen wir noch
+    eine harte Prüfung.
+  */
+
+  if(
+    rendered.sampleRate !==
+    BASIC_PITCH_SAMPLE_RATE
+  ){
+
+    throw new Error(
+      `Resampling fehlgeschlagen. ` +
+      `Erhalten: ${rendered.sampleRate} Hz, ` +
+      `benötigt: ${BASIC_PITCH_SAMPLE_RATE} Hz.`
+    );
+
+  }
+
+
+  return rendered;
+
+}
+
+
+/* ============================================================
+   AUDIO AUTOMATISCH KONVERTIEREN
+   ============================================================ */
+
+async function prepareAudioForBasicPitch(
+  file
+){
+
+  addLog(
+    "Originaldatei wird dekodiert …"
+  );
+
+
+  const context =
+    getAudioContext();
+
+
+  let decoded;
+
+
+  try{
+
+    const arrayBuffer =
+      await file.arrayBuffer();
+
+
+    decoded =
+      await context.decodeAudioData(
+        arrayBuffer
+      );
+
+
+  }finally{
+
+    try{
+
+      await context.close();
+
+    }catch{}
+
+  }
+
+
+  addLog(
+    `Original: ${decoded.numberOfChannels} Kanal/Kanäle · ${decoded.sampleRate} Hz`
+  );
+
+
+  /*
+    SCHRITT 1:
+    Mehrkanal → Mono
+  */
+
+  let prepared =
+    convertToMono(
+      decoded
+    );
+
+
+  if(
+    decoded.numberOfChannels !== 1
+  ){
+
+    addLog(
+      `${decoded.numberOfChannels} Kanäle → 1 Kanal (Mono)`
+    );
+
+  }else{
+
+    addLog(
+      "Audio ist bereits Mono."
+    );
+
+  }
+
+
+  /*
+    SCHRITT 2:
+    Sample-Rate → 22050 Hz
+  */
+
+  prepared =
+    await resampleTo22050(
+      prepared
+    );
+
+
+  /*
+    FINAL-CHECK
+  */
+
+  if(
+    prepared.numberOfChannels !== 1
+  ){
+
+    throw new Error(
+      `Audio ist nach der Konvertierung noch ` +
+      `${prepared.numberOfChannels}-kanalig. ` +
+      `Benötigt wird exakt 1 Kanal.`
+    );
+
+  }
+
+
+  if(
+    prepared.sampleRate !==
+    BASIC_PITCH_SAMPLE_RATE
+  ){
+
+    throw new Error(
+      `Audio hat nach der Konvertierung ` +
+      `${prepared.sampleRate} Hz. ` +
+      `Benötigt werden exakt 22050 Hz.`
+    );
+
+  }
+
+
+  addLog(
+    "✓ Audio ist jetzt Mono · 22050 Hz"
+  );
+
+
+  return prepared;
 
 }
 
@@ -1120,6 +1510,7 @@ function handleFile(file){
   fileName.textContent =
     file.name;
 
+
   fileMeta.textContent =
     `${formatBytes(file.size)} · ${
       file.type ||
@@ -1131,9 +1522,11 @@ function handleFile(file){
     "visible"
   );
 
+
   workspace.classList.add(
     "visible"
   );
+
 
   audioCard.classList.remove(
     "hidden"
@@ -1148,6 +1541,9 @@ function handleFile(file){
 
   midiBlob = null;
 
+  audioBuffer = null;
+
+
   downloadBtn.disabled =
     true;
 
@@ -1159,6 +1555,7 @@ function handleFile(file){
     "Datei bereit"
   );
 
+
   setProgress(
     0,
     "Bereit"
@@ -1167,142 +1564,15 @@ function handleFile(file){
 
   log.innerHTML = "";
 
+
   addLog(
     `Datei geladen: ${file.name}`
   );
 
-}
 
-
-/* ============================================================
-   AUDIO DEKODIEREN
-   ============================================================ */
-
-async function decodeAudio(file){
-
-  const AudioContextClass =
-    window.AudioContext ||
-    window.webkitAudioContext;
-
-
-  if(!AudioContextClass){
-
-    throw new Error(
-      "Web Audio API wird nicht unterstützt."
-    );
-
-  }
-
-
-  const context =
-    new AudioContextClass();
-
-
-  try{
-
-    const data =
-      await file.arrayBuffer();
-
-
-    addLog(
-      "Audio wird dekodiert …"
-    );
-
-
-    const decoded =
-      await context.decodeAudioData(
-        data
-      );
-
-
-    addLog(
-      `Original: ${decoded.sampleRate} Hz`
-    );
-
-
-    const TARGET =
-      22050;
-
-
-    /*
-      Schon richtig?
-    */
-
-    if(
-      decoded.sampleRate === TARGET
-    ){
-
-      return decoded;
-
-    }
-
-
-    addLog(
-      `${decoded.sampleRate} Hz → 22050 Hz`
-    );
-
-
-    const targetLength =
-      Math.ceil(
-        decoded.duration *
-        TARGET
-      );
-
-
-    const offline =
-      new OfflineAudioContext(
-        decoded.numberOfChannels,
-        targetLength,
-        TARGET
-      );
-
-
-    const source =
-      offline.createBufferSource();
-
-
-    source.buffer =
-      decoded;
-
-
-    source.connect(
-      offline.destination
-    );
-
-
-    source.start(0);
-
-
-    const result =
-      await offline.startRendering();
-
-
-    if(
-      result.sampleRate !== TARGET
-    ){
-
-      throw new Error(
-        `Resampling fehlgeschlagen: ` +
-        `${result.sampleRate} Hz`
-      );
-
-    }
-
-
-    addLog(
-      "Resampling abgeschlossen."
-    );
-
-
-    return result;
-
-  }finally{
-
-    try{
-      await context.close();
-    }catch{}
-
-  }
+  addLog(
+    "Die Datei wird vor der KI automatisch auf Mono · 22050 Hz konvertiert."
+  );
 
 }
 
@@ -1334,29 +1604,57 @@ async function transcribe(){
 
   try{
 
+    setProgress(
+      2,
+      "Audio wird vorbereitet …"
+    );
+
+
+    /*
+      HIER PASSIERT DIE ENTSCHEIDENDE
+      AUTOMATISCHE KONVERTIERUNG.
+    */
+
     audioBuffer =
-      await decodeAudio(
+      await prepareAudioForBasicPitch(
         selectedFile
       );
 
 
     /*
-      Sicherheitsprüfung:
-      Basic Pitch bekommt garantiert 22050 Hz.
+      ABSOLUTER SICHERHEITSCHECK.
     */
 
     if(
-      audioBuffer.sampleRate !==
-      22050
+      audioBuffer.numberOfChannels !== 1
     ){
 
       throw new Error(
-        `Falsche Sample-Rate: ` +
-        `${audioBuffer.sampleRate} Hz. ` +
-        `Basic Pitch benötigt 22050 Hz.`
+        `Basic Pitch benötigt Mono. ` +
+        `Die vorbereitete Datei hat ` +
+        `${audioBuffer.numberOfChannels} Kanäle.`
       );
 
     }
+
+
+    if(
+      audioBuffer.sampleRate !==
+      BASIC_PITCH_SAMPLE_RATE
+    ){
+
+      throw new Error(
+        `Basic Pitch benötigt 22050 Hz. ` +
+        `Die vorbereitete Datei hat ` +
+        `${audioBuffer.sampleRate} Hz.`
+      );
+
+    }
+
+
+    addLog(
+      `✓ Final: ${audioBuffer.numberOfChannels} Kanal · ${audioBuffer.sampleRate} Hz`
+    );
 
 
     setProgress(
@@ -1402,25 +1700,31 @@ async function transcribe(){
         c
       ) => {
 
-        frames.push(
-          ...f
-        );
+        if(Array.isArray(f)){
+          frames.push(...f);
+        }
 
-        onsets.push(
-          ...o
-        );
+        if(Array.isArray(o)){
+          onsets.push(...o);
+        }
 
-        contours.push(
-          ...c
-        );
+        if(Array.isArray(c)){
+          contours.push(...c);
+        }
 
       },
 
       progress => {
 
+        const safeProgress =
+          Number.isFinite(progress)
+            ? progress
+            : 0;
+
+
         setProgress(
           10 +
-          progress * 85,
+          safeProgress * 85,
           "Piano wird analysiert …"
         );
 
@@ -1435,19 +1739,37 @@ async function transcribe(){
     );
 
 
+    addLog(
+      "Erkennung abgeschlossen."
+    );
+
+
     /*
-      Erkannte Noten.
+      Polyphone Piano-Noten erzeugen.
     */
 
     let rawNotes =
       outputToNotesPoly(
+
         frames,
         onsets,
-        Number(threshold.value),
-        Number(threshold.value),
+
+        Number(
+          threshold.value
+        ),
+
+        Number(
+          threshold.value
+        ),
+
         5
+
       );
 
+
+    /*
+      Pitch Bends übernehmen.
+    */
 
     rawNotes =
       addPitchBendsToNoteEvents(
@@ -1463,7 +1785,10 @@ async function transcribe(){
 
 
     /*
-      Auf Piano-Bereich begrenzen.
+      Piano-Bereich:
+
+      A0 = MIDI 21
+      C8 = MIDI 108
     */
 
     notes =
@@ -1475,10 +1800,12 @@ async function transcribe(){
               note.pitchMidi
             );
 
+
           const start =
             Number(
               note.startTimeSeconds
             );
+
 
           const duration =
             Number(
@@ -1487,19 +1814,43 @@ async function transcribe(){
 
 
           return (
+
             pitch >= 21 &&
+
             pitch <= 108 &&
+
             Number.isFinite(start) &&
+
             Number.isFinite(duration) &&
+
             duration > 0
+
           );
 
         })
+
+
         .map(note => {
 
           const amplitude =
             Number(
               note.amplitude
+            );
+
+
+          const velocity =
+            clamp(
+              Math.round(
+                (
+                  Number.isFinite(
+                    amplitude
+                  )
+                    ? amplitude
+                    : .7
+                ) * 127
+              ),
+              1,
+              127
             );
 
 
@@ -1523,27 +1874,12 @@ async function transcribe(){
                 note.durationSeconds
               ),
 
-            velocity:
-              clamp(
-                Math.round(
-                  (
-                    Number.isFinite(amplitude)
-                      ? amplitude
-                      : .7
-                  ) * 127
-                ),
-                1,
-                127
-              )
+            velocity
 
           };
 
         });
 
-
-    /*
-      Sortierung.
-    */
 
     notes.sort(
       (a,b) =>
@@ -1559,8 +1895,12 @@ async function transcribe(){
     notes =
       quantizeNotes(
         notes,
-        Number(quant.value),
-        Number(tempo.value)
+        Number(
+          quant.value
+        ),
+        Number(
+          tempo.value
+        )
       );
 
 
@@ -1574,19 +1914,16 @@ async function transcribe(){
 
 
     /*
-      GANZ WICHTIG:
-      createMIDI erzeugt exakt EINEN
-      MIDI-Track und verwendet darin
-      ausschließlich MIDI CHANNEL 0.
-
-      Das entspricht MIDI Channel 1
-      in der normalen Benutzerzählung.
+      EIN MIDI-TRACK.
+      EIN MIDI-KANAL.
     */
 
     midiBlob =
       createSingleChannelMIDI(
         notes,
-        Number(tempo.value)
+        Number(
+          tempo.value
+        )
       );
 
 
@@ -1601,12 +1938,22 @@ async function transcribe(){
 
 
     addLog(
-      `${notes.length} Noten erkannt.`
+      `${notes.length} Piano-Noten erkannt.`
     );
 
+
     addLog(
-      "MIDI-Ausgabe: 1 Track · MIDI Channel 1"
+      "✓ MIDI: Format 0 · 1 Track · Channel 1"
     );
+
+
+    if(!notes.length){
+
+      addLog(
+        "Keine ausreichend deutlichen Piano-Noten gefunden."
+      );
+
+    }
 
 
   }catch(error){
@@ -1622,21 +1969,22 @@ async function transcribe(){
     );
 
 
+    const message =
+      error &&
+      error.message
+        ? error.message
+        : String(error);
+
+
     addLog(
       "FEHLER: " +
-      (
-        error?.message ||
-        String(error)
-      )
+      message
     );
 
 
     alert(
       "Die Analyse konnte nicht abgeschlossen werden.\n\n" +
-      (
-        error?.message ||
-        String(error)
-      )
+      message
     );
 
 
@@ -1697,9 +2045,13 @@ function quantizeNotes(
 
 
       return {
+
         ...note,
+
         start,
+
         end
+
       };
 
     }
@@ -1715,11 +2067,21 @@ function quantizeNotes(
 function clearRoll(){
 
   piano
-    .querySelectorAll(".note")
+    .querySelectorAll(
+      ".note"
+    )
     .forEach(
       element =>
         element.remove()
     );
+
+
+  piano.style.width =
+    "100%";
+
+
+  piano.style.height =
+    "520px";
 
 
   emptyRoll.style.display =
@@ -1728,10 +2090,14 @@ function clearRoll(){
 }
 
 
-function drawPianoRoll(notes){
+function drawPianoRoll(
+  notes
+){
 
   piano
-    .querySelectorAll(".note")
+    .querySelectorAll(
+      ".note"
+    )
     .forEach(
       element =>
         element.remove()
@@ -1754,6 +2120,7 @@ function drawPianoRoll(notes){
 
   const minPitch =
     21;
+
 
   const maxPitch =
     108;
@@ -1797,9 +2164,10 @@ function drawPianoRoll(notes){
 
 
   piano.style.height =
-    rows *
-    rowHeight +
-    "px";
+    Math.max(
+      520,
+      rows * rowHeight
+    ) + "px";
 
 
   for(
@@ -1866,15 +2234,19 @@ function drawPianoRoll(notes){
 
 
 /* ============================================================
-   MIDI VARLEN
+   MIDI VARIABLE LENGTH
    ============================================================ */
 
-function writeVarLen(value){
+function writeVarLen(
+  value
+){
 
   value =
     Math.max(
       0,
-      Math.floor(value)
+      Math.floor(
+        value
+      )
     );
 
 
@@ -1890,6 +2262,7 @@ function writeVarLen(value){
   ){
 
     buffer <<= 8;
+
 
     buffer |=
       (
@@ -1929,27 +2302,21 @@ function writeVarLen(value){
 
 
 /* ============================================================
-   MIDI ERSTELLEN
+   MIDI
    ============================================================ */
 
 /*
-============================================================
-WICHTIG
+  Erzeugt:
 
-Diese Funktion erzeugt:
-
-MIDI FORMAT 0
-     ↓
-1 MIDI Track
-     ↓
-MIDI Channel 1
-     ↓
-Acoustic Grand Piano
-     ↓
-alle Noten
-
-Es gibt KEINE weiteren Channels.
-============================================================
+  MIDI Format 0
+  ↓
+  exakt 1 Track
+  ↓
+  exakt MIDI Channel 1
+  ↓
+  Acoustic Grand Piano
+  ↓
+  alle Noten
 */
 
 function createSingleChannelMIDI(
@@ -1958,7 +2325,7 @@ function createSingleChannelMIDI(
 ){
 
   const PPQ =
-    480;
+    MIDI_PPQ;
 
 
   const tempoMicroseconds =
@@ -1972,7 +2339,7 @@ function createSingleChannelMIDI(
 
 
   /*
-    Tempo Meta Event
+    Tempo.
   */
 
   events.push({
@@ -1982,25 +2349,29 @@ function createSingleChannelMIDI(
     priority:0,
 
     bytes:[
+
       0xFF,
       0x51,
       0x03,
 
       (tempoMicroseconds >> 16) & 255,
+
       (tempoMicroseconds >> 8) & 255,
+
       tempoMicroseconds & 255
+
     ]
 
   });
 
 
   /*
-    Program Change
+    Acoustic Grand Piano.
 
-    0 = Acoustic Grand Piano
+    0xC0 + Channel 0
 
-    MIDI Channel 1 =
-    Channel 0 in der technischen MIDI-Notation.
+    = Program Change auf
+      MIDI Channel 1.
   */
 
   events.push({
@@ -2010,15 +2381,19 @@ function createSingleChannelMIDI(
     priority:1,
 
     bytes:[
-      0xC0 | 0,
+
+      0xC0 |
+      MIDI_CHANNEL,
+
       0
+
     ]
 
   });
 
 
   /*
-    Alle Noten auf Channel 0.
+    Noten.
   */
 
   for(
@@ -2028,35 +2403,43 @@ function createSingleChannelMIDI(
     const startTick =
       Math.max(
         0,
+
         Math.round(
+
           note.start *
+
           (
             bpm / 60
           ) *
+
           PPQ
+
         )
       );
 
 
     const endTick =
       Math.max(
+
         startTick + 1,
 
         Math.round(
+
           note.end *
+
           (
             bpm / 60
           ) *
+
           PPQ
+
         )
+
       );
 
 
     /*
       NOTE ON
-
-      0x90 = Note On
-      Kanal 0 = MIDI Channel 1
     */
 
     events.push({
@@ -2066,21 +2449,27 @@ function createSingleChannelMIDI(
       priority:2,
 
       bytes:[
-        0x90 | 0,
+
+        0x90 |
+        MIDI_CHANNEL,
 
         clamp(
-          Math.round(note.pitch),
+          Math.round(
+            note.pitch
+          ),
           0,
           127
         ),
 
         clamp(
           Math.round(
-            note.velocity || 80
+            note.velocity ||
+            80
           ),
           1,
           127
         )
+
       ]
 
     });
@@ -2088,9 +2477,6 @@ function createSingleChannelMIDI(
 
     /*
       NOTE OFF
-
-      0x80 = Note Off
-      Kanal 0 = MIDI Channel 1
     */
 
     events.push({
@@ -2100,15 +2486,20 @@ function createSingleChannelMIDI(
       priority:1,
 
       bytes:[
-        0x80 | 0,
+
+        0x80 |
+        MIDI_CHANNEL,
 
         clamp(
-          Math.round(note.pitch),
+          Math.round(
+            note.pitch
+          ),
           0,
           127
         ),
 
         0
+
       ]
 
     });
@@ -2117,19 +2508,24 @@ function createSingleChannelMIDI(
 
 
   /*
-    Zeitlich sortieren.
+    Sortierung.
+
+    Note Off kommt bei gleichem
+    Tick vor Note On.
   */
 
   events.sort(
+
     (a,b) =>
-      a.tick - b.tick ||
-      a.priority - b.priority
+
+      a.tick -
+      b.tick ||
+
+      a.priority -
+      b.priority
+
   );
 
-
-  /*
-    Track erstellen.
-  */
 
   const track = [];
 
@@ -2152,17 +2548,20 @@ function createSingleChannelMIDI(
 
 
     track.push(
+
       ...writeVarLen(
         delta
       ),
+
       ...event.bytes
+
     );
 
   }
 
 
   /*
-    End Of Track.
+    End Of Track
   */
 
   track.push(
@@ -2195,23 +2594,17 @@ function createSingleChannelMIDI(
     0x00,
     0x06,
 
-    /*
-      FORMAT 0
-    */
+    /* Format 0 */
 
     0x00,
     0x00,
 
-    /*
-      EXAKT 1 TRACK
-    */
+    /* exakt 1 Track */
 
     0x00,
     0x01,
 
-    /*
-      PPQ = 480
-    */
+    /* PPQ 480 */
 
     0x01,
     0xE0
@@ -2221,8 +2614,6 @@ function createSingleChannelMIDI(
 
   /*
     Track Header
-
-    MTrk
   */
 
   const trackHeader = [
@@ -2233,16 +2624,15 @@ function createSingleChannelMIDI(
     0x6B,
 
     (track.length >>> 24) & 255,
+
     (track.length >>> 16) & 255,
+
     (track.length >>> 8) & 255,
+
     track.length & 255
 
   ];
 
-
-  /*
-    Finale MIDI-Datei.
-  */
 
   return new Blob(
 
@@ -2263,7 +2653,8 @@ function createSingleChannelMIDI(
     ],
 
     {
-      type:"audio/midi"
+      type:
+        "audio/midi"
     }
 
   );
@@ -2272,7 +2663,7 @@ function createSingleChannelMIDI(
 
 
 /* ============================================================
-   DOWNLOAD
+   MIDI DOWNLOAD
    ============================================================ */
 
 function downloadMIDI(){
@@ -2289,15 +2680,19 @@ function downloadMIDI(){
 
   const base =
     original
+
       .replace(
         /\.[^/.]+$/,
         ""
       )
+
       .replace(
         /[^\wäöüÄÖÜß\- ]+/g,
         ""
       )
+
       .trim()
+
       ||
       "piano";
 
@@ -2317,6 +2712,7 @@ function downloadMIDI(){
   link.href =
     url;
 
+
   link.download =
     `${base}_MIDI_Channel_1.mid`;
 
@@ -2327,6 +2723,7 @@ function downloadMIDI(){
 
 
   link.click();
+
 
   link.remove();
 
@@ -2368,7 +2765,9 @@ const savedTheme =
   );
 
 
-if(savedTheme === "dark"){
+if(
+  savedTheme === "dark"
+){
 
   document.documentElement
     .classList
@@ -2410,7 +2809,7 @@ themeBtn.addEventListener(
 
 
 /* ============================================================
-   FILE EVENTS
+   DATEI EVENTS
    ============================================================ */
 
 chooseBtn.addEventListener(
@@ -2528,7 +2927,9 @@ playBtn.addEventListener(
       return;
 
 
-    if(audioPlayer.paused){
+    if(
+      audioPlayer.paused
+    ){
 
       audioPlayer.play();
 
@@ -2613,12 +3014,19 @@ showStatus(
   "Bereit"
 );
 
+
 addLog(
   "lamacHub Audio2MIDI gestartet."
 );
 
+
 addLog(
-  "MIDI-Ausgabe: genau 1 Track / Channel 1."
+  "Automatische Konvertierung: Mono · 22050 Hz."
+);
+
+
+addLog(
+  "MIDI-Ausgabe: 1 Track · MIDI Channel 1."
 );
 
 </script>
