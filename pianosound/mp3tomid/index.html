@@ -925,6 +925,9 @@ const MIDI_CHANNEL = 0;
 
 const MIDI_PPQ = 480;
 
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
 
 /* ============================================================
    ELEMENTE
