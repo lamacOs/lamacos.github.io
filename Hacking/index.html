@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEVICE HACK SIMULATION</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        color: #00ff41;
+        font-family: "Courier New", monospace;
+    }
+
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    canvas {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        opacity: 0.28;
+    }
+
+    .terminal {
+        position: relative;
+        z-index: 2;
+        width: min(900px, 94vw);
+        height: min(620px, 88vh);
+        background: rgba(0, 0, 0, 0.92);
+        border: 1px solid #00ff41;
+        box-shadow:
+            0 0 15px #00ff41,
+            inset 0 0 35px rgba(0,255,65,.08);
+        padding: 25px;
+        overflow: hidden;
+    }
+
+    .header {
+        border-bottom: 1px solid #00ff41;
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+        font-size: 14px;
+    }
+
+    .title {
+        font-size: clamp(20px, 4vw, 34px);
+        font-weight: bold;
+        text-shadow: 0 0 12px #00ff41;
+        margin-bottom: 5px;
+    }
+
+    #output {
+        height: calc(100% - 65px);
+        overflow: hidden;
+        font-size: clamp(12px, 1.8vw, 16px);
+        line-height: 1.55;
+        white-space: pre-wrap;
+    }
+
+    .line {
+        margin: 2px 0;
+    }
+
+    .warning {
+        color: #ffcc00;
+    }
+
+    .danger {
+        color: #ff3333;
+        text-shadow: 0 0 8px #ff0000;
+    }
+
+    .success {
+        color: #00ff41;
+        font-weight: bold;
+        text-shadow: 0 0 10px #00ff41;
+    }
+
+    .target {
+        color: #ffffff;
+        font-size: 20px;
+        text-shadow: 0 0 10px #00ff41;
+    }
+
+    .cursor {
+        display: inline-block;
+        width: 9px;
+        height: 17px;
+        background: #00ff41;
+        animation: blink .7s infinite;
+        vertical-align: middle;
+    }
+
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+
+    .scanline {
+        position: fixed;
+        inset: 0;
+        z-index: 5;
+        pointer-events: none;
+        background:
+            repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 3px,
+                rgba(0,255,65,.025) 4px
+            );
+    }
+
+    .final {
+        text-align: center;
+        margin-top: 35px;
+        font-size: clamp(20px, 4vw, 36px);
+        animation: glow 1.5s infinite alternate;
+    }
+
+    @keyframes glow {
+        from { text-shadow: 0 0 5px #00ff41; }
+        to  { text-shadow: 0 0 25px #00ff41; }
+    }
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="scanline"></div>
+
+<div class="terminal">
+    <div class="header">
+        <div class="title">DEVICE ACCESS MATRIX</div>
+        <div>SECURITY SIMULATION // LOCAL TERMINAL</div>
+    </div>
+
+    <div id="output"></div>
+</div>
+
+<script>
+/* =========================
+   MATRIX BACKGROUND
+   ========================= */
+
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+const chars =
+    "01アイウエオカキクケコサシスセソABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&";
+
+let fontSize = 16;
+let columns = Math.floor(canvas.width / fontSize);
+let drops = Array(columns).fill(1);
+
+function matrixRain() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#00ff41";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+
+        ctx.fillText(
+            char,
+            i * fontSize,
+            drops[i] * fontSize
+        );
+
+        if (
+            drops[i] * fontSize > canvas.height &&
+            Math.random() > 0.975
+        ) {
+            drops[i] = 0;
+        }
+
+        drops[i]++;
+    }
+}
+
+setInterval(matrixRain, 45);
+
+
+/* =========================
+   TERMINAL SIMULATION
+   ========================= */
+
+const output = document.getElementById("output");
+
+const steps = [
+    ["SYSTEM INITIALIZING...", "normal"],
+    ["Loading encrypted interface...", "normal"],
+    ["Establishing simulated connection...", "normal"],
+    ["Connection channel: SIMULATION", "warning"],
+    ["", "normal"],
+
+    ["TARGET IDENTIFIED:", "normal"],
+    ["Lukas Walker", "target"],
+    ["", "normal"],
+
+    ["Scanning fictional device network...", "normal"],
+    ["[████░░░░░░] 38%", "normal"],
+    ["[███████░░░] 67%", "normal"],
+    ["[██████████] 100%", "normal"],
+
+    ["", "normal"],
+    ["Analyzing security layers...", "normal"],
+    ["Layer 01 ............... OK", "normal"],
+    ["Layer 02 ............... OK", "normal"],
+    ["Layer 03 ............... OK", "normal"],
+    ["Layer 04 ............... SIMULATED", "warning"],
+
+    ["", "normal"],
+    ["Generating access sequence...", "normal"],
+    ["7F-A9-21-CC-04", "normal"],
+    ["D2-18-7B-91-FF", "normal"],
+    ["A0-44-E1-39-72", "normal"],
+
+    ["", "normal"],
+    ["Running simulated access protocol...", "normal"],
+    ["[████████████████░░░░] 81%", "normal"],
+    ["[██████████████████░░] 94%", "normal"],
+    ["[████████████████████] 100%", "normal"],
+
+    ["", "normal"],
+    ["ACCESS SEQUENCE COMPLETE", "success"],
+    ["", "normal"],
+    ["DEVICE STATUS: SIMULATION ONLY", "warning"],
+    ["TARGET: Lukas Walker", "target"],
+    ["", "normal"],
+    [">>> SIMULATION FINISHED <<<", "success"]
+];
+
+let index = 0;
+
+function addLine(text, type) {
+    const line = document.createElement("div");
+    line.className = "line " + type;
+    line.textContent = text;
+
+    output.appendChild(line);
+
+    // Immer den neuesten Eintrag sichtbar halten
+    output.scrollTop = output.scrollHeight;
+}
+
+function runSimulation() {
+
+    if (index >= steps.length) {
+        const cursor = document.createElement("span");
+        cursor.className = "cursor";
+        output.appendChild(cursor);
+        return;
+    }
+
+    const [text, type] = steps[index];
+
+    addLine(
+        (index === 0 ? "> " : "> ") + text,
+        type
+    );
+
+    index++;
+
+    // unterschiedliche Geschwindigkeiten für mehr Terminal-Feeling
+    let delay = 250 + Math.random() * 350;
+
+    if (text.includes("Lukas Walker")) {
+        delay = 900;
+    }
+
+    if (text.includes("COMPLETE") || text.includes("FINISHED")) {
+        delay = 1200;
+    }
+
+    setTimeout(runSimulation, delay);
+}
+
+
+/* =========================
+   START
+   ========================= */
+
+runSimulation();
+
+</script>
+
+</body>
+</html>
