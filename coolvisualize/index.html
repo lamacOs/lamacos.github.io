@@ -1,0 +1,608 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lamacOs Music Visualizer</title>
+<style>
+:root {
+  --accent: #55ff9b;
+  --glass: rgba(15,15,20,.78);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #08090c;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+#background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -3;
+  display: none;
+}
+#shade {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(#0003, #0004);
+  z-index: -2;
+  pointer-events: none;
+}
+#cover {
+  position: fixed;
+  left: 22px;
+  top: 22px;
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 13px;
+  background: #222;
+  box-shadow: 0 5px 30px #0008;
+}
+#track {
+  position: fixed;
+  top: 35px;
+  left: 112px;
+  font-size: 14px;
+  font-weight: 650;
+  max-width: 45vw;
+}
+#status {
+  display: block;
+  color: #ddd;
+  font-size: 12px;
+  margin-top: 7px;
+  font-weight: 400;
+}
+#orb {
+  position: fixed;
+  top: 25px;
+  right: 27px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 20px var(--accent), inset 0 0 15px #fff7;
+  transition: transform .48s ease, box-shadow .48s ease;
+}
+#orb.pulse {
+  transform: scale(1.12);
+  box-shadow: 0 0 38px var(--accent), 0 0 65px var(--accent);
+}
+#lyrics {
+  position: fixed;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: clamp(23px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.35;
+  color: white;
+  -webkit-text-stroke: 1.3px black;
+  paint-order: stroke fill;
+  text-shadow: 0 3px 12px #000, 0 0 25px #000;
+  white-space: pre-line;
+  pointer-events: none;
+}
+#panel {
+  position: fixed;
+  z-index: 5;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  width: min(480px, calc(100vw - 24px));
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--glass);
+  backdrop-filter: blur(24px);
+  border: 1px solid #ffffff22;
+  border-radius: 23px;
+  padding: 24px;
+  box-shadow: 0 20px 80px #0008;
+}
+h1 { font-size: 23px; margin: 0 0 6px; }
+.sub { color: #bbb; font-size: 13px; margin-bottom: 20px; }
+label {
+  display: block;
+  font-size: 12px;
+  color: #ddd;
+  margin: 15px 0 7px;
+}
+input[type="url"] {
+  width: 100%;
+  background: #ffffff12;
+  border: 1px solid #ffffff28;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+}
+input[type="file"] {
+  width: 100%;
+  color: #ddd;
+  font-size: 12px;
+}
+button {
+  border: 0;
+  border-radius: 11px;
+  padding: 11px 14px;
+  background: var(--accent);
+  color: #07140c;
+  font-weight: 750;
+  cursor: pointer;
+}
+button.secondary {
+  background: #ffffff14;
+  border: 1px solid #ffffff26;
+  color: white;
+}
+button:active { transform: scale(.98); }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+.actions button { flex: 1; }
+.small {
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.5;
+  margin-top: 14px;
+}
+#toolbar {
+  position: fixed;
+  z-index: 4;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: calc(100vw - 20px);
+  padding: 9px;
+  background: #09090bd9;
+  border: 1px solid #ffffff20;
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+}
+#toolbar button { padding: 11px 13px; }
+#queueInfo {
+  position: fixed;
+  bottom: 82px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: white;
+  background: #0009;
+  padding: 7px 12px;
+  border-radius: 10px;
+  max-width: 90vw;
+  text-align: center;
+}
+#progress {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+.hidden { display: none !important; }
+@media (max-width: 520px) {
+  #cover { width: 54px; height: 54px; left: 12px; top: 12px; }
+  #track { left: 76px; top: 19px; font-size: 12px; }
+  #orb { width: 38px; height: 38px; right: 13px; top: 80px; }
+  #toolbar { bottom: 10px; }
+  #toolbar button { padding: 9px; font-size: 11px; }
+  #queueInfo { bottom: 73px; }
+}
+</style>
+</head>
+<body>
+
+<video id="background" loop playsinline></video>
+<div id="shade"></div>
+
+<img id="cover" alt="Cover">
+<div id="track">
+  lamacOs Visualizer
+  <span id="status">Bereit zum Starten</span>
+</div>
+<div id="orb"></div>
+<div id="lyrics">Wähle deine Lyrics aus</div>
+<div id="queueInfo" class="hidden"></div>
+<div id="progress"></div>
+
+<section id="panel">
+  <h1>🎵 Music Visualizer</h1>
+  <div class="sub">Deine Musik. Dein Video. Dein Style.</div>
+
+  <label for="playlist">Apple-Music-Playlist-Link (optional, öffnet zusätzlich die Playlist)</label>
+  <input id="playlist" type="url"
+    placeholder="https://music.apple.com/...">
+
+  <label for="videoFile">Hintergrundvideo auswählen</label>
+  <input id="videoFile" type="file">
+
+  <label for="lyricsFile">Einzelne Lyrics-Datei (.lrc oder .lcr)</label>
+  <input id="lyricsFile" type="file">
+
+  <label for="folderFiles">Lyrics-Ordner mit Unterordnern auswählen</label>
+  <input id="folderFiles" type="file" webkitdirectory multiple>
+  <div class="small">
+    Beispiel: 1/song.lrc, 2/song.lrc, 10/song.lrc.
+    Unterstützt .lrc/.lcr; Ordner und Dateien werden numerisch sortiert.
+  </div>
+
+  <label for="coverFile">Coverbild (optional)</label>
+  <input id="coverFile" type="file">
+
+  <label for="accent">Feste Animationsfarbe</label>
+  <input id="accent" type="color" value="#55ff9b">
+
+  <div class="actions">
+    <button id="start">▶ Alles starten</button>
+    <button id="fullscreen" class="secondary">⛶ Vollbild</button>
+  </div>
+  <div class="small">
+    Der Start öffnet den macOS-Kurzbefehl „Start“ und startet Video,
+    Lyrics und Animation. macOS kann beim ersten Aufruf nachfragen.
+    Die Kreis-Pulse sind simuliert; die Farbe bleibt fest.
+  </div>
+</section>
+
+<div id="toolbar" class="hidden">
+  <button id="play">▶ Start</button>
+  <button id="pause" class="secondary">Ⅱ Pause</button>
+  <button id="previous" class="secondary">⏮ Lyrics zurück</button>
+  <button id="next" class="secondary">Lyrics weiter ⏭</button>
+  <button id="settings" class="secondary">⚙</button>
+  <button id="fullButton" class="secondary">⛶ Vollbild</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const video = $("background");
+
+let videoURL = null;
+let coverURL = null;
+let queue = [];
+let queueIndex = 0;
+let lyricLines = [];
+let currentLyric = -1;
+let running = false;
+let startedAt = 0;
+let elapsedBeforePause = 0;
+let animationFrame = null;
+let beatTimer = null;
+let lyricOffset = 0;
+
+function setColor(value) {
+  document.documentElement.style.setProperty("--accent", value);
+  // Keep the selected color fixed; no automatic color cycling.
+}
+$("accent").addEventListener("input", e => setColor(e.target.value));
+
+$("videoFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (videoURL) URL.revokeObjectURL(videoURL);
+  videoURL = URL.createObjectURL(file);
+  video.src = videoURL;
+  video.load();
+});
+
+$("coverFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (coverURL) URL.revokeObjectURL(coverURL);
+  coverURL = URL.createObjectURL(file);
+  $("cover").src = coverURL;
+});
+
+function numericCompare(a, b) {
+  return a.localeCompare(b, undefined, {
+    numeric: true,
+    sensitivity: "base"
+  });
+}
+
+function isLyricFile(file) {
+  // Robust gegen Großschreibung und versehentliche Leerzeichen am Dateinamenende.
+  return /\.(lrc|lcr)$/i.test((file.name || "").trim());
+}
+
+function normalizedPath(file) {
+  return (file.webkitRelativePath || file.name || "")
+    .normalize("NFC")
+    .replace(/\\/g, "/")
+    .replace(/^\.\//, "")
+    .trim();
+}
+
+function parseLRC(text) {
+  const result = [];
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    const matches = [...line.matchAll(
+      /\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\]/g
+    )];
+    const lyric = line.replace(/\[[^\]]+\]/g, "").trim();
+    if (!lyric) continue;
+
+    for (const m of matches) {
+      let fraction = 0;
+      if (m[3]) {
+        fraction = Number(m[3]) /
+          Math.pow(10, m[3].length);
+      }
+      result.push({
+        time: Number(m[1]) * 60 + Number(m[2]) + fraction,
+        text: lyric
+      });
+    }
+  }
+  return result.sort((a, b) => a.time - b.time);
+}
+
+async function loadQueue(files) {
+  // Nur Lyrics-Dateien übernehmen und doppelte relative Pfade vermeiden.
+  const seen = new Set();
+  const lyricFiles = [...files].filter(isLyricFile).filter(file => {
+    const key = normalizedPath(file).toLocaleLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  // Natürliche Sortierung: 1, 2, 3 ... 10 statt 1, 10, 2.
+  lyricFiles.sort((a, b) =>
+    numericCompare(normalizedPath(a), normalizedPath(b))
+  );
+
+  // Dateien parallel lesen; ein defekter Einzelfall verhindert nicht den Rest.
+  const loaded = await Promise.all(lyricFiles.map(async file => {
+    try {
+      const text = (await file.text()).replace(/^\uFEFF/, "");
+      return {
+        name: normalizedPath(file) || file.name,
+        file,
+        lines: parseLRC(text)
+      };
+    } catch (error) {
+      console.warn("Lyrics-Datei konnte nicht gelesen werden:", file.name, error);
+      return null;
+    }
+  }));
+  queue = loaded.filter(Boolean);
+
+  queueIndex = 0;
+  if (queue.length) {
+    showQueueTrack(0);
+    $("status").textContent =
+      `${queue.length} Lyrics-Datei(en) geladen`;
+  } else {
+    $("lyrics").textContent =
+      "Keine .lrc- oder .lcr-Dateien gefunden.";
+    $("status").textContent = "Keine Lyrics geladen";
+  }
+
+  updateQueueInfo();
+}
+
+$("lyricsFile").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  await loadQueue([file]);
+});
+
+$("folderFiles").addEventListener("change", async e => {
+  await loadQueue(e.target.files);
+});
+
+function showQueueTrack(index) {
+  if (!queue.length) return;
+
+  queueIndex = Math.max(0, Math.min(index, queue.length - 1));
+  lyricLines = queue[queueIndex].lines;
+  lyricOffset = 0;
+  currentLyric = -1;
+
+  $("track").childNodes[0].textContent =
+    queue[queueIndex].file.name;
+  // Vor dem ersten Zeitstempel bleibt der Liedtext leer.
+  $("lyrics").textContent = lyricLines.length
+    ? ""
+    : "Keine zeitgestempelten Lyrics gefunden.";
+
+  updateQueueInfo();
+}
+
+function updateQueueInfo() {
+  const info = $("queueInfo");
+  if (!queue.length) {
+    info.classList.add("hidden");
+    return;
+  }
+
+  info.classList.remove("hidden");
+  info.textContent =
+    `Lyrics ${queueIndex + 1} / ${queue.length} · ` +
+    queue[queueIndex].name;
+}
+
+function runShortcut() {
+  // Muss direkt aus dem Klick heraus aufgerufen werden.
+  // Safari/macOS kann beim ersten Öffnen des Kurzbefehls eine Bestätigung verlangen.
+  window.location.href = "shortcuts://run-shortcut?name=" + encodeURIComponent("Start");
+}
+
+function openPlaylist() {
+  const link = $("playlist").value.trim();
+  if (!link) return;
+
+  try {
+    const url = new URL(link);
+    if (!["music.apple.com", "itunes.apple.com"].includes(url.hostname)) {
+      alert("Bitte einen gültigen Apple-Music-Link eingeben.");
+      return;
+    }
+    // Open synchronously from the button click to reduce popup blocking.
+    window.open(url.href, "_blank");
+  } catch {
+    alert("Bitte einen gültigen Apple-Music-Link eingeben.");
+  }
+}
+
+async function enterFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    }
+  } catch (error) {
+    $("status").textContent =
+      "Vollbild nicht verfügbar – bitte über das Browsermenü aktivieren.";
+  }
+}
+
+$("fullscreen").addEventListener("click", enterFullscreen);
+$("fullButton").addEventListener("click", enterFullscreen);
+
+async function startVisualizer() {
+  // Den macOS-Kurzbefehl "Start" direkt aus der Nutzeraktion anstoßen.
+  runShortcut();
+  // Ein optionaler Playlist-Link öffnet zusätzlich die angegebene Apple-Music-Seite.
+  if ($("playlist").value.trim()) openPlaylist();
+  enterFullscreen();
+
+  if (running) return;
+
+  if (video.src) {
+    video.style.display = "block";
+    video.currentTime = 0;
+    try {
+      await video.play();
+    } catch {
+      $("status").textContent =
+        "Video konnte nicht automatisch starten.";
+    }
+  }
+
+  running = true;
+  startedAt = performance.now();
+  elapsedBeforePause = 0;
+  currentLyric = -1;
+
+  $("panel").classList.add("hidden");
+  $("toolbar").classList.remove("hidden");
+  $("status").textContent = "Visualizer läuft";
+
+  animate();
+  scheduleBeats();
+}
+
+function animate() {
+  if (!running) return;
+
+  const seconds = elapsedBeforePause +
+    (performance.now() - startedAt) / 1000;
+
+  if (lyricLines.length) {
+    let index = -1;
+    for (let i = 0; i < lyricLines.length; i++) {
+      if (lyricLines[i].time <= seconds + lyricOffset) index = i;
+      else break;
+    }
+
+    if (index !== currentLyric) {
+      currentLyric = index;
+      $("lyrics").textContent = index >= 0
+        ? lyricLines[index].text
+        : "";
+    }
+  }
+
+  if (Number.isFinite(video.duration) && video.duration > 0) {
+    $("progress").style.width =
+      (video.currentTime / video.duration * 100) + "%";
+  }
+
+  animationFrame = requestAnimationFrame(animate);
+}
+
+function scheduleBeats() {
+  clearInterval(beatTimer);
+  const orb = $("orb");
+
+  function pulse() {
+    if (!running) return;
+    orb.classList.add("pulse");
+    setTimeout(() => orb.classList.remove("pulse"), 520);
+  }
+
+  pulse();
+  beatTimer = setInterval(pulse, 1350);
+}
+
+function pauseAll() {
+  if (!running) return;
+  elapsedBeforePause += (performance.now() - startedAt) / 1000;
+  running = false;
+  cancelAnimationFrame(animationFrame);
+  clearInterval(beatTimer);
+  video.pause();
+  $("status").textContent = "Visualizer pausiert";
+}
+
+function resumeAll() {
+  if (running) return;
+  if (video.src) video.play().catch(() => {});
+  running = true;
+  startedAt = performance.now();
+  $("status").textContent = "Visualizer läuft";
+  animate();
+  scheduleBeats();
+}
+
+$("start").addEventListener("click", startVisualizer);
+$("play").addEventListener("click", resumeAll);
+$("pause").addEventListener("click", pauseAll);
+
+$("next").addEventListener("click", () => {
+  if (queueIndex < queue.length - 1) {
+    showQueueTrack(queueIndex + 1);
+    elapsedBeforePause = 0;
+    startedAt = performance.now();
+  }
+});
+
+$("previous").addEventListener("click", () => {
+  if (queueIndex > 0) {
+    showQueueTrack(queueIndex - 1);
+    elapsedBeforePause = 0;
+    startedAt = performance.now();
+  }
+});
+
+$("settings").addEventListener("click", () => {
+  $("panel").classList.remove("hidden");
+});
+
+document.addEventListener("fullscreenchange", () => {
+  $("fullButton").textContent = document.fullscreenElement
+    ? "⛶ Vollbild aktiv"
+    : "⛶ Vollbild";
+});
+</script>
+</body>
+</html>
