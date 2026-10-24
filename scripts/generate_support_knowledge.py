@@ -54,6 +54,8 @@ def site_roots() -> list[Path]:
     for html_file in sorted(list(ROOT.rglob("*.html")) + list(ROOT.rglob("*.htm"))):
         site = html_file.parent
         if site == ROOT:
+            if html_file.name.lower() == "index.html":
+                roots.add(ROOT)
             continue
         rel = site.relative_to(ROOT)
         if any(part.lower() in SKIP_PARTS for part in rel.parts):
@@ -211,8 +213,8 @@ def main() -> int:
     successes = 0
     for site in roots:
         site_name = "lamacHub-Startseite" if site == ROOT else site.name
-        site_path = site.relative_to(ROOT).as_posix()
-        slug = site_path.replace("/", "__")
+        site_path = "" if site == ROOT else site.relative_to(ROOT).as_posix()
+        slug = "lamacHub-Startseite" if site == ROOT else site_path.replace("/", "__")
         target = OUT / f"{slug}.md"
         context, included = make_context(site)
         if not context:
@@ -238,7 +240,7 @@ def main() -> int:
                 "name": site_name,
                 "path": site_path,
                 "document": target.relative_to(ROOT).as_posix(),
-                "url": f"https://lamachub.de/{site_path}/"
+                "url": "https://lamachub.de/" if not site_path else f"https://lamachub.de/{site_path}/"
             })
 
     # Preserve existing documents in the index so a partial/free-quota run doesn't remove entries.
