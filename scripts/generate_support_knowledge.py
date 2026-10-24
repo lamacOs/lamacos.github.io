@@ -240,7 +240,7 @@ def main() -> int:
                 "name": key.replace("__", " / "),
                 "path": key.replace("__", "/"),
                 "document": target.as_posix(),
-                "url": f"https://lamachub.de/{key.replace("__", "/")}/"
+                "url": f"https://lamachub.de/{key.replace('__', '/')}/"
             })
     index.sort(key=lambda item: item["name"].lower())
     (OUT / "index.json").write_text(json.dumps({
