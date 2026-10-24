@@ -48,10 +48,11 @@ def excluded(path: Path) -> bool:
     return path.suffix.lower() not in ALLOWED_EXTENSIONS
 
 def site_roots() -> list[Path]:
-    # Only websites in subfolders; recursively find index.html and skip every folder named cw.
-    roots = []
-    for index_file in sorted(ROOT.rglob("index.html")):
-        site = index_file.parent
+    # Discover website folders by any HTML entry file directly in the folder,
+    # not only index.html. This includes older projects using other HTML names.
+    roots: set[Path] = set()
+    for html_file in sorted(list(ROOT.rglob("*.html")) + list(ROOT.rglob("*.htm"))):
+        site = html_file.parent
         if site == ROOT:
             continue
         rel = site.relative_to(ROOT)
@@ -59,8 +60,8 @@ def site_roots() -> list[Path]:
             continue
         if any(part.lower() in SKIP_NAME_PARTS for part in rel.parts):
             continue
-        roots.append(site)
-    return roots
+        roots.add(site)
+    return sorted(roots, key=lambda p: p.as_posix().lower())
 
 def source_files(site: Path) -> list[Path]:
     try:
@@ -78,7 +79,15 @@ def source_files(site: Path) -> list[Path]:
         for parent in p.parents:
             if parent == site_rel:
                 break
-            if (ROOT / parent / "index.html").is_file():
+            parent_dir = ROOT / parent
+            if parent_dir != ROOT and any(
+                candidate.is_file() for candidate in (
+                    parent_dir / "index.html",
+                    parent_dir / "index.htm",
+                    parent_dir / "main.html",
+                    parent_dir / "app.html",
+                )
+            ):
                 nested_site = True
                 break
         if nested_site:
