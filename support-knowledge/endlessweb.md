@@ -4,351 +4,329 @@
 
 # endlessweb – Support-Dokumentation
 
-**Vermuteter Zweck:** Interaktive, rätselbasierte Kurzgeschichte mit 50 Stationen namens „The Endless Internet“.  
+**Website:** endlessweb  
+**Vermuteter Zweck:** Interaktive, rätselbasierte Kurzgeschichte namens „The Endless Internet“ mit 50 Stationen  
 **Quellcode-Pfad:** `endlessweb`  
-**Datum der Erstellung:** 16. März 2026  
+**Analysierte Dateien:** `endlessweb/index.html`, `endlessweb/404.html`  
+**Datum der Erstellung:** 10. April 2026
 
-> **Hinweis zum Quellcode:** Die bereitgestellten Auszüge aus `index.html` und `404.html` sind unvollständig. Die Dokumentation beschreibt daher nur Funktionen, die im sichtbaren Quellcode eindeutig erkennbar sind.
+> **Hinweis:** Die Quellcode-Auszüge wurden gekürzt. Die Dokumentation beschreibt die im sichtbaren Code bestätigten Funktionen. Funktionen, die nur im nicht vollständig gezeigten JavaScript-Bereich liegen, sind entsprechend gekennzeichnet.
 
 ---
 
 ## 1. Überblick
 
-„endlessweb“ ist eine deutschsprachige Website, die den Besucher durch eine fortlaufende Rätselgeschichte führt. Jede Station enthält:
+Bei endlessweb handelt es sich um eine statische, deutschsprachige Website, die eine fortlaufende Geschichte in Form von Rätseln präsentiert.
 
-- einen Kategorienamen,
-- einen Titel,
-- einen kurzen Untertitel,
-- mehrere Absätze Fließtext,
-- optional ein hervorgehobenes Zitat,
-- eine Rätselfrage,
-- ein Antwortfeld,
-- die Schaltfläche **„Prüfen“**,
-- bei einer richtigen Antwort die Schaltfläche **„Zur nächsten Spur →“**.
+Jede Station besteht aus:
 
-Im Quellcode ist ein Gesamtumfang von **50 Stationen** vorgesehen. Jede Frage soll mehrere akzeptierte Antwortformulierungen besitzen. Für die Station 01 werden beispielsweise zehn Antwortvarianten für „Link“, „Verbindung“ und „Hyperlink“ angeboten.
+- einer Kategorie,
+- einem Titel,
+- einer kurzen Einleitung,
+- mehreren Absätzen zum Handlungsverlauf,
+- optional einem hervorgehobenen Zitat,
+- einer Frage mit der Bezeichnung **„Die nächste Spur“**,
+- einem Antwortfeld,
+- der Schaltfläche **„Prüfen“**,
+- einer Rückmeldung zur Eingabe,
+- bei einer richtigen Antwort der Schaltfläche **„Zur nächsten Spur →“**.
 
-Die sichtbaren Stationen beginnen unter anderem mit:
+Die Geschichte ist als geschlossener Kreis angelegt. Im Quellcode heißt es ausdrücklich:
 
-1. **Der Anfang**
-2. **Der erste Eintrag**
-3. **Die Uhr**
-4. **Der Bahnhof**
-5. **Das Foto**
-6. **Dokument 17**
-7. **Die Zahlen**
-8. **Die Perspektive**
-9. **Die Treppe**
+- „50 Stationen“
+- Jeder Eintrag verweist auf den nächsten.
+- Der letzte Eintrag verweist wieder auf den ersten.
+
+Die Website ist ein digitales Rätselspiel beziehungsweise eine interaktive Webgeschichte. Sie stellt keine erkennbare Sammlung, Buchhandlung, Benutzerkontoverwaltung oder soziale Plattform dar.
 
 ---
 
-## 2. Voraussetzungen
+## 2. Voraussetzungen und technische Grundlagen
 
-### Für Besucherinnen und Besucher
+### 2.1 Erforderlicher Browser
 
-Für die Nutzung werden im Quellcode keine besonderen Berechtigungen, Anmeldungen oder Zahlungen vorausgesetzt.
+Für die dargestellte Website wird ein aktueller Browser mit folgenden Fähigkeiten vorausgesetzt:
 
-Voraussetzungen sind:
+- HTML5
+- CSS3
+- JavaScript
+- `localStorage` für das Speichern des Fortschritts
+- `history.pushState` beziehungsweise `history.replaceState` für die stationsbezogene URL-Verwaltung
 
-- ein Webbrowser mit JavaScript,
-- eine Internetverbindung, da Schriftarten von Google Fonts geladen werden,
-- die Möglichkeit, Seiten innerhalb des Website-Pfads `endlessweb` aufzurufen.
+Die Seiten sind als statische HTML-Dateien aufgebaut. Ob ein Server, ein Static-Host oder eine zusätzliche Build-Pipeline benötigt wird, ist **im Quellcode nicht eindeutig erkennbar**.
 
-Die Website ist responsiv gestaltet und enthält eine mobile Anpassung für schmale Bildschirme mit einer Breite von maximal 650 Pixeln.
+### 2.2 Lokale Ausführung
 
-### Für den Betrieb
+1. Den Ordner `endlessweb` öffnen.
+2. Die Datei `index.html` in einem modernen Browser aufruft.
 
-Im Quellcode ist **keine eigene Serverlogik** erkennbar. Die Stationen und ihre Inhalte werden offenbar direkt als statische HTML-, CSS- und JavaScript-Daten ausgeliefert.
+Ein Server ist für die Grundanzeige wahrscheinlich nicht zwingend erforderlich. Einzelne Funktionen können jedoch von der Herkunft der Seite abhängen, insbesondere:
 
-Ob das Projekt zusätzlich Routing-, Redirect- oder Deployment-Konfiguration benötigt, ist **im Quellcode nicht eindeutig erkennbar**.
+- das Speichern im Browser,
+- die Aktualisierung der Browserhistorie,
+- die Nutzung interner Pfade wie `/archiv/der-erste-eintrag`.
+
+Die vollständige Ausführung dieser Funktionen in einem einfachen Dateisystem ist **im vorliegenden Auszug nicht eindeutig erkennbar**.
+
+### 2.3 Schriften
+
+Die Seite lädt Inter und Poppins von Google Fonts. Für die normale Darstellung ist keine zusätzliche Installation erforderlich. Bei blockierten oder nicht verfügbaren externen Schriftdiensten kann die Seite jedoch auf Ersatzschriften zurückfallen.
 
 ---
 
 ## 3. Sichtbare Bereiche der Website
 
-### 3.1 Kopfbereich
+### 3.1 Obere Leiste
 
-Im fixierten Kopfbereich befindet sich links das Logo:
+Oben befindet sich eine feste beziehungsweise „sticky“ Leiste mit:
 
-**„lamacOs“**
+- dem sichtbaren Logo **„lamacOs“**,
+- der Schaltfläche **„←“** mit dem Tooltip **„Zurück“**,
+- der Schaltfläche **„☾“** mit dem Tooltip **„Darstellung“**.
 
-Rechts sind zwei quadratische Symbolschaltflächen sichtbar:
-
-- **„←“** mit dem Hinweis **„Zurück“**
-- **„☾“** mit dem Hinweis **„Darstellung“**
-
-Die Kopfzeile bleibt beim Scrollen sichtbar.
+Die Leiste bleibt beim Scrollen sichtbar.
 
 ### 3.2 Fortschrittsanzeige
 
-Direkt unterhalb der Kopfzeile stehen:
+Direkt unter der oberen Leiste zeigt die Website:
 
-- **„01 / 50“** – die aktuelle Station,
-- **„Durchlauf 1“** – der aktuelle Durchlauf.
+- die aktuelle Station, beispielsweise **„01 / 50“**,
+- den aktuellen Durchlauf, beispielsweise **„Durchlauf 1“**,
+- einen horizontalen Fortschrittsbalken.
 
-Darunter befindet sich ein horizontaler Fortschrittsbalken. Die Leiste füllt sich abhängig vom Fortschritt orange.
+Der Fortschrittsbalken ist orange und wird bei erfolgreichem Fortschritt nachgefüllt.
 
-### 3.3 Inhaltsbereich
+### 3.3 Kategorie und Titel
 
-Der Inhaltsbereich zeigt in dieser Reihenfolge:
+Oberhalb des Haupttextes stehen:
 
-1. die Kategorie, etwa „Der Anfang“, „Archiv“ oder „Orte“,
-2. den Titel der Station,
-3. einen kurzen Untertitel,
-4. die Textabsätze der Geschichte,
-5. gegebenenfalls ein optionales Zitat,
-6. den Rätselbereich **„Die nächste Spur“**.
+- die Kategorie der Station, etwa **„Der Anfang“**, **„Archiv“**, **„Wissenschaft“**, **„Orte“**, **„Geschichte“** oder **„Rätsel“**,
+- der große Stationstitel,
+- eine hervorgehobene Kurzbeschreibung.
 
-### 3.4 Rätselbereich
+### 3.4 Story-Bereich
 
-Der Rätselbereich enthält:
+Die eigentliche Geschichte wird in mehreren separaten Karten dargestellt. Jeder Absatz bildet eine eigene Karte.
 
-- die Beschriftung **„Die nächste Spur“**,
-- die konkrete Rätselfrage,
+### 3.5 Zitat
+
+Zwischen Geschichte und Rätsel kann ein optisch hervorgehobenes Zitat erscheinen. In den sichtbaren Beispielen besitzt die erste Station kein sichtbares Zitat. Das Zitatelement ist standardmäßig ausgeblendet und wird nur eingeblendet, wenn die jeweiligen Stationsdaten ein Zitat enthalten.
+
+### 3.6 Rätselbereich „Die nächste Spur“
+
+Der untere Bereich enthält:
+
+- die feste Bezeichnung **„Die nächste Spur“**,
+- die konkrete Frage,
 - ein Eingabefeld mit dem Platzhalter **„Deine Antwort …“**,
-- die orange Schaltfläche **„Prüfen“**,
-- einen Feedbackbereich,
-- nach einer richtigen Antwort die Schaltfläche **„Zur nächsten Spur →“**.
+- die Schaltfläche **„Prüfen“**,
+- eine Rückmeldungszeile,
+- bei richtiger Antwort die Schaltfläche **„Zur nächsten Spur →“**.
 
-### 3.5 Fußbereich
+### 3.7 Fußbereich
 
 Am Ende stehen:
 
-- **„The Endless Internet“**
-- **„© 2026 lamacHub“**
+- **„The Endless Internet“**,
+- **„© 2026 lamacHub“**.
 
 ---
 
 ## 4. Bedienung Schritt für Schritt
 
-### Schritt 1: Erste Station öffnen
+### 4.1 Eine Station lesen
 
-Öffnen Sie die Website über ihre Startseite im Verzeichnis `endlessweb`.
+1. `endlessweb/index.html` im Browser öffnen.
+2. Kategorie, Titel und Kurzbeschreibung lesen.
+3. Die Absätze der Story-Karten in Reihenfolge lesen.
+4. Falls vorhanden, das hervorgehobene Zitat lesen.
+5. Die Frage unter **„Die nächste Spur“** beantworten.
 
-Die erste Station **„Du bist hier.“** wird geladen. Der Fortschrittszähler zeigt zunächst:
+### 4.2 Eine Antwort prüfen
 
-- **„01 / 50“**
-- **„Durchlauf 1“**
+1. Die Antwort in das Feld **„Deine Antwort …“** eingeben.
+2. Auf **„Prüfen“** klicken.
+3. Die Rückmeldung unter dem Eingabefeld lesen.
+   - Eine korrekte Antwort wird grün dargestellt.
+   - Eine falsche Antwort wird rot dargestellt.
+4. Bei korrekter Antwort auf **„Zur nächsten Spur →“** klicken.
+5. Die nächste Station wird geladen.
 
-### Schritt 2: Geschichte lesen
+### 4.3 Zur vorherigen Station navigieren
 
-Lesen Sie den Fließtext und achten Sie auf Details, die für die jeweilige Frage relevant sein können. Einige Stationen enthalten zusätzlich ein Zitat oder versteckte Hinweise im Text.
+1. In der oberen Leiste auf **„←“** klicken.
+2. Die vorherige Station wird angezeigt.
 
-### Schritt 3: Antwort eingeben
+Der genaue Umgang mit dem ersten Eintrag ist **im gekürzten JavaScript-Auszug nicht eindeutig erkennbar**. Da die Geschichte als geschlossener Kreis beschrieben wird, ist eine Rücknavigation vom ersten zum letzten Eintrag beziehungsweise eine begrenzte Rücknavigation plausibel; dies ist jedoch eine **begründete Vermutung**, keine im Auszug bestätigte Funktion.
 
-Klicken Sie in das Feld mit dem Platzhalter **„Deine Antwort …“** und geben Sie Ihre Lösung ein.
+### 4.4 Darstellung wechseln
 
-Das Eingabefeld verwendet:
+1. In der oberen Leiste auf **„☾“** kliczen.
+2. Die Website wechselt zwischen dunkler und heller Darstellung.
+3. Das Symbol wird voraussichtlich passend zur aktiven Darstellung aktualisiert.
 
+Die Umschaltung ist im CSS durch die Klasse `body.light` vorbereitet. Die genaue JavaScript-Logik und ob die Auswahl dauerhaft gespeichert wird, ist im gekürzten Auszug **nicht eindeutig erkennbar**.
+
+### 4.5 Fortschritt dauerhaft fortsetzen
+
+Im Quellcode ist die Fortschrittsverwaltung über den Browser-Speicher vorgesehen. Das konkrete Speicherschema und der genaue Ablauf beim erneuten Aufruf der Website sind im gekürzten Auszug nicht vollständig sichtbar.
+
+Vermutlich wird unter anderem der aktuelle Stationseintrag und gegebenenfalls der Durchlauf gespeichert. Das ist **eine begründete Vermutung**, da solche Daten für die Fortsetzung nach einem Neuladen erforderlich wären.
+
+---
+
+## 5. Eingaben und Ausgaben
+
+### 5.1 Eingabefeld
+
+Das Eingabefeld besitzt die technische Kennung `answer` und folgende Eigenschaften:
+
+- Platzhalter: **„Deine Antwort …“**
 - keine automatische Vervollständigung,
-- keine Rechtschreibprüfung.
+- Rechtschreibprüfung deaktiviert,
+- freie Texteingabe.
 
-Groß- und Kleinschreibung, Artikel und alternative Formulierungen können je nach Frage unterschiedlich behandelt werden. Verwenden Sie daher möglichst eine der für die Frage vorgesehenen Antwortformen.
+### 5.2 Antwortprüfung
 
-### Schritt 4: Antwort prüfen
+Für jede Station enthält die Datenstruktur ein Feld `answers` mit bis zu zehn akzeptierten Formulierungen. Die erste Station akzeptiert beispielsweise Varianten von:
 
-Klicken Sie auf **„Prüfen“**.
+- „Link“
+- „Verbindung“
+- „Verknüpfung“
+- „Hyperlink“
 
-Anschließend erscheint unterhalb des Eingabefeldes eine Rückmeldung. Der Quellcode enthält dafür zwei Farbzustände:
+Das Eingabefeld wird gegen diese vordefinierten Antworten geprüft. Eine unbeabsichtigte groß- oder kleingeschriebene Variante kann dadurch abweichen, sofern die JavaScript-Funktion keine zusätzliche Normalisierung vornimmt. Eine solche Normalisierung ist im sichtbaren Auszug **nicht eindeutig erkennbar**.
 
-- grün für eine Erfolgsmeldung,
-- rot für eine Fehlermeldung.
+### 5.3 Rückmeldungen
 
-Der genaue Wortlaut der Meldungen und die genaue Normalisierung der Eingabe sind im gekürzten Quellcode nicht vollständig sichtbar.
+Für die Prüfung sind zwei CSS-Zustände definiert:
 
-### Schritt 5: Nächste Spur öffnen
+- `feedback.success` für eine grüne Erfolgsmeldung,
+- `feedback.error` für eine rote Fehlermeldung.
 
-Wird die Antwort als richtig erkannt, wird der Bereich mit der Schaltfläche **„Zur nächsten Spur →“** eingeblendet.
+Der genaue Wortlaut der Rückmeldungen ist im gekürzten Auszug nicht vollständig sichtbar.
 
-Klicken Sie auf diese Schaltfläche, um zur nächsten Station zu gelangen.
+### 5.4 Freischaltung des nächsten Schritts
 
-### Schritt 6: Zurück navigieren
+Der Container für **„Zur nächsten Spur →“** ist zunächst verborgen. Er erhält bei erfolgreicher Prüfung die Klasse `show` und wird dadurch sichtbar.
 
-Mit der Schaltfläche **„←“** im Kopfbereich können Sie zur vorherigen Station zurückkehren.
+### 5.5 Stationswechsel
 
-Ob dabei bereits abgegebene Antworten, der genaue Sprungverlauf oder der Durchlaufzähler verändert werden, ist **im Quellcode nicht eindeutig erkennbar**.
-
-### Schritt 7: Darstellung ändern
-
-Klicken Sie auf die Schaltfläche **„☾“**, um zwischen dunkler und heller Darstellung zu wechseln.
-
-Der Code enthält dafür die Klasse `body.light`, die das Farbschema der Seite verändert. Ob die gewählte Einstellung dauerhaft gespeichert wird, ist **im Quellcode nicht eindeutig erkennbar**.
-
----
-
-## 5. Antworten und Rückmeldungen
-
-### 5.1 Mehrere Antwortformulierungen
-
-Der Quellcode sieht pro Frage bis zu zehn akzeptierte Formulierungen vor. Dadurch sollen neben der genauen Lösung auch sprachlich ähnliche Antworten möglich sein.
-
-Beispiele:
-
-| Frage | Akzeptierte Formulierungen |
-|---|---|
-| Verbindung im Internet | „Link“, „ein Link“, „Verbindung“, „Verknüpfung“, „Hyperlink“ |
-| Wiederkehrende Zahl | „17“, „siebzehn“, „die 17“, „Dokument 17“, „Nummer 17“ |
-| Entferntes Objekt | „die Tür“, „eine Tür“, „der Eingang“, „die Eingangstür“ |
-| Geometrische Form | „Quadrat“, „ein Quadrat“, „quadratische Form“, „gleichseitiges Viereck“ |
-| Veränderter Blick | „den Blick“, „die Perspektive“, „mein Standpunkt“, „den Blickwinkel“ |
-
-Die genaue Art der Normalisierung – etwa Groß-/Kleinschreibung, zusätzliche Leerzeichen oder Satzzeichen – ist im gekürzten Quellcode nicht vollständig erkennbar.
-
-### 5.2 Erfolgszustand
-
-Nach einer korrekten Antwort:
-
-- erscheint eine grüne Rückmeldung,
-- wird die Schaltfläche **„Zur nächsten Spur →“** sichtbar,
-- kann die nächste Station geöffnet werden.
-
-### 5.3 Fehlerzustand
-
-Bei einer nicht akzeptierten Antwort:
-
-- erscheint eine rote Rückmeldung,
-- bleibt der aktuelle Inhalt sichtbar,
-- kann die Eingabe erneut geprüft werden.
-
-Ob zusätzlich eine konkrete Fehlermeldung wie „Falsch“ oder eine Erklärung angezeigt wird, ist im gekürzten Quellcode nicht eindeutig erkennbar.
-
----
-
-## 6. Navigation und Stationen
-
-### 6.1 Interne Pfade
-
-Jede Station besitzt im Datenmodell einen Pfad, beispielsweise:
+Jede Station enthält einen Zielpfad im Feld `next`, zum Beispiel:
 
 - `/archiv/der-erste-eintrag`
 - `/wissenschaft/die-uhr`
 - `/orte/der-bahnhof`
-- `/geschichte/das-foto`
-- `/archiv/dokument-17`
-- `/raetsel/die-zahlen`
-- `/wissenschaft/die-perspektive`
-- `/orte/die-treppe`
 
-Diese Pfade bilden die Reihenfolge der Geschichte ab.
-
-### 6.2 Fortschritt und Durchläufe
-
-Der Kopfbereich enthält einen Zähler für den **„Durchlauf“**. Der Startwert ist **„Durchlauf 1“**.
-
-Das Datenmodell sieht außerdem einen kreisförmigen Aufbau vor: Der letzte Eintrag verweist wieder auf den ersten. Ob diese Rückkehr technisch vollständig umgesetzt ist und wie der Durchlaufzähler dabei aktualisiert wird, ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
-
-### 6.3 Start- und Fehlerseite
-
-Zusätzlich zu `index.html` ist eine Datei `404.html` mit demselben Erscheinungsbild und demselben Stationsdatenmodell vorhanden.
-
-Damit wird offenbar die normale Ansicht auch für nicht gefundene Seiten verwendet. Ob die 404-Ansicht automatisch geladen wird oder nur manuell eingerichtet werden muss, ist **im Quellcode nicht eindeutig erkennbar**.
+Ob dieser Pfad unmittelbar per `history.pushState` gesetzt, durch einen serverseitigen Rewrite geladen oder anderweitig aufgelöst wird, ist im gekürzten Auszug **nicht eindeutig erkennbar**.
 
 ---
 
-## 7. Bedienung auf Mobilgeräten
+## 6. Stationen und Fortschritt
 
-Für Bildschirme mit maximal 650 Pixeln Breite passt die Website das Layout an:
+### 6.1 Anzahl der Stationen
 
-- Die Eingabe und die Schaltfläche **„Prüfen“** werden untereinander angezeigt.
-- **„Prüfen“** erhält die volle Breite.
-- Texte und Karten erhalten kleinere Innenabstände.
-- Der Fußbereich wird vertikal statt horizontal angezeigt.
+Der Quellcode nennt insgesamt **50 Stationen**.
 
-Die Grundeinstellungen für Zoom und Seitenanpassung sind im HTML festgelegt:
+Die sichtbaren Zähler sind standardmäßig:
 
-- `viewport=device-width`
-- `initial-scale=1.0`
+- **„01 / 50“**
+- **„Durchlauf 1“**
+
+### 6.2 Durchläufe
+
+Die Anzeige **„Durchlauf 1“** zeigt, dass die Geschichte nach Abschluss erneut begonnen werden kann. Der genaue Ablauf am letzten Eintrag sowie die genaue Bezeichnung weiterer Durchläufe sind im gekürzten Quellcode nicht vollständig erkennbar.
+
+### 6.3 Progressionsbalken
+
+Der Balken wird anhand der aktuellen Position aktualisiert. Die verwendete Prozentformel ist im gekürzten Auszug nicht vollständig sichtbar.
+
+---
+
+## 7. Mobile Bedienung
+
+Für schmale Bildschirme bis 650 Pixel Breite enthält die Seite eigene Layoutregeln:
+
+- reduzierte seitliche Abstände,
+- kleinere Innenabstände der Karten,
+- senkrechte Anordnung von Eingabefeld und **„Prüfen“**,
+- vollbreite Schaltfläche **„Prüfen“**,
+- untereinander angeordnete Fußzeilenelemente.
+
+Die große Überschrift passt sich mit einer responsiven Schriftgröße an.
 
 ---
 
 ## 8. Typische Probleme und Fehlerbehebung
 
-### 8.1 Die Antwort wird nicht akzeptiert
+### 8.1 Die Seite bleibt leer oder zeigt nur den Rahmen
 
-**Mögliche Ursache:** Die eingegebene Formulierung ist nicht in der Liste der akzeptierten Antworten enthalten oder wird zu stark vom erwarteten Text abweichen.
+**Möglicher Grund:** JavaScript wird nicht ausgeführt oder das Skript enthält einen Fehler.
 
-**Vorgehen:**
+**Prüfung und Behebung:**
 
-1. Lesen Sie die Frage noch einmal.
-2. Prüfen Sie die genaue Formulierung im umgebenden Text.
-3. Geben Sie möglichst das zentrale Stichwort ein.
-4. Verwenden Sie eine der im Quellcode vorgesehenen Varianten, zum Beispiel „17“ statt „Es ist siebzehn“.
-5. Klicken Sie erneut auf **„Prüfen“**.
+1. JavaScript im Browser aktivieren.
+2. Die Browser-Entwicklerwerkzeuge öffnen.
+3. Unter **Konsole** nach Fehlermeldungen suchen.
+4. Prüfen, ob `index.html` und das enthaltene Skript vollständig geladen wurden.
+5. Die Seite neu laden.
 
----
+### 8.2 **„Prüfen“** reagiert nicht
 
-### 8.2 Die Schaltfläche **„Zur nächsten Spur →“** bleibt ausgeblendet
+**Möglicher Grund:** Das JavaScript für die Antwortprüfung wurde nicht geladen oder ist nach einem Syntaxfehler nicht ausführbar.
 
-**Mögliche Ursache:** Die Antwort wurde noch nicht als korrekt bestätigt.
+**Behebung:**
 
-**Vorgehen:**
+1. Konsole auf Fehler prüfen.
+2. Sicherstellen, dass der vollständige `<script>`-Bereich vorhanden ist.
+3. Seite neu laden.
+4. Prüfen, ob eine Antwort in das Feld eingegeben wurde.
+5. Falls zutreffend, die Eingabe per Enter bestätigen; eine Enter-Bindung ist im sichtbaren Auszug jedoch **nicht eindeutig erkennbar**.
 
-1. Kontrollieren Sie die Rückmeldung unter dem Eingabefeld.
-2. Geben Sie eine alternative akzeptierte Antwortform ein.
-3. Klicken Sie erneut auf **„Prüfen“**.
+### 8.3 Eine offensichtlich passende Antwort wird abgelehnt
 
----
+**Möglicher Grund:** Die Website akzeptiert nur die fest hinterlegten Formulierungen. Eine zusätzliche Satzstellung, Abkürzung oder andere Schreibweise kann nicht enthalten sein.
 
-### 8.3 Der Inhalt bleibt leer oder die Station lädt nicht
+**Behebung:**
 
-**Mögliche Ursache:** JavaScript ist deaktiviert, die Datei wurde nicht vollständig bereitgestellt oder der Browser konnte die Seite nicht vollständig laden.
+1. Die Formulierung aus der Stationsfrage möglichst eng übernehmen.
+2. Zahlwörter oder Ziffern passend zur Fragestellung verwenden.
+3. Andere Formulierungen aus der Antwortliste testen.
+4. Groß- und Kleinschreibung berücksichtigen.
 
-**Vorgehen:**
+### 8.4 **„Zur nächsten Spur →“** bleibt unsichtbar
 
-1. Laden Sie die Seite neu.
-2. Prüfen Sie, ob JavaScript im Browser aktiviert ist.
-3. Öffnen Sie die Website in einem aktuellen Browser.
-4. Falls möglich, prüfen Sie die Browserkonsole auf technische Fehlermeldungen.
+**Möglicher Grund:** Die Antwort wurde nicht als korrekt bestätigt.
 
----
+**Behebung:**
 
-### 8.4 Der Fortschrittsbalken bewegt sich nicht
+1. Prüfen, ob eine grüne Erfolgsmeldung angezeigt wird.
+2. Falls nicht, die Antwort erneut eingeben und auf **„Prüfen“** klicken.
+3. Prüfen, ob das Eingabefeld leer war oder eine unsichtbare Eingabe enthielt.
+4. Falls die Meldung trotzdem nicht erscheint, JavaScript und Konsole prüfen.
 
-**Mögliche Ursache:** Der Balken wird an den Fortschritt gekoppelt, der möglicherweise erst nach erfolgreicher Beantwortung aktualisiert wird. Das genaue Verhalten ist im gekürzten Quellcode nicht vollständig erkennbar.
+### 8.5 Ein interner Pfad liefert einen 404-Fehler
 
-**Vorgehen:**
+Die Datei `404.html` enthält offenbar dieselbe Anwendung wie `index.html`. Damit soll bei nicht gefundenen Pfaden offenbar eine Ersatzansicht erscheinen.
 
-1. Antworten Sie die aktuelle Frage.
-2. Bestätigen Sie die Eingabe mit **„Prüfen“**.
-3. Klicken Sie nach erfolgreicher Prüfung auf **„Zur nächsten Spur →“**.
-4. Falls der Zähler weiterhin unverändert bleibt, prüfen Sie die Seite über die Browserkonsole und melden Sie den technischen Fehler.
+**Möblösung:**
 
----
+1. Sicherstellen, dass bei der Bereitstellung ein Rewrite auf `index.html` oder `404.html` eingerichtet ist.
+2. Prüfen, ob die URL-Struktur der konfigurierten Station entspricht.
+3. Relative Pfade bevorzugen, wenn der Inhalt in einem Unterordner gehostet wird.
+4. Die Browser-Konsole auf fehlgeschlagene Ressourcen prüfen.
 
-### 8.5 Die Schriftart wird anders dargestellt
+Ob das Hosting tatsächlich alle unbekannten URLs auf `404.html` umleitet, ist **im Quellcode nicht eindeutig erkennbar**, weil die Serverkonfiguration nicht vorliegt.
 
-**Mögliche Ursache:** Die Schriftarten werden von Google Fonts geladen. Bei blockierten externen Anfragen, fehlender Internetverbindung oder Netzwerkeinschränkungen kann die Website auf Ersatzschriften ausweichen.
+### 8.6 Der Zurück-Pfeil funktioniert nicht wie erwartet
 
-**Vorgehen:**
+**Möglicher Grund:** Die Browserhistorie oder der intern gespeicherte Stationsindex wird nicht wie erwartet verwendet.
 
-- Laden Sie die Seite mit aktiver Internetverbindung neu.
-- Prüfen Sie, ob Ihr Browser oder Netzwerk Anfragen an den Google-Fonts-Dienst blockiert.
-- Die Grundfunktionalität sollte weiterhin nutzbar sein, da der HTML-Code für die Schriften einen sans-serif-Fallback enthält.
+**Behebung:**
 
----
+1. Andere Tabs oder Seiten im Verlauf prüfen.
+2. Den Browserverlauf über die Browsernavigation testen.
+3. Die Seite neu laden und den Pfeil erneut verwenden.
+4. Falls die Anwendung intern einen Stationszähler verwaltet, den vollständigen JavaScript-Code auf Fehler prüfen.
 
-### 8.6 Die Schaltfläche **„←“** führt nicht zum erwarteten Ergebnis
-
-**Mögliche Ursache:** Die genaue Zuordnung der Browser-Historie zu den Stationen sowie das Verhalten bei direkt aufgerufenen URLs ist im gekürzten Quellcode nicht vollständig erkennbar.
-
-**Vorgehen:**
-
-1. Nutzen Sie die Schaltfläche **„Zur nächsten Spur →“**, um die Stationsfolge fortzusetzen.
-2. Verwenden Sie anschließend **„←“**, um zurückzugehen.
-3. Falls die Rücknavigation weiterhin abweicht, öffnen Sie die Startseite neu und beginnen erneut bei **„Du bist hier.“**
-
----
-
-### 8.7 Eine direkte URL zeigt nicht die gewünschte Station
-
-**Mögliche Ursache:** Die vorgesehenen Story-Pfade sind möglicherweise keine eigenständigen Dateien, sondern werden durch JavaScript oder serverseitiges Routing aufgelöst. Die konkrete technische Umsetzung ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
-
-**Vorgehen:**
-
-- Navigieren Sie bevorzugt über **„Prüfen“** und **„Zur nächsten Spur →“**.
-- Öffnen Sie bei Problemen die Startseite neu.
-- Prüfen Sie beim Betreiber, ob die Story-Pfade zusätzlich per Server-Routing konfiguriert werden müssen.
-
----
-
-## 9. Datenschutz und Berechtig
+### 8.7

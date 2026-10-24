@@ -1,7 +1,7 @@
 {
   "name": "lamacHub Support-Wissensdatenbank",
   "language": "de",
-  "generatedAt": "2026-10-24T13:16:11Z",
+  "generatedAt": "2026-10-24T14:43:47Z",
   "repository": "https://github.com/lamacOs/lamacos.github.io",
   "websites": [
     {
@@ -38,6 +38,13 @@
       "path": "endlessweb",
       "document": "support-knowledge/endlessweb.md",
       "url": "https://lamachub.de/endlessweb/"
+    },
+    {
+      "id": "Flohmarkt-Scanner-2.0",
+      "name": "Flohmarkt-Scanner-2.0",
+      "path": "Flohmarkt-Scanner-2.0",
+      "document": "support-knowledge/Flohmarkt-Scanner-2.0.md",
+      "url": "https://lamachub.de/Flohmarkt-Scanner-2.0/"
     },
     {
       "id": "fotoviewer",
@@ -89,6 +96,13 @@
       "url": "https://lamachub.de/MCLegacy/"
     },
     {
+      "id": "pianosound__mp3tomid",
+      "name": "mp3tomid",
+      "path": "pianosound/mp3tomid",
+      "document": "support-knowledge/pianosound__mp3tomid.md",
+      "url": "https://lamachub.de/pianosound/mp3tomid/"
+    },
+    {
       "id": "OCRTexterkennung",
       "name": "OCRTexterkennung",
       "path": "OCRTexterkennung",
@@ -108,6 +122,55 @@
       "path": "Pack-O-Mat",
       "document": "support-knowledge/Pack-O-Mat.md",
       "url": "https://lamachub.de/Pack-O-Mat/"
+    },
+    {
+      "id": "Paddle-Game",
+      "name": "Paddle-Game",
+      "path": "Paddle-Game",
+      "document": "support-knowledge/Paddle-Game.md",
+      "url": "https://lamachub.de/Paddle-Game/"
+    },
+    {
+      "id": "pianosound",
+      "name": "pianosound",
+      "path": "pianosound",
+      "document": "support-knowledge/pianosound.md",
+      "url": "https://lamachub.de/pianosound/"
+    },
+    {
+      "id": "qreditor",
+      "name": "qreditor",
+      "path": "qreditor",
+      "document": "support-knowledge/qreditor.md",
+      "url": "https://lamachub.de/qreditor/"
+    },
+    {
+      "id": "RouteNote-Converter",
+      "name": "RouteNote-Converter",
+      "path": "RouteNote-Converter",
+      "document": "support-knowledge/RouteNote-Converter.md",
+      "url": "https://lamachub.de/RouteNote-Converter/"
+    },
+    {
+      "id": "Silvester-Countdown",
+      "name": "Silvester-Countdown",
+      "path": "Silvester-Countdown",
+      "document": "support-knowledge/Silvester-Countdown.md",
+      "url": "https://lamachub.de/Silvester-Countdown/"
+    },
+    {
+      "id": "Smooth-Animations",
+      "name": "Smooth-Animations",
+      "path": "Smooth-Animations",
+      "document": "support-knowledge/Smooth-Animations.md",
+      "url": "https://lamachub.de/Smooth-Animations/"
+    },
+    {
+      "id": "Sprach-Berater",
+      "name": "Sprach-Berater",
+      "path": "Sprach-Berater",
+      "document": "support-knowledge/Sprach-Berater.md",
+      "url": "https://lamachub.de/Sprach-Berater/"
     }
   ]
 }
