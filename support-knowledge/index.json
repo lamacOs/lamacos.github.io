@@ -1,7 +1,7 @@
 {
   "name": "lamacHub Support-Wissensdatenbank",
   "language": "de",
-  "generatedAt": "2026-10-24T15:17:24Z",
+  "generatedAt": "2026-10-24T15:48:02Z",
   "repository": "https://github.com/lamacOs/lamacos.github.io",
   "websites": [
     {
@@ -17,6 +17,13 @@
       "path": "CarEscape",
       "document": "support-knowledge/CarEscape.md",
       "url": "https://lamachub.de/CarEscape/"
+    },
+    {
+      "id": "coolvisualize",
+      "name": "coolvisualize",
+      "path": "coolvisualize",
+      "document": "support-knowledge/coolvisualize.md",
+      "url": "https://lamachub.de/coolvisualize/"
     },
     {
       "id": "cw-builder",
@@ -84,9 +91,9 @@
     {
       "id": "lamacHub-Startseite",
       "name": "lamacHub-Startseite",
-      "path": "",
+      "path": "lamacHub-Startseite",
       "document": "support-knowledge/lamacHub-Startseite.md",
-      "url": "https://lamachub.de/"
+      "url": "https://lamachub.de/lamacHub-Startseite/"
     },
     {
       "id": "lamacOs-Kurzbefehle",
@@ -124,13 +131,6 @@
       "url": "https://lamachub.de/MCLegacy/"
     },
     {
-      "id": "pianosound__mp3tomid",
-      "name": "mp3tomid",
-      "path": "pianosound/mp3tomid",
-      "document": "support-knowledge/pianosound__mp3tomid.md",
-      "url": "https://lamachub.de/pianosound/mp3tomid/"
-    },
-    {
       "id": "OCRTexterkennung",
       "name": "OCRTexterkennung",
       "path": "OCRTexterkennung",
@@ -164,6 +164,13 @@
       "path": "pianosound",
       "document": "support-knowledge/pianosound.md",
       "url": "https://lamachub.de/pianosound/"
+    },
+    {
+      "id": "pianosound__mp3tomid",
+      "name": "pianosound / mp3tomid",
+      "path": "pianosound/mp3tomid",
+      "document": "support-knowledge/pianosound__mp3tomid.md",
+      "url": "https://lamachub.de/pianosound/mp3tomid/"
     },
     {
       "id": "qreditor",
