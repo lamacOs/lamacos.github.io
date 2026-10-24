@@ -48,7 +48,7 @@ def excluded(path: Path) -> bool:
     return path.suffix.lower() not in ALLOWED_EXTENSIONS
 
 def site_roots() -> list[Path]:
-    # Discover website folders by any HTML entry file directly in the folder,
+    # Discover all website folders by any HTML entry file directly in the folder,
     # not only index.html. This includes older projects using other HTML names.
     roots: set[Path] = set()
     for html_file in sorted(list(ROOT.rglob("*.html")) + list(ROOT.rglob("*.htm"))):
