@@ -4,7 +4,6 @@ on:
   push:
     paths-ignore:
       - "support-knowledge/**"
-      - "scripts/**"
       - ".github/workflows/update-support-knowledge.yml"
   schedule:
     # Weekly refresh; GitHub may delay scheduled runs during busy periods.
