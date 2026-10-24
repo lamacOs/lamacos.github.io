@@ -1,7 +1,7 @@
 {
   "name": "lamacHub Support-Wissensdatenbank",
   "language": "de",
-  "generatedAt": "2026-10-24T14:43:47Z",
+  "generatedAt": "2026-10-24T14:55:02Z",
   "repository": "https://github.com/lamacOs/lamacos.github.io",
   "websites": [
     {
@@ -54,11 +54,25 @@
       "url": "https://lamachub.de/fotoviewer/"
     },
     {
+      "id": "GeoDash",
+      "name": "GeoDash",
+      "path": "GeoDash",
+      "document": "support-knowledge/GeoDash.md",
+      "url": "https://lamachub.de/GeoDash/"
+    },
+    {
       "id": "lamacAI",
       "name": "lamacAI",
       "path": "lamacAI",
       "document": "support-knowledge/lamacAI.md",
       "url": "https://lamachub.de/lamacAI/"
+    },
+    {
+      "id": "lamacHub-Startseite",
+      "name": "lamacHub-Startseite",
+      "path": "",
+      "document": "support-knowledge/lamacHub-Startseite.md",
+      "url": "https://lamachub.de/"
     },
     {
       "id": "lamacOs-Kurzbefehle",
