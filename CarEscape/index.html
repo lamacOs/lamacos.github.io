@@ -1,0 +1,1454 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ff7a00">
+  <meta name="description" content="CarEscape – spiele, teile und erstelle eigene Escape-Level.">
+  <title>CarEscape – Escape the grid</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      color-scheme: light;
+      --accent: #ff7a00;
+      --cyan: #01c7fc;
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface2: #eef1f5;
+      --text: #20242c;
+      --muted: #6c7480;
+      --border: #e0e5eb;
+      --danger: #d83b42;
+      --success: #18885b;
+      --radius: 18px;
+      --shadow: 0 8px 30px #1a26380c;
+    }
+
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #11151b;
+      --surface: #1a2029;
+      --surface2: #242c37;
+      --text: #f3f5f7;
+      --muted: #a6b0bd;
+      --border: #333d49;
+      --shadow: 0 8px 30px #0003;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      transition: background .2s, color .2s;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    img { max-width: 100%; }
+    .app { max-width: 1500px; margin: auto; padding: 18px; }
+    header {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      padding: 12px 0 22px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; margin-right: auto; }
+    .brand img { width: 44px; height: 44px; object-fit: contain; }
+    .brand h1 { margin: 0; font-size: 22px; letter-spacing: -.7px; }
+    .brand h1 span { color: var(--accent); }
+    .subtitle { color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px;
+      color: var(--text); background: var(--surface); font-weight: 600;
+      transition: transform .12s, opacity .12s, background .12s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .btn.cyan { background: var(--cyan); color: #06232b; border-color: var(--cyan); }
+    .btn.danger { color: var(--danger); }
+    .btn.small { padding: 7px 10px; font-size: 12px; }
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 16px; }
+    .tab { white-space: nowrap; }
+    .tab.active { background: var(--text); color: var(--surface); border-color: var(--text); }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); gap: 18px; }
+    .panel {
+      min-width: 0; padding: 20px; border-radius: var(--radius);
+      border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow);
+    }
+    .panel h2, .panel h3 { margin: 0 0 14px; }
+    h2, h3, .section-title { color: var(--accent); }
+    .muted { color: var(--muted); }
+    .row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+    .between { justify-content: space-between; }
+    .field { display: grid; gap: 6px; margin: 10px 0; }
+    .field label { font-size: 12px; color: var(--muted); font-weight: 700; }
+    input, select, textarea {
+      width: 100%; padding: 11px 12px; border-radius: 11px;
+      color: var(--text); background: var(--surface); border: 1px solid var(--border);
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 100px; }
+    .notice { padding: 12px; border-radius: 12px; background: var(--surface2); font-size: 13px; }
+    .status { font-size: 13px; min-height: 20px; color: var(--muted); white-space: pre-wrap; }
+    .status.error { color: var(--danger); }
+    .status.success { color: var(--success); }
+    .board-wrap { display: grid; place-items: center; }
+    .board {
+      width: min(100%, 510px); aspect-ratio: 1; position: relative; overflow: hidden;
+      border: 2px solid var(--border); border-radius: 15px;
+      background-color: var(--surface2);
+      background-image: url("assets/gameplace.png");
+      background-size: 100% 100%;
+      touch-action: manipulation;
+    }
+    .board::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(to right, transparent calc(100% - 2px), #7b879233 2px),
+        linear-gradient(to bottom, transparent calc(100% - 2px), #7b879233 2px);
+      background-size: 16.666667% 16.666667%;
+    }
+    .vehicle {
+      position: absolute; z-index: 2; padding: 0; border: 0;
+      background: transparent; border-radius: 8px; overflow: hidden;
+      display: grid; place-items: center;
+      touch-action: none;
+    }
+    .vehicle.selected { outline: 3px solid var(--cyan); outline-offset: -3px; }
+    .vehicle img { display: block; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+    .vehicle.fallback {
+      background: var(--car-color, var(--accent)); border: 2px solid #fff9;
+      color: white; font-size: 11px; font-weight: 800; text-shadow: 0 1px 2px #0007;
+    }
+    .exit-mark {
+      position: absolute; right: -2px; top: 33.333%; width: 5px; height: 16.667%;
+      background: var(--success); border-radius: 4px 0 0 4px;
+    }
+    .touch-controls { display: flex; justify-content: center; gap: 12px; margin-top: 15px; }
+    .arrow { width: 64px; height: 54px; font-size: 22px; }
+    .inventory { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .inventory-item {
+      min-width: 0; border: 1px solid var(--border); background: var(--surface2);
+      border-radius: 12px; padding: 8px; display: grid; place-items: center; gap: 5px;
+      color: var(--text); font-size: 11px; text-align: center;
+    }
+    .inventory-item img { width: 100%; height: 48px; object-fit: contain; }
+    .inventory-item:disabled { filter: grayscale(1); }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .level-card {
+      min-width: 0; padding: 14px; border: 1px solid var(--border);
+      border-radius: 15px; background: var(--surface);
+    }
+    .level-card h3 { margin: 0 0 7px; font-size: 15px; overflow-wrap: anywhere; }
+    .level-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .level-card .row { margin-top: 10px; }
+    .chip { display: inline-flex; padding: 5px 8px; border-radius: 99px; background: var(--surface2); font-size: 11px; }
+    .hidden { display: none !important; }
+    .divider { height: 1px; background: var(--border); margin: 17px 0; }
+    .chat-log { display: grid; gap: 8px; max-height: 260px; overflow: auto; padding: 8px 0; }
+    .chat-message { padding: 10px 12px; border-radius: 12px; background: var(--surface2); font-size: 13px; overflow-wrap: anywhere; }
+    .chat-message.mine { border-left: 3px solid var(--cyan); }
+    footer { padding: 28px 0 8px; text-align: center; font-size: 12px; color: var(--muted); }
+    footer a { color: inherit; }
+    .modal {
+      position: fixed; inset: 0; z-index: 20; background: #0008; display: grid;
+      place-items: center; padding: 16px; overflow: auto;
+    }
+    .modal-card {
+      width: min(100%, 480px); max-height: 90vh; overflow: auto;
+      padding: 22px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border);
+    }
+    .modal-card h2 { margin-top: 0; }
+    .key-hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px) {
+      .app { padding: 12px; }
+      .panel { padding: 14px; }
+      .brand h1 { font-size: 19px; }
+      .brand img { width: 38px; height: 38px; }
+      .top-actions { width: 100%; }
+      .top-actions .btn { flex: 1; }
+      .cards { grid-template-columns: 1fr; }
+      .inventory { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .arrow { width: 76px; height: 58px; }
+    }
+    @media (max-width: 360px) {
+      .app { padding: 8px; }
+      .panel { padding: 10px; }
+      .btn { padding: 9px 10px; }
+      .inventory { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <img src="assets/cars/logo.png" alt="CarEscape Logo" onerror="this.style.display='none'">
+      <div>
+        <h1>Car<span>Escape</span></h1>
+        <div class="subtitle">Escape the grid. Build your own challenge.</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn" id="themeBtn" type="button">☾ Design</button>
+      <button class="btn" id="accountBtn" type="button">Anmelden</button>
+      <button class="btn primary" id="newLevelBtn" type="button">＋ Eigenes Level</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Hauptnavigation">
+    <button class="btn tab active" data-view="play">Spielen</button>
+    <button class="btn tab" data-view="discover">Level entdecken</button>
+    <button class="btn tab" data-view="create">Level erstellen</button>
+    <button class="btn tab" data-view="my">Meine Level</button>
+    <button class="btn tab" data-view="help">Hilfe & Support</button>
+    <button class="btn tab hidden" id="adminTab" data-view="admin">Admin</button>
+  </nav>
+
+  <main>
+    <section id="view-play" class="view">
+      <div class="layout">
+        <div class="panel">
+          <div class="row between">
+            <div>
+              <h2 id="levelTitle">CarEscape – Einsteiger</h2>
+              <div class="muted" id="levelSubtitle">Bewege das Polizeiauto zum Ausgang.</div>
+            </div>
+            <span class="chip" id="levelDifficulty">Leicht</span>
+          </div>
+          <div class="board-wrap">
+            <div class="board" id="board" role="application" aria-label="CarEscape Spielfeld">
+              <div class="exit-mark" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="touch-controls">
+            <button class="btn arrow" id="moveBack" aria-label="Zurück bewegen">←</button>
+            <button class="btn arrow" id="moveForward" aria-label="Vorwärts bewegen">→</button>
+          </div>
+          <div class="key-hint">Fahrzeug antippen und mit Pfeilen bewegen. Am Computer funktionieren auch die Pfeiltasten.</div>
+          <div class="divider"></div>
+          <div class="row between">
+            <span class="muted">Züge: <strong id="moveCount">0</strong></span>
+            <div class="row">
+              <button class="btn" id="resetBtn">Neu starten</button>
+              <button class="btn primary" id="shareBtn">Teilen</button>
+            </div>
+          </div>
+          <div id="gameStatus" class="status" aria-live="polite"></div>
+        </div>
+
+        <div class="panel">
+          <h2>KI-Levelgenerator</h2>
+          <p class="muted">Beschreibe dein Wunschlevel. Die KI erhält die CarEscape-Regeln automatisch.</p>
+          <div class="field">
+            <label for="aiPrompt">Deine Level-Idee</label>
+            <textarea id="aiPrompt" placeholder="Zum Beispiel: Ein schwieriges Level mit vielen kleinen Autos, aber nur einem freien Weg zum Ausgang."></textarea>
+          </div>
+          <div class="row">
+            <div class="field" style="flex:1;min-width:120px">
+              <label for="aiDifficulty">Schwierigkeit</label>
+              <select id="aiDifficulty">
+                <option value="leicht">Leicht</option>
+                <option value="mittel" selected>Mittel</option>
+                <option value="schwer">Schwer</option>
+                <option value="extrem">Extrem</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1;min-width:120px">
+              <label for="aiVehicleCount">Fahrzeuge</label>
+              <select id="aiVehicleCount">
+                <option value="6">6–8</option>
+                <option value="10" selected>9–12</option>
+                <option value="14">13–16</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn primary" id="generateBtn" style="width:100%">✦ Level mit KI erstellen</button>
+          <div id="aiStatus" class="status" aria-live="polite"></div>
+          <div class="notice">Die KI-Ausgabe muss ein gültiges CarEscape-Level enthalten. Unvollständige oder ungültige Ergebnisse werden abgelehnt.</div>
+          <div class="divider"></div>
+          <h3>Aktuelles Level</h3>
+          <div class="row">
+            <button class="btn" id="downloadImageBtn">Bild speichern</button>
+            <button class="btn" id="saveCurrentBtn">Level speichern</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-discover" class="view hidden">
+      <div class="panel">
+        <div class="row between">
+          <h2>Level entdecken</h2>
+          <button class="btn" id="refreshLevelsBtn">Aktualisieren</button>
+        </div>
+        <div class="row">
+          <input id="levelSearch" placeholder="Level, Serie oder Ersteller suchen…" aria-label="Level suchen">
+          <select id="difficultyFilter" aria-label="Schwierigkeit filtern" style="max-width:180px">
+            <option value="">Alle Schwierigkeiten</option>
+            <option>Leicht</option><option>Mittel</option><option>Schwer</option><option>Extrem</option>
+          </select>
+        </div>
+        <div class="divider"></div>
+        <div id="discoverCards" class="cards"></div>
+        <div id="discoverStatus" class="status"></div>
+      </div>
+    </section>
+
+    <section id="view-create" class="view hidden">
+      <div class="layout">
+        <div class="panel">
+          <h2>Level-Editor</h2>
+          <p class="muted">Das Spielfeld hat 6 × 6 Felder. Fahrzeuge dürfen sich nicht überlappen.</p>
+          <div class="field">
+            <label for="editTitle">Levelname</label>
+            <input id="editTitle" maxlength="70" placeholder="Mein CarEscape-Level">
+          </div>
+          <div class="row">
+            <div class="field" style="flex:1;min-width:120px">
+              <label for="editDifficulty">Schwierigkeit</label>
+              <select id="editDifficulty">
+                <option>Leicht</option><option selected>Mittel</option><option>Schwer</option><option>Extrem</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1;min-width:120px">
+              <label for="editSeries">Serie</label>
+              <input id="editSeries" maxlength="50" placeholder="Eigene Serie">
+            </div>
+          </div>
+          <div class="board-wrap"><div class="board" id="editBoard" aria-label="Editor-Spielfeld"></div></div>
+          <div class="divider"></div>
+          <h3>Fahrzeug-Inventar</h3>
+          <div class="inventory" id="inventory"></div>
+          <p class="muted">Wähle ein Fahrzeug aus dem Inventar, dann ein Feld auf dem Spielfeld. Antippen eines vorhandenen Fahrzeugs wählt es aus.</p>
+          <div class="row">
+            <button class="btn" id="removeVehicleBtn">Ausgewähltes entfernen</button>
+            <button class="btn" id="clearEditorBtn">Editor leeren</button>
+            <button class="btn cyan" id="testLevelBtn">Lösbarkeit testen</button>
+          </div>
+          <div id="editorStatus" class="status" aria-live="polite"></div>
+        </div>
+        <div class="panel">
+          <h2>Speichern & veröffentlichen</h2>
+          <div class="field">
+            <label for="visibility">Sichtbarkeit</label>
+            <select id="visibility">
+              <option value="private">Privat – nur ich</option>
+              <option value="link">Mit Link erreichbar</option>
+              <option value="public">Öffentlich in der Levelsuche</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="levelDescription">Beschreibung</label>
+            <textarea id="levelDescription" placeholder="Was macht dieses Level besonders?"></textarea>
+          </div>
+          <button class="btn primary" id="saveEditorBtn" style="width:100%">Level speichern</button>
+          <div class="divider"></div>
+          <h3>Regeln</h3>
+          <ul class="muted">
+            <li>Das Spielfeld ist 6 × 6 Felder groß.</li>
+            <li>Fahrzeuge dürfen nicht überlappen.</li>
+            <li>Das Polizeiauto fährt horizontal zum rechten Ausgang.</li>
+            <li>Ein Level sollte vor der Veröffentlichung lösbar sein.</li>
+            <li>Große Fahrzeuge belegen 3 Felder, kleine Fahrzeuge 2 Felder.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-my" class="view hidden">
+      <div class="panel">
+        <div class="row between">
+          <h2>Meine Level</h2>
+          <button class="btn" id="myLevelsBtn">Aktualisieren</button>
+        </div>
+        <div id="myCards" class="cards"></div>
+        <div id="myStatus" class="status">Melde dich an, um deine privaten und gespeicherten Level zu sehen.</div>
+      </div>
+    </section>
+
+    <section id="view-help" class="view hidden">
+      <div class="layout">
+        <div class="panel">
+          <h2>So funktioniert CarEscape</h2>
+          <ol>
+            <li>Tippe auf ein Fahrzeug, um es auszuwählen.</li>
+            <li>Bewege es in seiner Fahrtrichtung vor oder zurück.</li>
+            <li>Räume den Weg für das Polizeiauto frei.</li>
+            <li>Bewege das Polizeiauto nach rechts bis zum Ausgang.</li>
+          </ol>
+          <p class="muted">Bei Fragen kannst du den Support-Chat nutzen. Bitte gib keine Passwörter oder privaten Daten in Nachrichten ein.</p>
+          <div class="divider"></div>
+          <h3>Häufige Fragen</h3>
+          <details><summary>Warum kann ich ein Fahrzeug nicht bewegen?</summary><p>Ein anderes Fahrzeug blockiert den Weg oder du bewegst es quer zu seiner Fahrtrichtung.</p></details>
+          <details><summary>Wie teile ich ein Level?</summary><p>Speichere es mit der Sichtbarkeit „Mit Link erreichbar“ oder „Öffentlich“ und nutze anschließend die Teilen-Funktion.</p></details>
+          <details><summary>Wie erstelle ich ein Level mit KI?</summary><p>Gib deine Idee ein und wähle Schwierigkeit sowie gewünschte Fahrzeuganzahl. Die KI erstellt daraus einen Levelvorschlag.</p></details>
+        </div>
+        <div class="panel">
+          <h2>Support-Chat</h2>
+          <div class="field">
+            <label for="supportName">Anzeigename (optional)</label>
+            <input id="supportName" maxlength="40" placeholder="Anzeigename">
+          </div>
+          <div id="supportLog" class="chat-log"></div>
+          <div class="field">
+            <label for="supportMessage">Nachricht</label>
+            <textarea id="supportMessage" maxlength="1000" placeholder="Wie können wir helfen?" style="min-height:75px"></textarea>
+          </div>
+          <button class="btn primary" id="sendSupportBtn">Nachricht senden</button>
+          <div id="supportStatus" class="status"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-admin" class="view hidden">
+      <div class="panel">
+        <h2>Admin-Bereich</h2>
+        <p class="muted">Angemeldetes Admin-Konto: oslamu@mail.de</p>
+        <div class="row">
+          <button class="btn" id="adminRefreshBtn">Level aktualisieren</button>
+          <button class="btn" id="adminSupportBtn">Support-Nachrichten laden</button>
+        </div>
+        <div class="divider"></div>
+        <h3>Alle gespeicherten Level</h3>
+        <div id="adminCards" class="cards"></div>
+        <div class="divider"></div>
+        <h3>Support-Nachrichten</h3>
+        <div id="adminSupportLog" class="chat-log"></div>
+        <div id="adminStatus" class="status"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 lamacHub · CarEscape
+    <br>Verwende nur Bilder und Inhalte, für die du die nötigen Rechte besitzt.
+  </footer>
+</div>
+
+<div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="modal-card">
+    <div class="row between">
+      <h2 id="authTitle">Bei CarEscape anmelden</h2>
+      <button class="btn small" id="closeAuthBtn" aria-label="Schließen">✕</button>
+    </div>
+    <div class="field"><label for="authEmail">E-Mail</label><input id="authEmail" type="email" autocomplete="email"></div>
+    <div class="field"><label for="authPassword">Passwort</label><input id="authPassword" type="password" autocomplete="current-password"></div>
+    <div class="row">
+      <button class="btn primary" id="loginBtn">Anmelden</button>
+      <button class="btn" id="registerBtn">Registrieren</button>
+    </div>
+    <button class="btn" id="resetPasswordBtn" style="margin-top:8px">Passwort zurücksetzen</button>
+    <div id="authStatus" class="status"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+"use strict";
+
+/* -------------------------------------------------------
+   CarEscape – Einstellungen
+   ------------------------------------------------------- */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDTVENgQk4ArYDVMv1dX3wCcVYoCkiaS2s",
+  authDomain: "carescape-15f2e.firebaseapp.com",
+  databaseURL: "https://carescape-15f2e-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "carescape-15f2e",
+  storageBucket: "carescape-15f2e.firebasestorage.app",
+  messagingSenderId: "338785571187",
+  appId: "1:338785571187:web:6096498735773f0113b506"
+};
+
+const ADMIN_EMAIL = "oslamu@mail.de";
+const AI_ENDPOINT = "https://carescape-ai.oslamuoslamu.workers.dev/";
+const GRID = 6;
+const MAX_VEHICLES = 16;
+const MAX_LEVEL_JSON_LENGTH = 30000;
+
+const VEHICLE_TYPES = [
+  { id:"police", name:"CarEscape Patrol", file:"police-car.png", length:2, color:"#1677ff", fixed:true },
+  { id:"large1", name:"Grand Tourer", file:"large-01.png", length:3, color:"#7d5cff" },
+  { id:"large2", name:"Solar Van", file:"large-02.png", length:3, color:"#00a884" },
+  { id:"small1", name:"Ruby", file:"small-01.png", length:2, color:"#e5484d" },
+  { id:"small2", name:"Volt", file:"small-02.png", length:2, color:"#f5a623" },
+  { id:"small3", name:"Lime", file:"small-03.png", length:2, color:"#78b82a" },
+  { id:"small4", name:"Violet", file:"small-04.png", length:2, color:"#8b5cf6" },
+  { id:"small5", name:"Ember", file:"small-05.png", length:2, color:"#f97316" },
+  { id:"small6", name:"Cloud", file:"small-06.png", length:2, color:"#94a3b8" },
+  { id:"small7", name:"Midnight", file:"small-07.png", length:2, color:"#334155" },
+  { id:"small8", name:"Mint", file:"small-08.png", length:2, color:"#2dd4bf" },
+  { id:"small9", name:"Silverline", file:"small-09.png", length:2, color:"#64748b" },
+  { id:"small10", name:"Pop", file:"small-10.png", length:2, color:"#ec4899" },
+  { id:"small11", name:"Copper", file:"small-11.png", length:2, color:"#b87333" },
+  { id:"small12", name:"Lemon", file:"small-12.png", length:2, color:"#eab308" }
+];
+
+const TYPE_BY_ID = Object.fromEntries(VEHICLE_TYPES.map(v => [v.id, v]));
+const CAR_IMAGE_BASE = "assets/cars/";
+
+let auth = null;
+let db = null;
+let currentUser = null;
+let isAdmin = false;
+let activeView = "play";
+let currentLevel = null;
+let selectedVehicleId = null;
+let moveCount = 0;
+let editorVehicles = [];
+let editorSelectedType = null;
+let editorSelectedVehicleId = null;
+let editorNextId = 1;
+let savedLevels = {};
+let publicLevels = {};
+let supportMessages = {};
+let gameInitialLevel = null;
+let dragInfo = null;
+let theme = localStorage.getItem("carescape-theme") || "light";
+
+document.documentElement.dataset.theme = theme;
+
+/* -------------------------------------------------------
+   Hilfsfunktionen
+   ------------------------------------------------------- */
+const $ = id => document.getElementById(id);
+const clone = value => JSON.parse(JSON.stringify(value));
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+}[c]));
+
+function setStatus(id, message, kind = "") {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = "status" + (kind ? " " + kind : "");
+}
+function uid() {
+  return (crypto.randomUUID ? crypto.randomUUID() : "ce-" + Date.now() + "-" + Math.random().toString(36).slice(2));
+}
+function getType(typeId) { return TYPE_BY_ID[typeId] || TYPE_BY_ID.small1; }
+function normalizeDifficulty(value) {
+  const map = { leicht:"Leicht", mittel:"Mittel", schwer:"Schwer", extrem:"Extrem" };
+  return map[String(value || "").toLowerCase()] || (["Leicht","Mittel","Schwer","Extrem"].includes(value) ? value : "Mittel");
+}
+function currentEmail() { return currentUser?.email || ""; }
+function makeDefaultLevel() {
+  return {
+    id: "starter",
+    title: "CarEscape – Einsteiger",
+    description: "Räume den Weg für das Polizeiauto frei.",
+    difficulty: "Leicht",
+    series: "CarEscape Basics",
+    visibility: "public",
+    vehicles: [
+      { id: "p", type: "police", x: 0, y: 2, orientation: "h" },
+      { id: "a", type: "small1", x: 0, y: 0, orientation: "v" },
+      { id: "b", type: "small2", x: 1, y: 0, orientation: "v" },
+      { id: "c", type: "small3", x: 2, y: 0, orientation: "h" },
+      { id: "d", type: "small4", x: 4, y: 0, orientation: "v" },
+      { id: "e", type: "small5", x: 3, y: 1, orientation: "v" },
+      { id: "f", type: "large1", x: 0, y: 4, orientation: "h" },
+      { id: "g", type: "small6", x: 3, y: 3, orientation: "v" },
+      { id: "h", type: "small7", x: 4, y: 4, orientation: "h" },
+      { id: "i", type: "small8", x: 5, y: 1, orientation: "v" }
+    ]
+  };
+}
+function getVehicleSize(vehicle) { return getType(vehicle.type).length; }
+function vehicleCells(vehicle) {
+  const cells = [];
+  const len = getVehicleSize(vehicle);
+  for (let i = 0; i < len; i++) {
+    cells.push({
+      x: vehicle.x + (vehicle.orientation === "h" ? i : 0),
+      y: vehicle.y + (vehicle.orientation === "v" ? i : 0)
+    });
+  }
+  return cells;
+}
+function isInside(vehicle) {
+  return vehicle.x >= 0 && vehicle.y >= 0 &&
+    vehicle.x + (vehicle.orientation === "h" ? getVehicleSize(vehicle) : 1) <= GRID &&
+    vehicle.y + (vehicle.orientation === "v" ? getVehicleSize(vehicle) : 1) <= GRID;
+}
+function isValidLevel(level) {
+  if (!level || !Array.isArray(level.vehicles) || level.vehicles.length < 1 || level.vehicles.length > MAX_VEHICLES) {
+    return {ok:false, error:"Das Level muss zwischen 1 und " + MAX_VEHICLES + " Fahrzeuge enthalten."};
+  }
+  const ids = new Set();
+  let policeCount = 0;
+  const occupied = new Set();
+
+  for (const v of level.vehicles) {
+    if (!v || typeof v.id !== "string" || !TYPE_BY_ID[v.type]) return {ok:false, error:"Ein Fahrzeugtyp ist ungültig."};
+    if (ids.has(v.id)) return {ok:false, error:"Fahrzeug-IDs müssen eindeutig sein."};
+    ids.add(v.id);
+    if (!Number.isInteger(v.x) || !Number.isInteger(v.y) ||
+        !["h","v"].includes(v.orientation)) return {ok:false, error:"Fahrzeugposition oder Ausrichtung ungültig."};
+    if (getType(v.type).fixed) {
+      policeCount++;
+      if (v.orientation !== "h" || v.y !== 2) return {ok:false, error:"Das Polizeiauto muss horizontal in der Ausgangsreihe stehen."};
+    }
+    if (!isInside(v)) return {ok:false, error:"Ein Fahrzeug liegt außerhalb des Spielfelds."};
+    for (const c of vehicleCells(v)) {
+      const key = c.x + "," + c.y;
+      if (occupied.has(key)) return {ok:false, error:"Zwei Fahrzeuge überlappen sich."};
+      occupied.add(key);
+    }
+  }
+  if (policeCount !== 1) return {ok:false, error:"Das Level muss genau ein Polizeiauto enthalten."};
+  return {ok:true};
+}
+function occupiedMap(vehicles, ignoreId = null) {
+  const map = new Map();
+  for (const v of vehicles) {
+    if (v.id === ignoreId) continue;
+    for (const c of vehicleCells(v)) map.set(c.x + "," + c.y, v.id);
+  }
+  return map;
+}
+function canMove(vehicle, delta, vehicles) {
+  if (vehicle.orientation === "h" && delta.y !== 0) return false;
+  if (vehicle.orientation === "v" && delta.x !== 0) return false;
+  const next = {...vehicle, x:vehicle.x + delta.x, y:vehicle.y + delta.y};
+  if (!isInside(next)) {
+    // Das Polizeiauto darf über den rechten Rand hinausfahren, wenn es auf der Ausgangsreihe steht.
+    if (!(getType(vehicle.type).fixed && delta.x > 0 && vehicle.y === 2 && vehicle.x + 2 < GRID)) return false;
+  }
+  const occupied = occupiedMap(vehicles, vehicle.id);
+  for (const c of vehicleCells(next)) {
+    if (c.x < 0 || c.y < 0 || c.y >= GRID) return false;
+    if (c.x >= GRID) {
+      if (getType(vehicle.type).fixed && vehicle.y === 2 && delta.x > 0) continue;
+      return false;
+    }
+    if (occupied.has(c.x + "," + c.y)) return false;
+  }
+  return true;
+}
+function isSolved(level) {
+  const police = level.vehicles.find(v => getType(v.type).fixed);
+  if (!police || police.y !== 2) return false;
+  const occupied = occupiedMap(level.vehicles, police.id);
+  for (let x = police.x + 2; x < GRID; x++) if (occupied.has(x + ",2")) return false;
+  return true;
+}
+
+/* -------------------------------------------------------
+   Spielfeld rendern und bedienen
+   ------------------------------------------------------- */
+function renderBoard(target, level, isEditor = false) {
+  target.querySelectorAll(".vehicle").forEach(el => el.remove());
+  const vehicles = level?.vehicles || [];
+  for (const v of vehicles) {
+    const type = getType(v.type);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "vehicle" + ((!isEditor && v.id === selectedVehicleId) || (isEditor && v.id === editorSelectedVehicleId) ? " selected" : "");
+    button.dataset.vehicleId = v.id;
+    button.title = type.name;
+    button.setAttribute("aria-label", type.name);
+    button.style.left = (v.x * 100 / GRID) + "%";
+    button.style.top = (v.y * 100 / GRID) + "%";
+    button.style.width = ((v.orientation === "h" ? type.length : 1) * 100 / GRID) + "%";
+    button.style.height = ((v.orientation === "v" ? type.length : 1) * 100 / GRID) + "%";
+    button.style.setProperty("--car-color", type.color);
+    const img = document.createElement("img");
+    img.src = CAR_IMAGE_BASE + type.file;
+    img.alt = type.name;
+    img.draggable = false;
+    img.onerror = () => {
+      button.classList.add("fallback");
+      button.textContent = type.name;
+      img.remove();
+    };
+    button.appendChild(img);
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      if (isEditor) {
+        editorSelectedVehicleId = v.id;
+        editorSelectedType = null;
+        renderBoard($("editBoard"), {vehicles:editorVehicles}, true);
+        renderInventory();
+      } else {
+        selectedVehicleId = v.id;
+        renderBoard($("board"), currentLevel, false);
+      }
+    });
+    button.addEventListener("pointerdown", event => {
+      if (isEditor) return;
+      dragInfo = { id:v.id, x:event.clientX, y:event.clientY, moved:false };
+      button.setPointerCapture?.(event.pointerId);
+    });
+    button.addEventListener("pointerup", event => {
+      if (isEditor || !dragInfo || dragInfo.id !== v.id) return;
+      const dx = event.clientX - dragInfo.x;
+      const dy = event.clientY - dragInfo.y;
+      dragInfo = null;
+      const cell = target.clientWidth / GRID;
+      if (Math.abs(dx) > 18 || Math.abs(dy) > 18) {
+        selectedVehicleId = v.id;
+        const steps = v.orientation === "h" ? Math.round(dx / cell) : Math.round(dy / cell);
+        if (steps) moveSelected(Math.sign(steps), Math.abs(steps));
+      }
+    });
+    target.appendChild(button);
+  }
+}
+function loadLevel(level) {
+  const validation = isValidLevel(level);
+  if (!validation.ok) {
+    setStatus("gameStatus", validation.error, "error");
+    return false;
+  }
+  currentLevel = clone(level);
+  gameInitialLevel = clone(level);
+  selectedVehicleId = currentLevel.vehicles[0]?.id || null;
+  moveCount = 0;
+  $("levelTitle").textContent = currentLevel.title || "CarEscape-Level";
+  $("levelSubtitle").textContent = currentLevel.description || "Bewege das Polizeiauto zum Ausgang.";
+  $("levelDifficulty").textContent = normalizeDifficulty(currentLevel.difficulty);
+  $("moveCount").textContent = "0";
+  setStatus("gameStatus", "Level geladen.");
+  renderBoard($("board"), currentLevel);
+  showView("play");
+  return true;
+}
+function moveSelected(direction, maxSteps = 1) {
+  if (!currentLevel || !selectedVehicleId) {
+    setStatus("gameStatus", "Wähle zuerst ein Fahrzeug aus.");
+    return;
+  }
+  const v = currentLevel.vehicles.find(item => item.id === selectedVehicleId);
+  if (!v) return;
+  const delta = v.orientation === "h" ? {x:direction,y:0} : {x:0,y:direction};
+  let moved = false;
+  for (let i = 0; i < Math.min(maxSteps, GRID); i++) {
+    if (!canMove(v, delta, currentLevel.vehicles)) break;
+    v.x += delta.x; v.y += delta.y;
+    moved = true; moveCount++;
+    // Bei der Ausfahrt wird das Polizeiauto als gelöst gewertet, nicht dauerhaft außerhalb gespeichert.
+    if (getType(v.type).fixed && v.x >= GRID - 1) break;
+  }
+  $("moveCount").textContent = String(moveCount);
+  renderBoard($("board"), currentLevel);
+  if (moved && isSolved(currentLevel)) {
+    setStatus("gameStatus", "Geschafft! Der Weg zum Ausgang ist frei. Züge: " + moveCount, "success");
+  } else if (!moved) {
+    setStatus("gameStatus", "Dort ist kein Platz für das Fahrzeug.");
+  } else {
+    setStatus("gameStatus", "Gut! Räume den Weg weiter frei.");
+  }
+}
+function resetGame() {
+  if (!gameInitialLevel) return;
+  loadLevel(gameInitialLevel);
+}
+
+/* -------------------------------------------------------
+   Editor und Inventar
+   ------------------------------------------------------- */
+function renderInventory() {
+  const inventory = $("inventory");
+  inventory.innerHTML = "";
+  const counts = {};
+  editorVehicles.forEach(v => counts[v.type] = (counts[v.type] || 0) + 1);
+
+  for (const type of VEHICLE_TYPES) {
+    const count = counts[type.id] || 0;
+    const limit = type.fixed ? 1 : (type.length === 3 ? 4 : 12);
+    const button = document.createElement("button");
+    button.className = "inventory-item";
+    button.type = "button";
+    button.disabled = count >= limit || editorVehicles.length >= MAX_VEHICLES;
+    button.innerHTML = `<img src="${CAR_IMAGE_BASE + type.file}" alt=""><strong>${escapeHTML(type.name)}</strong><span>${count}/${limit}</span>`;
+    button.addEventListener("click", () => {
+      editorSelectedType = type.id;
+      editorSelectedVehicleId = null;
+      renderInventory();
+      setStatus("editorStatus", "Ausgewählt: " + type.name + ". Tippe jetzt auf ein freies Feld im Editor.");
+    });
+    inventory.appendChild(button);
+  }
+}
+function renderEditor() {
+  renderBoard($("editBoard"), {vehicles:editorVehicles}, true);
+  renderInventory();
+}
+function addEditorVehicle(typeId, x, y) {
+  const type = getType(typeId);
+  if (editorVehicles.length >= MAX_VEHICLES) return setStatus("editorStatus", "Das Inventar ist voll.", "error");
+  if (type.fixed && editorVehicles.some(v => getType(v.type).fixed)) return setStatus("editorStatus", "Es gibt bereits ein Polizeiauto.", "error");
+  const count = editorVehicles.filter(v => v.type === typeId).length;
+  const limit = type.fixed ? 1 : (type.length === 3 ? 4 : 12);
+  if (count >= limit) return setStatus("editorStatus", "Das Inventarlimit für diesen Fahrzeugtyp ist erreicht.", "error");
+
+  const orientation = type.fixed ? "h" : "h";
+  const v = {id:"e" + editorNextId++, type:typeId, x, y, orientation};
+  if (!isInside(v)) return setStatus("editorStatus", "Das Fahrzeug passt dort nicht auf das Spielfeld.", "error");
+  const candidate = {vehicles:[...editorVehicles, v]};
+  const valid = isValidLevel(candidate);
+  if (!valid.ok) return setStatus("editorStatus", valid.error, "error");
+  editorVehicles.push(v);
+  editorSelectedVehicleId = v.id;
+  editorSelectedType = null;
+  renderEditor();
+  setStatus("editorStatus", type.name + " hinzugefügt.", "success");
+}
+$("editBoard").addEventListener("click", event => {
+  if (!editorSelectedType) return;
+  const rect = $("editBoard").getBoundingClientRect();
+  const x = Math.floor((event.clientX - rect.left) / (rect.width / GRID));
+  const y = Math.floor((event.clientY - rect.top) / (rect.height / GRID));
+  if (x >= 0 && x < GRID && y >= 0 && y < GRID) addEditorVehicle(editorSelectedType, x, y);
+});
+$("removeVehicleBtn").addEventListener("click", () => {
+  if (!editorSelectedVehicleId) return setStatus("editorStatus", "Wähle zuerst ein Fahrzeug aus.");
+  editorVehicles = editorVehicles.filter(v => v.id !== editorSelectedVehicleId);
+  editorSelectedVehicleId = null;
+  renderEditor();
+  setStatus("editorStatus", "Fahrzeug entfernt.");
+});
+$("clearEditorBtn").addEventListener("click", () => {
+  editorVehicles = [];
+  editorSelectedVehicleId = null;
+  editorSelectedType = null;
+  renderEditor();
+  setStatus("editorStatus", "Editor geleert.");
+});
+function makeEditorLevel() {
+  return {
+    id:uid(),
+    title:$("editTitle").value.trim() || "Mein CarEscape-Level",
+    description:$("levelDescription").value.trim(),
+    difficulty:normalizeDifficulty($("editDifficulty").value),
+    series:$("editSeries").value.trim() || "Eigene Serie",
+    visibility:$("visibility").value,
+    vehicles:clone(editorVehicles),
+    ownerUid:currentUser?.uid || null,
+    ownerEmail:currentEmail(),
+    createdAt:Date.now()
+  };
+}
+function beginNewLevel() {
+  editorVehicles = [];
+  editorSelectedType = null;
+  editorSelectedVehicleId = null;
+  editorNextId = 1;
+  $("editTitle").value = "";
+  $("editSeries").value = "";
+  $("levelDescription").value = "";
+  renderEditor();
+  setStatus("editorStatus", "Wähle ein Fahrzeug im Inventar aus, um es zu platzieren.");
+  showView("create");
+}
+
+/* -------------------------------------------------------
+   Lösbarkeitstest – vollständige Zustands-Suche
+   ------------------------------------------------------- */
+function stateKey(vehicles) {
+  return vehicles.map(v => v.id + ":" + v.x + "," + v.y).sort().join("|");
+}
+function testSolvable(level, maxStates = 80000) {
+  const validation = isValidLevel(level);
+  if (!validation.ok) return {solvable:false, reason:validation.error, visited:0};
+  if (isSolved(level)) return {solvable:true, visited:1};
+  const start = clone(level.vehicles);
+  const queue = [start];
+  const seen = new Set([stateKey(start)]);
+  let head = 0;
+  while (head < queue.length && seen.size < maxStates) {
+    const state = queue[head++];
+    for (const v of state) {
+      for (const dir of [-1,1]) {
+        const next = clone(state);
+        const nv = next.find(x => x.id === v.id);
+        const delta = nv.orientation === "h" ? {x:dir,y:0} : {x:0,y:dir};
+        if (!canMove(nv, delta, next)) continue;
+        nv.x += delta.x; nv.y += delta.y;
+        if (getType(nv.type).fixed && nv.x >= GRID - 2) return {solvable:true, visited:seen.size};
+        const key = stateKey(next);
+        if (!seen.has(key)) { seen.add(key); queue.push(next); }
+      }
+    }
+  }
+  return {solvable:false, reason:seen.size >= maxStates ? "Suche abgebrochen: zu viele Zustände." : "Kein Lösungsweg gefunden.", visited:seen.size};
+}
+$("testLevelBtn").addEventListener("click", () => {
+  const result = testSolvable({vehicles:editorVehicles});
+  setStatus("editorStatus", result.solvable
+    ? `Lösungsweg gefunden! Geprüfte Zustände: ${result.visited}.`
+    : `${result.reason} Geprüfte Zustände: ${result.visited}.`, result.solvable ? "success" : "error");
+});
+
+/* -------------------------------------------------------
+   Vireonix KI – JSON-Anfrage nach deinem Kurzbefehle-Muster
+   ------------------------------------------------------- */
+function makeAIMessage(userPrompt, difficulty, count) {
+  const websiteContext = `
+Du bist der CarEscape-Levelgenerator der Website CarEscape.
+Erstelle ein spielbares Level für ein 6x6-Raster im Stil eines Fahrzeug-Schiebepuzzles.
+Das Ziel ist, das Polizeiauto "police" horizontal nach rechts aus dem Ausgang in Zeile y=2 zu bewegen.
+Fahrzeuge bewegen sich ausschließlich entlang ihrer Ausrichtung.
+Alle Koordinaten sind ganzzahlig und beginnen bei 0.
+x und y sind die linke obere Zelle eines Fahrzeugs.
+Erlaubte Fahrzeugtypen und Längen:
+- police: Länge 2, horizontal, genau einmal, y muss 2 sein.
+- large1 und large2: Länge 3.
+- small1 bis small12: Länge 2.
+Jedes Fahrzeug hat eine eindeutige id, einen type, x, y und orientation ("h" oder "v").
+Fahrzeuge dürfen nicht überlappen oder außerhalb des 6x6-Rasters liegen.
+Erstelle ungefähr ${count} Fahrzeuge, mit Schwierigkeit "${difficulty}".
+Erfinde einen passenden deutschen Titel, eine Beschreibung und eine Serie.
+WICHTIG: Antworte ausschließlich mit einem gültigen JSON-Objekt, ohne Markdown, ohne Codeblock und ohne zusätzliche Erklärungen.
+Verwende exakt dieses Schema:
+{
+  "title":"Titel",
+  "description":"Beschreibung",
+  "difficulty":"Leicht|Mittel|Schwer|Extrem",
+  "series":"Serienname",
+  "vehicles":[
+    {"id":"p","type":"police","x":0,"y":2,"orientation":"h"},
+    {"id":"a","type":"small1","x":0,"y":0,"orientation":"v"}
+  ]
+}
+Die Beispiele sind nur zur Format-Erklärung. Erstelle ein vollständiges, gültiges Level.
+Achte auf eine lösbare Anordnung. Gib nur JSON aus.
+`;
+  return websiteContext + "\n\nNachricht und Wunsch des Users:\n" + userPrompt.trim();
+}
+function extractJSON(text) {
+  let value = String(text || "").trim();
+  value = value.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  try { return JSON.parse(value); } catch (_) {}
+  const first = value.indexOf("{");
+  const last = value.lastIndexOf("}");
+  if (first >= 0 && last > first) return JSON.parse(value.slice(first, last + 1));
+  throw new Error("Die KI hat kein gültiges JSON zurückgegeben.");
+}
+async function generateAILevel() {
+  const prompt = $("aiPrompt").value.trim();
+  if (!prompt) return setStatus("aiStatus", "Bitte beschreibe zuerst deine Level-Idee.", "error");
+  const button = $("generateBtn");
+  button.disabled = true;
+  setStatus("aiStatus", "Die KI erstellt dein Level …");
+
+  try {
+    // Wie im Kurzbefehl: JSON-Haupttext mit model=auto und messages als Liste.
+    // Der Website-Kontext und die Nachricht des Nutzers stehen zusammen im content.
+    const requestBody = {
+      model: "auto",
+      messages: [
+        {
+          role: "user",
+          content: makeAIMessage(prompt, $("aiDifficulty").value, $("aiVehicleCount").value)
+        }
+      ]
+    };
+
+    const response = await fetch(AI_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+
+    const raw = await response.text();
+    if (!response.ok) {
+      throw new Error("Vireonix antwortete mit HTTP " + response.status + ". " + raw.slice(0, 250));
+    }
+
+    let apiData;
+    try { apiData = JSON.parse(raw); }
+    catch (_) { throw new Error("Die API-Antwort war kein gültiges JSON."); }
+
+    // OpenAI-kompatible Chat-Completions-Antwort.
+    const content = apiData?.choices?.[0]?.message?.content;
+    if (typeof content !== "string" || !content.trim()) {
+      throw new Error("In der API-Antwort fehlt choices[0].message.content.");
+    }
+    if (content.length > MAX_LEVEL_JSON_LENGTH) throw new Error("Die KI-Antwort ist zu groß.");
+
+    const generated = extractJSON(content);
+    const level = {
+      id:uid(),
+      title:String(generated.title || "KI-Level").slice(0,70),
+      description:String(generated.description || "Von der CarEscape-KI erstellt.").slice(0,1000),
+      difficulty:normalizeDifficulty(generated.difficulty || $("aiDifficulty").value),
+      series:String(generated.series || "KI-Level").slice(0,50),
+      visibility:"private",
+      vehicles:Array.isArray(generated.vehicles) ? generated.vehicles : []
+    };
+    const validation = isValidLevel(level);
+    if (!validation.ok) throw new Error("Das KI-Level ist ungültig: " + validation.error);
+
+    const solvability = testSolvable(level, 80000);
+    if (!solvability.solvable) {
+      throw new Error("Die KI hat ein Level erstellt, für das kein Lösungsweg gefunden wurde. Bitte erneut versuchen oder die Beschreibung ändern.");
+    }
+
+    $("editTitle").value = level.title;
+    $("editDifficulty").value = level.difficulty;
+    $("editSeries").value = level.series;
+    $("levelDescription").value = level.description;
+    editorVehicles = clone(level.vehicles);
+    editorSelectedType = null;
+    editorSelectedVehicleId = null;
+    renderEditor();
+    loadLevel(level);
+    setStatus("aiStatus", "Level erstellt und Lösungsweg gefunden. Es ist noch nicht veröffentlicht.", "success");
+  } catch (error) {
+    console.error("CarEscape KI-Fehler:", error);
+    const message = error?.message || "Unbekannter Fehler.";
+    setStatus("aiStatus", "KI-Erstellung fehlgeschlagen: " + message, "error");
+  } finally {
+    button.disabled = false;
+  }
+}
+$("generateBtn").addEventListener("click", generateAILevel);
+
+/* -------------------------------------------------------
+   Firebase initialisieren und Anmeldung
+   ------------------------------------------------------- */
+function initFirebase() {
+  if (!window.firebase) {
+    setStatus("authStatus", "Firebase konnte nicht geladen werden.", "error");
+    return;
+  }
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    auth = firebase.auth();
+    db = firebase.database();
+    auth.onAuthStateChanged(async user => {
+      currentUser = user;
+      isAdmin = !!user && user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      $("accountBtn").textContent = user ? (user.displayName || user.email || "Konto") : "Anmelden";
+      $("adminTab").classList.toggle("hidden", !isAdmin);
+      await refreshLevels();
+      renderMyLevels();
+      if (isAdmin) loadAdminLevels();
+    });
+  } catch (error) {
+    console.error(error);
+    setStatus("authStatus", "Firebase-Fehler: " + error.message, "error");
+  }
+}
+function showAuth() {
+  $("authModal").classList.remove("hidden");
+  setStatus("authStatus", "");
+}
+function closeAuth() { $("authModal").classList.add("hidden"); }
+$("accountBtn").addEventListener("click", async () => {
+  if (currentUser) {
+    if (confirm("Möchtest du dich abmelden?")) await auth.signOut();
+  } else showAuth();
+});
+$("closeAuthBtn").addEventListener("click", closeAuth);
+$("authModal").addEventListener("click", event => { if (event.target === $("authModal")) closeAuth(); });
+
+$("loginBtn").addEventListener("click", async () => {
+  if (!auth) return setStatus("authStatus", "Firebase ist nicht verfügbar.", "error");
+  try {
+    await auth.signInWithEmailAndPassword($("authEmail").value.trim(), $("authPassword").value);
+    closeAuth();
+  } catch (error) { setStatus("authStatus", friendlyAuthError(error), "error"); }
+});
+$("registerBtn").addEventListener("click", async () => {
+  if (!auth) return setStatus("authStatus", "Firebase ist nicht verfügbar.", "error");
+  try {
+    const credential = await auth.createUserWithEmailAndPassword($("authEmail").value.trim(), $("authPassword").value);
+    await credential.user.updateProfile({displayName:credential.user.email.split("@")[0]});
+    closeAuth();
+  } catch (error) { setStatus("authStatus", friendlyAuthError(error), "error"); }
+});
+$("resetPasswordBtn").addEventListener("click", async () => {
+  const email = $("authEmail").value.trim();
+  if (!email) return setStatus("authStatus", "Gib zuerst deine E-Mail-Adresse ein.", "error");
+  try { await auth.sendPasswordResetEmail(email); setStatus("authStatus", "E-Mail zum Zurücksetzen wurde angefordert.", "success"); }
+  catch (error) { setStatus("authStatus", friendlyAuthError(error), "error"); }
+});
+function friendlyAuthError(error) {
+  const messages = {
+    "auth/invalid-email":"Die E-Mail-Adresse ist ungültig.",
+    "auth/user-not-found":"Für diese E-Mail wurde kein Konto gefunden.",
+    "auth/wrong-password":"Das Passwort ist falsch.",
+    "auth/invalid-credential":"Anmeldedaten stimmen nicht.",
+    "auth/email-already-in-use":"Diese E-Mail wird bereits verwendet.",
+    "auth/weak-password":"Bitte verwende ein stärkeres Passwort.",
+    "auth/too-many-requests":"Zu viele Versuche. Bitte später erneut probieren."
+  };
+  return messages[error.code] || error.message || "Anmeldung fehlgeschlagen.";
+}
+function requireUser() {
+  if (currentUser) return true;
+  showAuth();
+  return false;
+}
+
+/* -------------------------------------------------------
+   Level speichern, laden, teilen
+   ------------------------------------------------------- */
+function cleanForDatabase(level) {
+  const copy = clone(level);
+  delete copy.ownerEmail;
+  return copy;
+}
+async function saveLevel(level, id = null) {
+  if (!requireUser()) return;
+  const validation = isValidLevel(level);
+  if (!validation.ok) throw new Error(validation.error);
+  const key = id || level.id || uid();
+  const record = {
+    ...cleanForDatabase(level),
+    id:key,
+    ownerUid:currentUser.uid,
+    ownerEmail:currentUser.email || "",
+    updatedAt:Date.now()
+  };
+  await db.ref("levels/" + key).set(record);
+  return key;
+}
+$("saveEditorBtn").addEventListener("click", async () => {
+  if (!requireUser()) return;
+  const level = makeEditorLevel();
+  const validation = isValidLevel(level);
+  if (!validation.ok) return setStatus("editorStatus", validation.error, "error");
+  const test = testSolvable(level);
+  if (!test.solvable && !confirm("Kein Lösungsweg gefunden (" + test.reason + "). Trotzdem speichern?")) return;
+  try {
+    const key = await saveLevel(level);
+    setStatus("editorStatus", "Level gespeichert. ID: " + key, "success");
+    level.id = key;
+    await refreshLevels();
+    renderMyLevels();
+  } catch (error) { setStatus("editorStatus", "Speichern fehlgeschlagen: " + error.message, "error"); }
+});
+$("saveCurrentBtn").addEventListener("click", async () => {
+  if (!currentLevel) return;
+  if (!requireUser()) return;
+  try {
+    const copy = clone(currentLevel);
+    copy.id = uid();
+    copy.visibility = "private";
+    const key = await saveLevel(copy);
+    setStatus("gameStatus", "Level privat gespeichert. ID: " + key, "success");
+    await refreshLevels();
+    renderMyLevels();
+  } catch (error) { setStatus("gameStatus", "Speichern fehlgeschlagen: " + error.message, "error"); }
+});
+async function refreshLevels() {
+  if (!db) return;
+  try {
+    const snap = await db.ref("levels").once("value");
+    savedLevels = snap.val() || {};
+    publicLevels = {};
+    for (const [id, level] of Object.entries(savedLevels)) {
+      if (level && (level.visibility === "public" || (level.visibility === "link" && new URLSearchParams(location.search).get("level") === id))) {
+        publicLevels[id] = level;
+      }
+    }
+    renderDiscover();
+    renderMyLevels();
+  } catch (error) {
+    console.error(error);
+    setStatus("discoverStatus", "Level konnten nicht geladen werden. Prüfe deine Firebase-Regeln.");
+  }
+}
+function makeLevelCard(id, level, admin = false) {
+  const card = document.createElement("article");
+  card.className = "level-card";
+  card.innerHTML = `
+    <h3>${escapeHTML(level.title || "Unbenanntes Level")}</h3>
+    <div class="row"><span class="chip">${escapeHTML(normalizeDifficulty(level.difficulty))}</span>
+    <span class="chip">${escapeHTML(level.series || "Ohne Serie")}</span></div>
+    <p>${escapeHTML(level.description || "Keine Beschreibung.")}</p>
+    <p class="muted">${escapeHTML(level.ownerEmail || "CarEscape-Spieler")} · ${escapeHTML(level.visibility || "private")}</p>
+    <div class="row">
+      <button class="btn primary small" data-action="play">Spielen</button>
+      <button class="btn small" data-action="share">Teilen</button>
+      ${admin ? '<button class="btn danger small" data-action="delete">Löschen</button>' : ""}
+    </div>`;
+  card.querySelector('[data-action="play"]').addEventListener("click", () => {
+    if (loadLevel(level)) setStatus("gameStatus", "Level geladen: " + (level.title || ""));
+  });
+  card.querySelector('[data-action="share"]').addEventListener("click", () => shareLevel(id, level));
+  const deleteBtn = card.querySelector('[data-action="delete"]');
+  if (deleteBtn) deleteBtn.addEventListener("click", () => deleteLevel(id));
+  return card;
+}
+function renderDiscover() {
+  const host = $("discoverCards");
+  host.innerHTML = "";
+  const search = ($("levelSearch").value || "").toLowerCase().trim();
+  const difficulty = $("difficultyFilter").value;
+  const entries = Object.entries(publicLevels).filter(([id,l]) => {
+    const haystack = [l.title,l.description,l.series,l.ownerEmail,id].join(" ").toLowerCase();
+    return (!search || haystack.includes(search)) && (!difficulty || normalizeDifficulty(l.difficulty) === difficulty);
+  }).sort((a,b) => (b[1].updatedAt || 0) - (a[1].updatedAt || 0));
+  for (const [id,level] of entries) host.appendChild(makeLevelCard(id,level));
+  setStatus("discoverStatus", entries.length ? entries.length + " Level gefunden." : "Keine öffentlichen Level gefunden.");
+}
+function renderMyLevels() {
+  const host = $("myCards");
+  if (!host) return;
+  host.innerHTML = "";
+  if (!currentUser) {
+    setStatus("myStatus", "Melde dich an, um deine Level zu sehen.");
+    return;
+  }
+  const entries = Object.entries(savedLevels).filter(([id,l]) => l && (l.ownerUid === currentUser.uid || (isAdmin && l.ownerEmail === ADMIN_EMAIL)));
+  for (const [id,level] of entries) host.appendChild(makeLevelCard(id,level));
+  setStatus("myStatus", entries.length ? entries.length + " eigene Level." : "Du hast noch keine Level gespeichert.");
+}
+async function shareLevel(id, level) {
+  let url = location.origin + location.pathname + "?level=" + encodeURIComponent(id);
+  try {
+    if (navigator.share) await navigator.share({title:level.title || "CarEscape-Level", text:level.description || "Spiele dieses CarEscape-Level", url});
+    else if (navigator.clipboard) { await navigator.clipboard.writeText(url); alert("Level-Link kopiert:\n" + url); }
+    else prompt("Kopiere diesen Level-Link:", url);
+  } catch (error) { if (error.name !== "AbortError") prompt("Level-Link:", url); }
+}
+async function deleteLevel(id) {
+  if (!isAdmin || !currentUser) return alert("Nur der Admin kann Level hier löschen.");
+  if (!confirm("Dieses Level endgültig löschen?")) return;
+  try {
+    await db.ref("levels/" + id).remove();
+    await refreshLevels();
+    loadAdminLevels();
+    setStatus("adminStatus", "Level gelöscht.", "success");
+  } catch (error) { setStatus("adminStatus", "Löschen fehlgeschlagen: " + error.message, "error"); }
+}
+
+/* -------------------------------------------------------
+   Admin
+   ------------------------------------------------------- */
+async function loadAdminLevels() {
+  if (!isAdmin) return;
+  const host = $("adminCards");
+  host.innerHTML = "";
+  for (const [id,level] of Object.entries(savedLevels)) host.appendChild(makeLevelCard(id,level,true));
+  setStatus("adminStatus", Object.keys(savedLevels).length + " Level geladen.");
+}
+$("adminRefreshBtn").addEventListener("click", async () => {
+  if (!isAdmin) return;
+  await refreshLevels();
+  await loadAdminLevels();
+});
+
+/* -------------------------------------------------------
+   Support-Chat (Realtime Database)
+   ------------------------------------------------------- */
+async function loadSupportMessages() {
+  if (!db) return;
+  try {
+    const snap = await db.ref("supportMessages").limitToLast(100).once("value");
+    supportMessages = snap.val() || {};
+    renderSupportLog();
+  } catch (error) {
+    setStatus("supportStatus", "Support-Nachrichten konnten nicht geladen werden.");
+  }
+}
+function renderSupportLog() {
+  const host = $("supportLog");
+  host.innerHTML = "";
+  for (const msg of Object.values(supportMessages).sort((a,b) => (a.createdAt || 0) - (b.createdAt || 0))) {
+    const div = document.createElement("div");
+    div.className = "chat-message";
+    div.innerHTML = `<strong>${escapeHTML(msg.name || "Gast")}</strong><div>${escapeHTML(msg.message || "")}</div><small class="muted">${new Date(msg.createdAt || Date.now()).toLocaleString("de-DE")}</small>`;
+    host.appendChild(div);
+  }
+  host.scrollTop = host.scrollHeight;
+}
+$("sendSupportBtn").addEventListener("click", async () => {
+  const message = $("supportMessage").value.trim();
+  if (!message) return setStatus("supportStatus", "Bitte gib eine Nachricht ein.");
+  if (message.length > 1000) return setStatus("supportStatus", "Die Nachricht ist zu lang.");
+  if (!db) return setStatus("supportStatus", "Firebase ist nicht verfügbar.", "error");
+  try {
+    await db.ref("supportMessages").push({
+      name:$("supportName").value.trim().slice(0,40) || currentUser?.displayName || "Gast",
+      message,
+      uid:currentUser?.uid || null,
+      createdAt:Date.now()
+    });
+    $("supportMessage").value = "";
+    await loadSupportMessages();
+    setStatus("supportStatus", "Nachricht gesendet.", "success");
+  } catch (error) {
+    setStatus("supportStatus", "Senden fehlgeschlagen. Prüfe die Firebase-Regeln.", "error");
+  }
+});
+$("adminSupportBtn").addEventListener("click", async () => {
+  if (!isAdmin) return;
+  try {
+    const snap = await db.ref("supportMessages").limitToLast(100).once("value");
+    const messages = Object.values(snap.val() || {}).sort((a,b) => (a.createdAt || 0) - (b.createdAt || 0));
+    $("adminSupportLog").innerHTML = "";
+    for (const msg of messages) {
+      const div = document.createElement("div");
+      div.className = "chat-message";
+      div.innerHTML = `<strong>${escapeHTML(msg.name || "Gast")}</strong> <span class="muted">${escapeHTML(msg.uid || "nicht angemeldet")}</span><div>${escapeHTML(msg.message || "")}</div><small class="muted">${new Date(msg.createdAt || Date.now()).toLocaleString("de-DE")}</small>`;
+      $("adminSupportLog").appendChild(div);
+    }
+    setStatus("adminStatus", messages.length + " Support-Nachrichten geladen.");
+  } catch (error) { setStatus("adminStatus", "Support-Chat konnte nicht geladen werden.", "error"); }
+});
+
+/* -------------------------------------------------------
+   Levelbild exportieren und Browser-Teilen
+   ------------------------------------------------------- */
+async function createBoardImage() {
+  if (!currentLevel) throw new Error("Kein Level geladen.");
+  const canvas = document.createElement("canvas");
+  const size = 900;
+  const cell = size / GRID;
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#e9edf2"; ctx.fillRect(0,0,size,size);
+  ctx.strokeStyle = "#aab4c0"; ctx.lineWidth = 3;
+  for (let i=0;i<=GRID;i++) {
+    ctx.beginPath(); ctx.moveTo(i*cell,0); ctx.lineTo(i*cell,size); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,i*cell); ctx.lineTo(size,i*cell); ctx.stroke();
+  }
+  ctx.fillStyle = "#18885b"; ctx.fillRect(size-8,2*cell,8,cell);
+  for (const v of currentLevel.vehicles) {
+    const type = getType(v.type);
+    const x = v.x*cell, y = v.y*cell;
+    const w = (v.orientation === "h" ? type.length : 1)*cell;
+    const h = (v.orientation === "v" ? type.length : 1)*cell;
+    let drawn = false;
+    try {
+      const img = new Image();
+      img.src = CAR_IMAGE_BASE + type.file;
+      await new Promise((resolve,reject) => { img.onload=resolve; img.onerror=reject; });
+      ctx.drawImage(img,x+4,y+4,w-8,h-8);
+      drawn = true;
+    } catch (_) {}
+    if (!drawn) {
+      ctx.fillStyle = type.color;
+      ctx.beginPath(); ctx.roundRect(x+5,y+5,w-10,h-10,15); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.font = "bold 22px Inter, sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(type.name.slice(0,12),x+w/2,y+h/2);
+    }
+  }
+  return await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+}
+$("downloadImageBtn").addEventListener("click", async () => {
+  try {
+    const blob = await createBoardImage();
+    if (!blob) throw new Error("Bild konnte nicht erzeugt werden.");
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "CarEscape-Level.png"; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) { setStatus("gameStatus", error.message, "error"); }
+});
+$("shareBtn").addEventListener("click", async () => {
+  if (!currentLevel) return;
+  try {
+    const blob = await createBoardImage();
+    if (navigator.canShare && navigator.canShare({files:[new File([blob],"CarEscape-Level.png",{type:"image/png"})]})) {
+      await navigator.share({
+        title:currentLevel.title || "CarEscape",
+        text:currentLevel.description || "Mein CarEscape-Level",
+        files:[new File([blob],"CarEscape-Level.png",{type:"image/png"})]
+      });
+    } else {
+      await shareLevel(currentLevel.id || "starter", currentLevel);
+    }
+  } catch (error) {
+    if (error.name !== "AbortError") setStatus("gameStatus", "Teilen nicht möglich: " + error.message, "error");
+  }
+});
+
+/* -------------------------------------------------------
+   Navigation, Tastatur, Theme und Start
+   ------------------------------------------------------- */
+function showView(view) {
+  activeView = view;
+  document.querySelectorAll(".view").forEach(el => el.classList.add("hidden"));
+  $("view-" + view)?.classList.remove("hidden");
+  document.querySelectorAll(".tab").forEach(el => el.classList.toggle("active", el.dataset.view === view));
+  if (view === "create" && !editorVehicles.length) renderEditor();
+  if (view === "discover") refreshLevels();
+  if (view === "my") renderMyLevels();
+  if (view === "help") loadSupportMessages();
+  if (view === "admin" && isAdmin) loadAdminLevels();
+}
+document.querySelectorAll(".tab").forEach(button => button.addEventListener("click", () => {
+  if (button.dataset.view === "admin" && !isAdmin) return;
+  showView(button.dataset.view);
+}));
+$("newLevelBtn").addEventListener("click", beginNewLevel);
+$("refreshLevelsBtn").addEventListener("click", refreshLevels);
+$("myLevelsBtn").addEventListener("click", refreshLevels);
+$("levelSearch").addEventListener("input", renderDiscover);
+$("difficultyFilter").addEventListener("change", renderDiscover);
+$("resetBtn").addEventListener("click", resetGame);
+$("moveBack").addEventListener("click", () => moveSelected(-1));
+$("moveForward").addEventListener("click", () => moveSelected(1));
+$("themeBtn").addEventListener("click", () => {
+  theme = theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("carescape-theme", theme);
+  $("themeBtn").textContent = theme === "dark" ? "☀ Design" : "☾ Design";
+});
+$("themeBtn").textContent = theme === "dark" ? "☀ Design" : "☾ Design";
+
+document.addEventListener("keydown", event => {
+  if (["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName)) return;
+  if (activeView !== "play") return;
+  if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+    event.preventDefault(); moveSelected(-1);
+  }
+  if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+    event.preventDefault(); moveSelected(1);
+  }
+});
+
+async function openLinkedLevel() {
+  const id = new URLSearchParams(location.search).get("level");
+  if (!id || !db) return;
+  try {
+    const snap = await db.ref("levels/" + id).once("value");
+    const level = snap.val();
+    if (!level) return setStatus("gameStatus", "Dieses Level wurde nicht gefunden.", "error");
+    if (level.visibility === "private" && level.ownerUid !== currentUser?.uid && !isAdmin) {
+      return setStatus("gameStatus", "Dieses Level ist privat.", "error");
+    }
+    loadLevel(level);
+  } catch (error) {
+    setStatus("gameStatus", "Level-Link konnte nicht geladen werden. Prüfe die Firebase-Regeln.", "error");
+  }
+}
+
+currentLevel = makeDefaultLevel();
+gameInitialLevel = clone(currentLevel);
+renderBoard($("board"), currentLevel);
+renderEditor();
+initFirebase();
+
+// Nach Firebase-Initialisierung kann ein geteilter Level-Link geladen werden.
+setTimeout(openLinkedLevel, 900);
+</script>
+</body>
+</html>
