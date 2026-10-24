@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(".")
 OUT = ROOT / "support-knowledge"
-MODEL = os.getenv("CLOUDFLARE_AI_MODEL", "@cf/meta/llama-3.1-8b-instruct")
+MODEL = os.getenv("CLOUDFLARE_AI_MODEL", "@cf/meta/llama-3.2-1b-instruct")
 ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID", "")
 API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "")
 MAX_FILE_CHARS = 18_000
