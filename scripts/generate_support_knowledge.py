@@ -129,11 +129,22 @@ def call_ai(site_name: str, site_path: str, context: str) -> str:
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "User-Agent": "lamacHub-SupportKnowledge/1.0"
+        },
         method="POST"
     )
-    with urllib.request.urlopen(req, timeout=120) as response:
-        data = json.loads(response.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=120) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        # A repeated access denial is likely environmental, so surface the
+        # provider's response body instead of hiding it behind "HTTP 403".
+        raise RuntimeError(
+            f"Vireonix HTTP {exc.code}: {detail[:2000] or exc.reason}"
+        ) from exc
     if data.get("error"):
         raise RuntimeError(json.dumps(data["error"], ensure_ascii=False))
     choices = data.get("choices", [])
