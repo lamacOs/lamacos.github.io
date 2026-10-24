@@ -46,6 +46,10 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add support-knowledge/
             git commit -m "docs: update AI support knowledge"
+            # Another workflow or a manual commit may have advanced main while AI ran.
+            # Rebase our generated docs on the latest main before pushing to avoid non-fast-forward failures.
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
             git push
           else
             echo "No documentation changes."
