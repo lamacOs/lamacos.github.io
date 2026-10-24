@@ -19,7 +19,7 @@ MAX_SITE_CHARS = 65_000
 ALLOWED_EXTENSIONS = {".html", ".htm", ".js", ".mjs", ".css", ".json", ".md", ".txt", ".ts"}
 SKIP_PARTS = {
     ".git", ".github", "node_modules", "vendor", "dist", "build",
-    "support-knowledge", "scripts", "coverage", ".next"
+    "support-knowledge", "scripts", "coverage", ".next", "cw"
 }
 SKIP_NAME_PARTS = {
     ".env", "secret", "credential", "private-key", "service-account",
@@ -51,29 +51,40 @@ def excluded(path: Path) -> bool:
     return path.suffix.lower() not in ALLOWED_EXTENSIONS
 
 def site_roots() -> list[Path]:
+    # Only websites in subfolders; recursively find index.html and skip every folder named cw.
     roots = []
-    for p in sorted(ROOT.iterdir()):
-        if p.is_dir() and p.name not in SKIP_PARTS and (p / "index.html").is_file():
-            roots.append(p)
-    if (ROOT / "index.html").is_file():
-        roots.insert(0, ROOT)
+    for index_file in sorted(ROOT.rglob("index.html")):
+        site = index_file.parent
+        if site == ROOT:
+            continue
+        rel = site.relative_to(ROOT)
+        if any(part.lower() in SKIP_PARTS for part in rel.parts):
+            continue
+        if any(part.lower() in SKIP_NAME_PARTS for part in rel.parts):
+            continue
+        roots.append(site)
     return roots
 
 def source_files(site: Path) -> list[Path]:
     try:
-        tracked = git("ls-files", "--", "." ).splitlines()
+        tracked = git("ls-files", "--", ".").splitlines()
     except Exception:
         tracked = [str(p) for p in ROOT.rglob("*") if p.is_file()]
     result = []
+    site_rel = site.relative_to(ROOT)
     for name in tracked:
         p = Path(name)
-        if excluded(p):
+        if excluded(p) or not p.is_relative_to(site_rel):
             continue
-        if site == ROOT:
-            # Root homepage only; do not mix in child websites.
-            if len(p.parts) != 1:
-                continue
-        elif not p.is_relative_to(site):
+        # Do not mix another nested website's files into its parent website.
+        nested_site = False
+        for parent in p.parents:
+            if parent == site_rel:
+                break
+            if (ROOT / parent / "index.html").is_file():
+                nested_site = True
+                break
+        if nested_site:
             continue
         if p.is_file():
             result.append(p)
@@ -162,17 +173,35 @@ def main() -> int:
             except Exception as exc:
                 print(f"Warnung: Änderungsliste konnte nicht ermittelt werden: {exc}")
     if event == "push" and changed_roots:
-        roots = [p for p in roots if ("." if p == ROOT else p.name) in changed_roots]
+        changed_paths = set()
+        before = os.getenv("GITHUB_EVENT_BEFORE", "")
+        after = os.getenv("GITHUB_SHA", "HEAD")
+        if before and set(before) != {"0"}:
+            try:
+                changed_paths = set(git("diff", "--name-only", before, after).splitlines())
+            except Exception:
+                changed_paths = set()
+        if changed_paths:
+            roots = [
+                site for site in roots
+                if any(
+                    name == site.relative_to(ROOT).as_posix()
+                    or name.startswith(site.relative_to(ROOT).as_posix() + "/")
+                    or site.relative_to(ROOT).as_posix().startswith(str(Path(name).parent).replace("\\\\", "/") + "/")
+                    for name in changed_paths
+                )
+            ]
         if not roots:
-            print("Keine Website-Quellcodedateien geändert; Dokumentation bleibt unverändert.")
+            print("Keine betroffenen Website-Quellcodedateien geändert; Dokumentation bleibt unverändert.")
             return 0
 
     index = []
     successes = 0
     for site in roots:
         site_name = "lamacHub-Startseite" if site == ROOT else site.name
-        site_path = "." if site == ROOT else site.as_posix()
-        target = OUT / ("homepage.md" if site == ROOT else f"{site.name}.md")
+        site_path = site.relative_to(ROOT).as_posix()
+        slug = site_path.replace("/", "__")
+        target = OUT / f"{slug}.md"
         context, included = make_context(site)
         if not context:
             print(f"Übersprungen (kein geeigneter Quellcode): {site_path}")
@@ -193,11 +222,11 @@ def main() -> int:
             # Keep any previous document; continue so a quota limit doesn't discard successful work.
         if target.exists():
             index.append({
-                "id": "homepage" if site == ROOT else site.name,
+                "id": slug,
                 "name": site_name,
                 "path": site_path,
                 "document": target.relative_to(ROOT).as_posix(),
-                "url": "https://lamachub.de/" if site == ROOT else f"https://lamachub.de/{site.name}/"
+                "url": f"https://lamachub.de/{site_path}/"
             })
 
     # Preserve existing documents in the index so a partial/free-quota run doesn't remove entries.
@@ -208,10 +237,10 @@ def main() -> int:
         if not any(item["document"] == target.as_posix() for item in index):
             index.append({
                 "id": key,
-                "name": "lamacHub-Startseite" if key == "homepage" else key,
-                "path": "." if key == "homepage" else key,
+                "name": key.replace("__", " / "),
+                "path": key.replace("__", "/"),
                 "document": target.as_posix(),
-                "url": "https://lamachub.de/" if key == "homepage" else f"https://lamachub.de/{key}/"
+                "url": f"https://lamachub.de/{key.replace("__", "/")}/"
             })
     index.sort(key=lambda item: item["name"].lower())
     (OUT / "index.json").write_text(json.dumps({
