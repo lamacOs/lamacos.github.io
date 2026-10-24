@@ -35,9 +35,9 @@ jobs:
 
       - name: Generate AI support documentation
         env:
-          GITHUB_EVENT_NAME: \${{ github.event_name }}
-          GITHUB_EVENT_BEFORE: \${{ github.event.before }}
-          GITHUB_SHA: \${{ github.sha }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_SHA: ${{ github.sha }}
         run: python scripts/generate_support_knowledge.py
 
       - name: Commit generated documentation
