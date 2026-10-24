@@ -281,14 +281,20 @@ footer{
   #lamac-ai-form button { width:42px; border:0; border-radius:50%; background:#007e62; color:#fff; cursor:pointer; }
 </style>
 
+
 <script>
-  const WORKER_URL = "https://lamacai.oslamu.workers.dev/chat";
+  const WORKER_URL =
+    "https://carescape-ai.oslamuoslamu.workers.dev/";
 
   const chatWindow = document.querySelector("#lamac-ai-window");
   const chatMessages = document.querySelector("#lamac-ai-messages");
   const chatInput = document.querySelector("#lamac-ai-input");
+  const chatForm = document.querySelector("#lamac-ai-form");
+  const sendButton = chatForm.querySelector("button");
+
   let history = [];
   let messageCount = 0;
+  let busy = false;
 
   document.querySelector("#lamac-ai-open").onclick = () => {
     chatWindow.classList.add("open");
@@ -307,10 +313,12 @@ footer{
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  document.querySelector("#lamac-ai-form").onsubmit = async event => {
+  chatForm.addEventListener("submit", async event => {
     event.preventDefault();
+
     const text = chatInput.value.trim();
-    if (!text) return;
+
+    if (!text || busy) return;
 
     addMessage(text, "lamac-user");
     chatInput.value = "";
@@ -318,36 +326,68 @@ footer{
 
     if (messageCount === 15) {
       addMessage(
-        "Hinweis: Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.",
+        "Tipp: Beschreibe dein Anliegen möglichst konkret.",
         "lamac-bot"
       );
     }
+
+    const messages = [
+      ...history,
+      { role: "user", content: text }
+    ];
+
+    busy = true;
+    sendButton.disabled = true;
+    chatInput.disabled = true;
 
     try {
       const response = await fetch(WORKER_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history })
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          mode: "support",
+          messages
+        })
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Support nicht erreichbar"
+        );
+      }
+
+      if (
+        typeof data.reply !== "string" ||
+        !data.reply.trim()
+      ) {
+        throw new Error("Ungültige Antwort");
+      }
 
       addMessage(data.reply, "lamac-bot");
-      history.push(
-        { role: "user", content: text },
-        { role: "assistant", content: data.reply }
-      );
 
-      history = history.slice(-12);
-    } catch {
+      history = [
+        ...messages,
+        { role: "assistant", content: data.reply }
+      ].slice(-12);
+
+    } catch (error) {
       addMessage(
-        "Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.",
+        "Der Kundenservice ist gerade nicht erreichbar. Bitte versuche es später erneut.",
         "lamac-bot"
       );
+    } finally {
+      busy = false;
+      sendButton.disabled = false;
+      chatInput.disabled = false;
+      chatInput.focus();
     }
-  };
+  });
 </script>
+
 <body>
 
 <!-- NAVBAR -->
