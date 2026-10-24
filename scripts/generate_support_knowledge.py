@@ -11,9 +11,6 @@ from pathlib import Path
 
 ROOT = Path(".")
 OUT = ROOT / "support-knowledge"
-MODEL = os.getenv("CLOUDFLARE_AI_MODEL", "@cf/meta/llama-3.2-1b-instruct")
-ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID", "")
-API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "")
 MAX_FILE_CHARS = 18_000
 MAX_SITE_CHARS = 65_000
 ALLOWED_EXTENSIONS = {".html", ".htm", ".js", ".mjs", ".css", ".json", ".md", ".txt", ".ts"}
@@ -115,8 +112,9 @@ def make_context(site: Path) -> tuple[str, list[str]]:
 
 def call_ai(site_name: str, site_path: str, context: str) -> str:
     import urllib.request
-    url = f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/{MODEL}"
+    url = "https://vireonix.ai/v1/chat/completions"
     payload = {
+        "model": "auto",
         "messages": [
             {"role": "system", "content": PROMPT},
             {"role": "user", "content": (
@@ -131,26 +129,20 @@ def call_ai(site_name: str, site_path: str, context: str) -> str:
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Authorization": f"Bearer {API_TOKEN}", "Content-Type": "application/json"},
+        headers={"Content-Type": "application/json"},
         method="POST"
     )
     with urllib.request.urlopen(req, timeout=120) as response:
         data = json.loads(response.read().decode("utf-8"))
-    if not data.get("success"):
-        raise RuntimeError(json.dumps(data.get("errors", data), ensure_ascii=False))
-    result = data.get("result", {})
-    text = result.get("response")
-    if not text and result.get("choices"):
-        text = result["choices"][0].get("message", {}).get("content")
+    if data.get("error"):
+        raise RuntimeError(json.dumps(data["error"], ensure_ascii=False))
+    choices = data.get("choices", [])
+    text = choices[0].get("message", {}).get("content") if choices else None
     if not text:
         raise RuntimeError("Das KI-Modell hat keinen Text zurückgegeben.")
     return text.strip()
 
 def main() -> int:
-    if not ACCOUNT_ID or not API_TOKEN:
-        print("Fehler: CLOUDFLARE_ACCOUNT_ID und CLOUDFLARE_API_TOKEN müssen gesetzt sein.", file=sys.stderr)
-        return 2
-
     OUT.mkdir(parents=True, exist_ok=True)
     roots = site_roots()
     if not roots:
