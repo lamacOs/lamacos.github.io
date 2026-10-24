@@ -1,8 +1,7 @@
-
 {
   "name": "lamacHub Support-Wissensdatenbank",
   "language": "de",
-  "generatedAt": "2026-10-24T15:54:58Z",
+  "generatedAt": "2026-10-24T17:23:13Z",
   "repository": "https://github.com/lamacOs/lamacos.github.io",
   "websites": [
     {
@@ -10,272 +9,238 @@
       "name": "Button-Creator",
       "path": "Button-Creator",
       "document": "support-knowledge/Button-Creator.md",
-      "url": "https://lamachub.de/Button-Creator/",
-      "aliases": ["Button Creator", "ButtonCreator", "Button Maker", "Button Generator", "Button erstellen", "Button Ersteller", "Buttons erstellen", "CSS Button Generator", "HTML Button Creator", "Button Design"]
+      "url": "https://lamachub.de/Button-Creator/"
     },
     {
       "id": "CarEscape",
       "name": "CarEscape",
       "path": "CarEscape",
       "document": "support-knowledge/CarEscape.md",
-      "url": "https://lamachub.de/CarEscape/",
-      "aliases": ["Car Escape", "Car-Escape", "Carescape", "Car Escape Game", "Auto Escape", "Auto Fluchtspiel", "Escape Game Auto", "Car Escape Spiel", "CarEscape Spiel", "Car Escape Level"]
+      "url": "https://lamachub.de/CarEscape/"
     },
     {
       "id": "coolvisualize",
       "name": "coolvisualize",
       "path": "coolvisualize",
       "document": "support-knowledge/coolvisualize.md",
-      "url": "https://lamachub.de/coolvisualize/",
-      "aliases": ["Cool Visualize", "CoolVisualize", "Cool-Visualize", "Cool Visualiser", "Music Visualizer", "Musikvisualisierung", "Musik Visualizer", "Audio Visualizer", "Musik Visualisation", "Visualizer"]
+      "url": "https://lamachub.de/coolvisualize/"
     },
     {
       "id": "cw-builder",
       "name": "cw-builder",
       "path": "cw-builder",
       "document": "support-knowledge/cw-builder.md",
-      "url": "https://lamachub.de/cw-builder/",
-      "aliases": ["CW Builder", "CWBuilder", "CW-Builder", "CW builder tool", "CW Ersteller", "CW Generator", "cw builder website", "CW erstellen", "CW Tool", "CW Editor"]
+      "url": "https://lamachub.de/cw-builder/"
     },
     {
       "id": "DeineDaten",
       "name": "DeineDaten",
       "path": "DeineDaten",
       "document": "support-knowledge/DeineDaten.md",
-      "url": "https://lamachub.de/DeineDaten/",
-      "aliases": ["Deine Daten", "Deine-Daten", "Deinedaten", "Meine Daten", "Datenschutz", "Datenübersicht", "Daten verwalten", "Persönliche Daten", "Datenverwaltung", "Meine Informationen"]
+      "url": "https://lamachub.de/DeineDaten/"
     },
     {
       "id": "endlessrunner",
       "name": "endlessrunner",
       "path": "endlessrunner",
       "document": "support-knowledge/endlessrunner.md",
-      "url": "https://lamachub.de/endlessrunner/",
-      "aliases": ["Endless Runner", "Endless-Runner", "Endlessrunner", "Endless Run", "Endlos Runner", "Endloses Laufspiel", "Runner Game", "Endless Runner Spiel", "Endless Running", "Endless Run Game"]
+      "url": "https://lamachub.de/endlessrunner/"
     },
     {
       "id": "endlessweb",
       "name": "endlessweb",
       "path": "endlessweb",
       "document": "support-knowledge/endlessweb.md",
-      "url": "https://lamachub.de/endlessweb/",
-      "aliases": ["Endless Web", "Endless-Web", "Endlessweb", "Endless Website", "Endloses Web", "Web Rätsel", "Endless Web Game", "Endless Puzzle", "Web Abenteuer", "Endless Web Spiel"]
+      "url": "https://lamachub.de/endlessweb/"
     },
     {
       "id": "Flohmarkt-Scanner-2.0",
       "name": "Flohmarkt-Scanner-2.0",
       "path": "Flohmarkt-Scanner-2.0",
       "document": "support-knowledge/Flohmarkt-Scanner-2.0.md",
-      "url": "https://lamachub.de/Flohmarkt-Scanner-2.0/",
-      "aliases": ["Flohmarkt Scanner", "FlohmarktScanner", "Flohmarkt-Scanner", "Flohmarkt Scanner 2.0", "FlohmarktScanner 2", "Flohmarkt Scanner 2", "Flohmarktpreis Scanner", "Flohmarkt App", "Flohmarkt Artikel erkennen", "Flohmarkt Preisfinder"]
-    },
-    {
-      "id": "fotoviewer",
-      "name": "fotoviewer",
-      "path": "fotoviewer",
-      "document": "support-knowledge/fotoviewer.md",
-      "url": "https://lamachub.de/fotoviewer/",
-      "aliases": ["Foto Viewer", "Foto-Viewer", "FotoViewer", "Fotoviewer", "Bildbetrachter", "Fotos ansehen", "Bilder ansehen", "Photo Viewer", "Fotoanzeige", "Bilder öffnen"]
-    },
-    {
-      "id": "GeoDash",
-      "name": "GeoDash",
-      "path": "GeoDash",
-      "document": "support-knowledge/GeoDash.md",
-      "url": "https://lamachub.de/GeoDash/",
-      "aliases": ["Geo Dash", "Geo-Dash", "Geodash", "Geo Dash Game", "Geografie Dashboard", "Geo Dashboard", "Geo Spiel", "Geographie Spiel", "GeoDash Spiel", "Geo Tool"]
-    },
-    {
-      "id": "InfoHub",
-      "name": "InfoHub",
-      "path": "InfoHub",
-      "document": "support-knowledge/InfoHub.md",
-      "url": "https://lamachub.de/InfoHub/",
-      "aliases": ["Info Hub", "Info-Hub", "Infohub", "Information Hub", "Infozentrum", "Informationsportal", "Info Portal", "Infosammlung", "Informationen", "Info Website"]
-    },
-    {
-      "id": "lamacAI",
-      "name": "lamacAI",
-      "path": "lamacAI",
-      "document": "support-knowledge/lamacAI.md",
-      "url": "https://lamachub.de/lamacAI/",
-      "aliases": ["lamac AI", "lamac-ai", "lamacai", "Lamac KI", "lamac KI", "lamacHub KI", "lamacHub AI", "Lama AI", "Lama KI", "KI von lamacHub"]
-    },
-    {
-      "id": "lamacHub-Startseite",
-      "name": "lamacHub-Startseite",
-      "path": "lamacHub-Startseite",
-      "document": "support-knowledge/lamacHub-Startseite.md",
-      "url": "https://lamachub.de/lamacHub-Startseite/",
-      "aliases": ["lamacHub Startseite", "lamacHub", "lamac Hub", "lamachub.de", "Lamac Hub", "lamacHub Homepage", "lamacHub Home", "Startseite lamacHub", "lamacHub Website", "LamacHub Start"]
-    },
-    {
-      "id": "lamacOs-Kurzbefehle",
-      "name": "lamacOs-Kurzbefehle",
-      "path": "lamacOs-Kurzbefehle",
-      "document": "support-knowledge/lamacOs-Kurzbefehle.md",
-      "url": "https://lamachub.de/lamacOs-Kurzbefehle/",
-      "aliases": ["lamacOs Kurzbefehle", "lamacOsKurzbefehle", "LamacOS Kurzbefehle", "lamacOs Shortcuts", "Apple Kurzbefehle", "iOS Shortcuts", "Kurzbefehle Website", "Shortcuts verwalten", "lamacOs Befehle", "iPhone Kurzbefehle"]
-    },
-    {
-      "id": "lamacOs-Mitarbeiter",
-      "name": "lamacOs-Mitarbeiter",
-      "path": "lamacOs-Mitarbeiter",
-      "document": "support-knowledge/lamacOs-Mitarbeiter.md",
-      "url": "https://lamachub.de/lamacOs-Mitarbeiter/",
-      "aliases": ["lamacOs Mitarbeiter", "lamacOsMitarbeiter", "LamacOS Mitarbeiter", "lamacOs Team", "Mitarbeiter lamacOs", "Team lamacOs", "lamacHub Mitarbeiter", "Mitarbeiterseite", "Teamseite", "LamacOS Team"]
-    },
-    {
-      "id": "lamacOs-Technolygies",
-      "name": "lamacOs-Technolygies",
-      "path": "lamacOs-Technolygies",
-      "document": "support-knowledge/lamacOs-Technolygies.md",
-      "url": "https://lamachub.de/lamacOs-Technolygies/",
-      "aliases": ["lamacOs Technologies", "lamacOs Technology", "lamacOs-Technologies", "LamacOS Technologies", "lamacOs Technolygies", "LamacOS Tech", "lamacOs Technik", "lamacOs Tech", "Technologies lamacOs", "lamacOs Technologie"]
-    },
-    {
-      "id": "lamacOsInfo",
-      "name": "lamacOsInfo",
-      "path": "lamacOsInfo",
-      "document": "support-knowledge/lamacOsInfo.md",
-      "url": "https://lamachub.de/lamacOsInfo/",
-      "aliases": ["lamacOs Info", "lamacOs-Info", "lamacosinfo", "LamacOS Info", "Infos über lamacOs", "lamacOs Informationen", "lamacOs Website", "Info lamacOs", "Über lamacOs", "lamacOs Profil"]
-    },
-    {
-      "id": "MCLegacy",
-      "name": "MCLegacy",
-      "path": "MCLegacy",
-      "document": "support-knowledge/MCLegacy.md",
-      "url": "https://lamachub.de/MCLegacy/",
-      "aliases": ["MC Legacy", "MC-Legacy", "Mclegacy", "Minecraft Legacy", "Minecraft-Server", "MCLegacy Server", "Minecraft Legacy Server", "MC Legacy Server", "Legacy Minecraft", "Minecraft Projekt"]
-    },
-    {
-      "id": "OCRTexterkennung",
-      "name": "OCRTexterkennung",
-      "path": "OCRTexterkennung",
-      "document": "support-knowledge/OCRTexterkennung.md",
-      "url": "https://lamachub.de/OCRTexterkennung/",
-      "aliases": ["OCR Texterkennung", "OCR-Texterkennung", "OCR Text Erkennung", "OCR", "Texterkennung", "Text aus Bild erkennen", "Bild zu Text", "Foto Texterkennung", "Text scannen", "Optische Zeichenerkennung"]
-    },
-    {
-      "id": "online-ticketmanager",
-      "name": "online-ticketmanager",
-      "path": "online-ticketmanager",
-      "document": "support-knowledge/online-ticketmanager.md",
-      "url": "https://lamachub.de/online-ticketmanager/",
-      "aliases": ["Online Ticketmanager", "Online-Ticket-Manager", "Online Ticket Manager", "Ticketmanager", "Ticket Manager", "Ticketverwaltung", "Tickets verwalten", "Ticket Tool", "Online Tickets", "Ticket Organizer"]
-    },
-    {
-      "id": "Pack-O-Mat",
-      "name": "Pack-O-Mat",
-      "path": "Pack-O-Mat",
-      "document": "support-knowledge/Pack-O-Mat.md",
-      "url": "https://lamachub.de/Pack-O-Mat/",
-      "aliases": ["Packomat", "Pack O Mat", "PackOMat", "Pack-O-Mat", "Packomat Website", "Packliste", "Packlisten erstellen", "Koffer packen", "Reise Packliste", "Packlisten Generator"]
-    },
-    {
-      "id": "Paddle-Game",
-      "name": "Paddle-Game",
-      "path": "Paddle-Game",
-      "document": "support-knowledge/Paddle-Game.md",
-      "url": "https://lamachub.de/Paddle-Game/",
-      "aliases": ["Paddle Game", "PaddleGame", "Paddlegame", "Paddle-Spiel", "Paddle Spiel", "Pong", "Pong Game", "Schlägerspiel", "Ball und Schläger Spiel", "Paddle Game online"]
-    },
-    {
-      "id": "pianosound",
-      "name": "pianosound",
-      "path": "pianosound",
-      "document": "support-knowledge/pianosound.md",
-      "url": "https://lamachub.de/pianosound/",
-      "aliases": ["Piano Sound", "PianoSound", "Piano-Sound", "Piano", "Klavier Sound", "Klavierklang", "Piano Sounds", "Pianosound Website", "Klavier spielen", "Piano Audio"]
-    },
-    {
-      "id": "pianosound__mp3tomid",
-      "name": "pianosound / mp3tomid",
-      "path": "pianosound/mp3tomid",
-      "document": "support-knowledge/pianosound__mp3tomid.md",
-      "url": "https://lamachub.de/pianosound/mp3tomid/",
-      "aliases": ["MP3 to MIDI", "MP3-to-MIDI", "MP3tomid", "MP3 to MID", "MP3 in MIDI umwandeln", "Audio zu MIDI", "Musik zu MIDI", "MP3 MIDI Converter", "MP3 MIDI Konverter", "Piano Audio to MIDI"]
-    },
-    {
-      "id": "qreditor",
-      "name": "qreditor",
-      "path": "qreditor",
-      "document": "support-knowledge/qreditor.md",
-      "url": "https://lamachub.de/qreditor/",
-      "aliases": ["QR Editor", "QR-Editor", "QREditor", "QR Code Editor", "QR Code bearbeiten", "QR Code Generator", "QR Ersteller", "QR Codes erstellen", "QR Tool", "QR Code Tool"]
-    },
-    {
-      "id": "RouteNote-Converter",
-      "name": "RouteNote-Converter",
-      "path": "RouteNote-Converter",
-      "document": "support-knowledge/RouteNote-Converter.md",
-      "url": "https://lamachub.de/RouteNote-Converter/",
-      "aliases": ["RouteNote Converter", "Route Note Converter", "RouteNoteConverter", "Routenote-Konverter", "RouteNote Umwandlung", "RouteNote Tool", "RouteNote Konverter", "Audio Converter RouteNote", "RouteNote Datei konvertieren", "Route Note"]
-    },
-    {
-      "id": "Silvester-Countdown",
-      "name": "Silvester-Countdown",
-      "path": "Silvester-Countdown",
-      "document": "support-knowledge/Silvester-Countdown.md",
-      "url": "https://lamachub.de/Silvester-Countdown/",
-      "aliases": ["Silvester Countdown", "SilvesterCountdown", "Silvester Countdown 2026", "Neujahr Countdown", "Jahreswechsel Countdown", "Countdown Silvester", "Neujahrs Countdown", "Silvester Uhr", "Countdown bis Mitternacht", "Neujahr Uhr"]
-    },
-    {
-      "id": "Smooth-Animations",
-      "name": "Smooth-Animations",
-      "path": "Smooth-Animations",
-      "document": "support-knowledge/Smooth-Animations.md",
-      "url": "https://lamachub.de/Smooth-Animations/",
-      "aliases": ["Smooth Animations", "SmoothAnimations", "SmoothAnimations", "Smooth Animation", "Flüssige Animationen", "Animationen glätten", "CSS Animationen", "Animation Tool", "Smooth Effects", "Web Animationen"]
-    },
-    {
-      "id": "Sprach-Berater",
-      "name": "Sprach-Berater",
-      "path": "Sprach-Berater",
-      "document": "support-knowledge/Sprach-Berater.md",
-      "url": "https://lamachub.de/Sprach-Berater/",
-      "aliases": ["Sprachberater", "Sprach Berater", "Sprach-Berater", "Sprache Berater", "Sprachhilfe", "Sprachassistent", "Sprachberatung", "Sprach Tool", "Sprachen lernen", "Text verbessern"]
+      "url": "https://lamachub.de/Flohmarkt-Scanner-2.0/"
     },
     {
       "id": "FlohmarktScanner",
       "name": "FlohmarktScanner",
       "path": "FlohmarktScanner",
       "document": "support-knowledge/FlohmarktScanner.md",
-      "url": "https://lamachub.de/FlohmarktScanner/",
-      "aliases": ["Flohmarkt Scanner", "Flohmarkt-Scanner", "Flohmarktscanner", "Flohmarkt Scanner App", "Flohmarkt Preis Scanner", "Flohmarkt Artikel scannen", "Flohmarkt Preis schätzen", "Flohmarkt Wert ermitteln", "Flohmarkt Gegenstand erkennen", "Flohmarkt Preisfinder"]
+      "url": "https://lamachub.de/FlohmarktScanner/"
+    },
+    {
+      "id": "fotoviewer",
+      "name": "fotoviewer",
+      "path": "fotoviewer",
+      "document": "support-knowledge/fotoviewer.md",
+      "url": "https://lamachub.de/fotoviewer/"
+    },
+    {
+      "id": "GeoDash",
+      "name": "GeoDash",
+      "path": "GeoDash",
+      "document": "support-knowledge/GeoDash.md",
+      "url": "https://lamachub.de/GeoDash/"
     },
     {
       "id": "HTMLBuilder",
       "name": "HTMLBuilder",
       "path": "HTMLBuilder",
       "document": "support-knowledge/HTMLBuilder.md",
-      "url": "https://lamachub.de/HTMLBuilder/",
-      "aliases": ["HTML Builder", "HTML-Builder", "Htmlbuilder", "HTML Editor", "HTML erstellen", "HTML Code Editor", "HTML CSS JS Editor", "Website Builder", "Webseiten erstellen", "HTML Vorschau"]
+      "url": "https://lamachub.de/HTMLBuilder/"
+    },
+    {
+      "id": "InfoHub",
+      "name": "InfoHub",
+      "path": "InfoHub",
+      "document": "support-knowledge/InfoHub.md",
+      "url": "https://lamachub.de/InfoHub/"
+    },
+    {
+      "id": "lamacAI",
+      "name": "lamacAI",
+      "path": "lamacAI",
+      "document": "support-knowledge/lamacAI.md",
+      "url": "https://lamachub.de/lamacAI/"
+    },
+    {
+      "id": "lamacHub-Startseite",
+      "name": "lamacHub-Startseite",
+      "path": "lamacHub-Startseite",
+      "document": "support-knowledge/lamacHub-Startseite.md",
+      "url": "https://lamachub.de/lamacHub-Startseite/"
+    },
+    {
+      "id": "lamacOs-Kurzbefehle",
+      "name": "lamacOs-Kurzbefehle",
+      "path": "lamacOs-Kurzbefehle",
+      "document": "support-knowledge/lamacOs-Kurzbefehle.md",
+      "url": "https://lamachub.de/lamacOs-Kurzbefehle/"
+    },
+    {
+      "id": "lamacOs-Mitarbeiter",
+      "name": "lamacOs-Mitarbeiter",
+      "path": "lamacOs-Mitarbeiter",
+      "document": "support-knowledge/lamacOs-Mitarbeiter.md",
+      "url": "https://lamachub.de/lamacOs-Mitarbeiter/"
+    },
+    {
+      "id": "lamacOs-Technolygies",
+      "name": "lamacOs-Technolygies",
+      "path": "lamacOs-Technolygies",
+      "document": "support-knowledge/lamacOs-Technolygies.md",
+      "url": "https://lamachub.de/lamacOs-Technolygies/"
+    },
+    {
+      "id": "lamacOsInfo",
+      "name": "lamacOsInfo",
+      "path": "lamacOsInfo",
+      "document": "support-knowledge/lamacOsInfo.md",
+      "url": "https://lamachub.de/lamacOsInfo/"
     },
     {
       "id": "LaunchKit",
       "name": "LaunchKit",
       "path": "LaunchKit",
       "document": "support-knowledge/LaunchKit.md",
-      "url": "https://lamachub.de/LaunchKit/",
-      "aliases": ["Launch Kit", "Launch-Kit", "Launchkit", "LaunchKit Website", "Launch Kit Tool", "LaunchKit Dashboard", "Produkt Launch", "Produktverwaltung", "Launch Plattform", "LaunchKit Produkte"]
+      "url": "https://lamachub.de/LaunchKit/"
     },
     {
       "id": "Live-WEBcam",
       "name": "Live-WEBcam",
       "path": "Live-WEBcam",
       "document": "support-knowledge/Live-WEBcam.md",
-      "url": "https://lamachub.de/Live-WEBcam/",
-      "aliases": ["Live Webcam", "Live-Webcam", "LiveWEBcam", "Livewebcam", "Webcam live", "Kamera übertragen", "Kamera teilen", "Live Kamera", "Webcam verbinden", "Kamera Streaming"]
+      "url": "https://lamachub.de/Live-WEBcam/"
     },
     {
       "id": "Live-World",
       "name": "Live-World",
       "path": "Live-World",
       "document": "support-knowledge/Live-World.md",
-      "url": "https://lamachub.de/Live-World/",
-      "aliases": ["Live World", "LiveWorld", "Liveworld", "Live Welt", "Welt Statistiken", "Weltstatistik live", "Echtzeit Weltstatistik", "Welt in Zahlen", "Globale Statistiken", "World Statistics"]
+      "url": "https://lamachub.de/Live-World/"
+    },
+    {
+      "id": "MCLegacy",
+      "name": "MCLegacy",
+      "path": "MCLegacy",
+      "document": "support-knowledge/MCLegacy.md",
+      "url": "https://lamachub.de/MCLegacy/"
+    },
+    {
+      "id": "OCRTexterkennung",
+      "name": "OCRTexterkennung",
+      "path": "OCRTexterkennung",
+      "document": "support-knowledge/OCRTexterkennung.md",
+      "url": "https://lamachub.de/OCRTexterkennung/"
+    },
+    {
+      "id": "online-ticketmanager",
+      "name": "online-ticketmanager",
+      "path": "online-ticketmanager",
+      "document": "support-knowledge/online-ticketmanager.md",
+      "url": "https://lamachub.de/online-ticketmanager/"
+    },
+    {
+      "id": "Pack-O-Mat",
+      "name": "Pack-O-Mat",
+      "path": "Pack-O-Mat",
+      "document": "support-knowledge/Pack-O-Mat.md",
+      "url": "https://lamachub.de/Pack-O-Mat/"
+    },
+    {
+      "id": "Paddle-Game",
+      "name": "Paddle-Game",
+      "path": "Paddle-Game",
+      "document": "support-knowledge/Paddle-Game.md",
+      "url": "https://lamachub.de/Paddle-Game/"
+    },
+    {
+      "id": "pianosound",
+      "name": "pianosound",
+      "path": "pianosound",
+      "document": "support-knowledge/pianosound.md",
+      "url": "https://lamachub.de/pianosound/"
+    },
+    {
+      "id": "pianosound__mp3tomid",
+      "name": "pianosound / mp3tomid",
+      "path": "pianosound/mp3tomid",
+      "document": "support-knowledge/pianosound__mp3tomid.md",
+      "url": "https://lamachub.de/pianosound/mp3tomid/"
+    },
+    {
+      "id": "qreditor",
+      "name": "qreditor",
+      "path": "qreditor",
+      "document": "support-knowledge/qreditor.md",
+      "url": "https://lamachub.de/qreditor/"
+    },
+    {
+      "id": "RouteNote-Converter",
+      "name": "RouteNote-Converter",
+      "path": "RouteNote-Converter",
+      "document": "support-knowledge/RouteNote-Converter.md",
+      "url": "https://lamachub.de/RouteNote-Converter/"
+    },
+    {
+      "id": "Silvester-Countdown",
+      "name": "Silvester-Countdown",
+      "path": "Silvester-Countdown",
+      "document": "support-knowledge/Silvester-Countdown.md",
+      "url": "https://lamachub.de/Silvester-Countdown/"
+    },
+    {
+      "id": "Smooth-Animations",
+      "name": "Smooth-Animations",
+      "path": "Smooth-Animations",
+      "document": "support-knowledge/Smooth-Animations.md",
+      "url": "https://lamachub.de/Smooth-Animations/"
+    },
+    {
+      "id": "Sprach-Berater",
+      "name": "Sprach-Berater",
+      "path": "Sprach-Berater",
+      "document": "support-knowledge/Sprach-Berater.md",
+      "url": "https://lamachub.de/Sprach-Berater/"
     }
   ]
 }
