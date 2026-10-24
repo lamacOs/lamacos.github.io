@@ -171,43 +171,21 @@ def main() -> int:
         print("Keine Website-Ordner mit index.html gefunden.", file=sys.stderr)
         return 1
 
-    # On push, regenerate only sites affected by changed files. Scheduled/manual runs refresh all sites.
-    event = os.getenv("GITHUB_EVENT_NAME", "")
-    changed_roots: set[str] = set()
-    if event == "push":
-        before = os.getenv("GITHUB_EVENT_BEFORE", "")
-        after = os.getenv("GITHUB_SHA", "HEAD")
-        if before and set(before) != {"0"}:
-            try:
-                changed = git("diff", "--name-only", before, after).splitlines()
-                for name in changed:
-                    p = Path(name)
-                    if p.parts and p.parts[0] not in SKIP_PARTS:
-                        changed_roots.add(p.parts[0] if len(p.parts) > 1 else ".")
-            except Exception as exc:
-                print(f"Warnung: Änderungsliste konnte nicht ermittelt werden: {exc}")
-    if event == "push" and changed_roots:
-        changed_paths = set()
-        before = os.getenv("GITHUB_EVENT_BEFORE", "")
-        after = os.getenv("GITHUB_SHA", "HEAD")
-        if before and set(before) != {"0"}:
-            try:
-                changed_paths = set(git("diff", "--name-only", before, after).splitlines())
-            except Exception:
-                changed_paths = set()
-        if changed_paths:
-            roots = [
-                site for site in roots
-                if any(
-                    name == site.relative_to(ROOT).as_posix()
-                    or name.startswith(site.relative_to(ROOT).as_posix() + "/")
-                    or site.relative_to(ROOT).as_posix().startswith(str(Path(name).parent).replace("\\\\", "/") + "/")
-                    for name in changed_paths
-                )
-            ]
-        if not roots:
-            print("Keine betroffenen Website-Quellcodedateien geändert; Dokumentation bleibt unverändert.")
-            return 0
+    # This workflow is intentionally limited to the six requested websites.
+    # Never spend AI requests on unrelated sites during this recovery run.
+    target_sites = {
+        "FlohmarktScanner",
+        "HTMLBuilder",
+        "LaunchKit",
+        "Live-WEBcam",
+        "Live-World",
+        "coolvisualize",
+    }
+    roots = [site for site in roots if site != ROOT and site.name in target_sites]
+    found = {site.name for site in roots}
+    missing_folders = sorted(target_sites - found)
+    if missing_folders:
+        print("Warnung: Zielordner nicht gefunden: " + ", ".join(missing_folders), file=sys.stderr)
 
     index = []
     successes = 0
