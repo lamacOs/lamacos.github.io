@@ -1,0 +1,113 @@
+{
+  "name": "lamacHub Support-Wissensdatenbank",
+  "language": "de",
+  "generatedAt": "2026-10-24T13:16:11Z",
+  "repository": "https://github.com/lamacOs/lamacos.github.io",
+  "websites": [
+    {
+      "id": "Button-Creator",
+      "name": "Button-Creator",
+      "path": "Button-Creator",
+      "document": "support-knowledge/Button-Creator.md",
+      "url": "https://lamachub.de/Button-Creator/"
+    },
+    {
+      "id": "CarEscape",
+      "name": "CarEscape",
+      "path": "CarEscape",
+      "document": "support-knowledge/CarEscape.md",
+      "url": "https://lamachub.de/CarEscape/"
+    },
+    {
+      "id": "cw-builder",
+      "name": "cw-builder",
+      "path": "cw-builder",
+      "document": "support-knowledge/cw-builder.md",
+      "url": "https://lamachub.de/cw-builder/"
+    },
+    {
+      "id": "endlessrunner",
+      "name": "endlessrunner",
+      "path": "endlessrunner",
+      "document": "support-knowledge/endlessrunner.md",
+      "url": "https://lamachub.de/endlessrunner/"
+    },
+    {
+      "id": "endlessweb",
+      "name": "endlessweb",
+      "path": "endlessweb",
+      "document": "support-knowledge/endlessweb.md",
+      "url": "https://lamachub.de/endlessweb/"
+    },
+    {
+      "id": "fotoviewer",
+      "name": "fotoviewer",
+      "path": "fotoviewer",
+      "document": "support-knowledge/fotoviewer.md",
+      "url": "https://lamachub.de/fotoviewer/"
+    },
+    {
+      "id": "lamacAI",
+      "name": "lamacAI",
+      "path": "lamacAI",
+      "document": "support-knowledge/lamacAI.md",
+      "url": "https://lamachub.de/lamacAI/"
+    },
+    {
+      "id": "lamacOs-Kurzbefehle",
+      "name": "lamacOs-Kurzbefehle",
+      "path": "lamacOs-Kurzbefehle",
+      "document": "support-knowledge/lamacOs-Kurzbefehle.md",
+      "url": "https://lamachub.de/lamacOs-Kurzbefehle/"
+    },
+    {
+      "id": "lamacOs-Mitarbeiter",
+      "name": "lamacOs-Mitarbeiter",
+      "path": "lamacOs-Mitarbeiter",
+      "document": "support-knowledge/lamacOs-Mitarbeiter.md",
+      "url": "https://lamachub.de/lamacOs-Mitarbeiter/"
+    },
+    {
+      "id": "lamacOs-Technolygies",
+      "name": "lamacOs-Technolygies",
+      "path": "lamacOs-Technolygies",
+      "document": "support-knowledge/lamacOs-Technolygies.md",
+      "url": "https://lamachub.de/lamacOs-Technolygies/"
+    },
+    {
+      "id": "lamacOsInfo",
+      "name": "lamacOsInfo",
+      "path": "lamacOsInfo",
+      "document": "support-knowledge/lamacOsInfo.md",
+      "url": "https://lamachub.de/lamacOsInfo/"
+    },
+    {
+      "id": "MCLegacy",
+      "name": "MCLegacy",
+      "path": "MCLegacy",
+      "document": "support-knowledge/MCLegacy.md",
+      "url": "https://lamachub.de/MCLegacy/"
+    },
+    {
+      "id": "OCRTexterkennung",
+      "name": "OCRTexterkennung",
+      "path": "OCRTexterkennung",
+      "document": "support-knowledge/OCRTexterkennung.md",
+      "url": "https://lamachub.de/OCRTexterkennung/"
+    },
+    {
+      "id": "online-ticketmanager",
+      "name": "online-ticketmanager",
+      "path": "online-ticketmanager",
+      "document": "support-knowledge/online-ticketmanager.md",
+      "url": "https://lamachub.de/online-ticketmanager/"
+    },
+    {
+      "id": "Pack-O-Mat",
+      "name": "Pack-O-Mat",
+      "path": "Pack-O-Mat",
+      "document": "support-knowledge/Pack-O-Mat.md",
+      "url": "https://lamachub.de/Pack-O-Mat/"
+    }
+  ]
+}
