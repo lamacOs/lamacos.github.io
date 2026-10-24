@@ -207,5 +207,42 @@
       "document": "support-knowledge/Sprach-Berater.md",
       "url": "https://lamachub.de/Sprach-Berater/"
     }
+    
+{
+  "id": "FlohmarktScanner",
+  "name": "FlohmarktScanner",
+  "path": "FlohmarktScanner",
+  "document": "support-knowledge/FlohmarktScanner.md",
+  "url": "https://lamachub.de/FlohmarktScanner/"
+},
+{
+  "id": "HTMLBuilder",
+  "name": "HTMLBuilder",
+  "path": "HTMLBuilder",
+  "document": "support-knowledge/HTMLBuilder.md",
+  "url": "https://lamachub.de/HTMLBuilder/"
+},
+{
+  "id": "LaunchKit",
+  "name": "LaunchKit",
+  "path": "LaunchKit",
+  "document": "support-knowledge/LaunchKit.md",
+  "url": "https://lamachub.de/LaunchKit/"
+},
+{
+  "id": "Live-WEBcam",
+  "name": "Live-WEBcam",
+  "path": "Live-WEBcam",
+  "document": "support-knowledge/Live-WEBcam.md",
+  "url": "https://lamachub.de/Live-WEBcam/"
+},
+{
+  "id": "Live-World",
+  "name": "Live-World",
+  "path": "Live-World",
+  "document": "support-knowledge/Live-World.md",
+  "url": "https://lamachub.de/Live-World/"
+}
+
   ]
 }
