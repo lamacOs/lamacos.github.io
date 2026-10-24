@@ -1,7 +1,7 @@
 {
   "name": "lamacHub Support-Wissensdatenbank",
   "language": "de",
-  "generatedAt": "2026-10-24T14:55:02Z",
+  "generatedAt": "2026-10-24T15:17:24Z",
   "repository": "https://github.com/lamacOs/lamacos.github.io",
   "websites": [
     {
@@ -24,6 +24,13 @@
       "path": "cw-builder",
       "document": "support-knowledge/cw-builder.md",
       "url": "https://lamachub.de/cw-builder/"
+    },
+    {
+      "id": "DeineDaten",
+      "name": "DeineDaten",
+      "path": "DeineDaten",
+      "document": "support-knowledge/DeineDaten.md",
+      "url": "https://lamachub.de/DeineDaten/"
     },
     {
       "id": "endlessrunner",
@@ -59,6 +66,13 @@
       "path": "GeoDash",
       "document": "support-knowledge/GeoDash.md",
       "url": "https://lamachub.de/GeoDash/"
+    },
+    {
+      "id": "InfoHub",
+      "name": "InfoHub",
+      "path": "InfoHub",
+      "document": "support-knowledge/InfoHub.md",
+      "url": "https://lamachub.de/InfoHub/"
     },
     {
       "id": "lamacAI",
