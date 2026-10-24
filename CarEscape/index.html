@@ -122,7 +122,8 @@
       touch-action: none;
     }
     .vehicle.selected { outline: 3px solid var(--cyan); outline-offset: -3px; }
-    .vehicle img { display: block; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+    /* object-fit: contain behält das Seitenverhältnis der Bilder – nichts wird mehr in die Länge gezogen. */
+    .vehicle img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; pointer-events: none; }
     /* Die Bilder sind hochkant (Front oben). Waagerechte Autos werden um 90° im Uhrzeigersinn gedreht (Front zeigt nach rechts). */
     .vehicle img.rot { position: absolute; left: 50%; top: 50%; max-width: none; transform: translate(-50%, -50%) rotate(90deg); }
     .vehicle.fallback {
@@ -337,7 +338,7 @@
           <div class="divider"></div>
           <h3>Fahrzeug-Inventar</h3>
           <div class="inventory" id="inventory"></div>
-          <p class="muted">Wähle ein Fahrzeug aus dem Inventar, dann ein Feld auf dem Spielfeld. Mit „↻ Drehen“ (oder Taste R) wechselst du zwischen waagerecht und senkrecht – die Bilder werden automatisch richtig gedreht. Ein platziertes Fahrzeug wählst du durch Antippen aus und verschiebst es mit einem Tipp auf ein freies Feld.</p>
+          <p class="muted">Wähle ein Fahrzeug aus dem Inventar, dann ein Feld auf dem Spielfeld. Jedes kleine Auto gibt es nur 1×, jedes große Auto 2×. Mit „↻ Drehen“ (oder Taste R) wechselst du zwischen waagerecht und senkrecht – die Bilder werden automatisch richtig gedreht. Ein platziertes Fahrzeug wählst du durch Antippen aus und verschiebst es mit einem Tipp auf ein freies Feld.</p>
           <div class="row">
             <button class="btn" id="rotateVehicleBtn">↻ Drehen</button>
             <button class="btn" id="removeVehicleBtn">Ausgewähltes entfernen</button>
@@ -368,7 +369,7 @@
             <li>Fahrzeuge dürfen nicht überlappen.</li>
             <li>Das Polizeiauto fährt horizontal zum rechten Ausgang.</li>
             <li>Ein Level sollte vor der Veröffentlichung lösbar sein.</li>
-            <li>Große Fahrzeuge belegen 3 Felder, kleine Fahrzeuge 2 Felder.</li>
+            <li>Große Fahrzeuge belegen 3 Felder (je Modell 2×), kleine Fahrzeuge 2 Felder (je Modell 1×).</li>
           </ul>
         </div>
       </div>
@@ -555,6 +556,8 @@ function normalizeDifficulty(value) {
   return map[String(value || "").toLowerCase()] || (["Leicht","Mittel","Schwer","Extrem"].includes(value) ? value : "Mittel");
 }
 function currentEmail() { return currentUser?.email || ""; }
+// Wie oft darf ein Fahrzeugmodell vorkommen? Polizei 1×, kleine Autos 1×, große Autos 2×.
+function limitFor(type) { return type.fixed ? 1 : (type.length === 3 ? 2 : 1); }
 function makeDefaultLevel() {
   // Dieses Level wurde per Suche geprüft: kürzeste Lösung = 10 Züge.
   return {
@@ -681,6 +684,7 @@ function renderBoard(target, level, isEditor = false) {
     img.draggable = false;
     if (v.orientation === "h") {
       // Bild ist hochkant (Front oben) -> für waagerechte Autos um 90° drehen, Front zeigt nach rechts.
+      // Vor der Drehung ist die Box 1 Feld breit und "Länge" Felder hoch; object-fit: contain verhindert Verzerrung.
       img.className = "rot";
       img.style.width = (100 / type.length) + "%";
       img.style.height = (type.length * 100) + "%";
@@ -788,7 +792,6 @@ function resetGame() {
 /* -------------------------------------------------------
    Editor und Inventar
    ------------------------------------------------------- */
-function limitFor(type) { return type.fixed ? 1 : (type.length === 3 ? 4 : 12); }
 function newEditorPolice() {
   return {id:"e" + (editorNextId++), type:"police", x:0, y:2, orientation:"h"};
 }
@@ -840,7 +843,7 @@ function addEditorVehicle(typeId, x, y) {
   if (editorVehicles.length >= MAX_VEHICLES) return setStatus("editorStatus", "Das Level ist voll (max. " + MAX_VEHICLES + " Fahrzeuge).", "error");
   if (type.fixed && editorVehicles.some(v => getType(v.type).fixed)) return setStatus("editorStatus", "Es gibt bereits ein Polizeiauto.", "error");
   const count = editorVehicles.filter(v => v.type === typeId).length;
-  if (count >= limitFor(type)) return setStatus("editorStatus", "Das Limit für diesen Fahrzeugtyp ist erreicht.", "error");
+  if (count >= limitFor(type)) return setStatus("editorStatus", "Das Limit für diesen Fahrzeugtyp ist erreicht (" + limitFor(type) + "×).", "error");
 
   const v = fitVehicle({id:"e" + (editorNextId++), type:typeId, x, y, orientation: type.fixed ? "h" : editorOrientation});
   const err = placementError([...editorVehicles, v]);
@@ -1000,8 +1003,8 @@ x und y geben immer die linke obere Zelle eines Fahrzeugs an.
 Fahrzeuge bewegen sich nur entlang ihrer Ausrichtung.
 Erlaubte Fahrzeugtypen:
 - police: Länge 2, genau einmal, IMMER orientation "h" und y=2.
-- large1, large2: Länge 3 (jeweils höchstens einmal).
-- small1 bis small12: Länge 2 (jeweils höchstens einmal).
+- large1, large2: Länge 3 (jeder dieser Typen höchstens ZWEIMAL).
+- small1 bis small12: Länge 2 (jeder dieser Typen höchstens EINMAL).
 Jedes Fahrzeug hat eine eindeutige id, einen type, x, y und orientation.
 Fahrzeuge dürfen sich NIEMALS überlappen (keine Zelle doppelt belegen) und nicht aus dem Raster ragen.
 Rechne die belegten Zellen vor der Ausgabe nach. Blockiere den Weg des Polizeiautos mit senkrechten Autos in Zeile 2 und mache das Level lösbar.
@@ -1033,6 +1036,7 @@ function extractJSON(text) {
   throw new Error("Die KI hat kein gültiges JSON zurückgegeben.");
 }
 // Repariert typische KI-Fehler: falsche Schreibweisen, Gleitkommazahlen, doppelte IDs, ragende oder überlappende Fahrzeuge.
+// Beachtet außerdem die Typ-Limits (kleine Autos 1×, große Autos 2×).
 function sanitizeVehicles(list) {
   const arr = Array.isArray(list) ? list.filter(v => v && typeof v === "object") : [];
   const out = [];
@@ -1053,17 +1057,17 @@ function sanitizeVehicles(list) {
   if (!Number.isFinite(px)) px = 0;
   px = Math.max(0, Math.min(px, GRID - 2));
   take({id:"p", type:"police", x:px, y:2, orientation:"h"});
-  const usedTypes = new Set(["police"]);
+  const usedCount = {police: 1};
   for (const raw of arr) {
     const type = String(raw.type || "").toLowerCase().trim();
     const t = TYPE_BY_ID[type];
-    if (!t || t.fixed || usedTypes.has(type)) continue;
+    if (!t || t.fixed || (usedCount[type] || 0) >= limitFor(t)) continue;
     const o = String(raw.orientation || raw.o || "h").toLowerCase().startsWith("v") ? "v" : "h";
     const x = Math.round(Number(raw.x)), y = Math.round(Number(raw.y));
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
     const v = {id:String(raw.id || ""), type, x, y, orientation:o};
     if (!isInside(v)) continue;
-    if (take(v)) usedTypes.add(type);
+    if (take(v)) usedCount[type] = (usedCount[type] || 0) + 1;
     if (out.length >= MAX_VEHICLES) break;
   }
   return out;
@@ -1081,7 +1085,8 @@ function generateLocalLevel(count, difficulty) {
   const start = performance.now();
   let best = null;
   while (performance.now() - start < 3000) {
-    const pool = shuffle(VEHICLE_TYPES.filter(t => !t.fixed).map(t => t.id));
+    // Pool enthält jedes Modell so oft, wie es erlaubt ist (klein 1×, groß 2×).
+    const pool = shuffle(VEHICLE_TYPES.filter(t => !t.fixed).flatMap(t => Array(limitFor(t)).fill(t.id)));
     const px = randInt(0, 1);
     const vs = [{id:"p", type:"police", x:px, y:2, orientation:"h"}];
     const occ = new Set(); vehicleCells(vs[0]).forEach(c => occ.add(c.x + "," + c.y));
@@ -1486,6 +1491,14 @@ $("adminSupportBtn").addEventListener("click", async () => {
 /* -------------------------------------------------------
    Levelbild exportieren und Browser-Teilen
    ------------------------------------------------------- */
+// Zeichnet ein Bild proportional (ohne Verzerrung) mittig in die Zielbox ("contain").
+function drawContain(ctx, img, dx, dy, dw, dh) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  if (!iw || !ih) { ctx.drawImage(img, dx, dy, dw, dh); return; }
+  const scale = Math.min(dw / iw, dh / ih);
+  const w = iw * scale, h = ih * scale;
+  ctx.drawImage(img, dx + (dw - w) / 2, dy + (dh - h) / 2, w, h);
+}
 async function createBoardImage() {
   if (!currentLevel) throw new Error("Kein Level geladen.");
   const canvas = document.createElement("canvas");
@@ -1514,10 +1527,10 @@ async function createBoardImage() {
         ctx.save();
         ctx.translate(x + w / 2, y + h / 2);
         ctx.rotate(Math.PI / 2);
-        ctx.drawImage(img, -(h - 8) / 2, -(w - 8) / 2, h - 8, w - 8);
+        drawContain(ctx, img, -(h - 8) / 2, -(w - 8) / 2, h - 8, w - 8);
         ctx.restore();
       } else {
-        ctx.drawImage(img, x + 4, y + 4, w - 8, h - 8);
+        drawContain(ctx, img, x + 4, y + 4, w - 8, h - 8);
       }
       drawn = true;
     } catch (_) {}
