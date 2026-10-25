@@ -2,138 +2,112 @@
 <!-- source-path: coolvisualize -->
 <!-- source-files: ["coolvisualize/index.html", "coolvisualize/shortcut.txt"] -->
 
-# coolvisualize
+# coolvisualize – Support-Dokumentation
 
-**Vermuteter Zweck:** `coolvisualize` ist eine browserbasierte Music-Visualizer-Anwendung. Sie kombiniert ein lokal ausgewähltes Hintergrundvideo, zeitgestempelte Lyrics, ein optionales Coverbild, einen Apple-Music-Playlist-Link und eine pulsierende Kreis-/Farbanimation zu einer vollflächigen Präsentation.
-
+**Vermuteter Zweck:** `coolvisualize` ist ein browserbasierter Musik-Visualizer für macOS. Er kombiniert ein lokal ausgewähltes Hintergrundvideo, zeitgestempelte Lyrics aus `.lrc`- oder `.lcr`-Dateien, ein optionales Coverbild, eine frei wählbare Animationsfarbe und einen macOS-Kurzbefehl namens „Start“.  
 **Quellcode-Pfad:** `coolvisualize`  
-**Datum der Erstellung:** 12. März 2025
+**Datum der Erstellung:** 11. März 2026
+
+> **Hinweis zum Quellcode:** Die Angaben basieren auf den bereitgestellten Auszügen aus `coolvisualize/index.html` und `coolvisualize/shortcut.txt`. Da nur einzelne Dateien vorliegen, sind insbesondere das Verhalten des macOS-Kurzbefehls und die Kommunikation zwischen Website und Musikplayer nicht vollständig nachvollziehbar.
 
 ---
 
 ## 1. Überblick
 
-Die Website läuft als einzelne HTML-Seite und benötigt laut Quellcode keine sichtbare Anmeldung. Die wichtigsten Bestandteile sind:
+`coolvisualize` erstellt eine vollflächige Präsentation mit folgenden Elementen:
 
-- ein zentriertes Einstellungsfenster,
-- ein lokales Hintergrundvideo,
-- einzelne oder mehrere Lyrics-Dateien im LRC-Format,
-- ein optionales Coverbild,
-- eine frei wählbare, feste Animationsfarbe,
-- eine simulierte pulsierende Kreisanimation,
-- ein unteres Bedienfeld mit Start, Pause, Lyrics-Navigation, Einstellungen und Vollbild,
-- eine optionale Verknüpfung mit einem Apple-Music-Playlist-Link,
-- der Start eines macOS-Kurzbefehls namens `Start`.
+- einem lokal ausgewählten Hintergrundvideo,
+- synchronisierten Lyrics,
+- einem optionalen Coverbild,
+- einer pulsierenden Kreis-Animation,
+- einer fest einstellbaren Animationsfarbe,
+- einer Wiedergabeliste aus einer oder mehreren Lyrics-Dateien,
+- einer Fortschrittsanzeige für das Video,
+- einem optionalen Apple-Music-Playlist-Link.
 
-Die Website ist optisch für eine Präsentation auf einem größeren Bildschirm ausgelegt. Die Farb- und Hintergrundgestaltung erzeugt einen dunklen, halbtransparenten Look.
+Die Website ist als einzelne Seite aufgebaut. Die Einstellungen werden zunächst in einem mittig angezeigten Panel dargestellt. Nach dem Start wird dieses ausgeblendet und eine Steuerleiste am unteren Bildschirmrand eingeblendet.
 
 ---
 
-## 2. Voraussetzungen
+## 2. Voraussetzungen und unterstützte Umgebung
 
-### 2.1 Allgemeine Voraussetzungen
+### 2.1 Browser
 
-Für die grundlegende Darstellung wird ein aktueller Browser benötigt. Im Quellcode werden folgende Browser- bzw. Plattformfunktionen verwendet:
+Für die vollständige Nutzung wird ein aktueller Browser mit folgenden Funktionen benötigt:
 
-- Auswahl lokaler Dateien,
-- lokale Datei-URLs über `URL.createObjectURL()`,
+- JavaScript,
 - HTML5-Video,
-- Web Animations beziehungsweise `requestAnimationFrame`,
-- Vollbild über die Fullscreen API,
-- automatisches Abspielen von Video,
-- `window.open()` für den Apple-Music-Link.
+- Web Audio ist im vorliegenden Quellcode nicht erforderlich,
+- WebKit-/Safari-Unterstützung für die Auswahl ganzer Ordner,
+- Fullscreen-API,
+- Unterstützung für lokale Dateien über `File` beziehungsweise `Blob`-URLs.
 
-Ob alle verwendeten Funktionen in jedem Browser und auf jedem Betriebssystem identisch funktionieren, ist im Quellcode nicht eindeutig erkennbar.
+Die Gestaltung und Bedienung sind besonders auf Safari und macOS abgestimmt.
 
-### 2.2 Voraussetzungen für den macOS-Kurzbefehl
+### 2.2 macOS-Kurzbefehl „Start“
 
-Beim Betätigen von **„▶ Alles starten“** wird die Adresse
+Beim Klick auf **„▶ Alles starten“** versucht die Website, den macOS-Kurzbefehl mit dem Namen **„Start“** auszuführen.
 
-```text
-shortcuts://run-shortcut?name=Start
-```
+Dafür gilt:
 
-aufgerufen.
+- Der Kurzbefehl muss auf dem verwendeten macOS-Gerät vorhanden und entsprechend benannt sein.
+- Beim ersten Aufruf kann macOS eine Bestätigung anzeigen.
+- Der Kurzbefehl wird über die Kennung `shortcuts://run-shortcut` aufgerufen.
+- Das Verhalten des Kurzbefehls selbst ist im bereitgestellten Website-Quellcode nicht eindeutig erkennbar.
 
-Damit dieser Teil funktioniert, sind mindestens erforderlich:
+In `coolvisualize/shortcut.txt` ist ein iCloud-Link für einen passenden Kurzbefehl hinterlegt. Der Link kann von der Website selbst nicht automatisch zur Einrichtung verwendet werden; die Einrichtung erfolgt über die offizielle Apple-Kurzbefehle-App oder eine manuelle Eingabe.
 
-- macOS,
-- die Apple-App „Kurzbefehle“,
-- ein Kurzbefehl mit der Bezeichnung `Start`,
-- die Erlaubnis der App beziehungsweise des Browsers, den Kurzbefehl auszuführen.
+### 2.3 Dateiberechtigungen
 
-Der Quellcode enthält einen Verweis auf einen iCloud-Kurzbefehl. Ob dieser Verweis ohne Anmeldung, ohne Apple-ID oder mit besonderen Freigaben funktioniert, ist im Quellcode nicht eindeutig erkennbar. Der tatsächliche Inhalt und die Schritte des Kurzbefehls sind im bereitgestellten Quellcode nicht enthalten.
-
-### 2.3 Dateiformate
-
-Bestätigt unterstützt werden:
-
-| Eingabe | Unterstütztes Format |
-|---|---|
-| Hintergrundvideo | Im Quellcode nicht eindeutig auf ein bestimmtes Format beschränkt; verwendet wird das vom Browser unterstützte Videoformat |
-| Einzelne Lyrics-Datei | `.lrc` und `.lcr` |
-| Lyrics-Ordner | `.lrc`- und `.lcr`-Dateien inklusive Unterordnern |
-| Coverbild | Vom Browser unterstütztes Bildformat; keine Dateiendungsfilterung im Quellcode |
-| Apple-Music-Playlist | URL mit den Hosts `music.apple.com` oder `itunes.apple.com` |
+Beim Auswählen von Dateien beziehungsweise Ordnern erteilt der Browser Zugriff auf die ausgewählten Inhalte. Es werden keine expliziten Mikrofon-, Kamera- oder Standortberechtigungen angefordert.
 
 ---
 
 ## 3. Sichtbare Bereiche der Website
 
-## 3.1 Hintergrund
+### 3.1 Hintergrund
 
-Die gesamte Seite besitzt einen dunklen Hintergrund. Sobald ein Hintergrundvideo ausgewählt und gestartet wurde, wird es als fixiertes, seitenfüllendes Video dargestellt.
+Die Website verwendet einen dunklen, nahezu schwarzen Hintergrund. Sobald ein Hintergrundvideo ausgewählt und gestartet wurde, wird dieses als festes, bildschirmfüllendes Hintergrundvideo angezeigt.
 
-Eine dezente dunkle Überlagerung liegt über dem Video, damit Texte und Bedienelemente sichtbar bleiben.
+Eine halbtransparente Verdunkelung liegt über dem Video, damit Cover, Trackname und Lyrics besser lesbar bleiben.
 
-## 3.2 Coverbild oben links
+### 3.2 Coverbild
 
-Oben links befindet sich ein quadratisches Coverbild mit abgerundeten Ecken.
+Oben links befindet sich ein quadratisches Coverbild mit abgerundeten Ecken. Solange kein Cover ausgewählt wurde, bleibt dieser Bereich als dunkler Platzhalter sichtbar.
 
-- Ohne Auswahl bleibt der vorgesehene Platz sichtbar.
-- Nach Auswahl eines Coverbilds wird das Bild dort angezeigt.
-- Das Bild wird lokal aus dem Browser verarbeitet und nicht an einen im Quellcode erkennbaren Server hochgeladen.
+Das Cover kann über **„Coverbild (optional)“** ausgewählt werden.
 
-## 3.3 Track-Anzeige
+### 3.3 Trackanzeige und Status
 
-Neben dem Coverbild zeigt die Website den aktuellen Dateinamen der Lyrics sowie eine Statuszeile.
+Neben dem Cover zeigt die Website den aktuell ausgewählten Lyrics-Dateinamen. In der Zeile darunter wird der aktuelle Betriebszustand angezeigt, beispielsweise:
 
-Mögliche bestätigte Statustexte sind:
+- **„Bereit zum Starten“**
+- **„x Lyrics-Datei(en) geladen“**
+- **„Visualizer läuft“**
+- **„Visualizer pausiert“**
+- **„Video konnte nicht automatisch starten.“**
+- **„Keine Lyrics geladen“**
+- **„Vollbild nicht verfügbar – bitte über das Browsermenü aktivieren.“**
 
-- `Bereit zum Starten`
-- `Visualizer läuft`
-- `Visualizer pausiert`
-- `Video konnte nicht automatisch starten.`
-- `Keine Lyrics geladen`
-- eine Anzahl geladener Lyrics-Dateien
-- `Vollbild nicht verfügbar – bitte über das Browsermenü aktivieren.`
+Der Titel über der Statusanzeige lautet beim ersten Laden **„lamacOs Visualizer“**. Nach dem Laden der Lyrics-Liste wird dort der Name der aktuellen Datei angezeigt.
 
-Wenn eine Lyrics-Datei geladen wurde, wird ihr Dateiname links oben angezeigt.
+### 3.4 Kreis-Animation
 
-## 3.4 Kreisanimation oben rechts
+Oben rechts befindet sich ein leuchtender Kreis. Während der Visualizer läuft, wird seine Größe in einem regelmäßigen Takt kurzzeitig vergrößert.
 
-Oben rechts befindet sich ein leuchtender Kreis. Dieser:
+Wichtig: Die Kreis-Pulse sind ausdrücklich **simuliert**. Sie werden nicht aus der tatsächlichen Musik berechnet. Die Animationsfarbe kann über das Farbfeld festgelegt werden.
 
-- verwendet die im Einstellungsfenster gewählte Farbe,
-- pulsiert in regelmäßigen Abständen,
-- wird beim Start beziehungsweise Fortsetzen aktiviert,
-- wird beim Pausieren beendet.
+### 3.5 Lyrics
 
-Die Pulsation ist laut Oberfläche und Quellcode **simuliert**. Sie analysiert weder die Musik noch das Video und ist nicht zwingend synchron zum Audiotakt.
+In der Bildschirmmitte werden die zeitgestempelten Lyrics angezeigt. Vor dem ersten gültigen Zeitstempel bleibt der Textbereich leer. Wenn eine Datei geladen wurde, aber keine zeitgestempelten Zeilen erkannt werden, erscheint der Hinweis:
 
-## 3.5 Lyrics-Anzeige in der Bildschirmmitte
+**„Keine zeitgestempelten Lyrics gefunden.“**
 
-In der Mitte der Seite steht der aktuell zeitgestempelte Liedtext.
+Der Text wird weiß, fett und mit schwarzer Kontur dargestellt. Dadurch bleibt er auch über einem hellen Video sichtbar.
 
-Vor dem ersten gültigen Zeitstempel bleibt der Bereich leer. Bei einer Datei ohne erkennbare zeitgestempelte Zeilen erscheint:
+### 3.6 Einstellungs-Panel
 
-> Keine zeitgestempelten Lyrics gefunden.
-
-Mehrere zeitgestempelte Zeilen innerhalb derselben LRC-Zeile werden unterstützt. Das Programm verwendet dann den zulzt passenden Eintrag.
-
-## 3.6 Einstellungsfenster
-
-Beim ersten Aufruf ist ein zentriertes Einstellungsfenster mit der Überschrift **„🎵 Music Visualizer“** sichtbar.
+Beim ersten Aufruf ist ein mittig platziertes Panel mit dem Titel **„🎵 Music Visualizer“** und dem Untertitel **„Deine Musik. Dein Video. Dein Style.“** sichtbar.
 
 Es enthält:
 
@@ -142,14 +116,15 @@ Es enthält:
 3. eine Dateiauswahl für eine einzelne Lyrics-Datei,
 4. eine Ordnerauswahl für mehrere Lyrics-Dateien,
 5. eine Dateiauswahl für ein Coverbild,
-6. eine Farbauswahl für die feste Animationsfarbe,
-7. die Schaltflächen **„▶ Alles starten“** und **„⛶ Vollbild“**.
+6. ein Farbfeld für die Animationsfarbe,
+7. die Schaltflächen **„▶ Alles starten“** und **„⛶ Vollbild“**,
+8. einen Hinweistext zu macOS und zur simulierten Kreis-Animation.
 
-Nach dem Start wird das Einstellungsfenster ausgeblendet. Über die Schaltfläche **„⚙“** im unteren Bedienfeld kann es erneut geöffnet werden.
+Während der Visualizer läuft, wird das Panel ausgeblendet. Über **„⚙“** in der unteren Steuerleiste kann es wieder geöffnet werden.
 
-## 3.7 Unteres Bedienfeld
+### 3.7 Untere Steuerleiste
 
-Nach dem Start erscheint am unteren Bildschirmrand eine Bedienleiste mit folgenden sichtbaren Beschriftungen:
+Nach dem Start erscheint am unteren Rand eine Steuerleiste mit folgenden Schaltflächen:
 
 - **„▶ Start“**
 - **„Ⅱ Pause“**
@@ -158,68 +133,63 @@ Nach dem Start erscheint am unteren Bildschirmrand eine Bedienleiste mit folgend
 - **„⚙“**
 - **„⛶ Vollbild“**
 
-Die Leiste wird auf kleinen Bildschirmen schmaler dargestellt und ihre Beschriftungen werden verkleinert.
+Da der Bildschirmbereich begrenzt ist, kann sich die Leiste auf kleinen Displays über mehrere Zeilen umbrechen.
 
-## 3.8 Wiedergabefortschritt
+### 3.8 Wiedergabelisten-Anzeige
 
-Am untersten Rand befindet sich eine dünne grüne Fortschrittsleiste. Sie zeigt den Anteil des bereits abgespielten Hintergrundvideos an.
+Oberhalb der Steuerleiste wird der aktuelle Eintrag der Lyrics-Wiedergabeliste angezeigt, zum Beispiel:
 
-Voraussetzung dafür ist, dass der Browser die Videodauer korrekt ermitteln kann.
+**„Lyrics 2 / 5 · 2/song.lrc“**
 
-## 3.9 Queue-Anzeige
+Sie erscheint nur, wenn mindestens eine Lyrics-Datei geladen wurde.
 
-Oberhalb des Bedienfelds erscheint nach dem Laden von Lyrics eine Anzeige wie:
+### 3.9 Fortschrittsanzeige
 
-```text
-Lyrics 1 / 5 · song.lrc
-```
-
-Sie enthält den aktuellen Queue-Index, die Gesamtzahl der geladenen Dateien und den relativen Pfad der aktuellen Datei.
+Am unteren very edge des Bildschirms befindet sich eine dünne grüne Fortschrittslinie. Sie zeigt den Fortschritt des Hintergrundvideos an, sofern dessen Laufzeit technisch ermittelt werden kann.
 
 ---
 
 ## 4. Bedienung Schritt für Schritt
 
-## 4.1 Apple-Music-Playlist vorbereiten
+### 4.1 Vorbereitung
 
-1. Öffnen Sie die zentrale Apple-Music-Webseite.
-2. Kopieren Sie die Adresse der gewünschten Playlist.
-3. Fügen Sie die Adresse in das Feld **„Apple-Music-Playlist-Link (optional, öffnet zusätzlich die Playlist)“** ein.
+1. Öffnen Sie die Website in einem aktuellen Browser.
+2. Stellen Sie sicher, dass auf dem macOS-Gerät der Kurzbefehl **„Start“** eingerichtet und benannt ist.
+3. Wählen Sie bei Bedarf die Dateien aus, die verwendet werden sollen.
 
-Die Eingabe muss eine vollständige `https://`-Adresse sein. Akzeptiert werden nur Links zu:
+### 4.2 Apple-Music-Playlist-Link eingeben
 
-- `music.apple.com`
-- `itunes.apple.com`
+1. Öffnen Sie das Einstellungs-Panel.
+2. Geben Sie in das Feld **„Apple-Music-Playlist-Link (optional, öffnet zusätzlich die Playlist)“** eine Apple-Music-Adresse ein, beispielsweise eine URL mit `music.apple.com` oder `itunes.apple.com`.
+3. Lassen Sie das Feld leer, wenn die Playlist nicht geöffnet werden soll.
 
-Ein Link zu einer anderen Domain wird abgelehnt.
+Die eingegebene Adresse wird erst beim Klick auf **„▶ Alles starten“** geöffnet. Es wird nicht automatisch beim Eintippen geöffnet.
 
-## 4.2 Hintergrundvideo auswählen
+### 4.3 Hintergrundvideo auswählen
 
-1. Klicken Sie auf die Dateiauswahl bei **„Hintergrundvideo auswählen“**.
-2. Wählen Sie ein lokales Video aus.
-3. Das Video wird in die Website geladen und im Hintergrund vorgesehen.
+1. Klicken Sie im Bereich **„Hintergrundvideo auswählen“** auf die Dateiauswahl.
+2. Wählen Sie eine lokale Videodatei aus.
+3. Bestätigen Sie die Auswahl im Betriebssystem.
 
-Das Video startet jedoch nicht zwingend bereits mit der Dateiauswahl. Es wird beim Start beziehungsweise Fortsetzen abgespielt.
+Das Video wird lokal in eine temporäre Browser-URL geladen. Es ist im Quellcode nicht erkennbar, welche Videoformate der jeweils verwendete Browser unterstützt. Am zuverlässigsten ist ein vom Browser unterstütztes Format wie MP4 mit H.264-Video.
 
-## 4.3 Eine einzelne Lyrics-Datei auswählen
+### 4.4 Einzelne Lyrics-Datei auswählen
 
-1. Klicken Sie auf die Dateiauswahl bei **„Einzelne Lyrics-Datei (.lrc oder .lcr)“**.
+1. Klicken Sie auf **„Einzelne Lyrics-Datei (.lrc oder .lcr)“**.
 2. Wählen Sie eine `.lrc`- oder `.lcr`-Datei aus.
-3. Die Datei wird gelesen und als einziger Eintrag in die Lyrics-Queue aufgenommen.
-4. Links oben erscheint der Name der Datei.
-5. In der Queue-Anzeige wird der geladene Eintrag angezeigt.
+3. Die Datei wird eingelesen und als erster Eintrag der Lyrics-Liste verwendet.
 
-Das Laden einer einzelnen Datei ersetzt eine zuvor geladene Queue.
+Die Dateierweiterung wird ohne Rücksicht auf Groß- oder Kleinschreibung erkannt. Versehentliche Leerzeichen am Ende des Dateinamens werden bei der Prüfung toleriert.
 
-## 4.4 Mehrere Lyrics-Dateien auswählen
+### 4.5 Mehrere Lyrics-Dateien auswählen
 
-1. Klicken Sie auf die Auswahl bei **„Lyrics-Ordner mit Unterordnern auswählen“**.
-2. Wählen Sie einen Ordner und bestätigen Sie die Auswahl.
-3. Die Website durchsucht die Auswahl nach `.lrc`- und `.lcr`-Dateien.
-4. Dateien aus Unterordnern werden einbezogen.
-5. Die Dateien werden numerisch sortiert.
+1. Klicken Sie auf **„Lyrics-Ordner mit Unterordnern auswählen“**.
+2. Wählen Sie den gewünschten Ordner aus.
+3. Bestätigen Sie den Zugriff auf den Ordner.
 
-Beispielstruktur laut Oberfläche:
+Die Website übernimmt nur `.lrc`- und `.lcr`-Dateien. Andere Dateitypen werden ignoriert. Relative Pfade werden normalisiert und numerisch sortiert. Dadurch wird beispielsweise die Reihenfolge `1`, `2`, `10` statt `1`, `10`, `2` verwendet.
+
+Unterordner können für die Sortierung verwendet werden. Das im Panel gezeigte Beispiel lautet:
 
 ```text
 1/song.lrc
@@ -227,122 +197,96 @@ Beispielstruktur laut Oberfläche:
 10/song.lrc
 ```
 
-Die Reihenfolge wird dann:
+Doppelte relative Pfade werden nur einmal übernommen.
 
-```text
-1/song.lrc
-2/song.lrc
-10/song.lrc
-```
+### 4.6 Coverbild auswählen
 
-Die Groß-/Kleinschreibung der Dateiendung wird nicht unterschieden. Ein versehentliches Leerzeichen am Ende des Dateinamens wird beim Erkennen der Dateiendung berücksichtigt.
+1. Klicken Sie auf **„Coverbild (optional)“**.
+2. Wählen Sie ein lokales Bild aus.
+3. Das Bild erscheint unmittelbar oben links.
 
-Doppelte relative Pfade werden nicht mehrfach in die Queue aufgenommen.
+Das empfohlene Seitenverhältnis ist quadratisch, da der Anzeigebereich quadratisch zugeschnitten wird. Welche Bildformate und Dateigrößen unterstützt werden, hängt vom Browser ab.
 
-## 4.5 Coverbild auswählen
+### 4.7 Animationsfarbe festlegen
 
-1. Öffnen Sie das Einstellungsfenster.
-2. Klicken Sie auf die Dateiauswahl bei **„Coverbild (optional)“**.
-3. Wählen Sie ein lokales Bild aus.
-4. Das Coverbild wird oben links angezeigt.
-
-Ein Coverbild ist nicht erforderlich.
-
-## 4.6 Animationsfarbe festlegen
-
-1. Klicken Sie im Einstellungsfenster auf das Farbfeld bei **„Feste Animationsfarbe“**.
+1. Öffnen Sie das Farbfeld neben **„Feste Animationsfarbe“**.
 2. Wählen Sie eine Farbe aus.
-3. Die Kreisanimation, Fortschrittsleiste und hervorgehobenen Schaltflächen verwenden unmittelbar die neue Farbe.
 
-Die Farbe bleibt nach der Auswahl fest. Eine automatische Farbänderung ist im Quellcode ausdrücklich nicht vorgesehen.
+Die gewählte Farbe wird unmittelbar für Kreis, Fortschrittslinie und hervorgehobene Schaltflächen verwendet. Es findet keine automatische Farbwechsel-Animation statt.
 
-## 4.7 Alles starten
+### 4.8 Visualizer starten
 
-1. Wählen Sie bei Bedarf Video, Lyrics, Cover und Playlist-Link aus.
-2. Klicken Sie auf **„▶ Alles starten“**.
-3. Die Website versucht, den macOS-Kurzbefehl `Start` aufzurufen.
-4. Falls ein Playlist-Link eingetragen wurde, öffnet die Website zusätzlich den Apple-Music-Link in einem neuen Tab.
-5. Die Website versucht, in den Vollbildmodus zu wechseln.
-6. Das Hintergrundvideo beginnt zu laufen.
-7. Das Einstellungsfenster wird ausgeblendet.
-8. Das untere Bedienfeld erscheint.
-9. Die Lyrics werden anhand der Laufzeit synchronisiert.
-10. Die Kreisanimation beginnt zu pulsieren.
+1. Klicken Sie auf **„▶ Alles starten“**.
+2. Die Website versucht:
+   - den macOS-Kurzbefehl **„Start“** auszuführen,
+   - einen angegebenen Apple-Music-Playlist-Link in einem neuen Tab zu öffnen,
+   - den Browser in den Vollbildmodus zu versetzen,
+   - das Hintergrundvideo abzuspielen,
+   - Lyrics und Kreis-Animation zu starten.
+3. Das Einstellungs-Panel wird ausgeblendet.
+4. Die untere Steuerleiste erscheint.
 
-Je nach Browser und macOS-System kann beim ersten Kurzbefehl eine Bestätigung erscheinen. Die Oberfläche weist ausdrücklich darauf hin, dass macOS beim ersten Aufruf nachfragen kann.
+Ist der macOS-Kurzbefehl nicht verfügbar oder wird er vom Betriebssystem blockiert, kann die Website weiterhin ihr eigenes Video und ihre Lyrics anzeigen. Ob zusätzlich ein externer Musikplayer oder Apple Music gestartet wird, hängt vom Kurzbefehl ab und ist im Website-Quellcode nicht eindeutig erkennbar.
 
-## 4.8 Vollbild
+### 4.9 Wiedergabe pausieren und fortsetzen
 
-Sie können den Vollbildmodus auf zwei Arten anfordern:
+- Klicken Sie auf **„Ⅱ Pause“**, um Video, Lyrics-Timing und Kreis-Pulse anzuhalten.
+- Klicken Sie auf **„▶ Start“**, um die Wiedergabe fortzusetzen.
 
-- im Einstellungsfenster über **„⛶ Vollbild“**,
-- in der unteren Bedienleiste über **„⛶ Vollbild“**.
+Beim Pausieren wird die bisherige Laufzeit gespeichert. Beim Fortsetzen wird das Video erneut gestartet beziehungsweise fortgesetzt und das Lyrics-Timing anhand der gespeicherten Laufzeit fortgeführt.
 
-Während der Vollbildmodus aktiv ist, zeigt die Schaltfläche in der unteren Leiste:
+### 4.10 Zwischen Lyrics-Dateien wechseln
 
-> ⛶ Vollbild aktiv
+- Klicken Sie auf **„Lyrics weiter ⏭“**, um zur nächsten geladenen Datei zu wechseln.
+- Klicken Sie auf **„⏮ Lyrics zurück“**, um zur vorherigen Datei zurückzugehen.
 
-Beim Verlassen des Vollbildmodus wird sie wieder als:
+Beim Wechsel:
 
-> ⛶ Vollbild
+- beginnt die Zeitberechnung der Lyrics wieder bei null,
+- wird der aktuelle Dateiname oben angezeigt,
+- wird die Wiedergabelisten-Anzeige aktualisiert,
+- wird die nächste Datei über die Steuerleiste ausgewählt.
 
-angezeigt.
+An der ersten beziehungsweise letzten Datei führt der jeweilige Vorwärts- beziehungsweise Rückwärts-Klick zu keiner weiteren Änderung.
 
-## 4.9 Pausieren und fortsetzen
+### 4.11 Einstellungen erneut öffnen
 
-### Pausieren
+1. Klicken Sie in der unteren Steuerleiste auf **„⚙“**.
+2. Das Einstellungs-Panel erscheint wieder über der laufenden Präsentation.
 
-1. Klicken Sie in der unteren Leiste auf **„Ⅱ Pause“**.
-2. Das Video wird pausiert.
-3. Die Lyrics-Uhr wird angehalten.
-4. Die Pulsanimation endet.
-5. Die Statusanzeige wechselt zu **„Visualizer pausiert“**.
+Das erneute Laden einer Lyrics-Auswahl ersetzt die bisherige Lyrics-Liste.
 
-### Fortsetzen
+### 4.12 Vollbild aktivieren oder verlassen
 
-1. Klicken Sie auf **„▶ Start“**.
-2. Das Video wird fortgesetzt, sofern ein Video geladen wurde.
-3. Die Lyrics-Uhr läuft ab der gespeicherten Pausezeit weiter.
-4. Die Pulsanimation beginnt erneut.
-5. Die Statusanzeige wechselt zu **„Visualizer läuft“**.
+- Klicken Sie auf **„⛶ Vollbild“**, um den Vollbildmodus zu aktivieren.
+- Im aktivierten Zustand wird die Beschriftung zu **„⛶ Vollbild aktiv“**.
+- Um den Vollbildmodus zu verlassen, verwenden Sie in der Regel die Vollbildsteuerung des Browsers oder drücken Sie erneut auf die Schaltfläche, sofern der Browser dies zulässt.
 
-Die Schaltfläche **„▶ Start“** dient im unteren Bedienfeld zum Fortsetzen eines pausierten Visualizers. Der eigentliche Start befindet sich im Einstellungsfenster.
-
-## 4.10 Zwischen Lyrics-Dateien wechseln
-
-### Nächste Datei
-
-1. Klicken Sie auf **„Lyrics weiter ⏭“**.
-2. Die nächste Datei der numerisch sortierten Queue wird geladen.
-3. Die Lyrics-Zeit wird auf null zurückgesetzt.
-4. Die Anzeige **„Lyrics x / y“** und der Dateiname oben links werden aktualisiert.
-
-Am Ende der Queue führt diese Schaltfläche keine weitere Aktion aus.
-
-### Vorherige Datei
-
-1. Klicken Sie auf **„⏮ Lyrics zurück“**.
-2. Die vorherige Datei wird geladen.
-3. Die Lyrics-Zeit wird auf null zurückgesetzt.
-4. Die Anzeige **„Lyrics x / y“** und der Dateiname oben links werden aktualisiert.
-
-An der ersten Datei führt diese Schaltfläche keine weitere Aktion aus.
-
-## 4.11 Einstellungen erneut öffnen
-
-1. Klicken Sie in der unteren Leiste auf **„⚙“**.
-2. Das Einstellungsfenster wird vor dem laufenden Visualizer eingeblendet.
-
-Im Quellcode ist keine separate Schaltfläche zum vollständigen Beenden oder Neustarten der Präsentation vorhanden. Eine vollständige Beendigung ist deshalb im Quellcode nicht eindeutig erkennbar.
+Der Vollbildmodus kann alternativ über das Browsermenü aktiviert werden. Die Website verwendet dafür die Fullscreen-API des Browsers.
 
 ---
 
-## 5. Format und Verarbeitung der Lyrics
+## 5. Unterstütztes LRC-Format
 
-## 5.1 Erkannte Zeitstempel
-
-Der Parser unterstützt Zeitstempel in Form von:
+Die Website erkennt Zeitstempel nach dem Muster:
 
 ```text
 [mm:ss]
-[mm:ss
+[mm:ss.x]
+[mm:ss.xxx]
+```
+
+Dabei sind:
+
+- `mm` eine oder zwei Minuten,
+- `ss` zwei Sekunden,
+- `.x` oder `.xxx` optionale Sekundenbruchteile.
+
+Beispiel:
+
+```lrc
+[00:12.50]Erste Zeile
+[01:05.00]Zweite Zeile
+```
+
+Die Dateien werden zeilenweise eingelesen. Metadaten wie `[ar:]`, `[ti:]` oder `[al:]` werden zwar als Text entfernt
