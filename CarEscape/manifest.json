@@ -1,0 +1,27 @@
+
+{
+  "id": "/CarEscape/",
+  "name": "CarEscape",
+  "short_name": "CarEscape",
+  "description": "CarEscape - Escape the grid!",
+  "start_url": "/CarEscape/",
+  "scope": "/CarEscape/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#ff7a00",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
