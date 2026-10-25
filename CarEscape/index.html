@@ -219,8 +219,36 @@
     }
   </style>
 </head>
+<!-- lamacHub Besucher-Counter -->
+<script>
+(async () => {
+  const counterId = location.hostname.replace(/\./g, "-") + "-visitors";
+  const counterUrl =
+    "https://api.counterapi.dev/v1/lamachub/" +
+    encodeURIComponent(counterId) + "/up";
 
-<body>
+  try {
+    const response = await fetch(counterUrl);
+    if (!response.ok) throw new Error("Counter nicht erreichbar");
+
+    const data = await response.json();
+    const counter = document.getElementById("visitor-counter");
+
+    if (counter) {
+      counter.textContent =
+        Number(data.count).toLocaleString("de-DE");
+    }
+  } catch (error) {
+    console.error("Besucher-Counter:", error);
+  }
+})();
+</script>
+
+<!-- Sichtbare Anzeige dort einfügen, wo der Counter erscheinen soll -->
+<div>
+  👥 Besucher: <span id="visitor-counter">…</span>
+</div>
+  <body>
 <div class="app">
   <header>
     <div class="brand">
