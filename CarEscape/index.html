@@ -178,6 +178,19 @@
     }
     .modal-card h2 { margin-top: 0; }
     .key-hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; }
+    .chip.diff { font-weight: 700; }
+    .stats { gap: 16px; }
+    .switch { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .switch input { width: auto; }
+    .hint-status { padding: 10px 12px; border-radius: 12px; font-size: 14px; font-weight: 700; margin-top: 8px; }
+    .hint-status.warm { background: #ff7a0022; color: #d35400; border-left: 4px solid #ff7a00; }
+    .hint-status.cold { background: #01c7fc22; color: #0a7fa0; border-left: 4px solid var(--cyan); }
+    .hint-status.neutral { background: var(--surface2); color: var(--muted); border-left: 4px solid var(--border); }
+    [data-theme="dark"] .hint-status.warm { color: #ffa24d; }
+    [data-theme="dark"] .hint-status.cold { color: #5fdcff; }
+    .solution-box { margin-top: 10px; padding: 12px; border-radius: 12px; background: var(--surface2); font-size: 13px; }
+    .solution-box ol { margin: 8px 0; padding-left: 22px; max-height: 220px; overflow: auto; }
+    .solution-box li { margin: 3px 0; }
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
       .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -241,7 +254,7 @@
               <h2 id="levelTitle">CarEscape – Einsteiger</h2>
               <div class="muted" id="levelSubtitle">Bewege das Polizeiauto zum Ausgang.</div>
             </div>
-            <span class="chip" id="levelDifficulty">Leicht</span>
+            <span class="chip diff" id="levelDifficulty">Leicht</span>
           </div>
           <div id="testBanner" class="notice test-banner hidden">
             <div class="row between">
@@ -263,12 +276,22 @@
           <div class="key-hint">Fahrzeug antippen und mit den Pfeilen bewegen: ← → für waagerechte, ↑ ↓ für senkrechte Fahrzeuge. Am Computer funktionieren auch die Pfeiltasten.</div>
           <div class="divider"></div>
           <div class="row between">
-            <span class="muted">Züge: <strong id="moveCount">0</strong></span>
+            <div class="row stats">
+              <span class="muted">Züge: <strong id="moveCount">0</strong></span>
+              <span class="muted">Mindestzüge: <strong id="minMoves">…</strong></span>
+              <span class="muted">Zeit: <strong id="timer">00:00</strong></span>
+            </div>
             <div class="row">
               <button class="btn" id="resetBtn">Neu starten</button>
               <button class="btn primary" id="shareBtn">Teilen</button>
             </div>
           </div>
+          <div class="row" style="margin-top:10px">
+            <label class="switch"><input type="checkbox" id="hintToggle"> Warm/Kalt-Hinweis</label>
+            <button class="btn small" id="solutionBtn" type="button">💡 Lösung anzeigen</button>
+          </div>
+          <div id="hintStatus" class="hint-status hidden" aria-live="polite"></div>
+          <div id="solutionBox" class="solution-box hidden"></div>
           <div id="gameStatus" class="status" aria-live="polite"></div>
         </div>
 
@@ -282,12 +305,7 @@
           <div class="row">
             <div class="field" style="flex:1;min-width:120px">
               <label for="aiDifficulty">Schwierigkeit</label>
-              <select id="aiDifficulty">
-                <option value="leicht">Leicht</option>
-                <option value="mittel" selected>Mittel</option>
-                <option value="schwer">Schwer</option>
-                <option value="extrem">Extrem</option>
-              </select>
+              <select id="aiDifficulty"></select>
             </div>
             <div class="field" style="flex:1;min-width:120px">
               <label for="aiVehicleCount">Fahrzeuge</label>
@@ -320,8 +338,6 @@
         <div class="row">
           <input id="levelSearch" placeholder="Level, Serie oder Ersteller suchen…" aria-label="Level suchen">
           <select id="difficultyFilter" aria-label="Schwierigkeit filtern" style="max-width:180px">
-            <option value="">Alle Schwierigkeiten</option>
-            <option>Leicht</option><option>Mittel</option><option>Schwer</option><option>Extrem</option>
           </select>
         </div>
         <div class="divider"></div>
@@ -342,9 +358,7 @@
           <div class="row">
             <div class="field" style="flex:1;min-width:120px">
               <label for="editDifficulty">Schwierigkeit</label>
-              <select id="editDifficulty">
-                <option>Leicht</option><option selected>Mittel</option><option>Schwer</option><option>Extrem</option>
-              </select>
+              <select id="editDifficulty"></select>
             </div>
             <div class="field" style="flex:1;min-width:120px">
               <label for="editSeries">Serie</label>
@@ -450,6 +464,15 @@
           <button class="btn" id="adminSupportBtn">Support-Nachrichten laden</button>
         </div>
         <div class="divider"></div>
+        <h3>Schwierigkeiten verwalten</h3>
+        <p class="muted">Neue Schwierigkeiten mit Farbe hinzufügen. Sie stehen danach allen beim Level-Erstellen zur Verfügung.</p>
+        <div class="row">
+          <input id="newDiffName" maxlength="20" placeholder="Name, z. B. Genie" style="flex:1;min-width:140px" aria-label="Name der Schwierigkeit">
+          <input id="newDiffColor" type="color" value="#9b59b6" style="width:64px;height:42px;padding:3px" aria-label="Farbe">
+          <button class="btn primary" id="addDiffBtn" type="button">Hinzufügen</button>
+        </div>
+        <div id="diffList" class="row" style="margin-top:12px"></div>
+        <div class="divider"></div>
         <h3>Alle gespeicherten Level</h3>
         <div id="adminCards" class="cards"></div>
         <div class="divider"></div>
@@ -550,6 +573,12 @@ let levelSolved = false;
 let testMode = false;
 let editorOrientation = "h";
 let theme = localStorage.getItem("carescape-theme") || "light";
+// Stoppuhr, Mindestzüge, Hinweise, Lösung
+let timerStart = null, timerInterval = null, timerElapsed = 0;
+let minMoves = null, minToken = 0;
+let hintEnabled = false;
+let usedSolution = false, autoplaying = false, autoplayToken = 0;
+const remainingCache = new Map();
 
 document.documentElement.dataset.theme = theme;
 
@@ -572,9 +601,129 @@ function uid() {
   return (crypto.randomUUID ? crypto.randomUUID() : "ce-" + Date.now() + "-" + Math.random().toString(36).slice(2));
 }
 function getType(typeId) { return TYPE_BY_ID[typeId] || TYPE_BY_ID.small1; }
+/* ---------- Schwierigkeiten (Standard + vom Admin hinzugefügte) ---------- */
+const BASE_DIFFICULTIES = [
+  { name:"Leicht", color:"#22a559", builtin:true },
+  { name:"Mittel", color:"#eab308", builtin:true },
+  { name:"Schwer", color:"#2f6fed", builtin:true },
+  { name:"Extrem", color:"#d83b42", builtin:true }
+];
+let customDifficulties = [];
+function allDifficulties() { return [...BASE_DIFFICULTIES, ...customDifficulties.map(d => ({...d, builtin:false}))]; }
 function normalizeDifficulty(value) {
-  const map = { leicht:"Leicht", mittel:"Mittel", schwer:"Schwer", extrem:"Extrem" };
-  return map[String(value || "").toLowerCase()] || (["Leicht","Mittel","Schwer","Extrem"].includes(value) ? value : "Mittel");
+  const s = String(value || "").trim();
+  if (!s) return "Mittel";
+  const found = allDifficulties().find(d => d.name.toLowerCase() === s.toLowerCase());
+  return found ? found.name : s.slice(0, 20);
+}
+function difficultyColor(name) {
+  const s = String(name || "").trim().toLowerCase();
+  const found = allDifficulties().find(d => d.name.toLowerCase() === s);
+  return found ? found.color : "#6c7480";
+}
+function readableText(hex) {
+  const n = parseInt(String(hex).slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? "#1b1f26" : "#ffffff";
+}
+function difficultyStyle(name) {
+  const c = difficultyColor(name);
+  return "background:" + c + ";color:" + readableText(c) + ";";
+}
+function paintDifficulty(el, name) {
+  if (!el) return;
+  const c = difficultyColor(name);
+  el.style.background = c;
+  el.style.color = readableText(c);
+}
+function paintSelect(sel) {
+  if (!sel) return;
+  if (!sel.value) { sel.style.background = ""; sel.style.color = ""; return; }
+  paintDifficulty(sel, sel.value);
+}
+function fillDifficultySelects() {
+  const list = allDifficulties();
+  const fill = (sel, withAll) => {
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = "";
+    if (withAll) {
+      const o = document.createElement("option");
+      o.value = ""; o.textContent = "Alle Schwierigkeiten";
+      sel.appendChild(o);
+    }
+    for (const d of list) {
+      const o = document.createElement("option");
+      o.value = d.name; o.textContent = d.name;
+      o.style.background = d.color; o.style.color = readableText(d.color);
+      sel.appendChild(o);
+    }
+    const keep = [...sel.options].some(o => o.value === prev);
+    sel.value = keep ? prev : (withAll ? "" : "Mittel");
+    paintSelect(sel);
+  };
+  fill($("aiDifficulty"), false);
+  fill($("editDifficulty"), false);
+  fill($("difficultyFilter"), true);
+}
+function renderDifficultyAdmin() {
+  const host = $("diffList");
+  if (!host) return;
+  host.innerHTML = "";
+  for (const d of allDifficulties()) {
+    const chip = document.createElement("span");
+    chip.className = "chip diff";
+    chip.style.cssText = "background:" + d.color + ";color:" + readableText(d.color) + ";padding:7px 11px;font-size:12px";
+    chip.textContent = d.name + (d.builtin ? "" : " ");
+    if (!d.builtin) {
+      const x = document.createElement("button");
+      x.type = "button"; x.textContent = "✕";
+      x.setAttribute("aria-label", d.name + " löschen");
+      x.style.cssText = "margin-left:6px;border:0;background:transparent;color:inherit;cursor:pointer;font-weight:800;padding:0 2px";
+      x.addEventListener("click", () => deleteDifficulty(d));
+      chip.appendChild(x);
+    }
+    host.appendChild(chip);
+  }
+}
+async function loadDifficulties() {
+  if (!db) return;
+  try {
+    const snap = await db.ref("difficulties").once("value");
+    const val = snap.val() || {};
+    customDifficulties = Object.entries(val)
+      .filter(([k, d]) => d && typeof d.name === "string" && /^#[0-9a-f]{6}$/i.test(d.color || ""))
+      .map(([key, d]) => ({ key, name:d.name.slice(0, 20), color:d.color.toLowerCase() }))
+      .filter(d => !BASE_DIFFICULTIES.some(b => b.name.toLowerCase() === d.name.toLowerCase()))
+      .sort((a, b) => a.key.localeCompare(b.key));
+  } catch (error) { console.warn("Schwierigkeiten konnten nicht geladen werden:", error); }
+  fillDifficultySelects();
+  renderDifficultyAdmin();
+  if (currentLevel) paintDifficulty($("levelDifficulty"), currentLevel.difficulty);
+}
+async function addDifficulty() {
+  if (!isAdmin || !currentUser) return setStatus("adminStatus", "Nur Admins können Schwierigkeiten hinzufügen.", "error");
+  const name = $("newDiffName").value.trim().replace(/\s+/g, " ");
+  const color = $("newDiffColor").value;
+  if (!/^[\p{L}\p{N} -]{2,20}$/u.test(name)) return setStatus("adminStatus", "Der Name braucht 2–20 Zeichen (Buchstaben, Zahlen, Leerzeichen, Bindestrich).", "error");
+  if (!/^#[0-9a-f]{6}$/i.test(color)) return setStatus("adminStatus", "Bitte wähle eine gültige Farbe.", "error");
+  if (allDifficulties().some(d => d.name.toLowerCase() === name.toLowerCase())) return setStatus("adminStatus", "Diese Schwierigkeit gibt es schon.", "error");
+  try {
+    await db.ref("difficulties/d" + Date.now().toString(36)).set({ name, color:color.toLowerCase(), createdBy:currentUser.uid, createdAt:Date.now() });
+    $("newDiffName").value = "";
+    await loadDifficulties();
+    setStatus("adminStatus", "Schwierigkeit „" + name + "“ hinzugefügt.", "success");
+  } catch (error) { setStatus("adminStatus", "Speichern fehlgeschlagen: " + error.message + " (Firebase-Regeln prüfen)", "error"); }
+}
+async function deleteDifficulty(d) {
+  if (!isAdmin || !currentUser) return;
+  if (!confirm("Schwierigkeit „" + d.name + "“ löschen? Bestehende Level mit dieser Schwierigkeit werden grau dargestellt.")) return;
+  try {
+    await db.ref("difficulties/" + d.key).remove();
+    await loadDifficulties();
+    await refreshLevels();
+    setStatus("adminStatus", "Schwierigkeit gelöscht.", "success");
+  } catch (error) { setStatus("adminStatus", "Löschen fehlgeschlagen: " + error.message, "error"); }
 }
 function ownerDisplayName() { return currentUser?.displayName || "CarEscape-Spieler"; }
 // Wie oft darf ein Fahrzeugmodell vorkommen? Polizei 1×, kleine Autos 1×, große Autos 2×.
@@ -762,18 +911,26 @@ function loadLevel(level, opts = {}) {
   moveCount = 0;
   levelSolved = false;
   testMode = !!opts.test;
+  autoplayToken++; autoplaying = false; usedSolution = false;
+  remainingCache.clear();
+  resetTimer();
+  clearHint();
+  $("solutionBox").classList.add("hidden");
   $("testBanner").classList.toggle("hidden", !testMode);
   $("levelTitle").textContent = currentLevel.title || "CarEscape-Level";
   $("levelSubtitle").textContent = currentLevel.description || "Bewege das Polizeiauto zum Ausgang.";
   $("levelDifficulty").textContent = normalizeDifficulty(currentLevel.difficulty);
+  paintDifficulty($("levelDifficulty"), currentLevel.difficulty);
   $("moveCount").textContent = "0";
   setStatus("gameStatus", testMode ? "Testmodus: Spiele dein Level selbst." : "Level geladen.");
   renderBoard($("board"), currentLevel);
   showView("play");
+  computeMinMoves();
   return true;
 }
 // axis: "h" (← →) oder "v" (↑ ↓). Ohne axis wird die Fahrtrichtung des Fahrzeugs verwendet (Wischen).
-function moveSelected(direction, maxSteps = 1, axis = null) {
+function moveSelected(direction, maxSteps = 1, axis = null, fromAuto = false) {
+  if (autoplaying && !fromAuto) return;
   if (!currentLevel || !selectedVehicleId) {
     setStatus("gameStatus", "Wähle zuerst ein Fahrzeug aus.");
     return;
@@ -792,6 +949,8 @@ function moveSelected(direction, maxSteps = 1, axis = null) {
   }
   const delta = v.orientation === "h" ? {x:direction,y:0} : {x:0,y:direction};
   let moved = false;
+  const hintActive = hintEnabled && !fromAuto;
+  const remBefore = hintActive ? getRemaining(currentLevel.vehicles) : null;
   for (let i = 0; i < Math.min(maxSteps, GRID); i++) {
     if (!canMove(v, delta, currentLevel.vehicles)) break;
     v.x += delta.x; v.y += delta.y;
@@ -801,11 +960,17 @@ function moveSelected(direction, maxSteps = 1, axis = null) {
   }
   $("moveCount").textContent = String(moveCount);
   renderBoard($("board"), currentLevel);
+  if (moved) startTimer();
   if (moved && isSolved(currentLevel)) {
     levelSolved = true;
+    stopTimer();
+    clearHint();
+    const timeText = formatTime(timerElapsed);
+    const minText = minMoves !== null ? " (Minimum: " + minMoves + ")" : "";
+    const perfect = minMoves !== null && moveCount <= minMoves && !usedSolution ? " 🏆 Perfekt!" : "";
     setStatus("gameStatus", testMode
-      ? "Test bestanden! Dein Level ist lösbar – du hast " + moveCount + " Züge gebraucht. Gehe zurück zum Editor, um es zu speichern."
-      : "Geschafft! Das Polizeiauto fährt hinaus. Züge: " + moveCount, "success");
+      ? "Test bestanden! Dein Level ist lösbar – Züge: " + moveCount + minText + ", Zeit: " + timeText + ". Gehe zurück zum Editor, um es zu speichern."
+      : "Geschafft! Das Polizeiauto fährt hinaus. Züge: " + moveCount + minText + " · Zeit: " + timeText + (usedSolution ? " · mit Lösungshilfe" : "") + perfect, "success");
     const police = currentLevel.vehicles.find(item => getType(item.type).fixed);
     const el = police && $("board").querySelector('[data-vehicle-id="' + police.id + '"]');
     if (el) {
@@ -815,13 +980,199 @@ function moveSelected(direction, maxSteps = 1, axis = null) {
   } else if (!moved) {
     setStatus("gameStatus", "Dort ist kein Platz für das Fahrzeug.");
   } else {
-    setStatus("gameStatus", "Gut! Räume den Weg weiter frei.");
+    setStatus("gameStatus", "Räume den Weg weiter frei.");
+    if (hintActive) showHint(remBefore, getRemaining(currentLevel.vehicles));
   }
 }
 function resetGame() {
   if (!gameInitialLevel) return;
   loadLevel(gameInitialLevel, {test:testMode});
 }
+
+/* -------------------------------------------------------
+   Stoppuhr (startet beim ersten Zug, stoppt beim Lösen)
+   ------------------------------------------------------- */
+function formatTime(ms) {
+  const total = Math.floor(ms / 1000);
+  return String(Math.floor(total / 60)).padStart(2, "0") + ":" + String(total % 60).padStart(2, "0");
+}
+function resetTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null; timerStart = null; timerElapsed = 0;
+  $("timer").textContent = "00:00";
+}
+function startTimer() {
+  if (timerStart !== null || levelSolved) return;
+  timerStart = Date.now();
+  timerInterval = setInterval(() => { $("timer").textContent = formatTime(Date.now() - timerStart); }, 250);
+}
+function stopTimer() {
+  if (timerStart === null) return;
+  timerElapsed = Date.now() - timerStart;
+  clearInterval(timerInterval);
+  timerInterval = null; timerStart = null;
+  $("timer").textContent = formatTime(timerElapsed);
+}
+
+/* -------------------------------------------------------
+   Lösungssuche: kürzester Weg (Züge = einzelne Feldschritte, wie der Zugzähler)
+   ------------------------------------------------------- */
+function solvePath(vehicles, maxStates = 250000) {
+  const none = {solvable:false, moves:null, path:[]};
+  if (!isValidLevel({vehicles}).ok) return none;
+  const vs = vehicles, n = vs.length;
+  const len = vs.map(v => getVehicleSize(v));
+  const horiz = vs.map(v => v.orientation === "h");
+  const fixedCoord = vs.map(v => v.orientation === "h" ? v.y : v.x);
+  const start = vs.map(v => v.orientation === "h" ? v.x : v.y);
+  const pi = vs.findIndex(v => getType(v.type).fixed);
+  const parent = new Map([[start.join(","), null]]);
+  let queue = [start];
+  while (queue.length && parent.size < maxStates) {
+    const next = [];
+    for (const s of queue) {
+      const occ = new Array(GRID * GRID).fill(-1);
+      for (let i = 0; i < n; i++) {
+        for (let k = 0; k < len[i]; k++) {
+          occ[horiz[i] ? fixedCoord[i] * GRID + s[i] + k : (s[i] + k) * GRID + fixedCoord[i]] = i;
+        }
+      }
+      let free = true;
+      for (let x = s[pi] + 2; x < GRID; x++) if (occ[2 * GRID + x] >= 0) { free = false; break; }
+      const sKey = s.join(",");
+      if (free) {
+        const path = [];
+        let p = parent.get(sKey);
+        while (p) { path.push({id:vs[p.i].id, dir:p.dir}); p = parent.get(p.prev); }
+        path.reverse();
+        return {solvable:true, moves:path.length, path};
+      }
+      for (let i = 0; i < n; i++) {
+        for (const dir of [-1, 1]) {
+          const np = s[i] + dir;
+          if (np < 0 || np + len[i] > GRID) continue;
+          const edge = dir > 0 ? np + len[i] - 1 : np;
+          if (occ[horiz[i] ? fixedCoord[i] * GRID + edge : edge * GRID + fixedCoord[i]] >= 0) continue;
+          const t = s.slice(); t[i] = np;
+          const key = t.join(",");
+          if (!parent.has(key)) { parent.set(key, {prev:sKey, i, dir}); next.push(t); }
+        }
+      }
+    }
+    queue = next;
+  }
+  return none;
+}
+// Restliche Mindestzüge bis zum Ziel für eine Stellung (mit Zwischenspeicher).
+function getRemaining(vehicles) {
+  const key = vehicles.map(v => v.x + "," + v.y).join("|");
+  if (remainingCache.has(key)) return remainingCache.get(key);
+  const r = solvePath(vehicles);
+  const value = r.solvable ? r.moves : null;
+  remainingCache.set(key, value);
+  return value;
+}
+function computeMinMoves() {
+  const token = ++minToken;
+  minMoves = null;
+  $("minMoves").textContent = "…";
+  setTimeout(() => {
+    if (token !== minToken || !gameInitialLevel) return;
+    minMoves = getRemaining(gameInitialLevel.vehicles);
+    $("minMoves").textContent = minMoves === null ? "–" : String(minMoves);
+  }, 20);
+}
+
+/* -------------------------------------------------------
+   Warm/Kalt-Hinweis
+   ------------------------------------------------------- */
+function clearHint() {
+  const el = $("hintStatus");
+  el.className = "hint-status hidden";
+  el.textContent = "";
+}
+function showHint(before, after) {
+  if (before === null || after === null) return clearHint();
+  const el = $("hintStatus");
+  if (after < before) { el.className = "hint-status warm"; el.textContent = "🔥 Warm – dieser Zug bringt dich dem Ziel näher."; }
+  else if (after > before) { el.className = "hint-status cold"; el.textContent = "🧊 Kalt – dieser Zug entfernt dich vom Ziel."; }
+  else { el.className = "hint-status neutral"; el.textContent = "😐 Lauwarm – dieser Zug ändert nichts an deinem Weg zum Ziel."; }
+}
+$("hintToggle").addEventListener("change", event => {
+  hintEnabled = event.target.checked;
+  clearHint();
+  setStatus("gameStatus", hintEnabled ? "Hinweis aktiv: Nach jedem Zug siehst du, ob er warm oder kalt war." : "Hinweis ausgeschaltet.");
+});
+
+/* -------------------------------------------------------
+   Lösung anzeigen und abspielen
+   ------------------------------------------------------- */
+function solutionGroups(vehicles, path) {
+  const pos = new Map(vehicles.map(v => [v.id, {x:v.x, y:v.y, o:v.orientation, type:v.type}]));
+  const groups = [];
+  for (const step of path) {
+    const p = pos.get(step.id);
+    const last = groups[groups.length - 1];
+    if (last && last.id === step.id && last.dir === step.dir) last.count++;
+    else groups.push({id:step.id, dir:step.dir, count:1, o:p.o, name:getType(p.type).name, col:p.x + 1, row:p.y + 1});
+    if (p.o === "h") p.x += step.dir; else p.y += step.dir;
+  }
+  return groups;
+}
+function dirText(g) {
+  if (g.o === "h") return g.dir < 0 ? "← nach links" : "→ nach rechts";
+  return g.dir < 0 ? "↑ nach oben" : "↓ nach unten";
+}
+function showSolution() {
+  if (!currentLevel) return;
+  if (levelSolved) return setStatus("gameStatus", "Dieses Level ist bereits geschafft.", "success");
+  if (!confirm("Möchtest du dir wirklich die Lösung anzeigen lassen?")) return;
+  const box = $("solutionBox");
+  const r = solvePath(currentLevel.vehicles);
+  if (!r.solvable) {
+    box.textContent = "Für diese Stellung wurde keine Lösung gefunden. Versuche „Neu starten“.";
+    box.classList.remove("hidden");
+    return;
+  }
+  usedSolution = true;
+  const groups = solutionGroups(currentLevel.vehicles, r.path);
+  box.innerHTML = "<strong>Lösung ab der aktuellen Stellung (" + r.moves + " Züge):</strong><ol>" +
+    groups.map(g => "<li>" + escapeHTML(g.name) + " (Spalte " + g.col + ", Zeile " + g.row + ") " + dirText(g) + " – " + g.count + (g.count === 1 ? " Feld" : " Felder") + "</li>").join("") +
+    "<li>Danach fährt das Polizeiauto nach rechts hinaus.</li></ol>" +
+    '<div class="row"><button class="btn small primary" id="playSolutionBtn" type="button">▶ Abspielen</button><button class="btn small" id="closeSolutionBtn" type="button">Schließen</button></div>';
+  box.classList.remove("hidden");
+  $("playSolutionBtn").addEventListener("click", toggleSolutionPlay);
+  $("closeSolutionBtn").addEventListener("click", () => {
+    autoplayToken++; autoplaying = false;
+    box.classList.add("hidden");
+  });
+}
+function toggleSolutionPlay() {
+  if (autoplaying) {
+    autoplayToken++; autoplaying = false;
+    const b = $("playSolutionBtn"); if (b) b.textContent = "▶ Abspielen";
+  } else playSolution();
+}
+async function playSolution() {
+  const r = solvePath(currentLevel.vehicles);
+  if (!r.solvable) return;
+  usedSolution = true;
+  const token = ++autoplayToken;
+  autoplaying = true;
+  const btn = $("playSolutionBtn"); if (btn) btn.textContent = "⏹ Stopp";
+  clearHint();
+  for (const step of r.path) {
+    if (token !== autoplayToken || levelSolved) break;
+    selectedVehicleId = step.id;
+    moveSelected(step.dir, 1, null, true);
+    await new Promise(res => setTimeout(res, 450));
+  }
+  if (token === autoplayToken) {
+    autoplaying = false;
+    const b = $("playSolutionBtn"); if (b) b.textContent = "▶ Abspielen";
+  }
+}
+$("solutionBtn").addEventListener("click", showSolution);
 
 /* -------------------------------------------------------
    Editor und Inventar
@@ -1186,7 +1537,7 @@ async function requestAILevel(prompt, difficulty, count) {
     id:uid(),
     title:String(generated.title || "KI-Level").slice(0,70),
     description:String(generated.description || "Von der CarEscape-KI erstellt.").slice(0,1000),
-    difficulty:normalizeDifficulty(generated.difficulty || difficulty),
+    difficulty:normalizeDifficulty(difficulty),
     series:String(generated.series || "KI-Level").slice(0,50),
     visibility:"private",
     vehicles
@@ -1223,6 +1574,7 @@ async function generateAILevel() {
 
     $("editTitle").value = level.title;
     $("editDifficulty").value = level.difficulty;
+    paintSelect($("editDifficulty"));
     $("editSeries").value = level.series;
     $("levelDescription").value = level.description;
     editorNextId = 1000;
@@ -1376,6 +1728,7 @@ $("saveCurrentBtn").addEventListener("click", async () => {
 async function refreshLevels() {
   if (!db) return;
   try {
+    await loadDifficulties();
     const snap = await db.ref("levels").once("value");
     savedLevels = snap.val() || {};
     publicLevels = {};
@@ -1396,7 +1749,7 @@ function makeLevelCard(id, level, admin = false) {
   card.className = "level-card";
   card.innerHTML = `
     <h3>${escapeHTML(level.title || "Unbenanntes Level")}</h3>
-    <div class="row"><span class="chip">${escapeHTML(normalizeDifficulty(level.difficulty))}</span>
+    <div class="row"><span class="chip diff" style="${difficultyStyle(level.difficulty)}">${escapeHTML(normalizeDifficulty(level.difficulty))}</span>
     <span class="chip">${escapeHTML(level.series || "Ohne Serie")}</span></div>
     <p>${escapeHTML(level.description || "Keine Beschreibung.")}</p>
     <p class="muted">${escapeHTML(level.ownerName || "CarEscape-Spieler")} · ${escapeHTML(level.visibility || "private")}</p>
@@ -1767,9 +2120,15 @@ async function openLinkedLevel() {
   }
 }
 
+fillDifficultySelects();
+renderDifficultyAdmin();
+for (const id of ["editDifficulty", "aiDifficulty", "difficultyFilter"]) $(id).addEventListener("change", () => paintSelect($(id)));
+$("addDiffBtn").addEventListener("click", addDifficulty);
 currentLevel = makeDefaultLevel();
 gameInitialLevel = clone(currentLevel);
+paintDifficulty($("levelDifficulty"), currentLevel.difficulty);
 renderBoard($("board"), currentLevel);
+computeMinMoves();
 editorVehicles = [newEditorPolice()];
 renderEditor();
 initFirebase();
