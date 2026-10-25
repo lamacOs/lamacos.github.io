@@ -4,120 +4,132 @@
 
 # FlohmarktScanner – Support-Dokumentation
 
-**Vermuteter Zweck:** FlohmarktScanner ist eine webbasierte Anwendung, mit der Gegenstände fotografiert, Preise erfasst und später anhand eines Farbvergleichs wiedergefunden werden können.  
-**Quellcode-Pfad:** `FlohmarktScanner/index.html`  
-**Erstellungsdatum:** 14. April 2025
+**Vermuteter Zweck:** Der FlohmarktScanner ist eine browserbasierte Anwendung, mit der Gegenstände mithilfe der Kamera erfasst, Preise lokal gespeichert und später über einen vereinfachten Farbvergleich wiedergefunden werden können.  
+**Quellcode-Pfad:** `FlohmarktScanner`  
+**Datum der Erstellung:** 25. Mai 2026
+
+> Der Quellcode enthält nur die Datei `FlohmarktScanner/index.html`. Aussagen zu nicht vorhandenen Dateien, Serverfunktionen oder einer persistenten Synchronisierung sind daher **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
 ## 1. Überblick
 
-FlohmarktScanner bietet zwei Hauptfunktionen:
+Der FlohmarktScanner bietet zwei Hauptfunktionen:
 
-1. **Neues Objekt hinzufügen:**  
-   Ein Gegenstand wird fotografiert, anschließend wird ein Preis eingegeben und das Objekt lokal im Browser gespeichert.
+1. **Neues Objekt hinzufügen**
+   - Gegenstand fotografieren
+   - Preisfeld eingeben
+   - Objekt lokal im Browser speichern
 
-2. **Objekt scannen:**  
-   Ein Gegenstand wird fotografiert. Die Anwendung vergleicht die durchschnittliche Farbe des Fotos mit bereits gespeicherten Objekten und zeigt bei einem Treffer den gespeicherten Preis an.
+2. **Objekt scannen**
+   - Gegenstand fotografieren
+   - Farbe des Fotos mit gespeicherten Objekten vergleichen
+   - Bei einem Treffer den gespeicherten Preis anzeigen
 
-Die Website enthält außerdem:
+Zusätzlich enthält die Seite:
 
-- einen hellen und einen dunklen Darstellungsmodus,
-- einen fest positionierten Kundensupport-Chat,
-- einen schwebenden Button **„Zurück“**, der nur unter bestimmten Einbettungsbedingungen erscheint.
-
-> Die Quellcode-Auszüge können unvollständig sein. Nicht erkennbare Funktionen werden in dieser Dokumentation ausdrücklich als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
+- einen Licht-/Dunkelmodus,
+- einen eingebetteten KI-gestützten Kundenservice,
+- eine Rückkehr-Schaltfläche zu lamachub.de unter bestimmten Einbettungsbedingungen.
 
 ---
 
 ## 2. Voraussetzungen
 
-### 2.1 Browser und Bildschirm
+### Für die Hauptfunktionen
 
-Für die基本 Nutzung wird ein aktueller Browser mit JavaScript-Unterstützung benötigt.
+Für Kameraaufnahmen benötigt der FlohmarktScanner:
 
-Die Oberfläche passt sich grundsätzlich an die verfügbare Breite an. Für die Nutzung der Kamera ist jedoch ein Gerät mit Kamera und geeigneter Browser- beziehungsweise Betriebssystem-Berechtigung erforderlich.
+- einen aktuellen Browser mit Unterstützung für `navigator.mediaDevices.getUserMedia`,
+- eine Kamera,
+- die Erlaubnis des Browsers, auf die Kamera zuzugreifen,
+- eine sichere Umgebung oder eine entsprechend vom Browser zugelassene lokale Seite.
 
-### 2.2 Kamera und Berechtigungen
+Die Kamera muss in den meisten aktuellen Browsern über **HTTPS** oder über `localhost` verfügbar sein.
 
-Beim ersten Zugriff auf **„📦 Neues Objekt hinzufügen“** oder **„🔍 Objekt scannen“** fordert der Browser eine Kamerafreigabe an.
+### Für den Kundenservice
 
-Die Kamera wird nach einem Klick auf **„✖ Abbrechen“** wieder beendet. Beim erneuten Start wird erneut eine Kamerafreigabe benötigt beziehungsweise der Browser prüft die bereits erteilte Berechtigung erneut.
+Der Kundenservice sendet Nachrichten an einen externen KI-Dienst. Dafür müssen:
 
-### 2.3 Lokaler Speicher
+- eine Internetverbindung bestehen,
+- der eingebettete Dienst erreichbar sein,
+- die Seite über eine erreichbare Browser-Implementierung von `fetch` verfügen.
 
-Gespeicherte Objekte werden im `localStorage` des Browsers abgelegt. Das bedeutet:
+### Für die lokale Speicherung
 
-- Die Daten sind an den verwendeten Browser und das jeweilige Gerät beziehungsweise Profil gebunden.
-- Ein Wechsel von Browser, Gerät oder Browserprofil kann dazu führen, dass gespeicherte Objekte nicht sichtbar sind.
-- Im Quellcode ist keine Anmeldung und keine Synchronisierung zwischen Geräten erkennbar.
-- Eine Funktion zum Anzeigen oder Löschen der gespeicherten Objektliste ist im vorliegenden Quellcode nicht erkennbar.
+Die gespeicherten Objekte werden im `localStorage` des Browsers abgelegt. Voraussetzung ist, dass der Browser die lokale Speicherung nicht vollständig deaktiviert hat.
 
 ---
 
 ## 3. Sichtbare Bereiche der Website
 
-### 3.1 Kopfbereich
+### 3.1 Kopfzeile
 
-Im oberen Bereich der Website befindet sich links das Logo mit der Bezeichnung **„FlohmarktScanner“**. Rechts ist eine Schaltfläche mit einem Mond- oder Sonnen-Symbol sichtbar.
+Oben links befindet sich das Logo mit der Bezeichnung:
 
-Mit dieser Schaltfläche kann zwischen dem hellen und dem dunklen Farbschema gewechselt werden.
+**„FlohmarktScanner“**
+
+Rechts befindet sich eine Mond-/Sonn-Schaltfläche mit dem Symbol:
+
+**„🌗“**
+
+Mit dieser Schaltfläche wechselt die Seite zwischen dem hellen und dem dunklen Farbschema.
 
 ### 3.2 Begrüßungsbereich
 
-Unterhalb des Kopfbereichs stehen:
+Unter der Kopfzeile stehen:
 
-- die Überschrift **„FlohmarktScanner“**,
-- der Text **„Scanne Gegenstände und speichere Preise smarter 🔍“**.
+- **„FlohmarktScanner“**
+- **„Scanne Gegenstände und speichere Preise smarter 🔍“**
 
 ### 3.3 Hauptkarte
 
-Die Hauptkarte enthält zunächst zwei große Schaltflächen:
+Die Hauptkarte enthält zunächst zwei Schaltflächen:
 
 - **„📦 Neues Objekt hinzufügen“**
 - **„🔍 Objekt scannen“**
 
-Je nach ausgewählter Funktion werden anschließend weitere Bereiche eingeblendet.
+Je nach gewählter Funktion werden darunter der Kamerabereich, die Aufnahmesteuerung und gegebenenfalls das Preisfeld eingeblendet.
 
-### 3.4 Kamera- und Aufnahmebereich
+### 3.4 Kamerabereich
 
-Nach dem Start einer Funktion erscheinen:
+Nach dem Start einer Kamerafunktion erscheinen:
 
-- eine Live-Ansicht der Kamera,
+- eine Live-Vorschau,
 - die Schaltfläche **„📸 Foto“**,
 - die Schaltfläche **„🔄 Kamera“**,
-- die Schaltfläche **„✖ Abbrechen“**,
-- eine Fläche für das aufgenommene Foto.
+- die Schaltfläche **„✖ Abbrechen“**.
 
-Das Foto wird quadratisch mit einer Kantenlänge von 200 Pixeln dargestellt. Der Code erzeugt das Vorschaubild als JPEG mit einer Qualitätsstufe von 0,6.
+Nach einer Aufnahme wird die Live-Vorschau durch eine Aufnahme in einem quadratischen Canvas-Bereich ersetzt.
 
 ### 3.5 Preiseingabe
 
-Im Modus **„Neues Objekt hinzufügen“** erscheint nach der Aufnahme ein Eingabefeld mit dem Platzhalter:
+Im Modus **„Neues Objekt hinzufügen“** erscheint nach der Aufnahme ein Textfeld mit dem Platzhalter:
 
-> `z.B. 3.50`
+**„z.B. 3.50“**
 
-Daneben befindet sich die Schaltfläche **„Speichern“**.
+Darunter befindet sich die Schaltfläche:
 
-Der Code akzeptiert sowohl einen Punkt als auch ein Komma als Dezimaltrennzeichen. Beim Speichern wird der Preis intern mit zwei Nachkommastellen formatiert.
+**„Speichern“**
 
-### 3.6 Kundensupport-Chat
+### 3.6 Kundenservice
 
-Unten rechts befindet sich eine runde grüne Schaltfläche mit einem Sprechblasen-Symbol. Sie öffnet das Fenster **„lamachub Kundenservice“** mit dem Hinweis **„KI-gestützter Support“**.
+Unten rechts befindet sich eine runde Chat-Schaltfläche mit einem Sprechblasen-Symbol.
 
-Im Chat steht zunächst:
+Nach dem Öffnen erscheint ein Fenster mit der Überschrift:
 
-> „Hallo! Wie kann ich Ihnen weiterhelfen?“
+- **„lamachub Kundenservice“**
+- **„KI-gestützter Support“**
 
-Darunter befindet sich ein Eingabefeld mit der Beschriftung **„Nachricht schreiben“** und eine Senden-Schaltfläche mit Pfeilsymbol.
+Im Chat-Verlauf wird zu Beginn die Nachricht angezeigt:
 
-Der Chat kann über das **„×“** oben rechts wieder geschlossen werden.
+**„Hallo! Wie kann ich Ihnen weiterhelfen?“**
 
-### 3.7 Schwebender Button „Zurück“
+Unten befindet sich ein Eingabefeld mit dem Platzhalter:
 
-Ein zusätzlicher Button mit der Aufschrift **„Zurück“** kann in der rechten unteren Bildschirmecke erscheinen. Er öffnet `https://www.lamachub.de/` im aktuellen Tab.
+**„Nachricht schreiben“**
 
-Der Button wird nur eingeblendet, wenn die Seite laut Quellcode aus der Domain `www.lamachub.de` über die HTTPS-Adresse aufgerufen wurde. Diese technische Einschränkung ist für Besucher normalerweise nicht sichtbar.
+Rechts daneben befindet sich eine Senden-Schaltfläche mit einem Pfeilsymbol.
 
 ---
 
@@ -125,198 +137,250 @@ Der Button wird nur eingeblendet, wenn die Seite laut Quellcode aus der Domain `
 
 ### Schritt 1: Funktion starten
 
-1. Öffnen Sie FlohmarktScanner.
-2. Klicken Sie auf **„📦 Neues Objekt hinzufügen“**.
-3. Die beiden Startschaltflächen werden ausgeblendet.
-4. Die Kamera wird gestartet, sofern der Browser die Berechtigung erteilt.
+1. Öffnen Sie die Website.
+2. Wählen Sie **„📦 Neues Objekt hinzufügen“**.
 
-### Schritt 2: Kamera ausrichten
+Die beiden Hauptschaltflächen werden ausgeblendet und die Kamera wird gestartet.
 
-Richten Sie den Gegenstand in der Live-Ansicht aus. Für einen aussagekräftigeren Vergleich sollte der Gegenstand möglichst groß und gut beleuchtet im Kamerabild erscheinen.
+### Schritt 2: Kamera freigeben
 
-### Schritt 3: Foto aufnehmen
+Beim ersten Zugriff kann der Browser eine Berechtigungsabfrage anzeigen.
 
-1. Klicken Sie auf **„📸 Foto“**.
-2. Die Live-Ansicht wird durch die aufgenommene Bildvorschau ersetzt.
-3. Bei der Funktion „Neues Objekt hinzufügen“ wird nun das Preisfeld angezeigt.
+- Erlauben Sie den Kamerazugriff, um die Funktion nutzen zu können.
+- Wenn Sie den Zugriff ablehnen, wird eine Fehlermeldung angezeigt.
 
-### Schritt 4: Preis eingeben
+### Schritt 3: Kamera auswählen
 
-1. Klicken Sie in das Feld mit dem Platzhalter **„z.B. 3.50“**.
-2. Geben Sie den gewünschten Preis ein.
-3. Beispielwerte sind `3.50`, `3,50`, `10` oder `12.90`.
+Bei Geräten mit mehreren Kameras können Sie mit **„🔄 Kamera“** zwischen der nach vorn gerichteten und der nach hinten gerichteten Kamera wechseln.
 
-Negative Werte werden vom Quellcode nicht ausdrücklich abgelehnt.
+Der Kamerazugriff wird dabei neu aufgebaut. Die jeweils aktive Kamera wird in der Live-Vorschau angezeigt.
 
-### Schritt 5: Objekt speichern
+### Schritt 4: Foto aufnehmen
 
-1. Klicken Sie auf **„Speichern“**.
-2. Bei gültigem Bild und gültigem Preis erscheint der Hinweis **„Gespeichert!“**.
-3. Die Kamera wird beendet und die Startschaltflächen werden wieder angezeigt.
+1. Richten Sie die Kamera auf den gewünschten Gegenstand.
+2. Wählen Sie **„📸 Foto“**.
 
-### Schritt 6: Vorgang abbrechen
+Das Bild wird auf 200 × 200 Pixel verkleinert und als JPEG mit reduzierter Qualität gespeichert. Die Live-Vorschau wird anschließend durch die Aufnahme ersetzt.
 
-Sie können den Vorgang jederzeit mit **„✖ Abbrechen“** beenden. Es wird dann kein Preis gespeichert.
+### Schritt 5: Preis eingeben
+
+Geben Sie in das Preisfeld einen Betrag ein, beispielsweise:
+
+- `3.50`
+- `3,50`
+
+Der Code wandelt ein Komma vor der Verarbeitung in einen Punkt um. Andere Eingaben werden mit `parseFloat` verarbeitet; ein möglicherweise unvollständig interpretierbarer Betrag kann dabei zu einer anderen Zahl führen.
+
+### Schritt 6: Objekt speichern
+
+1. Wählen Sie **„Speichern“**.
+2. Nach erfolgreicher Speicherung erscheint die Meldung **„Gespeichert!“**.
+3. Der Kamerabereich und das Preisfeld werden ausgeblendet.
+4. Die beiden Hauptschaltflächen werden wieder angezeigt.
+
+Das gespeicherte Objekt enthält:
+
+- ein Bild,
+- den Preis als Zeichenkette mit zwei Nachkommastellen.
 
 ---
 
 ## 5. Bedienung: Objekt scannen
 
-### Schritt 1: Scan starten
+### Schritt 1: Scanfunktion starten
 
-1. Klicken Sie auf **„🔍 Objekt scannen“**.
-2. Die Kamera startet nach Erteilung der entsprechenden Browserberechtigung.
+1. Öffnen Sie die Website.
+2. Wählen Sie **„🔍 Objekt scannen“**.
 
-### Schritt 2: Foto aufnehmen
+Die Kamera wird gestartet und die Live-Vorschau erscheint.
 
-1. Richten Sie den gesuchten Gegenstand in der Kamera aus.
-2. Klicken Sie auf **„📸 Foto“**.
-3. Die Aufnahme wird unmittelbar mit den gespeicherten Objekten verglichen.
+### Schritt 2: Kamera einstellen
 
-### Schritt 3: Ergebnis prüfen
+- Mit **„🔄 Kamera“** können Sie die Kamera wechseln.
+- Mit **„✖ Abbrechen“** können Sie die Kamerasession beenden und zur Auswahl zurückkehren.
 
-Je nach Ergebnis erscheint eine Meldung:
+### Schritt 3: Foto aufnehmen
 
-- **„Preis: … €“** bei einem ausreichend ähnlichen Treffer,
-- **„Kein Treffer“**, wenn kein passendes Objekt gefunden wurde.
+1. Richten Sie die Kamera auf das gespeicherte Objekt.
+2. Wählen Sie **„📸 Foto“**.
 
-Anschließend wird die Kamera beendet und die Startschaltflächen werden wieder angezeigt.
+Anschließend wird automatisch der Scan gestartet. Im Modus **„Objekt scannen“** wird kein Preisfeld angezeigt.
 
-### Erläuterung des Vergleichs
+### Schritt 4: Ergebnis prüfen
 
-Der Scan verwendet keine sichtbare Texterkennung und keine vollständige Bildsuche. Stattdessen wird für die aktuelle Aufnahme und jedes gespeicherte Bild die durchschnittliche Farbe berechnet.
+Der Scanner berechnet die durchschnittliche Farbe des aufgenommenen Bildes und vergleicht sie mit den durchschnittlichen Farben der gespeicherten Objekte.
 
-Anschließend wird der Abstand zwischen den durchschnittlichen RGB-Farben ermittelt. Nur wenn dieser Abstand unter einem festgelegten Schwellenwert liegt, gilt das Objekt als Treffer und der gespeicherte Preis wird angezeigt.
+Mögliche Ergebnisse:
 
-Das bedeutet:
+- **„Preis: … €“**  
+  Ein gespeichertes Objekt wurde als passendster Treffer erkannt.
 
-- Unterschiedliche Gegenstände mit ähnlicher Durchschnittsfarbe können als Treffer gewertet werden.
-- Gleiche Gegenstände unter stark abweichenden Lichtverhältnissen können als „Kein Treffer“ erscheinen.
-- Es wird im Quellcode nicht eindeutig erkennbar, ob das System einen Artikelnamen, eine Warenkategorie oder eine eindeutige Produktkennung speichert.
+- **„Kein Treffer“**  
+  Es wurde kein ausreichend ähnlicher Treffer gefunden.
+
+Danach wird der Kamerabereich geschlossen und die Auswahl der Hauptfunktionen wieder angezeigt.
+
+### Erkennungsgrenzen
+
+Der Abgleich basiert ausschließlich auf der durchschnittlichen Farbe des Fotos. Daher gilt:
+
+- Unterschiedliche Objekte mit ähnlicher Durchschnittsfarbe können als Treffer erscheinen.
+- Andere Farben können zu **„Kein Treffer“** führen.
+- Form, Textur, Größe, Logos und Details werden nicht ausgewertet.
+- Unterschiedliche Lichtverhältnisse können das Ergebnis beeinflussen.
 
 ---
 
-## 6. Helligen und dunklen Modus wechseln
+## 6. Kameraschaltfläche verstehen
 
-1. Klicken Sie oben rechts auf die Schaltfläche mit dem Mond- oder Sonnen-Symbol.
-2. Die Website wechselt zwischen einem hellen und einem dunklen Farbschema.
-3. Ein erneuter Klick wechselt die Darstellung zurück.
+Mit **„🔄 Kamera“** wird die Variable `useFront` umgeschaltet:
 
-Der gewählte Modus wird im Quellcode nicht dauerhaft gespeichert. Nach einem Neuladen der Seite ist daher standardmäßig wieder der helle Modus zu erwarten.
+- beim ersten Start wird standardmäßig die rückseitige beziehungsweise Umgebungskamera angefordert,
+- nach dem Wechsel wird die nach vorn gerichtete Kamera angefordert,
+- bei einem weiteren Wechsel wird wieder die Umgebungskamera verwendet.
+
+Ob ein Gerät tatsächlich beide Kameras besitzt, hängt vom Gerät und Browser ab. Im Quellcode ist keine detaillierte Fehlerbehandlung für Geräte ohne Wechselmöglichkeit erkennbar.
 
 ---
 
-## 7. Kundensupport-Chat verwenden
+## 7. Abbrechen und zurück zur Startansicht
 
-### 7.1 Chat öffnen
+Mit **„✖ Abbrechen“** werden folgende Schritte ausgeführt:
 
-1. Klicken Sie unten rechts auf die runde grüne Sprechblasen-Schaltfläche.
-2. Das Chatfenster **„lamachub Kundenservice“** öffnet sich.
-3. Der Cursor wird automatisch in das Eingabefeld gesetzt.
+1. Alle aktiven Kameraspuren werden gestoppt.
+2. Der Kamerabereich wird ausgeblendet.
+3. Das Preisfeld wird ausgeblendet.
+4. Die Startschaltflächen werden wieder angezeigt.
+5. Die Live-Vorschau wird wieder vorbereitet.
+6. Das zuletzt aufgenommene Canvas-Bild wird ausgeblendet.
 
-### 7.2 Nachricht senden
+Die Aufnahme bleibt bis zum nächsten Foto im Arbeitsspeicher des Browsers bestehen. Beim Neustart einer Kamerasession wird sie bei der nächsten Aufnahme ersetzt.
 
-1. Geben Sie Ihre Frage in das Feld **„Nachricht schreiben“** ein.
-2. Klicken Sie auf die Pfeil-Schaltfläche oder senden Sie das Formular mit der Eingabetaste.
-3. Ihre Nachricht erscheint im Chat.
-4. Die Antwort wird über einen externen Support-Dienst geladen.
+---
 
-Leere Nachrichten werden nicht gesendet.
+## 8. Licht- und Dunkelmodus
 
-### 7.3 Chat schließen
+Die Mond-/Sonn-Schaltfläche **„🌗“** schaltet die Klassen `light` und `dark` am Dokument um.
 
-Klicken Sie oben rechts im Chatfenster auf **„×“**. Der Chat wird ausgeblendet; die vorherigen Chatnachrichten bleiben beim erneuten Öffnen innerhalb derselben Seiten Sitzung sichtbar.
+Bestätigte Auswirkungen:
 
-### 7.4 Nachrichtenhistorie
+- Hintergrund- und Kartenfarben ändern sich,
+- Textfarben ändern sich,
+- Rahmen und einige Bedienelemente passen sich an,
+- eine Seitenübergangsanimation von 0,3 Sekunden wird verwendet.
 
-Der Chat überträgt die bisherige Unterhaltung zusammen mit der neuen Nachricht an den Support-Dienst. Im Arbeitsspeicher werden für die KI-Antwort grundsätzlich die letzten zwölf Verlaufsnachrichten berücksichtigt.
+Der gewählte Modus wird im Quellcode nicht dauerhaft gespeichert. Nach einem vollständigen Neuladen der Seite ist deshalb wieder der im HTML festgelegte helle Ausgangszustand zu erwarten.
+
+---
+
+## 9. Kundenservice
+
+### 9.1 Chat öffnen
+
+1. Klicken Sie unten rechts auf die Sprechblasen-Schaltfläche.
+2. Das Chat-Fenster wird geöffnet.
+3. Das Eingabefeld erhält automatisch den Fokus.
+
+### 9.2 Nachricht senden
+
+1. Schreiben Sie Ihre Nachricht in das Feld **„Nachricht schreiben“**.
+2. Klicken Sie auf die Pfeil-Schaltfläche oder senden Sie das Formular ab.
+3. Ihre Nachricht erscheint im Chat als grüne Benutzernachricht.
+4. Das Eingabefeld wird geleert.
+5. Die Antwort wird nach erfolgreicher Verarbeitung als Bot-Nachricht angezeigt.
+
+Das Eingabefeld erlaubt maximal 1.800 Zeichen. Eine Nachricht, die nur aus Leerzeichen besteht, wird nicht versendet.
+
+### 9.3 Chatverlauf
+
+Für die Verarbeitung werden die letzten zwölf Chat-Einträge berücksichtigt. Der Verlauf wird erst nach einer erfolgreichen Antwort erweitert.
 
 Ab der 15. gesendeten Nachricht erscheint zusätzlich der Hinweis:
 
-> „Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.“
+**„Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.“**
 
-Die Nachrichtenzählung wird beim Neuladen der Seite zurückgesetzt.
+### 9.4 Chat schließen
 
-### 7.5 Wenn der Support nicht erreichbar ist
+Klicken Sie im Chat-Fenster auf **„×“**. Der Chat wird geschlossen; der bis dahin sichtbare Verlauf bleibt im aktuellen Seitenaufruf im Arbeitsspeicher.
 
-Bei einem Netzwerk-, Server- oder Verarbeitungsfehler erscheint:
+### 9.5 Fehlermeldung
 
-> „Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.“
+Wenn die Kommunikation mit dem KI-Dienst fehlschlägt, erscheint:
 
-In diesem Fall kann die Nachricht erneut gesendet werden.
+**„Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.“**
 
----
-
-## 8. Typische Probleme und Fehlerbehebung
-
-### 8.1 Die Kamera startet nicht
-
-**Meldung:** Ein Browserdialog oder eine Fehlermeldung wie „Kamera Fehler: …“ erscheint.
-
-**Mögliche Ursachen:**
-
-- Die Kamera wurde nicht freigegeben.
-- Die Kamera wird bereits von einer anderen Anwendung verwendet.
-- Die Seite läuft nicht über eine sichere Umgebung.
-- Die eingestellte Kamera ist nicht verfügbar.
-- Die Geräte- oder Browserberechtigungen wurden blockiert.
-
-**Fehlerbehebung:**
-
-1. Prüfen Sie die Kamera- und Mikrofonberechtigungen des Browsers für diese Website.
-2. Schließen Sie andere Anwendungen, die möglicherweise auf die Kamera zugreifen.
-3. Laden Sie die Seite neu.
-4. Falls die Fehlermeldung bestehen bleibt, versuchen Sie einen anderen aktuellen Browser oder ein anderes Gerät.
-5. Prüfen Sie, ob die Website über `https://` oder lokal über `localhost` aufgerufen wird. Viele Browser erlauben Kamerazugriff nur in diesen Kontexten.
+Die konkrete technische Ursache wird dem Besucher nicht angezeigt.
 
 ---
 
-### 8.2 Es wird „Ungültig“ angezeigt
+## 10. Rückkehr zu lamachub.de
 
-Diese Meldung erscheint, wenn beim Speichern entweder:
+Die Website enthält eine zusätzliche Schaltfläche:
 
-- kein aufgenommenes Bild vorhanden ist,
-- der Preisfeldinhalt nicht als gültige Zahl interpretiert werden kann.
+**„← Zurück“**
 
-**Fehlerbehebung:**
+Sie wird nur unter folgenden Bedingungen eingeblendet:
 
-1. Klicken Sie auf **„📸 Foto“**, um tatsächlich ein Bild aufzunehmen.
-2. Geben Sie eine Zahl ein, beispielsweise `3.50` oder `3,50`.
-3. Klicken Sie erneut auf **„Speichern“**.
+1. Die Website wurde in einem Kontext mit Referrer `https://www.lamachub.de` geöffnet.
+2. Der Referrer wird als URL mit dem Protokoll `https` und dem Hostnamen `www.lamachub.de` erkannt.
 
-Der Platzhaltertext `z.B. 3.50` ist nur ein Beispiel und muss nicht unbedingt eingegeben werden.
+Die Schaltfläche befindet sich in einem separaten Shadow-DOM-Bereich und leitet anschließend zur lamachub-Hauptseite weiter.
 
----
-
-### 8.3 Das gespeicherte Objekt wird nicht gefunden
-
-**Meldung:** **„Kein Treffer“**
-
-**Mögliche Ursachen:**
-
-- Es wurde noch kein Objekt gespeichert.
-- Das gespeicherte Objekt befindet sich in einem anderen Browserprofil oder auf einem anderen Gerät.
-- Das gespeicherte Bild und das neue Foto haben stark unterschiedliche Durchschnittsfarben.
-- Die Kameraaufnahme war unscharf, zu dunkel oder stark überbelichtet.
-- Das Kamerabild enthielt überwiegend den Hintergrund statt des Gegenstands.
-
-**Fehlerbehebung:**
-
-1. Speichern Sie das Objekt erneut mit möglichst ähnlicher Beleuchtung.
-2. Nehmen Sie das Objekt großflächig und zentral im Bild auf.
-3. Vermeiden Sie starke Farb- oder Lichtunterschiede.
-4. Kontrollieren Sie, ob Sie dieselbe Website in demselben Browserprofil verwenden.
-5. Bedenken Sie, dass der Vergleich ausschließlich auf Durchschnittsfarben basiert.
+Ob die Seite in einem iframe eingebettet ist, spielt für die angezeigte Schaltfläche keine erkennbare Rolle. Ob die Navigation aus jedem eingebetteten Kontext heraus tatsächlich möglich ist, ist **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
-### 8.4 Falscher Preis wird angezeigt
+## 11. Lokale Speicherung und Datenhaltung
 
-Der Scan wählt den gespeicherten Eintrag mit der ähnlichsten durchschnittlichen Farbe. Bei mehreren ähnlich farbigen Objekten kann deshalb der falsche Artikel als Treffer erscheinen.
+### Bestätigt
 
-**Verbesserung:**
+Gespeicherte Objekte werden im Browser unter dem Schlüssel `objects` im `localStorage` abgelegt. Jeder Eintrag enthält ein Bild und einen Preis.
 
-- Hintergrund möglichst wenig erfassen.
-- Das Objekt vollständig und mittig aufnehmen.
-- Gegenstände mit ähnlichen Durchschnittsfarben nicht in einem zu ähnlichen Beleuchtungszustand vergleichen.
-- Für präzise Ergebnisse wäre eine detailliertere Bildanalyse nötig. Eine solche Funktion ist im
+Die Daten werden:
+
+- lokal im verwendeten Browser gespeichert,
+- nicht an eine im Quellcode erkennbare FlohmarktScanner-eigene Serverdatenbank übertragen,
+- beim nächsten Scan wieder aus dem `localStorage` gelesen.
+
+### Nicht im Quellcode erkennbar
+
+- Ein Export- oder Import-Funktion.
+- Eine Synchronisierung zwischen Geräten.
+- Ein Konto oder eine Anmeldung.
+- Eine serverseitige Sicherung.
+- Eine automatische Löschung nach einer bestimmten Zeit.
+- Ein sichtbares Menü zur Verwaltung oder Löschung bereits gespeicherter Objekte.
+
+### Praktische Hinweise
+
+- Beim Löschen der Browserdaten kann auch der lokale Speicher gelöscht werden.
+- Unterschiedliche Browser, Geräte oder Browserprofile verwenden üblicherweise getrennten lokalen Speicher.
+- Im privaten Modus kann der Speicher beim Schließen des Browserfensters verschwinden.
+- Das lokale Speichern von Bildern kann den verfügbaren Browser-Speicher schnell belegen, da jedes Objekt ein Bild als Data-URL enthält.
+- Eine explizite Löschfunktion einzelner Objekte ist im Quellcode nicht vorhanden.
+
+---
+
+## 12. Datenschutz- und Berechtigungshinweise
+
+### Kamera
+
+Die Website fordert ausdrücklich Zugriff auf die Kamera an. Die Kamera wird erst nach Auswahl einer Kamerafunktion gestartet.
+
+### Mikrofon
+
+Im Quellcode ist keine Anforderung für Mikrofonzugriff erkennbar.
+
+### Standort
+
+Im Quellcode ist keine Geolokalisierung erkennbar.
+
+### Kundenservice und externe Ressourcen
+
+Bestätigt sind folgende externe Verbindungen:
+
+1. **KI-gestützter Kundenservice:**  
+   Nachrichten und ein begrenzter Chatverlauf werden per HTTP-Anfrage an einen externen Worker-Dienst übermittelt.
+
+2. **Schriftart:**  
+   Die Seite
