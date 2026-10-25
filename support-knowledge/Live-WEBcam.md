@@ -4,325 +4,329 @@
 
 # Live-WEBcam
 
-**Vermuteter Zweck:** Live-Übertragung einer Kamera beziehungsweise eines Webcam-Streams über eine temporäre Verbindung zwischen zwei Browsern.
+**Vermuteter Zweck:** Live-Ansicht einer Webcam beziehungsweise einer per Browser erreichbaren Kamera über eine WebRTC-Verbindung. Die Seite bietet außerdem einen Code zur Eingabe und einen KI-gestützten Kundenservice-Chat an.  
+**Quellcode-Pfad:** `Live-WEBcam`  
+**Datum der Erstellung:** 21. Mai 2026
 
-**Quellcode-Pfad:** `Live-WEBcam/index.html`
-
-**Erstellt am:** 10. März 2026
+> **Hinweis zur Quellcodebasis:** Die bereitgestellten Auszüge sind unvollständig und teilweise in einer fremden Textformatierung eingebettet. Die nachfolgende Dokumentation beschreibt ausschließlich Funktionen, die im sichtbaren Quellcode eindeutig erkennbar sind. Nicht vollständig sichtbare Bereiche werden ausdrücklich als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
 
 ---
 
 ## 1. Überblick
 
-Bei „Live-WEBcam“ handelt es sich um eine browserbasierte Webcam-Anwendung von lamacHub beziehungsweise lamacOs. Die Oberfläche bietet zwei Hauptfunktionen:
+„Live-WEBcam“ ist eine deutschsprachige Single-Page-Anwendung mit folgenden bestätigten Bestandteilen:
 
-- **Hosten (Kamera teilen):** Der sendende Browser fordert Zugriff auf Kamera und Mikrofon an, erzeugt einen temporären Code und stellt eine lokale Vorschau bereit.
-- **Empfangen (Code eingeben):** Der empfangende Browser gibt einen sechsstelligen Code ein und versucht, die Live-Verbindung herzustellen.
+- Kopfbereich mit Logo, dem Titel „lamacOs — Live Kamera“ und einem Schalter für ein helles oder dunkles Erscheinungsbild
+- Startansicht mit einer großen Überschrift und Schaltflächen
+- Eingabemöglichkeit für einen Verbindungscode
+- Anzeige eines Live-Videos
+- Statusanzeigen für Verbindungszustände
+- Schaltflächen zum Aufbau und Beenden einer Verbindung
+- Eingebetteter KI-Support-Chat mit der Bezeichnung „lamacHub Kundenservice“
+- Fußbereich
 
-Die Verbindung wird im Quellcode über **WebRTC** aufgebaut. Für die Vermittlung der Verbindungsinformationen wird **Firebase Firestore** verwendet.
-
-> **Hinweis zum Quellcode:** Die bereitgestellte Datei ist gekürzt. Daher werden nur Funktionen beschrieben, die im sichtbaren Auszug eindeutig erkennbar sind. Insbesondere ist der vollständige Verbindungsablauf sowie die Implementierung der vollständigen Fehlerbehandlung nur teilweise einsehbar.
+Die genaue technische Einbindung der Webcam, das verwendete WebRTC-Signalisierungsverfahren sowie die Bedeutung aller angezeigten Codes sind im vorliegenden Auszug **nicht eindeutig erkennbar**.
 
 ---
 
 ## 2. Voraussetzungen
 
-### 2.1 Browser und Gerät
+### 2.1 Bestätigte technische Voraussetzungen
 
-Für die Kamerafunktion wird ein aktueller Browser mit Unterstützung für die MediaDevices-API benötigt. Der Quellcode empfiehlt ausdrücklich, die Seite direkt in Safari oder Chrome und nicht in einem eingebetteten Browser zu öffnen.
+Für die dargestellten Funktionen gelten folgende Anforderungen:
 
-Bestätigte Anforderungen:
+- Ein aktueller Browser mit Unterstützung für WebRTC beziehungsweise `RTCPeerConnection`
+- Zugriff auf eine Kamera und ein Mikrofon, sofern die Kameraübertragung Audio enthalten soll
+- Für die Bildschirmdarstellung beziehungsweise Aufnahme muss der Browser die entsprechenden Berechtigungen erlauben
+- Eine erreichbare Netzwerkverbindung
+- JavaScript muss im Browser aktiviert sein
+- Für die automatisch geladene Schrift werden externe Google-Fonts-Ressourcen verwendet. Die Kernfunktionen sind jedoch nicht zwingend an das erfolgreiche Laden dieser Schrift gebunden.
 
-- Kamera und Mikrofon beziehungsweise ein entsprechendes Erlaubnisdialog des Browsers
-- WebRTC-Unterstützung
-- Zugriff auf `getUserMedia()`
-- JavaScript-Aktivierung
-- Internetverbindung für Firebase Firestore und die WebRTC-Verbindung
+### 2.2 Berechtigungen
 
-### 2.2 Sichere Umgebung
+Je nach verwendetem Browser kann der Besucher eine Bestätigung für folgende Berechtigungen erhalten:
 
-Die Anwendung prüft vor der Nutzung, ob die Seite in einem sicheren Kontext geladen wurde.
+- Kamerazugriff
+- Mikrofonzugriff
+- gegebenenfalls Bildschirmaufnahme
 
-Kamera und Mikrofon funktionieren laut Quellcode nur:
+Die genaue Reihenfolge der Berechtigungsabfragen und die Zuordnung zum jeweiligen Bedienschritt sind **im Quellcode nicht eindeutig erkennbar**.
 
-- über **HTTPS**, oder
-- über **localhost**.
-
-Die Meldung hierzu lautet:
-
-> „Diese Seite läuft nicht über HTTPS. Kamera und Mikrofon funktionieren nur über HTTPS oder localhost.“
-
-### 2.3 Firebase
-
-Die Anwendung verwendet Firebase Firestore, um:
-
-- eine Sitzung beziehungsweise einen Live-Aufruf unter dem eingegebenen Code abzulegen,
-- WebRTC-Verbindungsinformationen auszutauschen,
-- Änderungen dieser Informationen in Echtzeit zu empfangen,
-- die zugehörigen Daten wieder zu löschen.
-
-Im Quellcode ist keine Anmeldung, Registrierung oder Eingabe von Benutzerkonto-Daten erkennbar.
+> **Sicherheitshinweis:** Der Quellcode enthält die Adresse eines externen KI-Dienstes. Diese Adresse wird hier aus Sicherheitsgründen nicht vollständig wiedergegeben. Ob dort sensible Unterlagen oder personenbezogene Daten verarbeitet werden, ist **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
-## 3. Sichtbare Bereiche der Website
+# 3. Sichtbare Bereiche der Website
 
-### 3.1 Navigationsleiste
+## 3.1 Navigationsleiste
 
-Ganz oben befindet sich eine feste Navigationsleiste mit:
+Im oberen Seitenbereich befindet sich eine sticky Navigationsleiste. Sie bleibt beim Scrollen sichtbar.
 
-- dem **lamacOs-Logo**
-- der Bezeichnung **„lamacOs Live“**
-- einer Schaltfläche **„🌗“** zum Wechseln zwischen hellem und dunklem Erscheinungsbild
+Bestätigte Elemente:
 
-Die Schaltfläche ist mit dem Titel „Theme umschalten“ versehen.
+- ein Logobild mit dem Dateinamen `navbar-logo`
+- der Seitentitel „lamacOs — Live Kamera“
+- ein Umschalter mit einem Sonnen-/Mond-Symbol
 
-#### Farbschema wechseln
+Der sichtbare Titel verwendet nicht unmittelbar den Namen „Live-WEBcam“, sondern **„lamacOs — Live Kamera“**.
 
-1. Klicken Sie oben rechts auf **„🌗“**.
-2. Die Website wechselt zwischen dem hellen und dem dunklen Farbschema.
-3. Die Auswahl wird im Browserspeicher unter dem Schlüssel `livecam-theme` gespeichert.
-4. Beim nächsten Besuch wird das zuletzt gewählte Schema verwendet.
+### Helles und dunkles Erscheinungsbild
 
-Fehlt der gespeicherte Wert, startet die Anwendung im dunklen Farbschema.
+1. Klicken Sie auf das Sonnen-/Mond-Symbol in der Navigationsleiste.
+2. Die Seite wechselt zwischen einem hellen und einem dunklen Farbschema.
 
----
-
-### 3.2 Hauptmenü
-
-Im Hauptbereich stehen die Bezeichnung **„Live Kamera System“** und der Text **„Teile deine Kamera in Echtzeit“**.
-
-Darunter befinden sich zwei Schaltflächen:
-
-- **„📤 Hosten (Kamera teilen)“**
-- **„📥 Empfangen (Code eingeben)“**
+Der Quellcode enthält Farbdefinitionen für beide Modi. Ob die Auswahl dauerhaft gespeichert wird, ist **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
-### 3.3 Hosten-Bereich
+## 3.2 Hauptbereich
 
-Nach Auswahl von **„📤 Hosten (Kamera teilen)“** erscheint der Bereich **„📤 Sender aktiv“**.
+Der Hauptbereich ist in mehrere gegenseitig sichtbare Abschnitte aufgebaut. Standardmäßig wird jeweils nur der aktive Abschnitt angezeigt.
 
-Er enthält:
+Die genaue Reihenfolge und die vollständigen sichtbaren Beschriftungen der Schaltflächen sind im gekürzten Auszug **nicht eindeutig erkennbar**. Erkennbar sind:
 
-- eine lokale Live-Vorschau der Kamera,
-- einen sechsstelligen Verbindungscode,
-- den Hinweis **„Teile diesen Code mit dem Empfänger“**,
-- den Hinweis **„Dieser Code ist 30 Minuten lang gültig.“**,
-- eine Statusanzeige,
-- die Schaltfläche **„📋 Code kopieren“**,
-- die Schaltfläche **„← Zurück zum Menü“**.
-
----
-
-### 3.4 Empfänger-Bereich
-
-Nach Auswahl von **„📥 Empfangen (Code eingeben)“** erscheint der Bereich **„📥 Empfänger“**.
-
-Er enthält:
-
-- das Eingabefeld **„CODE EINGEBEN“**,
-- die Schaltfläche **„Start“**,
-- eine Statusanzeige,
-- einen zunächst ausgeblendeten Bereich für die Videowiedergabe,
-- die Schaltfläche **„← Zurück zum Menü“**.
-
-Das Eingabefeld akzeptiert maximal sechs Zeichen. Die Eingabe wird visuell in Großbuchstaben dargestellt.
+- eine Startansicht mit Schaltflächen
+- eine Eingabeseite mit einem Textfeld
+- eine Videoseite mit einem HTML-`<video>`-Element
+- Statusanzeigen
+- Steuerbuttons
+- eine hervorgehobene Codeanzeige
 
 ---
 
-### 3.5 Support-Chat
+## 3.3 Codeanzeige
 
-Unten rechts befindet sich eine runde grüne Schaltfläche mit einem Sprechblasen-Symbol.
+Die Webcam-Seite enthält ein orange umrandetes Anzeigefeld mit:
 
-Sie öffnet den Bereich **„lamachub Kundenservice“** mit der Untertitelzeile **„KI-gestützter Support“**.
+- einem kurzen erläuternden Text
+- einem großen alphanumerischen Code in Monospace-Schrift
 
-Der Chat enthält:
-
-- ein Eingabefeld mit dem Platzhalter **„Nachricht schreiben“**,
-- eine Sendeschaltfläche mit dem Symbol **„➤“**,
-- eine Schließen-Schaltfläche **„×“**,
-- eine initially sichtbare Begrüßung: **„Hallo! Wie kann ich Ihnen weiterhelfen?“**
-
-Die maximale Länge einer Chatnachricht beträgt 1.800 Zeichen.
-
-> Die vollständige Implementierung der Chatlogik ist im gekürzten Quellcode nicht vollständig erkennbar. Insbesondere lässt sich aus dem sichtbaren Ausschnitt nicht zuverlässig feststellen, ob Nachrichten an einen externen KI-Dienst gesendet, gespeichert oder in einer automatisierten Antwort verarbeitet werden.
+Die CSS-Regeln formatieren den Code mit Großbuchstaben und zusätzlichem Abstand zwischen den Zeichen. Ob der Code statisch vorbelegt, dynamisch erzeugt oder vom Server bezogen wird, ist **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
-### 3.6 Fußbereich
+## 3.4 Eingabefeld
 
-Am Seitenende steht:
+Es steht ein zentriertes Textfeld mit folgenden Eigenschaften zur Verfügung:
 
-> „© 2026 lamacHub — Live Kamera System“
+- breite, dominante Darstellung
+- Großbuchstaben durch `text-transform: uppercase`
+- Eingaben werden mit zusätzlichem Zeichenabstand dargestellt
+- oranges Rahmen- und Fokusverhalten
+- geeignet für einen alphanumerischen Verbindungscode
+
+Ob nur Zahlen, Großbuchstaben, Bindestriche oder weitere Zeichen erlaubt sind, ist im Auszug **nicht eindeutig erkennbar**.
 
 ---
 
-## 4. Kamera teilen – Schritt für Schritt
+## 3.5 Videoanzeige
 
-### 4.1 Hosten starten
+Die Videoseite enthält ein `<video>`-Element in einer abgerundeten Karte. Vorgesehen sind:
+
+- schwarzer Hintergrund
+- responsive Breite
+- mindestens 200 Pixel Höhe
+- Anzeige des entfernten oder lokalen Livebilds
+
+Im gekürzten Quellcode ist nicht eindeutig erkennbar:
+
+- ob Ton wiedergegeben wird,
+- ob Vollbild verfügbar ist,
+- ob ein Standbild oder eine Aufnahme erstellt werden kann,
+- welche Auflösung oder Bildrate verwendet wird,
+- ob das Video automatisch startet,
+- welche genauen Browserbedingungen für die Wiedergabe gelten.
+
+---
+
+## 3.6 Statusanzeige
+
+Für die Verbindung sind Statusklassen definiert:
+
+- `connecting` – orange
+- `connected` – grün
+- `error` – rot
+
+Die Statusanzeige wird linksseitig mit einer farbigen Linie hervorgehoben. Der genaue Text der einzelnen Zustände ist im vorliegenden Auszug nicht vollständig sichtbar.
+
+---
+
+## 3.7 Steuerbuttons
+
+Ein Bereich für Steuerbuttons ist vorhanden. Im CSS wird eine vertikale Anordnung vorgesehen.
+
+Die genauen Beschriftungen und Funktionen der Buttons sind im gekürzten Quellcode **nicht eindeutig erkennbar**. Vermutlich gehören sie zu Aufbau, Trennen oder Beenden der Verbindung. Diese Zuordnung ist eine **begründete Vermutung**, aber nicht vollständig bestätigt.
+
+---
+
+## 3.8 KI-Support-Chat
+
+Am rechten unteren Bildschirmrand befindet sich ein runder grüner Button mit einem Chat-Symbol.
+
+### Chat öffnen
+
+1. Klicken Sie auf den grünen runden Button am rechten unteren Rand.
+2. Das Chatfenster „lamacHub Kundenservice“ öffnet sich.
+3. Die Begrüßung lautet: „Hallo! Wie kann ich dir weiterhelfen?“
+
+### Chat verwenden
+
+1. Tippen Sie Ihre Frage in das Feld „Nachricht schreiben …“.
+2. Senden Sie die Nachricht über den Pfeilbutton.
+3. Ihre Eingabe erscheint als grüne Sprechblase auf der rechten Seite.
+4. Während eine Antwort verarbeitet wird, ist eine animierte Tippanzeige sichtbar.
+5. Die Antwort erscheint als weiße Sprechblase.
+
+Bestätigte Eigenschaften:
+
+- maximal 1800 Zeichen pro Nachricht
+- Pflichtfeld
+- kein Browser-Autoverlauf für das Eingabefeld
+- Chatverlauf kann über die Tastatur gelesen werden
+- Antworten werden als kontrolliertes HTML mit Markdown-Formatierungen dargestellt
+- das Chatfenster ist auf kleinen Bildschirmen fast vollständig breit
+
+### Chat schließen
+
+Klicken Sie oben rechts im Chatfenster auf **„×“**. Der Button besitzt die Barrierefreiheitsbezeichnung „Chat schließen“.
+
+### Unterstützte Darstellung in Antworten
+
+Für KI-Antworten sind folgende Formatierungen gestylt:
+
+- Überschriften
+- Absätze
+- Listen
+- Tabellen
+- Links
+- Codeblöcke
+- Zitate
+- horizontale Trennlinien
+
+Die Anwendung versucht, HTML aus der Antwort vor der Darstellung zu escapen und anschließend kontrolliertes HTML zu erzeugen. Das reduziert das Risiko einer direkten HTML-Injektion.
+
+### Verhalten bei fehlender Netzwerkverbindung
+
+Der Chat sendet Anfragen an einen externen Dienst. Bei Netzwerk- oder Serverproblemen ist im gekürzten Auszug nicht vollständig erkennbar, welche Fehlermeldung erscheint. Vermutlich wird ein roter Status angezeigt; dies ist **nicht eindeutig bestätigt**.
+
+---
+
+## 3.9 Fußbereich
+
+Im unteren Seitenbereich befindet sich ein Footer mit zentriertem, kleiner gedrucktem Text.
+
+Der konkrete Footer-Text ist im Auszug nicht eindeutig lesbar.
+
+---
+
+# 4. Typischer Bedienungsablauf
+
+Der genaue Ablauf ist wegen des gekürzten Quellcodes nur teilweise bestätigt. Das folgende Vorgehen beschreibt die erkennbare Struktur.
+
+## 4.1 Seite öffnen
 
 1. Öffnen Sie die Website in einem aktuellen Browser.
-2. Prüfen Sie, ob die Adresse mit `https://` beginnt oder ob die Seite lokal über `localhost` ausgeliefert wird.
-3. Klicken Sie auf **„📤 Hosten (Kamera teilen)“**.
-4. Der Browser zeigt eine Berechtigungsanfrage für Kamera und Mikrofon an.
-5. Erlauben Sie den Zugriff, wenn Sie die Kamera teilen möchten.
-6. Nach erfolgreicher Freigabe erscheint Ihre Kamera in der lokalen Vorschau.
-7. Die Anwendung erzeugt einen sechsstelligen Code, der im Bereich **„Sender aktiv“** angezeigt wird.
+2. Prüfen Sie, ob die Startansicht mit den angeboten Schaltflächen erscheint.
+3. Falls gewünscht, wechseln Sie über das Sonnen-/Mond-Symbol die Darstellung.
 
-### 4.2 Kamera oder Mikrofon nicht freigeben
+## 4.2 Eine Verbindung vorbereiten
 
-Wenn Sie die Berechtigung ablehnen oder widerrufen, kann die Website die Live-Vorschau nicht starten. Im gekürzten Quellcode ist eine entsprechende Fehlermeldung nur teilweise sichtbar.
+1. Wählen Sie auf der Startseite die Schaltfläche, die zum Eingeben oder Verbinden einer Kamera führt.
+2. Geben Sie den angeforderten Code in das Textfeld ein.
+3. Prüfen Sie das Eingabefeld auf Tippfehler.
+4. Bestätigen Sie die Verbindung mit der dafür vorgesehenen Schaltfläche.
 
-Gehen Sie wie folgt vor:
+Die genaue Bezeichnung der relevanten Schaltflächen ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
 
-1. Öffnen Sie die Browser-Einstellungen für Website-Berechtigungen.
-2. Setzen Sie Kamera beziehungsweise Mikrofon auf „Erlauben“.
-3. Laden Sie die Seite neu.
-4. Starten Sie **„📤 Hosten (Kamera teilen)“** erneut.
+## 4.3 Livebild ansehen
 
-### 4.3 Code weitergeben
+1. Beobachten Sie die Statusanzeige unterhalb des Eingabefeldes.
+2. Warten Sie auf den Status „Verbunden“ oder eine entsprechend grün dargestellte Statusmeldung.
+3. Das Videobild erscheint in der Videokarte.
+4. Falls das Bild nicht startet, prüfen Sie die Hinweise unter „Fehlerbehebung“.
 
-1. Kopieren Sie den angezeigten Code über **„📋 Code kopieren“** in die Zwischenablage.
-2. Senden Sie den Code über einen geeigneten Kommunikationsweg an den Empfänger.
-3. Der Empfänger trägt ihn im Eingabefeld **„CODE EINGEBEN“** ein.
-4. Der Empfänger klickt auf **„Start“**.
+## 4.4 Verbindung beenden
 
-Der Quellcode weist darauf hin, dass der Code 30 Minuten gültig ist. Ob die technische Umsetzung die Gültigkeit serverseitig, clientseitig oder durch das Löschen des Firestore-Dokuments sicherstellt, ist im gekürzten Auszug nicht eindeutig erkennbar.
+1. Verwenden Sie im Steuerbereich die Schaltfläche, die dem Trennen oder Beenden zugeordnet ist.
+2. Warten Sie, bis die Statusanzeige den neuen Zustand meldet.
+3. Verlassen Sie die Seite nur, wenn keine laufende Verbindung mehr benötigt wird.
 
-### 4.4 Hosten beenden
-
-1. Klicken Sie auf **„← Zurück zum Menü“**.
-2. Der Empfänger-Bereich und die Sender-Oberfläche werden ausgeblendet.
-
-> Ob dabei der Kamerastream vollständig gestoppt und die zugehörige Firebase-Sitzung zuverlässig gelöscht wird, ist im gekürzten Quellcode nicht eindeutig erkennbar. Starten Sie das Hosten anschließend testweise erneut, um die Kamerafreigabe zu bestätigen.
+Die sichtbare Button-Beschriftung ist im Auszug **nicht eindeutig erkennbar**.
 
 ---
 
-## 5. Live-Bild empfangen – Schritt für Schritt
+# 5. Eingaben und Ausgaben
 
-1. Öffnen Sie die Website in einem aktuellen Browser.
-2. Klicken Sie auf **„📥 Empfangen (Code eingeben)“**.
-3. Geben Sie den sechsstelligen Code in das Feld **„CODE EINGEBEN“** ein.
-4. Klicken Sie auf **„Start“**.
-5. Die Statusanzeige meldet den Verbindungsaufbau.
-6. Nach erfolgreicher Verbindung wird der Videobereich mit der Bild- und Tonwiedergabe eingeblendet.
-7. Klicken Sie auf **„← Zurück zum Menü“**, um den Empfänger-Bereich zu verlassen.
+## 5.1 Verbindungscode
 
-Die Soundwiedergabe des Empfängers ist im Quellcode nicht ausdrücklich vorgegeben. Im Browser kann die automatische Tonwiedergabe durch die Autoplay-Richtlinien blockiert werden.
+**Eingabe:** alphanumerischer Code im zentralen Textfeld.  
+**Ausgabe:** vermutlich eine WebRTC-Verbindung mit anschließender Videoanzeige.
 
----
+Bestätigt ist, dass das Eingabefeld existiert und die Oberfläche Codes in hervorgehobener Form darstellt. Ob das System einen Code eingibt, empfängt oder gegen einen Server prüft, ist **im Quellcode nicht eindeutig erkennbar**.
 
-## 6. Bedienung des Support-Chats
+## 5.2 Kamerabild
 
-1. Klicken Sie rechts unten auf das Sprechblasen-Symbol.
-2. Der Bereich **„lamachub Kundenservice“** öffnet sich.
-3. Schreiben Sie Ihre Nachricht in das Feld **„Nachricht schreiben“**.
-4. Klicken Sie auf **„➤“**, um die Nachricht abzusenden.
-5. Scrollen Sie bei längeren Verläufen im Nachrichtenbereich.
-6. Klicken Sie oben rechts auf **„×“**, um den Chat zu schließen.
+**Eingabe:** Berechtigter Zugriff auf eine Webcam oder eine externe Kameraquelle.  
+**Ausgabe:** Livebild im Videoelement.
 
-Ob der Support-Chat offline, lokal, über Firebase oder über einen externen KI-Dienst arbeitet, ist im gekürzten Quellcode nicht eindeutig erkennbar.
+## 5.3 Support-Nachricht
+
+**Eingabe:** Text mit bis zu 1800 Zeichen.  
+**Ausgabe:** formatierte Antwort des KI-Supports.
+
+Der Code enthält keine sichtbare Möglichkeit, den Support-Chat zu anonymisieren, die Übertragung eines Chats zu deaktivieren oder den Gesprächsverlauf zu löschen. Eine solche Funktion ist **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
-## 7. Statusanzeigen verstehen
+# 6. Datenschutz und Berechtigungen
 
-Die Anwendung besitzt eine zentrale Statusanzeige mit verschiedenen Zuständen:
+## 6.1 Kamera- und Mikrofonzugriff
 
-- **connecting:** Verbindung oder Kamera wird aufgebaut
-- **connected:** Verbindung erfolgreich hergestellt
-- **error:** Fehler aufgetreten
+Eine Webcam-Anwendung benötigt üblicherweise eine ausdrückliche Browserberechtigung. Diese Website fordert Kamera- beziehungsweise Mikrofonzugriff an; der genaue Ablauf ist im gekürzten Code jedoch nicht vollständig sichtbar.
 
-Für den Sender wird zu Beginn der Text
+Besucher sollten darauf achten,:
 
-> „🔄 Kamera wird gestartet...“
+- die Berechtigungsabfrage nur bei einer vertrauenswürdigen Seite zu bestätigen,
+- Kamera- und Mikrofonzugriff in den Browser-Einstellungen wieder deaktivieren zu können,
+- keine Aufnahme zu starten, bevor Einwilligungen und Zweck klar sind.
 
-angezeigt.
+## 6.2 Externe Schrift
 
-Der sichtbare Quellcode enthält außerdem eine Funktion zur Erklärung von Medienfehlern. Im gekürzten Ausschnitt ist insbesondere die Behandlung von `NotAllowedError` erkennbar. Sie weist darauf hin, die Website-Berechtigungen für Kamera und Mikrofon zu prüfen.
+Die Website lädt Inter über Google Fonts. Beim Aufruf können dadurch technische Verbindungsdaten an einen externen Dienst bekannt werden. Für die Kernfunktion der Webcam ist diese Schrift nicht zwingend erforderlich.
 
----
+## 6.3 KI-Support
 
-## 8. Typische Probleme und Fehlerbehebung
+Der Support-Chat überträgt Nachrichten an einen externen KI-Dienst. Im Quellcode ist nicht eindeutig erkennbar:
 
-### 8.1 Die Website meldet, dass sie nicht über HTTPS läuft
+- welche Daten neben der Nachricht übertragen werden,
+- ob der Gesprächsverlauf serverseitig gespeichert wird,
+- wie lange Daten gespeichert werden,
+- ob eine Einwilligung vor der ersten Nutzung erforderlich ist,
+- ob der Nutzer den Chatverlauf löschen kann.
 
-**Ursache:** Der Browser blockiert den Zugriff auf Kamera und Mikrofon in einem unsicheren Kontext.
+Daher sollten im Support-Chat keine unnötigen personenbezogenen Daten, geheimen Zugangsdaten, Passwörter oder Tokens angegeben werden.
 
-**Behebung:**
+## 6.4 Fehlende Lösch- und Einstellungsfunktionen
 
-1. Öffnen Sie die Website über eine HTTPS-Adresse.
-2. Verwenden Sie alternativ eine lokale `localhost`-Adresse.
-3. Starten Sie den Zugriff auf **„📤 Hosten (Kamera teilen)“** danach erneut.
-
----
-
-### 8.2 Die Meldung „Dein Browser stellt keine MediaDevices-API bereit“ erscheint
-
-**Ursache:** Der verwendete Browser oder die eingebettete Browseransicht stellt die MediaDevices-API nicht bereit.
-
-**Behebung:**
-
-1. Öffnen Sie die Seite direkt in Safari oder Chrome.
-2. Verwenden Sie keinen eingebetteten Browser, beispielsweise nicht in einer App-Ansicht.
-3. Aktualisieren Sie den Browser.
-4. Laden Sie die Seite neu und versuchen Sie es erneut.
+Im sichtbaren Quellcode ist kein eigener Bereich für Datenschutzeinstellungen, Chatlöschung oder Widerruf der Kamerafreigabe erkennbar. Solche Funktionen können im nicht eingebetteten Teil der Website vorhanden sein; dies ist **im vorliegenden Quellcode nicht eindeutig erkennbar**.
 
 ---
 
-### 8.3 Die Meldung „Dein Browser unterstützt getUserMedia() nicht“ erscheint
+# 7. Typische Probleme und Fehlerbehebung
 
-**Ursache:** Die benötigte Browserfunktion steht nicht zur Verfügung.
+## 7.1 Die Live-Webcam bleibt schwarz
 
-**Behebung:**
+### Mögliche Ursachen
 
-1. Verwenden Sie eine aktuelle Version von Safari oder Chrome.
-2. Deaktivieren Sie gegebenenfalls strenge Browser-Erweiterungen oder Browserrichtlinien, die Webcamzugriff einschränken.
-3. Laden Sie die Website neu.
+- Kamerafreigabe wurde nicht erteilt.
+- Die Kamera wird bereits von einer anderen Anwendung verwendet.
+- Der Browser blockiert die WebRTC-Verbindung.
+- Der eingegebene Code ist falsch oder unvollständig.
+- Die verbindliche Gegenstelle ist nicht erreichbar.
+- Das Videoformat oder die Browserbedingungen werden nicht unterstützt.
 
-Ob die Anwendung selbst eine Erweiterung, private Browsermodi oder Unternehmensrichtlinien unterstützt, ist nicht eindeutig erkennbar.
+### Abhilfe
 
----
-
-### 8.4 Kamera oder Mikrofon bleiben schwarz oder die Freigabe wird verweigert
-
-**Ursache:** Die Berechtigung wurde abgelehnt, gesperrt oder der Browser kann kein Gerät nutzen.
-
-**Behebung:**
-
-1. Öffnen Sie die Browser-Einstellungen für Website-Berechtigungen.
-2. Erlauben Sie Kamera und Mikrofon für diese Website.
-3. Prüfen Sie, ob Kamera und Mikrofon unter Windows, macOS oder Linux ordnungsgemäß angeschlossen und nicht durch eine andere Anwendung belegt sind.
-4. Laden Sie die Seite vollständig neu.
-5. Starten Sie das Hosten erneut.
-
----
-
-### 8.5 Der Empfänger sieht kein Bild
-
-Mögliche Ursachen und Prüfungen:
-
-1. **Falscher oder abgelaufener Code:** Lassen Sie den Sender den Code neu erzeugen und geben Sie ihn erneut ein.
-2. **Noch laufender Verbindungsaufbau:** Warten Sie, bis die Statusanzeige den verbundenen Zustand meldet.
-3. **Blockierte Medienwiedergabe:** Aktivieren Sie gegebenenfalls die automatische Tonwiedergabe für die Website.
-4. **Browserzustand:** Laden Sie die Empfängerseite neu und starten Sie **„Start“** erneut.
-5. **Verbindung durch Netzwerk oder Firewall blockiert:** Prüfen Sie die Netzwerkverbindung und zugelassenen Browserfunktionen.
-
-Ob die Anwendung TURN-Server, Firewall-Hinweise oder eine konkrete Retry-Schaltfläche bereitstellt, ist im gekürzten Quellcode nicht eindeutig erkennbar.
-
-### 8.6 Der Code funktioniert nicht
-
-1. Prüfen Sie, ob genau sechs Zeichen eingegeben wurden.
-2. Kontrollieren Sie, ob versehentlich ähnliche Zeichen wie `0/O` oder `1/I` verwendet wurden.
-3. Kopieren Sie den Code möglichst über **„📋 Code kopieren“** statt durch manuelle Eingabe.
-4. Lassen Sie den Sender den Code bei Bedarf neu erzeugen.
-5. Prüfen Sie, ob der angegebene Zeitraum von 30 Minuten noch nicht abgelaufen ist.
-
----
-
-## 9. Datenschutz und Berechtigungen
-
-### 9.1 Kamera und Mikrofon
-
-Die Kamera- beziehungsweise Mikrofonbere
+1. Prüfen Sie, ob die Statusanzeige einen Fehler meldet.
+2. Öffnen Sie die Browser-Berechtigungen für die Website.
+3.
