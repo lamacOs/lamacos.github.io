@@ -4,329 +4,359 @@
 
 # LaunchKit – Support-Dokumentation
 
-**Vermuteter Zweck:** LaunchKit ist eine mehrseitige Website und Produktplattform für digitale Produkte wie Software, Spiele, Apps, Plugins und Open-Source-Projekte. Sie soll Besuchern unter anderem Produktseiten, Downloads, Versionen, Changelogs und Analytics bereitstellen.  
-**Quellcode-Pfad:** `LaunchKit`  
-**Datum der Erstellung:** 19. Februar 2026  
+**Website:** LaunchKit  
+**Vermuteter Zweck:** LaunchKit ist eine professionelle Plattform zur Präsentation und Verwaltung digitaler Produkte wie Software, Spiele, Apps, Plugins und Open-Source-Projekte. Die Website bietet Produktseiten, Downloads, Versionen, Changelogs und Analytics an einem zentralen Ort.  
+**Quellcode-Pfad:** `LaunchKit/index.html`  
+**Datum der Erstellung:** 16. Mai 2026
 
-> **Hinweis zur Quellcodebasis:** Die vorliegenden Auszüge sind ausdrücklich unvollständig. Die Dokumentation beschreibt nur eindeutig erkennbare Funktionen. Nicht belegte Abläufe, Preise, Konten, Rollen oder Fehlerursachen werden als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
+> **Hinweis zum Quellcode:** Die bereitgestellten Quellcode-Auszüge sind unvollständig. Die Dokumentation beschreibt ausschließlich Funktionen, die im sichtbaren Quellcode eindeutig erkennbar sind. Nicht erkennbare Abläufe werden ausdrücklich als „Im Quellcode nicht eindeutig erkennbar“ gekennzeichnet.
 
 ---
 
-## 1. Zweck und Zielgruppe
+## 1. Überblick
 
-LaunchKit ist eine professionell gestaltete Website mit orangefarbener Markenoptik für die Präsentation und Verwaltung digitaler Produkte.
+LaunchKit ist eine statisch gestaltete Website mit einer responsiven Benutzeroberfläche für digitale Produkte. Sie verwendet ein eigenes Designsystem mit:
 
-Im Quellcode erkennbare Ziele sind:
+- heller oder dunkler Darstellung,
+- orangefarbener Markenakzentfarbe,
+- Desktop-Navigation und mobilem Menü,
+- Produktkarten,
+- Filter- und Suchbereich,
+- Produktdetailseiten,
+- Changelog-Bereichen,
+- Analytics-Darstellungen,
+- Kontakt- und Footer-Bereichen.
 
-- Präsentation eines digitalen Produkts
-- Anzeige von Produktkarten mit:
-  - Produktname
-  - Produktkategorie oder Status
-  - Kurzbeschreibung
-  - Schlagwörtern
-  - Versionsangabe
-- Bereitstellung von Produktdetailseiten
-- Anzeige von Versionen und Changelogs
-- Bereitstellung von Download-Möglichkeiten
-- Darstellung von Analytics
-- Umschalten zwischen einem hellen und einem dunklen Erscheinungsbild
-- Nutzung auf Desktop- und Mobilgeräten
-
-Die Website ist offenbar als statische Weboberfläche angelegt. Ob Produkte nur dargestellt oder tatsächlich über ein Backend verwaltet werden, ist im vorliegenden Auszug **nicht eindeutig erkennbar**.
+Die Seite ist in deutscher Sprache verfasst und für Desktop- sowie mobile Geräte ausgelegt.
 
 ---
 
 ## 2. Voraussetzungen
 
-### Für Besucher
+### 2.1 Technische Voraussetzungen
 
-Für die Grundnutzung benötigen Besucher:
+Für die Nutzung wird ein aktueller Browser mit Unterstützung für folgende moderne Web-Technologien empfohlen:
 
-- einen aktuellen Browser mit JavaScript-Unterstützung
-- eine Internetverbindung, insbesondere für:
-  - extern geladene Schriftarten
-  - das Logo auf der GitHub-Raw-URL
-  - externe Downloads oder Links, sofern diese in weiteren Seiten enthalten sind
-- für einen Download eine zum Zielsystem passende Datei und gegebenenfalls die nötigen Installationsberechtigungen
+- CSS Grid und Flexbox,
+- CSS Custom Properties,
+- `backdrop-filter`,
+- JavaScript für die interaktiven Funktionen,
+- mobile Browserversionen mit JavaScript-Aktivierung.
 
-### Für Betreiber
+Die Seite lädt Schriften von Google Fonts und ein Logo von einem externen GitHub-Hosting. Für ein einheitliches Erscheinungsbild ist eine Internetverbindung erforderlich. Ohne Internetverbindung kann die Seite möglicherweise weiterhin geladen werden; externe Schriften oder Bilder werden dann jedoch möglicherweise nicht angezeigt.
 
-Aus dem gezeigten HTML ist erkennbar, dass die Website überwiegend aus einer einzelnen HTML-Datei mit eingebettetem CSS und JavaScript besteht. Für die vollständige Bereitstellung ist im Quellcode nicht eindeutig erkennbar, ob weitere Seiten, Build-Schritte, Serverdienste oder Konfigurationsdateien benötigt werden.
+### 2.2 Inhaltliche Voraussetzungen
 
-Die Website enthält außerdem einen Verweis auf eine externe GitHub-Raw-URL für das Logo. Ob zusätzliche lokale Ressourcen vorhanden sind, geht aus dem gekürzten Auszug nicht hervor.
+Für die Nutzung der Produktfunktionen benötigt ein Besucher:
 
----
+- einen Browser,
+- eine funktionierende Internetverbindung,
+- bei Downloads einen passenden Speicherort auf dem Gerät,
+- bei der Installation je nach Produkt die jeweils vom Hersteller angegebenen Systemvoraussetzungen.
 
-## 3. Aufbau und sichtbare Bereiche
-
-### 3.1 Kopfzeile
-
-Die Kopfzeile ist am oberen Seitenrand fixiert beziehungsweise „sticky“ und enthält:
-
-- das LaunchKit-Logo mit dem Schriftzug „LaunchKit“
-- Navigationslinks
-- eine Schaltfläche zum Umschalten des Erscheinungsbilds
-- auf schmalen Bildschirmen eine Schaltfläche für das mobile Menü
-
-Die Navigation verwendet Scroll-Verhalten innerhalb derselben Seite. Auf kleinen Bildschirmen öffnet sich zusätzlich ein mobiles Menü.
-
-### 3.2 Startseite
-
-Die Startseite beziehungsweise Hero-Bereich enthält:
-
-- eine große Überschrift
-- eine Einführung in LaunchKit
-- eine Schaltfläche mit der sichtbaren Bezeichnung **„Launch starten“**
-- weitere Hauptbereiche wie Funktionen, Produktdarstellung und Präsentation
-- eine statisch gestaltete Vorschaukarte mit:
-  - Pulsanzeige
-  - Produktbeispiel
-  - Statusangaben
-  - Kennzahlen
-  - Diagramm-ähnlichen Balken
-
-Die Werte in der Vorschaukarte sind Teil des HTML-Motivs. Ob sie aus echten Live-Analytics stammen, ist im Quellcode **nicht eindeutig erkennbar**.
-
-### 3.3 Funktionen
-
-Die Startseite stellt mehrere Funktionen in Form von Karten dar. Im gekürzten Quellcode ist der Abschnitt vorhanden; die vollständigen sichtbaren Beschriftungen aller Karten sind jedoch nicht vollständig enthalten.
-
-Die Gestaltung zeigt, dass jede Karte enthält:
-
-- ein Symbol
-- eine Überschrift
-- einen erläuternden Text
-- eine Hervorhebung beim Überfahren mit dem Mauszeiger
-
-### 3.4 Produktdarstellung
-
-Ein Showcase-Bereich zeigt eine größere Produktvorschau mit:
-
-- Status- beziehungsweise Metadaten
-- einer Überschrift
-- mehreren visuellen Vorschaufen
-- dekorativen Bildflächen
-
-Die dargestellten Flächen wirken wie statische Platzhalter oder illustrative Mock-ups. Eine echte Live-Vorschau ist im Auszug nicht eindeutig erkennbar.
-
-### 3.5 Produktübersicht
-
-Die Produktübersicht enthält eine Werkzeugleiste mit:
-
-- einem Suchfeld
-- vier Auswahlfeldern
-- einer Schaltfläche rechts
-
-Der HTML-Code bestätigt die Existenz dieser Bedienelemente. Exakte sichtbare Bezeichnungen der Filter und die konkrete Filterlogik sind in den vorliegenden Auszügen nicht vollständig sichtbar.
-
-Darunter wird ein Raster aus Produktkarten angezeigt. Jede Produktkarte enthält:
-
-- ein quadratisches Logofeld mit einem Buchstaben oder Kürzel
-- Produktnamen
-- eine untergeordnete Status- oder Kategoriezeile
-- Beschreibung
-- Schlagwörter
-- Versionsangabe
-- eine Verlinkung beziehungsweise anklickbare Kartenfläche
-
-Wenn keine Produkte den aktuellen Kriterien entsprechen, ist ein eigener Leerzustand vorgesehen.
-
-### 3.6 Produktdetailseite
-
-Der Quellcode enthält Styles für eine Produktdetailseite. Der zugehörige vollständige HTML-Abschnitt wurde gekürzt. Bestätigt sind unter anderem:
-
-- eine eigene Seitenüberschrift
-- eine Produktdarstellung
-- eine Seitenleiste beziehungsweise Informationsbereich
-- Versions- und Changelog-Bereiche
-- Download-Bereiche
-- Analytics-Bereiche
-
-Die genauen sichtbaren Schaltflächen, Tabellen und Bezeichnungen dieser Seite sind aus dem vorliegenden Auszug nicht vollständig feststellbar.
-
-### 3.7 Fußbereich
-
-Der Fußbereich ist in mehrere Spalten gegliedert. Sichtbar sind:
-
-- eine Spalte mit LaunchKit beziehungsweise Produktinformationen
-- drei Linkgruppen
-- eine untere Zeile mit weiteren Hinweisen
-
-Die genauen Namen aller Linkgruppen und Zielseiten sind im gekürzten Auszug nicht vollständig sichtbar.
+Konkrete Mindestversionen von Betriebssystemen, Browsern oder Grafikkarten sind im Quellcode nicht eindeutig erkennbar.
 
 ---
 
-## 4. Bedienung Schritt für Schritt
+## 3. Aufbau der Website
 
-### 4.1 Zwischen Bereichen navigieren
+### 3.1 Kopfbereich
 
-1. Öffnen Sie LaunchKit im Browser.
-2. Nutzen Sie in der oberen Navigation den gewünschten Navigationspunkt.
-3. Bei entsprechenden Ankern springt die Seite weich zum jeweiligen Abschnitt.
-4. Auf kleinen Bildschirmen:
-   1. Tippen Sie auf die Schaltfläche mit den drei Linien rechts in der Kopfzeile.
-   2. Das mobile Menü öffnet sich über dem Seiteninhalt.
-   3. Tippen Sie auf den gewünschten Eintrag.
-   4. Schließen Sie das Menü gegebenenfalls über dieselbe Schaltfläche.
+Im fixiert wirkenden Kopfbereich befindet sich links das LaunchKit-Logo mit dem Produktnamen.
 
-### 4.2 Helles oder dunkles Erscheinungsbild wählen
+Je nach Bildschirmbreite sind in der Navigation folgende sichtbare Einträge vorgesehen:
 
-1. Klicken Sie auf das Symbol zum Umschalten des Erscheinungsbilds in der Kopfzeile.
-2. Die Seite wechselt zwischen den im CSS definierten hellen und dunklen Farben.
-3. Die ausgewählte Einstellung wird für die aktuelle Browsersitzung verwendet.
+- **Produkte**
+- **Funktionen**
+- **Changelog**
+- **Preise**
+- **Docs**
+- **Kontakt**
 
-Ob die Auswahl dauerhaft gespeichert und bei einem späteren Besuch wiederhergestellt wird, ist im vorliegenden Auszug **nicht eindeutig erkennbar**. Es sollte daher nicht vorausgesetzt werden.
+Rechts befindet sich eine Schaltfläche zum Umschalten zwischen hellem und dunklem Erscheinungsbild.
 
-### 4.3 Produkte suchen
+> Ob alle Navigationseinträge tatsächlich zu unterschiedlichen Seiten oder Seitenbereichen führen, ist im gekürzten Quellcode nicht vollständig erkennbar.
 
-1. Wechseln Sie zur Produktübersicht.
-2. Geben Sie in das Suchfeld einen Produktnamen, eine Beschreibung oder einen passenden Begriff ein.
-3. Die Filterung erfolgt voraussichtlich direkt bei der Eingabe.
-4. Korrigieren Sie bei Bedarf die weiteren Filterwerte.
+### 3.2 Mobilnavigation
 
-Welche Felder konkret durchsucht werden und ob die Groß-/Kleinschreibung relevant ist, ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
+Auf schmalen Bildschirmen wird anstelle der Desktop-Navigation eine Menüschaltfläche mit drei horizontalen Linien angezeigt.
 
-### 4.4 Produkte filtern
+Die sichtbaren Bereiche sind:
 
-1. Wählen Sie in einem der vier Auswahlfelder den gewünschten Wert.
-2. Die Produktliste wird voraussichtlich automatisch aktualisiert.
-3. Entfernen Sie Filter wieder, indem Sie die jeweilige Standardoption auswählen.
+1. Schaltfläche mit Menü-Symbol öffnet das mobile Menü.
+2. Das mobile Menü öffnet sich über den Seiteninhalt.
+3. Die Navigationseinträge werden als einzelne Zeilen angezeigt.
+4. Im unteren Bereich des Menüs befinden sich Aktionsschaltflächen.
 
-Die konkreten Filterkategorien, Optionen und Regeln sind im Auszug nicht vollständig sichtbar.
+Der Quellcode enthält keine vollständige Implementierung für das automatische Schließen des Menüs nach Auswahl eines Eintrags. Dieses Verhalten ist daher nicht eindeutig erkennbar.
 
-### 4.5 Eine Produktkarte öffnen
+### 3.3 Startseite
 
-1. Klicken Sie auf den Produktnamen oder eine andere Stelle der Produktkarte.
-2. Die verlinkte Produktdetailseite wird geöffnet.
-3. Auf der Detailseite können Sie je nach Projekt:
-   - Versionen einsehen
-   - den Changelog lesen
-   - eine verfügbare Datei herunterladen
-   - Analytics ansehen
+#### Hero-Bereich
 
-Die vollständige Abfolge der Detailseite ist aus dem gekürzten Material nicht eindeutig rekonstruierbar.
+Der Startbereich enthält:
 
-### 4.6 Ein Produkt herunterladen
+- eine Eyebrow-Angabe,
+- eine große Überschrift,
+- einen erklärenden Text,
+- zwei Hauptaktionen,
+- ergänzende Meta-Angaben,
+- eine dekorative Produktkarte mit Kennzahlen.
 
-1. Öffnen Sie die Produktdetailseite.
-2. Suchen Sie den Download-Bereich.
-3. Wählen Sie die passende Version beziehungsweise Datei.
-4. Bestätigen Sie gegebenenfalls den Download im Browser.
-5. Öffnen Sie die heruntergeladene Datei mit der passenden Anwendung.
+Die sichtbaren Hauptaktionen sind:
 
-Welche Betriebssysteme, Dateiformate oder Download-Buttons konkret angeboten werden, ist im vorliegenden Auszug **nicht eindeutig erkennbar**.
+- **Produkt ansehen**
+- **Jetzt starten**
 
-### 4.7 Analytics ansehen
+Die genaue Zieladresse oder Funktion hinter **„Jetzt starten“** ist im vorliegenden Ausschnitt nicht eindeutig erkennbar.
 
-1. Öffnen Sie die Produktdetailseite.
-2. Wechseln Sie zum Analytics-Bereich.
-3. Prüfen Sie die dort angezeigten Kennzahlen und Verlaufsdarstellungen.
+#### Vorschaukarte
 
-Die Analytics seemit im gezeigten Design eine Dashboard-artige Darstellung zu sein. Ob reale Nutzungsdaten geladen werden oder ob es sich um statische Darstellungen handelt, ist im Quellcode **nicht eindeutig erkennbar**.
+Die Karte im Hero-Bereich zeigt stilisierte Inhalte:
 
----
+- einen Statusindikator,
+- einen Produktnamen,
+- einen Status oder Typ,
+- drei Kennzahlen,
+- ein kleines Diagramm,
+- eine Zeile mit Metadaten.
 
-## 5. Sichtbare Eingaben und Ausgaben
+Diese Werte sind Teil einer statischen Präsentationsansicht. Eine echte Datenanbindung ist im gezeigten HTML/CSS nicht erkennbar.
 
-### 5.1 Eingaben
+#### Funktionsbereich
 
-| Bedienelement | Zweck | Bestätigte Funktion |
-|---|---|---|
-| Suchfeld | Produkte nach Textmerkmalen durchsuchen | Eingabefeld vorhanden; vollständige Suchlogik nicht eindeutig sichtbar |
-| Vier Auswahlfelder | Produkte anhand verschiedener Kriterien einschränken | Filterfelder vorhanden; genaue Optionen nicht vollständig sichtbar |
-| Schaltfläche rechts in der Werkzeugleiste | Mögliche Aktion für die Produktliste | Schaltfläche vorhanden; genaue Funktion nicht eindeutig erkennbar |
-| Schaltfläche für das mobile Menü | Navigation auf kleinen Bildschirmen öffnen und schließen | Öffnen/Schließen ist im CSS und JavaScript-Kontext erkennbar |
-| Schaltfläche für das Erscheinungsbild | Zwischen hell und dunkel wechseln | Umschaltung ist bestätigt |
-| Produktkarten | Produktdetails öffnen | Verlinkung beziehungsweise Klickfläche vorhanden |
+Der Abschnitt „Alles, was dein Produkt braucht“ enthält mehrere Funktionskarten. Die sichtbaren Themen sind:
 
-### 5.2 Ausgaben und Anzeigen
+- Produktseite
+- Downloads
+- Versionen
+- Analytics
 
-Die Website zeigt unter anderem:
+Die Karten dienen als sichtbare Übersicht der angebotenen Funktionen. Eine Detailansicht für jede Karte ist im gekürzten Quellcode nicht vollständig erkennbar.
 
-- Produktnamen
-- Produktbeschreibungen
-- Status- oder Kategorieangaben
-- Schlagwörter
-- Versionsangaben
-- Download-Informationen
-- Changelog-Einträge
-- Analytics-Kennzahlen
-- Diagramme und visuelle Vorschauen
-- eine Meldung, wenn keine Produkte gefunden werden
+#### Showcase
 
-Der Leerzustand wird bei einer leeren beziehungsweise vollständig gefilterten Produktliste angezeigt.
+Der Showcase-Bereich stellt die Produktverwaltung in einer stilisierten Oberfläche dar. Er enthält:
+
+- mehrere Kennzeichnungen,
+- eine große Überschrift,
+- einen Beschreibungstext,
+- zwei stilisierte Bildschirmdarstellungen.
+
+Die Bildschirmdarstellungen sind CSS-Grafiken und keine im Quellcode erkennbaren Live-Screenshots.
 
 ---
 
-## 6. Mobile Bedienung
+## 4. Produktkatalog
 
-Für schmale Bildschirme ist ein mobilMenü vorgesehen:
+Der Produktkatalog ist für Produktnamen, Kategorien und weitere Kriterien vorgesehen.
 
-- Das Desktop-Navigationsmenü wird ausgeblendet.
-- Rechts in der Kopfzeile erscheint die Drei-Linien-Schaltfläche.
-- Das mobile Menü öffnet sich als überlappende Fläche.
-- Jeder Menüeintrag führt zu einem Navigationsziel.
-- Im unteren Bereich des mobilen Menüs sind Aktionsschaltflächen vorgesehen.
+### 4.1 Sichtbarer Filterbereich
 
-Die konkreten Beschriftungen dieser mobilen Aktionsschaltflächen sind im gekürzten Auszug nicht vollständig erkennbar.
+Der Filterbereich enthält:
+
+1. ein Suchfeld mit Lupensymbol,
+2. mehrere Auswahlfelder,
+3. weitere Filter- beziehungsweise Sortierkontrollen.
+
+Im gekürzten Quellcode sind die konkreten sichtbaren Beschriftungen aller Auswahlfelder und ihre tatsächliche Funktionsweise nicht vollständig erkennbar.
+
+### 4.2 Produktkarten
+
+Jede Produktkarte enthält:
+
+- ein Logofeld mit einer Initiale,
+- einen Produktnamen,
+- einen kurzen Produkttyp oder Status,
+- eine Beschreibung,
+- mehrere Schlagwörter,
+- eine Versionsangabe,
+- einen weiteren Hinweis im Fußbereich.
+
+Eine Produktkarte ist als anklickbarer Link beziehungsweise als klickbare Fläche gestaltet. Ob alle Karten auf tatsächliche Detailseiten verweisen, kann aus dem unvollständigen Ausschnitt nicht vollständig bestätigt werden.
+
+### 4.3 Leere Ergebnisanzeige
+
+Für den Fall ohne passende Produkte ist ein eigener Zustand mit Symbol und Hinweistext vorgesehen. Der genaue Text ist im gekürzten Ausschnitt nicht vollständig sichtbar.
 
 ---
 
-## 7. Typische Probleme und Fehlerbehebung
+## 5. Produktdetails
 
-### 7.1 Das mobile Menü öffnet sich nicht
+Für Produktdetailseiten sind im Quellcode eigene Layoutklassen vorhanden. Der Dateiauszug endet jedoch mitten in diesem Bereich.
 
-**Mögliche Ursache:** JavaScript ist deaktiviert oder die Seite wurde nicht vollständig geladen.
+Im vollständigen Quellcode sind für Produktdetails unter anderem folgende Bestandteile erkennbar beziehungsweise vorgesehen:
 
-**Prüfung und Behebung:**
+- eine Produktdarstellung,
+- Produktmetadaten,
+- Download-Bereich,
+- Versionsinformationen,
+- Changelog,
+- Analytics,
+- mögliche Aktionsschaltflächen.
 
-1. Laden Sie die Seite neu.
-2. Aktivieren Sie JavaScript für die Website.
-3. Prüfen Sie, ob die Drei-Linien-Schaltfläche sichtbar ist.
-4. Falls sie sichtbar ist, tippen Sie direkt auf das Symbol.
-5. Prüfen Sie alternativ im Browser, ob Inhalte der Seite vollständig geladen wurden.
+Die konkreten sichtbaren Beschriftungen und das genaue Verhalten der Produktdetailseite sind im bereitgestellten Ausschnitt nicht vollständig eindeutig erkennbar.
 
-### 7.2 Das dunkle Erscheinungsbild wird nicht dauerhaft gespeichert
+---
 
-**Bestätigter Zustand:** Der Farbmodus lässt sich in der laufenden Sitzung umschalten. Eine dauerhafte Speicherung ist im Auszug nicht eindeutig erkennbar.
+## 6. Bedienung
+
+### 6.1 Website aufrufen
+
+1. Öffnen Sie die LaunchKit-Website in einem aktuellen Browser.
+2. Die Startseite wird mit Hero-Bereich und Produktvorschau angezeigt.
+3. Scrollen Sie nach unten, um Funktionsbereich, Showcase, Produktkatalog und weitere Seitenabschnitte zu sehen.
+
+### 6.2 Helles oder dunkles Design wählen
+
+1. Klicken Sie rechts oben auf die Schaltfläche mit dem Sonnen- beziehungsweise Mondsymbol.
+2. Die Farben der Website wechseln zwischen dem hellen und dem dunklen Farbschema.
+3. Eine dauerhafte Speicherung der Auswahl ist im sichtbaren JavaScript-Ausschnitt nicht eindeutig erkennbar.
+
+Nach einem Neuladen kann das Design daher wieder auf die Standarddarstellung zurückfallen, sofern keine Speicherung über den Browser oder eine andere technische Einrichtung erfolgt.
+
+### 6.3 Mobile Navigation öffnen
+
+1. Öffnen Sie die Website auf einem schmalen Bildschirm.
+2. Tippen Sie oben rechts auf die Schaltfläche mit den drei Linien.
+3. Wählen Sie im geöffneten Menü den gewünschten Eintrag.
+
+### 6.4 Ein Produkt suchen
+
+1. Scrollen Sie zum Produktkatalog.
+2. Geben Sie in das Suchfeld einen Produktnamen oder Suchbegriff ein.
+3. Die Liste wird anhand des eingegebenen Textes gefiltert.
+
+Ob die Suche sofort während der Eingabe arbeitet oder erst nach dem Drücken der Eingabetaste, ist im gekürzten Quellcode nicht vollständig erkennbar.
+
+### 6.5 Produkte filtern
+
+1. Scrollen Sie zum Filterbereich des Produktkatalogs.
+2. Wählen Sie in den angebotenen Auswahlfeldern die gewünschte Kategorie oder ein anderes Filterkriterium.
+3. Die Produktliste wird entsprechend angepasst.
+4. Setzen Sie die Filter zurück, um wieder alle sichtbaren Produkte anzuzeigen.
+
+Die genaue Zuordnung der Filterfelder zu Kategorien, Lizenzen, Preisen oder anderen Kriterien ist im Ausschnitt nicht vollständig erkennbar.
+
+### 6.6 Eine Produktkarte öffnen
+
+1. Suchen Sie im Produktkatalog die gewünschte Produktkarte.
+2. Klicken oder tippen Sie auf die Karte beziehungsweise auf den Produktnamen.
+3. Die zugehörige Produktdetailseite wird geöffnet, sofern die Karte korrekt mit einem Ziel verknüpft ist.
+
+### 6.7 Dark Mode umschalten
+
+1. Klicken oder tippen Sie auf dierunde Schaltfläche mit dem Sonnen-/Mondsymbol.
+2. Warten Sie auf den Farbwechsel.
+3. Prüfen Sie, ob Hintergrund, Texte, Karten und Bedienelemente weiterhin lesbar sind.
+
+---
+
+## 7. Downloads und Versionen
+
+Die Website beschreibt LaunchKit als Plattform für Downloads und Versionen. In den sichtbaren Karten und Produktbereichen werden Versionsangaben angezeigt.
+
+Ein vollständiger Downloadablauf ist im vorliegenden Quellcode-Auszug nicht vollständig erkennbar. Insbesondere lässt sich nicht bestätigt:
+
+- ob Dateien direkt heruntergeladen werden,
+- ob ein Download-Dialog mit Formatwahl erscheint,
+- welche Betriebssysteme und Dateiformate verfügbar sind,
+- ob Downloads eine Anmeldung voraussetzen,
+- ob Prüfsummen oder Signaturen angezeigt werden.
+
+Diese Angaben sollten daher nicht als bestätigte Funktionalität verstanden werden.
+
+---
+
+## 8. Changelog
+
+Ein sichtbarer Navigationspunkt heißt **„Changelog“**. Im Quellcode sind außerdem Changelog-Bereiche im Kontext von Produktversionen angelegt.
+
+Im gekürzten Quellcode ist jedoch nicht vollständig erkennbar:
+
+- ob ein zentrales Changelog für alle Produkte existiert,
+- ob jedes Produkt einen eigenen Changelog besitzt,
+- wie nach Version, Datum oder Änderungsart gefiltert wird,
+- ob alte Versionen auswählbar sind,
+- ob vollständige Änderungsprotokolle angezeigt werden.
+
+---
+
+## 9. Analytics
+
+Der Hero-Bereich und die Funktionsübersicht enthalten Darstellungen mit Kennzahlen und Diagrammen. Die Produktdetails enthalten außerdem eigene Layoutklassen für Analytics.
+
+Die gezeigten Zahlen und Balken erscheinen zunächst als statische Präsentationselemente. Eine Anbindung an eine externe Datenquelle ist im bereitgestellten Quellcode nicht erkennbar.
+
+Die Plattformbeschreibung nennt Analytics als Bestandteil des Funktionsumfangs. Ob Besucher dort:
+
+- eigene Produkte analysieren,
+- Downloads und Nutzung verfolgen,
+- Daten exportieren,
+- Zeiträume auswählen,
+
+ist im Ausschnitt nicht eindeutig erkennbar.
+
+---
+
+## 10. Formulare und Eingaben
+
+Im Quellcode sind grundsätzlich Eingabeelemente für Text und Auswahl definiert:
+
+- ein Suchfeld,
+- mehrere Auswahlfelder.
+
+Ein Kontaktformular, Anmeldeformular oder Formular zur Veröffentlichung eines Produkts ist im gekürzten Quellcode nicht vollständig erkennbar. Daher sollten Besucher keine derartigen Eingaben erwarten, solange ein entsprechendes sichtbares Formular nicht auf der Seite angezeigt wird.
+
+---
+
+## 11. Typische Probleme und Fehlerbehebung
+
+### 11.1 Die Navigation ist auf dem Mobilgerät nicht sichtbar
+
+**Mögliche Ursache:** Die Anzeige wird zu breit dargestellt oder das mobile Menü ist geschlossen.
 
 **Abhilfe:**
 
-1. Lassen Sie die Seite geöffnet, wenn die Einstellung erhalten bleiben soll.
-2. Prüfen Sie die Browsereinstellungen auf gespeicherte Website-Daten.
-3. Beachten Sie, dass das Löschen von Website-Daten oder eine blockierte Speicherung die Auswahl zurücksetzen kann.
+1. Prüfen Sie, ob das Fenster schmal genug für die mobile Darstellung ist.
+2. Tippen Sie oben rechts auf das Symbol mit den drei Linien.
+3. Falls nötig, drehen Sie das Gerät oder vergrößern beziehungsweise verkleinern Sie die Browseransicht.
 
-### 7.3 Das Logo oder die Schriften werden nicht korrekt dargestellt
+### 11.2 Das dunkle Design wird nicht beibehalten
 
-**Mögliche Ursache:** Die externen Ressourcen von Google Fonts beziehungsweise GitHub sind nicht erreichbar oder werden durch das Netzwerk blockiert.
+**Mögliche Ursache:** Die Auswahl wird möglicherweise nicht dauerhaft gespeichert.
 
-**Behebung:**
+**Abhilfe:**
+
+1. Schalten Sie das Design unmittelbar nach dem Laden erneut um.
+2. Prüfen Sie, ob die Website bei einem Neuladen wieder in der hellen Standarddarstellung erscheint.
+3. Eine dauerhafte Speicherung kann nur dann zugesichert werden, wenn im vollständigen JavaScript eine Speicherung im Browser vorgesehen ist. Dies ist im Ausschnitt nicht eindeutig erkennbar.
+
+### 11.3 Die Suche liefert keine passenden Produkte
+
+**Abhilfe:**
+
+1. Prüfen Sie die Schreibweise des Suchbegriffs.
+2. Entfernen Sie zunächst gesetzte Filter.
+3. Verwenden Sie einen kürzeren, allgemeineren Begriff.
+4. Prüfen Sie, ob mehrere Filterkombinationen aktiv sind.
+
+### 11.4 Ein Produkt erscheint nach einer Auswahl nicht
+
+**Abhilfe:**
+
+1. Setzen Sie alle Filter zurück.
+2. Leeren Sie das Suchfeld.
+3. Laden Sie die Seite neu.
+4. Prüfen Sie, ob die Produktkarte vollständig geladen wurde.
+
+### 11.5 Schriften oder Bilder fehlen
+
+**Mögliche Ursache:** Die extern gehosteten Ressourcen konnten nicht geladen werden.
+
+**Abhilfe:**
 
 1. Prüfen Sie die Internetverbindung.
-2. Öffnen Sie die Seite in einem aktuellen Browser.
-3. Erlauben Sie bei Bedarf externe Ressourcen.
-4. Falls andere Websites erreichbar sind, LaunchKit aber nicht, kann eine Firewall- oder DNS-Sperre die Ursache sein.
-
-### 7.4 Die Produktliste bleibt leer
-
-**Mögliche Ursachen:**
-
-- Der Suchbegriff liefert keinen Treffer.
-- Die gewählten Filter schließen sich gegenseitig aus.
-- Es sind noch keine Produkte verfügbar.
-- Daten konnten nicht geladen werden.
-
-**Behebung:**
-
-1. Löschen Sie den Inhalt des Suchfelds.
-2. Setzen Sie alle Auswahlfelder auf ihre Standardwerte zurück.
-3. Laden Sie die Seite neu.
-4. Falls weiterhin nichts angezeigt wird, prüfen Sie die Netzwerkverbindung.
-5. Eine darüber hinausgehende Serverdiagnose ist ohne vollständigen Quellcode nicht möglich.
-
-### 7.5 Ein Download startet nicht
-
-**Mögliche Ursache:**
-
-- Der Download-Link ist nicht erreichbar.
-- Der Browser blockiert
+2. Laden Sie die Seite neu.
+3. Prüfen Sie, ob Inhalte von `fonts.googleapis.com`, `fonts.gstatic.com` und dem im HTML eingetragenen GitHub-Raw-Host erreichbar sind.
+4. Verwenden Sie bei einer Blockliste einen

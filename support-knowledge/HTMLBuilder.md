@@ -2,29 +2,30 @@
 <!-- source-path: HTMLBuilder -->
 <!-- source-files: ["HTMLBuilder/index.html"] -->
 
-# HTMLBuilder
+# HTMLBuilder – Support-Dokumentation
 
-- **Vermuteter Zweck:** Browserbasierte Oberfläche zum Erstellen und Anzeigen von HTML-Code. Die Seite enthält einen Editor, Ausgabeflächen und einen integrierten KI-gestützten Kundenservice.
-- **Quellcode-Pfad:** `HTMLBuilder/index.html`
-- **Erstellungsdatum der Dokumentation:** 18. August 2026
+**Website:** HTMLBuilder  
+**Vermuteter Zweck:** Browserbasierter HTML-Editor mit Eingabefeld, generiertem HTML-Code und Live-Vorschau. Zusätzlich ist ein KI-gestützter Kundenservice-Chat integriert.  
+**Quellcode-Pfad:** `HTMLBuilder/index.html`  
+**Datum der Erstellung:** 16. Juni 2025  
 
-> Die vorliegende Dokumentation basiert auf einem gekürzten Quellcode-Auszug. Funktionen, die im sichtbaren Ausschnitt nicht eindeutig nachvollziehbar sind, werden ausdrücklich als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
+> **Hinweis zur Quellcode-Basis:** Die Dokumentation basiert auf einem gekürzten Auszug aus `HTMLBuilder/index.html`. Nicht vollständig sichtbare Funktionen werden als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
 
 ---
 
 ## 1. Überblick
 
-HTMLBuilder ist eine responsive Webanwendung mit einem zentralen Arbeitsbereich. Im Quellcode sind folgende Bestandteile erkennbar:
+HTMLBuilder ist eine einzelne HTML-Seite für die Erstellung und Vorschau von HTML-Code.
 
-1. Kopfbereich mit Branding und Schaltflächen
-2. Begrüßungs- und Informationsbereich
-3. Zwei nebeneinander angeordnete Karten:
-   - links ein Eingabefeld für HTML beziehungsweise Quellcode
-   - rechts eine Ausgabe beziehungsweise Vorschau
-4. Fußbereich
-5. Fest positionierter Kundenservice-Chat
+Die Seite enthält laut Quellcode:
 
-Die Seite unterstützt hell- und dunkel dargestellte Farbschemata. Eine Schaltfläche für den Wechsel ist im CSS vorbereitet. Ob im nicht vollständig gezeigten HTML eine entsprechende Schaltfläche mit dieser Klasse vorhanden ist und wie sie betrieben wird, ist im vorliegenden Ausschnitt nicht eindeutig erkennbar.
+- eine Navigationsleiste mit Logo, dem Namen „HTML Builder“ und themenabhängigen Schaltflächen,
+- einen zentralen Bereich mit Überschrift und kurzer Beschreibung,
+- ein zweispaltiges Layout aus Editor und Ausgabe/Vorschau,
+- einen KI-Chat namens **„lamacHub Kundenservice“**,
+- einen mobilen Layoutumbruch bei einer Fensterbreite von höchstens 1.000 Pixeln.
+
+Die Seite unterstützt ein helles und ein dunkles Erscheinungsbild. Der Wechsel wird über das Attribut `data-theme` gesteuert.
 
 ---
 
@@ -32,322 +33,283 @@ Die Seite unterstützt hell- und dunkel dargestellte Farbschemata. Eine Schaltfl
 
 ### 2.1 Technische Voraussetzungen
 
-Für die grundlegende Nutzung werden bestätigt:
+Für die Verwendung des HTML-Editors werden benötigt:
 
-- ein aktueller Webbrowser,
-- eine Bildschirmdarstellung mit JavaScript-Ausführung,
-- für die Darstellung der Vorschau grundsätzlich die vom Browser unterstützten HTML- und CSS-Funktionen.
+- ein aktueller Browser mit JavaScript-Unterstützung,
+- eine Internetverbindung, sofern die Schriftart von Google Fonts geladen und der KI-Chat verwendet werden soll,
+- für den Chat eine erreichbare Verbindung zum im Quellcode hinterlegten Support-Dienst.
 
-Die Anwendung ist als statische HTML-Seite aufgebaut. Eine Installation ist im gezeigten Quellcode nicht erforderlich.
+### 2.2 Inhaltliche Voraussetzungen
 
-### 2.2 Optionale Netzwerkabhängigkeiten
+Für den Editor sind keine Anmeldung und kein Konto erforderlich.
 
-Bestätigt sind externe oder externe Server beteiligt:
-
-- Die Schrift „Inter“ wird über Google Fonts geladen. Fällt diese Ressource nicht verfügbar, verwendet die Seite ersatzweise eine Sans-Serif-Schrift.
-- Der Kundenservice sendet Anfragen an eine externe Worker-Adresse. Für den Chat ist daher eine Netzwerkverbindung erforderlich.
-- Der Integrationscode verwendet eine fest hinterlegte externe Adresse. Diese wird hier aus Sicherheitsgründen nicht wiedergegeben.
-
-### 2.3 Inhalte im Textfeld
-
-Das Eingabefeld ist für Quellcode vorgesehen. Akzeptierte Formate und Verarbeitung sind nur eingeschränkt erkennbar, da der Quellcode gekürzt ist.
-
-Bestätigt ist:
-
-- Das Feld ist mehrzeilig.
-- Es kann in der Größe verändert werden.
-- Es verwendet eine Monospace-Schrift.
-- Die Mindesthöhe beträgt ungefähr 250 Pixel.
-
-Nicht eindeutig erkennbar ist, ob beliebiges HTML direkt gerendert, validiert oder in einen Rahmen eingebettet wird.
+Die technische Bearbeitung setzt Grundkenntnisse in HTML voraus. Das gilt insbesondere beim manuellen Schreiben von HTML-Code.
 
 ---
 
-## 3. Sichtbare Bereiche
+## 3. Sichtbare Bereiche der Website
 
-## 3.1 Kopfbereich
+### 3.1 Navigationsleiste
 
-Der Kopfbereich ist als „navbar“ gestaltet. Er enthält:
+Oben befindet sich eine schmale Navigationsleiste mit:
 
-- ein Bild beziehungsweise Logo,
-- die sichtbare Bezeichnung **„HTML Builder“**,
-- orange hervorgehobene Schaltflächen mit den CSS-Klassen `theme-btn` und `action-btn`.
+- einem Logo,
+- der Bezeichnung **„HTML Builder“**,
+- themenabhängig beschrifteten Schaltflächen.
 
-Die konkreten Beschriftungen dieser Schaltflächen sowie ihre Funktionen liegen nicht vollständig im Ausschnitt vor. Im Besonderen ist nicht eindeutig erkennbar:
+Die genaue Beschriftung sowie die genaue Zuordnung der Schaltflächen zu ihren Funktionen sind im gekürzten Quellcode nicht vollständig erkennbar. Sichtbar bestätigt ist jedoch, dass mindestens Schaltflächen mit den CSS-Klassen `theme-btn` und `action-btn` vorhanden sind.
 
-- welche Aktion das `action-btn` ausführt,
-- ob die `theme-btn` den hellen oder dunklen Zustand umschaltet,
-- ob ein Zurücksetzen, Importieren, Kopieren oder Speichern angeboten wird.
+### 3.2 Hero-Bereich
 
----
+Unterhalb der Navigationsleiste steht ein zentraler Textbereich mit:
 
-## 3.2 Hero-Bereich
+- einer großen orangefarbenen Überschrift,
+- einem erklärenden Untertext.
 
-Unmittelbar unter dem Kopfbereich befindet sich ein zentrierter Abschnitt mit:
+Der genaue Wortlaut der Texte ist im vorliegenden Auszug nicht vollständig enthalten.
 
-- einer großen orangefarbenen Überschrift `h1`,
-- einem erklärenden Textabsatz `p`.
+### 3.3 Editorbereich
 
-Der konkrete Text der Überschrift und Beschreibung ist im gekürzten Ausschnitt nicht enthalten.
+Der Editorbereich befindet sich in einer Karte. Er enthält:
 
----
+- eine Überschrift der Ebene 2,
+- ein mehrzeiliges Textfeld,
+- eine Höhe von mindestens 250 Pixeln,
+- eine vertikal skalierbare Größe,
+- eine Monospace-Schrift.
 
-## 3.3 Arbeitsbereich
+Der Inhalt des Textfelds wird mit `textarea` verarbeitet. Eine Beschriftung des Eingabefelds ist im Auszug nicht sichtbar.
 
-Der Arbeitsbereich besteht aus einem Raster mit zwei Karten.
+### 3.4 Aktionsbereich
 
-### Linke Karte
+Unterhalb des Editors befindet sich ein Bereich mit der CSS-Klasse `actions`. Er ist für mehrere Schaltflächen vorgesehen und kann bei schmalen Bildschirmen umbrechen.
 
-Die linke Karte enthält:
+Welche Aktionen dort im vollständigen Code verfügbar sind, ist aus dem gekürzten Auszug **nicht eindeutig erkennbar**. Die Klasse `action-btn` bestätigt zumindest das Vorhandensein einer orangefarbenen Aktionsschaltfläche.
 
-- eine Überschrift der zweiten Ebene,
-- ein großes Textarea,
-- unterhalb des Textareas einen Bereich mit Schaltflächen.
+### 3.5 Ausgabebereich
 
-Die Überschrift und die sichtbaren Schaltflächenbeschriftungen sind im Ausschnitt nicht enthalten.
+Ein weiterer Bereich besitzt die Klasse `output`. Darin befindet sich ein Element mit der ID `output` und einer Mindesthöhe von 250 Pixeln.
 
-Das Textarea ist das zentrale Eingabefeld. Es ist ausdrücklich für die manuelle Eingabe von HTML beziehungsweise Quellcode vorgesehen.
+Dieser Bereich dient wahrscheinlich der Darstellung des erzeugten HTML-Codes. Die genaue Funktionszuordnung ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
 
-### Rechte Karte
+### 3.6 Vorschau
 
-Die rechte Karte enthält:
+Das Stylesheet enthält außerdem eine Klasse `preview`. Sie ist für einen eingebetteten Rahmen mit folgenden Eigenschaften vorgesehen:
 
-- eine Überschrift der zweiten Ebene,
-- einen Abschnitt mit der ID `output`,
-- eine Vorschaufläche der Klasse `preview`.
+- Breite: 100 %,
+- Höhe: 500 Pixel,
+- weißer Hintergrund,
+- abgerundete Ecken.
 
-Die Vorschau besitzt:
+Ob und wie die Vorschau im vollständigen Quellcode aktiviert wird, ist im gekürzten Auszug **nicht eindeutig erkennbar**.
 
-- eine Höhe von 500 Pixeln,
-- eine weiße Hintergrundfarbe,
-- abgerundete Ecken,
-- keinen sichtbaren Rahmen.
+### 3.7 Fußbereich
 
-Was innerhalb dieser Karte konkret angezeigt wird, ist im Ausschnitt nicht eindeutig erkennbar. Der Name `output` könnte für HTML-Ausgabe, generierten Code oder eine gerenderte Vorschau verwendet werden; das kann aus dem gekürzten Quellcode nicht sicher abgeleitet werden.
+Am Ende der Seite befindet sich ein zentrierter Fußbereich mit grauer Textfarbe. Der konkrete Inhalt ist im Auszug nicht vollständig sichtbar.
 
 ---
 
-## 3.4 Reaktionsfähige Darstellung
+## 4. HTML-Code bearbeiten
 
-Bestätigt ist:
+### 4.1 Code eingeben
 
-- Ab einer Bildschirmbreite von 1000 Pixeln werden die beiden Karten untereinander angeordnet.
-- Die große Hero-Überschrift wird auf kleineren Bildschirmen verkleinert.
-- Das Textarea bleibt grundsätzlich horizontal auf die verfügbare Kartenbreite ausgerichtet.
+1. Öffnen Sie die Website.
+2. Klicken Sie in das große Eingabefeld im linken Kartenbereich.
+3. Geben Sie Ihren HTML- oder CSS-Code ein.
+4. Nutzen Sie die Größe des Eingabefelds bei Bedarf durch Ziehen des unteren Randes.
 
----
+### 4.2 Code auswählen und kopieren
 
-## 3.5 Fußbereich
+1. Setzen Sie den Cursor in das Eingabefeld.
+2. Wählen Sie den gewünschten Text mit `Strg + A` beziehungsweise `Cmd + A` aus.
+3. Kopieren Sie die Auswahl mit `Strg + C` beziehungsweise `Cmd + C`.
 
-Am Ende der Seite befindet sich ein zentrierter Fußbereich mit grauer Textfarbe. Sein konkreter Inhalt ist im Ausschnitt nicht sichtbar.
+### 4.3 Code leeren
 
----
+1. Klicken Sie in das Eingabefeld.
+2. Markieren Sie den gesamten Inhalt.
+3. Löschen Sie ihn oder drücken Sie die Entf-Taste.
 
-# 4. Bedienung von HTMLBuilder
+### 4.4 Hinweise zur Bearbeitung
 
-## 4.1 HTML-Code eingeben
-
-1. Öffnen Sie die Website im Browser.
-2. Wählen Sie das Eingabefeld in der linken Karte.
-3. Geben Sie Ihren HTML- beziehungsweise Quellcode ein.
-4. Korrigieren Sie den Code bei Bedarf direkt im Feld.
-
-Das Eingabefeld ist vertikal vergrößerbar. Ziehen Sie dazu den unteren Rand des Textbereichs nach unten.
-
----
-
-## 4.2 Ergebnis erzeugen
-
-1. Geben Sie den gewünschten Code in das Textfeld ein.
-2. Suchen Sie in der linken Karte die Schaltflächen unterhalb des Eingabefelds.
-3. Betätigen Sie die Schaltfläche, deren Beschriftung dem gewünschten Vorgang entspricht.
-
-> Die konkreten Schaltflächen und ihre Beschriftungen sind im bereitgestellten Ausschnitt nicht enthalten. Daher kann keine bestimmte Aktion wie „Generieren“, „Vorschau“, „Kopieren“ oder „Zurücksetzen“ bestätigt werden.
-
-Falls im vollständigen Quellcode mehrere Ausgabemodi vorhanden sind, sollten sie anhand ihrer sichtbaren Beschriftungen unterschieden werden.
+- Das Feld besitzt keine sichtbare automatische Syntaxhervorhebung.
+- Der Quellcode enthält keine sichtbare Fehlermeldung für ungültiges HTML.
+- Eine automatische Formatierung oder automatische Vervollständigung ist im Auszug nicht erkennbar.
+- Der genaue Ablauf nach einer Änderung – etwa ob Code sofort erzeugt wird oder erst nach einem Klick – ist im gekürzten Auszug nicht vollständig erkennbar.
 
 ---
 
-## 4.3 Ausgabe beziehungsweise Vorschau prüfen
+## 5. Ausgabe und Vorschau verwenden
 
-1. Nach der Ausführung eines Vorgangs prüfen Sie den rechten Kartenbereich.
-2. Beachten Sie den Abschnitt mit der ID `output`.
-3. Prüfen Sie anschließend die Vorschaufläche mit der Klasse `preview`.
-4. Bei einer leeren Vorschau kontrollieren Sie, ob im linken Textfeld vollständiger und fehlerfreier Code vorhanden ist.
-5. Prüfen Sie außerdem, ob der Browser JavaScript-Fehler in den Entwicklerwerkzeugen anzeigt.
+Der Quellcode enthält separate Bereiche für Ausgabe und Vorschau. Die sichtbaren Bezeichnungen und die genauen Schaltflächen zum Auslösen dieser Funktionen sind im vorliegenden Auszug jedoch nicht enthalten.
 
-Welche Ausgabe in `output` und welche Darstellung in der Vorschau jeweils erscheinen, ist **im Quellcode nicht eindeutig erkennbar**.
+Daher gelten folgende Aussagen nur als **begründete Vermutung**:
 
----
+- Der Inhalt des Eingabefelds wird in HTML umgewandelt und im Ausgabebereich dargestellt.
+- Eine Vorschau verwendet den erzeugten Code in einem eingebetteten Rahmen.
 
-## 4.4 Darstellung auf dem Smartphone oder Tablet
-
-1. Öffnen Sie die Seite in einem mobilen Browser.
-2. Drehen Sie das Gerät bei Bedarf in die Querlage.
-3. Scrollen Sie zu den Karten.
-4. Die Bearbeitungs- und Ausgabekarte stehen untereinander.
-5. Tippen Sie in das Eingabefeld, um den Code zu bearbeiten.
-
-Das Chat-Fenster passt seine Breite und Höhe an den verfügbaren Bildschirm an. Auf kleinen Geräten wird es fast über die gesamte Breite dargestellt.
+Für die tatsächliche Bedienung gilt: Verwenden Sie ausschließlich die in der vollständigen Seite sichtbaren Schaltflächen und Bezeichnungen. Im gekürzten Quellcode ist kein eindeutig benannter Vorschau- oder Generierungsbefehl erkennbar.
 
 ---
 
-# 5. Integrierter Kundenservice
+## 6. Darstellung zwischen hellem und dunklem Design wechseln
 
-## 5.1 Zweck
+Bestätigt ist, dass die Website zwei Farbschemata definiert:
 
-Unten rechts ist ein runder, grüner Kundenservice-Button sichtbar. Er öffnet das Chat-Fenster **„lamacHub Kundenservice“** mit der Unterzeile **„KI-gestützter Support“**.
+- **Helles Design** als Standard,
+- **Dunkles Design** über `data-theme="dark"`.
 
-Der Chat ist im Quellcode ausdrücklich als KI-gestützt gekennzeichnet.
+### 6.1 Wechsel durchführen
+
+1. Suchen Sie in der Navigationsleiste die Schaltfläche mit der Klasse `theme-btn`.
+2. Klicken Sie darauf.
+3. Prüfen Sie, ob Hintergrund, Textfarben und Karten Darstellung entsprechend wechseln.
+
+### 6.2 Mögliche Ursache, wenn der Wechsel nicht funktioniert
+
+Falls sich das Design nicht ändert:
+
+1. Öffnen Sie die Browser-Entwicklerwerkzeuge.
+2. Prüfen Sie, ob das Element `html` oder `body` das Attribut `data-theme="dark"` erhält.
+3. Prüfen Sie, ob die zugehörige JavaScript-Funktion auf einen Klick reagiert.
+4. Laden Sie die Seite neu und wiederholen Sie den Test.
+
+Ob die gewählte Theme-Einstellung dauerhaft gespeichert wird, ist im Auszug **nicht eindeutig erkennbar**.
 
 ---
 
-## 5.2 Chat öffnen
+## 7. KI-Chat „lamacHub Kundenservice“
 
-1. Klicken Sie auf den runden grünen Button unten rechts.
-2. Das Chat-Fenster öffnet sich über der Seite.
-3. Im Chat erscheint die Begrüßung:
+### 7.1 Zweck
 
-   > Hallo! Wie kann ich dir weiterhelfen?
+Der Chat ist als **„KI-gestützter Support“** gekennzeichnet. Er soll Besuchern helfen, Fragen zur Nutzung von HTMLBuilder zu stellen.
 
-Der Button besitzt die Barrierefreiheitsbezeichnung **„Kundensupport öffnen“**.
+Der Chat wird über eine feste Schaltfläche unten rechts geöffnet.
 
----
+### 7.2 Chat öffnen
 
-## 5.3 Nachricht senden
+1. Klicken Sie auf die runde, grüne Schaltfläche unten rechts mit dem Smiley-Symbol.
+2. Das Chatfenster mit der Überschrift **„lamacHub Kundenservice“** öffnet sich.
+3. Die erste Nachricht lautet: **„Hallo! Wie kann ich dir weiterhelfen?“**
 
-1. Klicken Sie in das Eingabefeld mit dem Platzhalter **„Nachricht schreiben“**.
+### 7.3 Nachricht senden
+
+1. Klicken Sie in das Eingabefeld mit dem Platzhalter **„Nachricht schreiben …“**.
 2. Geben Sie Ihre Frage ein.
-3. Klicken Sie auf den runden Senden-Button rechts neben dem Eingabefeld.
-4. Ihre Nachricht erscheint rechts in grüner Hervorhebung.
-5. Während der Verarbeitung wird eine animierte Statusanzeige eingeblendet.
-6. Die Antwort erscheint anschließend als Bot-Nachricht.
+3. Klicken Sie auf die runde Senden-Schaltfläche rechts neben dem Eingabefeld.
+4. Ihre Nachricht erscheint im Chat als grüne Nachricht.
+5. Während der Antwort wird eine animierte Tipp-Anzeige eingeblendet.
+6. Die Antwort erscheint anschließend als helle Nachricht.
 
-Das Eingabefeld:
+Alternativ kann die Nachricht mit der Eingabetaste gesendet werden, sofern das Formular dies standardmäßig behandelt.
 
-- ist erforderlich,
-- erlaubt maximal 1800 Zeichen,
-- verwendet die Barrierefreiheitsbezeichnung **„Deine Nachricht“**,
-- deaktiviert die Browser-Autovervollständigung.
+### 7.4 Unterstützte Formatierungen in Antworten
 
-Der Senden-Button wird während einer laufenden Anfrage deaktiviert.
+Der Chat kann Markdown-ähnliche Formatierungen darstellen:
 
----
-
-## 5.4 Chat schließen
-
-Klicken Sie oben rechts im Chat-Fenster auf **„×“**. Der Button hat die Barrierefreiheitsbezeichnung **„Chat schließen“**.
-
-Das Schließen entfernt den Chat nicht dauerhaft aus dem Quellcode. Beim erneuten Öffnen wird das Fenster erneut eingeblendet.
-
----
-
-## 5.5 Unterstützte Formatierungen
-
-Der Kundenservice kann Antworten mit verschiedenen Markdown-Elementen darstellen. Im Quellcode sind bestätigt:
-
-- Überschriften der Ebenen 1 bis 4,
+- Überschriften,
 - Absätze,
-- ungeordnete und geordnete Listen,
+- Listen,
 - Links,
 - fett, kursiv und durchgestrichen,
 - Inline-Code,
 - Codeblöcke,
-- Zitate,
-- horizontale Linien,
-- Tabellen.
+- Tabellen,
+- Zitatblöcke,
+- horizontale Linien.
 
-HTTP- und HTTPS-Links werden in einem neuen Tab geöffnet. Andere Linkprotokolle werden nicht als klickbare Links übernommen.
+Links werden nur für HTTP- beziehungsweise HTTPS-Adressen erzeugt und öffnen sich in einem neuen Tab. Der Quellcode setzt dabei zusätzliche Sicherheitsattribute.
 
----
+### 7.5 Chat schließen
 
-## 5.6 Inhaltliche Grenzen des Chats
+1. Klicken Sie oben rechts im Chatfenster auf das **„×“**.
+2. Das Fenster wird ausgeblendet.
+3. Die grüne Smiley-Schaltfläche öffnet den Chat erneut.
 
-Die Antworten stammen erkennbar nicht aus einer lokalen festen Wissensbasis, sondern von einem externen KI-Dienst. Daher gilt:
+### 7.6 Verhalten während einer laufenden Antwort
 
-- Antworten können unvollständig oder fehlerhaft sein.
-- Der Kundenservice kennt möglicherweise nicht den vollständigen Quellcode.
-- Fragen zu nicht sichtbaren Funktionen oder privaten Konfigurationen können daher nicht zuverlässig beantwortet werden.
-- Für fachlich verbindliche Aussagen sollte eine andere Supportmöglichkeit genutzt werden. Eine konkrete E-Mail-Adresse oder Telefonnummer ist im Quellcode nicht erkennbar.
+Der Quellcode sieht einen Status `busy` vor:
 
----
-
-# 6. Eingaben und Ausgaben
-
-## 6.1 HTML-Eingabefeld
-
-**Eingabe:** frei formulierter HTML- oder Quellcode.
-
-**Mögliche Ausgabe:** Der Quellcode-Auszug belegt die Existenz eines Ausgabebereichs und einer Vorschau, enthält aber nicht die vollständige Verarbeitungslogik. Deshalb ist nicht eindeutig erkennbar:
-
-- ob fehlerhafter Code validiert wird,
-- ob Syntaxfehler angezeigt werden,
-- ob Code automatisch formatiert wird,
-- ob einzelne Elemente gesucht oder ersetzt werden können,
-- ob der erzeugte Code kopiert oder gespeichert werden kann.
+- Während eine Antwort verarbeitet wird, wird die Senden-Schaltfläche deaktiviert.
+- Dadurch soll verhindert werden, dass mehrere Anfragen gleichzeitig gesendet werden.
+- Nach Abschluss der Antwort wird der Status wieder freigegeben.
 
 ---
 
-## 6.2 Chat-Eingabefeld
+## 8. Datenschutz und Berechtigungen
 
-**Eingabe:** eine Supportanfrage mit bis zu 1800 Zeichen.
+### 8.1 Keine Anmeldung im gezeigten Quellcode
 
-**Ausgabe:** eine textbasierte KI-Antwort mit formatierbarer Markdown-Ausgabe.
+In `HTMLBuilder/index.html` ist kein Anmeldeformular erkennbar. Eine Anmeldung oder ein Benutzerkonto wird daher nicht vorausgesetzt.
 
-**Rückmeldung während der Verarbeitung:** drei animierte Punkte mit der Statusbezeichnung **„Kundenservice antwortet“**.
+### 8.2 Übertragung von Chatnachrichten
 
----
+Der Chat sendet Nachrichten an einen externen Support-Dienst. Im Quellcode ist dafür eine feste Web-Worker-Adresse hinterlegt. Aus Sicherheitsgründen wird dieser Wert hier nicht wiedergegeben.
 
-# 7. Typische Probleme und Fehlerbehebung
+Daraus ergeben sich folgende praktische Hinweise:
 
-## 7.1 Die Vorschau bleibt leer
+- Chatnachrichten werden zur Verarbeitung an einen externen Dienst übertragen.
+- Vermeiden Sie die Eingabe von Passwörtern, API-Schlüsseln, Tokens oder anderen vertraulichen Informationen.
+- Personenbezogene Daten sollten nur übermittelt werden, wenn dies für die konkrete Supportfrage erforderlich ist.
+- Der genaue Umfang der serverseitigen Verarbeitung, Speicherung und Löschung ist im vorliegenden Quellcode **nicht eindeutig erkennbar**.
 
-### Mögliche Ursachen
+### 8.3 Verarbeitung des HTML-Codes
 
-- Das Eingabefeld enthält keinen Code.
-- Der gewünschte Vorgang wurde noch nicht ausgeführt.
-- Der HTML-Code enthält syntaktische Fehler.
-- Der Quellcode verweist auf Dateien oder Ressourcen, die nicht erreichbar sind.
-- JavaScript wurde im Browser deaktiviert.
+Der sichtbare Quellcode enthält keine sichtbare Übermittlungsfunktion für den HTML-Editorinhalt an den Support-Dienst. Ob eine solche Funktion im gekürzten Teil existiert, ist **nicht eindeutig erkennbar**.
 
-### Prüfungen
+### 8.4 In der Vorschau ausgeführter Code
 
-1. Öffnen Sie die linke Karte.
-2. Prüfen Sie, ob im Textarea Code vorhanden ist.
-3. Korrigieren Sie offene oder nicht geschlossene Tags.
-4. Betätigen Sie die in der vollständigen Oberfläche sichtbare Erzeugungs- oder Aktualisierungsschaltfläche.
-5. Aktualisieren Sie die Seite.
-6. Prüfen Sie, ob JavaScript in den Browser-Einstellungen aktiviert ist.
-7. Öffnen Sie die Browser-Entwicklerwerkzeuge und prüfen Sie dort auf JavaScript- oder Netzwerkfehler.
+Eine HTML-Vorschau kann grundsätzlich HTML, CSS und JavaScript ausführen. Da der konkrete Mechanismus der Vorschau im gekürzten Quellcode nicht vollständig erkennbar ist, wird empfohlen:
 
-Der konkrete Fehlertext der Anwendung ist im Quellcode-Auszug nicht erkennbar.
+- nur eigenen oder vertrauenswürdigen Code verwenden,
+- keine unbekannten Skripte aus dem Internet einfügen,
+- sensible Formulare oder Daten nicht in eine Vorschau übernehmen.
 
----
+Ob die Website Vorschauinhalte in einer abgeschotteten Umgebung ausführt, ist im Quellcode **nicht eindeutig erkennbar**.
 
-## 7.2 Der Kundenservice öffnet sich nicht
+### 8.5 Drittanbieter-Ressourcen
 
-1. Prüfen Sie, ob das Chat-Fenster durch einen anderen Inhalt überdeckt wird.
-2. Klicken Sie den grünen Button erneut.
-3. Laden Sie die Seite neu.
-4. Deaktivieren Sie testweise Erweiterungen, die Seiteninhalte verändern.
-5. Prüfen Sie in den Entwicklerwerkzeugen, ob Fehler beim Laden der externen Ressourcen auftreten.
-
-Da der Chat über eine externe Adresse antwortet, kann ein fehlender oder eingeschränkter Internetzugang die Antwort verhindern.
+Die Seite lädt die Schriftart „Inter“ von Google Fonts. Damit stellt die Seite eine Verbindung zu einem Drittanbieter her. Weitere Datenschutzbestimmungen, etwa ein Impressum oder eine Datenschutzerklärung, sind im gekürzten Auszug nicht erkennbar.
 
 ---
 
-## 7.3 Eine Chat-Nachricht wird nicht gesendet
+## 9. Barrierefreiheit und mobile Nutzung
 
-1. Stellen Sie sicher, dass das Eingabefeld nicht leer ist.
-2. Prüfen Sie, ob die Nachricht höchstens 1800 Zeichen lang ist.
-3. Klicken Sie direkt auf den runden Senden-Button.
-4. Warten Sie, falls der Button während einer laufenden Anfrage deaktiviert ist.
-5. Prüfen Sie die Internetverbindung.
+### 9.1 Tastaturbedienung
 
-Bei einer längeren Netzwerkunterbrechung kann die laufende Anfrage fehlschlagen. Im gekürzten Quellcode ist nicht erkennbar, ob nach einem Fehler automatisch eine erneute Anfrage erfolgt.
+- Das Chat-Eingabefeld ist erforderlich und auf 1.800 Zeichen begrenzt.
+- Der Senden-Button besitzt eine sprechende Beschriftung.
+- Der Schließen-Button besitzt die Beschriftung **„Chat schließen“**.
+- Die öffnende Schaltfläche besitzt die Beschriftung **„Kundensupport öffnen“**.
+- Der Chatbereich verwendet `aria-live="polite"`, damit neue Antworten assistiven Technischen Systemen gemeldet werden können.
+- Die Reduzierung von Animationen wird bei entsprechender Browsereinstellung berücksichtigt.
+
+### 9.2 Mobile Darstellung
+
+Bis zu einer Breite von 1.000 Pixeln werden die beiden großen Karten untereinander angezeigt.
+
+Für den Chat gilt:
+
+- Bis 480 Pixel Breite nutzt er fast die gesamte Bildschirmbreite.
+- Das Chatfenster bleibt auf kleinen Bildschirmen nach oben und rechts mit einem kleinen Abstand positioniert.
+- Der Editor und die Ausgabe benötigen auf mobilen Geräten weiterhin horizontales Scrollen, falls Zeilen oder Codeblöcke zu breit sind.
 
 ---
 
-## 7.4 Der Chat bleibt bei der Statusanzeige stehen
+## 10. Typische Probleme und Fehlerbehebung
 
-Das kann auf eine fehlende oder unterbrochene Netzwerkverbindung h
+### 10.1 Der Chat lässt sich nicht öffnen
+
+1. Prüfen Sie, ob die grüne Smiley-Schaltfläche unten rechts sichtbar ist.
+2. Klicken Sie direkt auf das Symbol.
+3. Laden Sie die Seite neu, falls das Fenster nicht erscheint.
+4. Prüfen Sie in den Entwicklerwerkzeugen, ob die Elemente `lamac-ai-open` und `lamac-ai-window` vorhanden sind.
+
+### 10.2 Der Chat öffnet sich, antwortet aber nicht
+
+Mögliche Ursache: Die Verbindung zum externen Support-Dienst ist nicht verfügbar oder wird blockiert.
+
+1. Prüfen Sie Ihre Internetverbindung.
+2. Öffnen Sie die Website in einem anderen aktuellen Browser.
+3. Prüfen Sie, ob Inhalte von Drittanbietern oder Skripte blockiert werden.
+4. Wiederholen

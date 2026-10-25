@@ -2,331 +2,336 @@
 <!-- source-path: Live-WEBcam -->
 <!-- source-files: ["Live-WEBcam/index.html"] -->
 
-# Live-WEBcam
+# Live-WEBcam – Support-Dokumentation
 
-**Vermuteter Zweck:** Live-Ansicht einer Webcam beziehungsweise einer per Browser erreichbaren Kamera über eine WebRTC-Verbindung. Die Seite bietet außerdem einen Code zur Eingabe und einen KI-gestützten Kundenservice-Chat an.  
-**Quellcode-Pfad:** `Live-WEBcam`  
-**Datum der Erstellung:** 21. Mai 2026
+**Website-Name:** Live-WEBcam  
+**Vermuteter Zweck:** Anzeige und Steuerung einer Live-Webcam beziehungsweise eines Live-Video-Streams über eine browserbasierte Oberfläche.  
+**Quellcode-Pfad:** `Live-WEBcam/index.html`  
+**Datum der Erstellung:** 18. März 2026
 
-> **Hinweis zur Quellcodebasis:** Die bereitgestellten Auszüge sind unvollständig und teilweise in einer fremden Textformatierung eingebettet. Die nachfolgende Dokumentation beschreibt ausschließlich Funktionen, die im sichtbaren Quellcode eindeutig erkennbar sind. Nicht vollständig sichtbare Bereiche werden ausdrücklich als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
+> Der vorliegende Quellcode ist gekürzt. Diese Dokumentation beschreibt ausschließlich Funktionen, die im bereitgestellten Auszug eindeutig erkennbar sind. Weitere Abläufe werden ausdrücklich als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
 
 ---
 
-## 1. Überblick
+## 1. Zweck und Umfang
 
-„Live-WEBcam“ ist eine deutschsprachige Single-Page-Anwendung mit folgenden bestätigten Bestandteilen:
+Live-WEBcam ist eine einzelne HTML-Seite mit einer deutschsprachigen Oberfläche. Im sichtbaren Grundlayout sind folgende Bestandteile vorgesehen:
 
-- Kopfbereich mit Logo, dem Titel „lamacOs — Live Kamera“ und einem Schalter für ein helles oder dunkles Erscheinungsbild
-- Startansicht mit einer großen Überschrift und Schaltflächen
-- Eingabemöglichkeit für einen Verbindungscode
-- Anzeige eines Live-Videos
-- Statusanzeigen für Verbindungszustände
-- Schaltflächen zum Aufbau und Beenden einer Verbindung
-- Eingebetteter KI-Support-Chat mit der Bezeichnung „lamacHub Kundenservice“
-- Fußbereich
+- eine Kopfleiste,
+- eine Umschaltmöglichkeit zwischen hellem und dunklem Erscheinungsbild,
+- mehrere wechselnde Ansichten beziehungsweise Bereiche,
+- eine Videoanzeige,
+- eine Eingabe für einen Zugangscode,
+- Statusmeldungen,
+- Bedienbuttons und
+- einen KI-gestützten Kundenservice-Chat.
 
-Die genaue technische Einbindung der Webcam, das verwendete WebRTC-Signalisierungsverfahren sowie die Bedeutung aller angezeigten Codes sind im vorliegenden Auszug **nicht eindeutig erkennbar**.
+Die einzelnen Ansichten werden über die Klasse `active` geschaltet. Der Quellcode-Auszug enthält diesbezüglich die Grundlogik, jedoch nicht den vollständigen JavaScript-Teil.
 
 ---
 
 ## 2. Voraussetzungen
 
-### 2.1 Bestätigte technische Voraussetzungen
+### 2.1 Technische Voraussetzungen
 
-Für die dargestellten Funktionen gelten folgende Anforderungen:
+Für die vollständig dargestellten Browserfunktionen werden benötigt:
 
-- Ein aktueller Browser mit Unterstützung für WebRTC beziehungsweise `RTCPeerConnection`
-- Zugriff auf eine Kamera und ein Mikrofon, sofern die Kameraübertragung Audio enthalten soll
-- Für die Bildschirmdarstellung beziehungsweise Aufnahme muss der Browser die entsprechenden Berechtigungen erlauben
-- Eine erreichbare Netzwerkverbindung
-- JavaScript muss im Browser aktiviert sein
-- Für die automatisch geladene Schrift werden externe Google-Fonts-Ressourcen verwendet. Die Kernfunktionen sind jedoch nicht zwingend an das erfolgreiche Laden dieser Schrift gebunden.
+- ein aktueller Browser mit Unterstützung für HTML5-Video,
+- JavaScript,
+- CSS-Unterstützung für benutzerdefinierte Eigenschaften und `data-theme`,
+- eine Internetverbindung für den externen Schriftarten-Import und den externen KI-Dienst,
+- für die Live-Kamera Verbindung zu einem Video- oder Stream-Server.
 
-### 2.2 Berechtigungen
+### 2.2 Kamera- und Geräterrechte
 
-Je nach verwendetem Browser kann der Besucher eine Bestätigung für folgende Berechtigungen erhalten:
+Eine Live-Kamera kann je nach Browser und Betriebssystem eine Berechtigung zur Kameranutzung verlangen. Der vorliegende Auszug zeigt jedoch keinen vollständigen Ablauf für das Anfordern oder Ablehnen dieser Berechtigung. Der Umgang mit diesen Berechtigungen ist daher **im Quellcode nicht eindeutig erkennbar**.
 
-- Kamerazugriff
-- Mikrofonzugriff
-- gegebenenfalls Bildschirmaufnahme
+### 2.3 Zugangscode
 
-Die genaue Reihenfolge der Berechtigungsabfragen und die Zuordnung zum jeweiligen Bedienschritt sind **im Quellcode nicht eindeutig erkennbar**.
-
-> **Sicherheitshinweis:** Der Quellcode enthält die Adresse eines externen KI-Dienstes. Diese Adresse wird hier aus Sicherheitsgründen nicht vollständig wiedergegeben. Ob dort sensible Unterlagen oder personenbezogene Daten verarbeitet werden, ist **im Quellcode nicht eindeutig erkennbar**.
+Die Oberfläche enthält ein Eingabefeld für einen Code. Ob dieser Code für die Kamera, für den Stream oder für eine andere Autorisierung benötigt wird, ist im gekürzten Auszug **nicht eindeutig erkennbar**.
 
 ---
 
-# 3. Sichtbare Bereiche der Website
+## 3. Sichtbare Bereiche der Website
 
-## 3.1 Navigationsleiste
+### 3.1 Kopfleiste
 
-Im oberen Seitenbereich befindet sich eine sticky Navigationsleiste. Sie bleibt beim Scrollen sichtbar.
+Die Kopfleiste bleibt beim Scrollen sichtbar. Sie enthält:
 
-Bestätigte Elemente:
+- ein Logo,
+- den Titel **„lamacOs — Live Kamera“** beziehungsweise eine entsprechende Kopfleisten-Beschriftung,
+- einen Button zum Wechseln des Erscheinungsbilds.
 
-- ein Logobild mit dem Dateinamen `navbar-logo`
-- der Seitentitel „lamacOs — Live Kamera“
-- ein Umschalter mit einem Sonnen-/Mond-Symbol
+Der Theme-Button besitzt keinen sichtbaren Text, sondern wird über ein Symbol gesteuert. Seine genaue Beschriftung und der Ablauf beim Umschalten sind im gekürzten Quellcode nicht vollständig enthalten.
 
-Der sichtbare Titel verwendet nicht unmittelbar den Namen „Live-WEBcam“, sondern **„lamacOs — Live Kamera“**.
+**Bestätigt:** Die Seite unterstützt ein helles und ein dunkles Farbschema.  
+**Vermutung:** Das Symbol oder der Button-Zustand zeigt den aktuellen Modus an. Dies ist im Auszug nicht vollständig erkennbar.
 
-### Helles und dunkles Erscheinungsbild
+### 3.2 Start- und Verbindungsansicht
 
-1. Klicken Sie auf das Sonnen-/Mond-Symbol in der Navigationsleiste.
-2. Die Seite wechselt zwischen einem hellen und einem dunklen Farbschema.
+Die Seite verwendet getrennte Abschnitte mit der Klasse `section`. Nur der Abschnitt mit der Klasse `active` wird dargestellt.
 
-Der Quellcode enthält Farbdefinitionen für beide Modi. Ob die Auswahl dauerhaft gespeichert wird, ist **im Quellcode nicht eindeutig erkennbar**.
+Vorgesehen sind:
 
----
+- eine Überschrift,
+- eine Gruppe orangefarbener Schaltflächen,
+- einen Eingabebereich,
+- eine hervorgehobene Codeanzeige,
+- eine Statuszeile,
+- einen Videobereich und
+- weitere Bedienbuttons.
 
-## 3.2 Hauptbereich
+Die konkreten sichtbaren Beschriftungen und die Zuordnung der Buttons zu den Ansichten sind im gekürzten Auszug nicht vollständig enthalten.
 
-Der Hauptbereich ist in mehrere gegenseitig sichtbare Abschnitte aufgebaut. Standardmäßig wird jeweils nur der aktive Abschnitt angezeigt.
+### 3.3 Codeanzeige
 
-Die genaue Reihenfolge und die vollständigen sichtbaren Beschriftungen der Schaltflächen sind im gekürzten Auszug **nicht eindeutig erkennbar**. Erkennbar sind:
+Im Quellcode ist ein Bereich mit der Klasse `code-display` vorgesehen. Er enthält:
 
-- eine Startansicht mit Schaltflächen
-- eine Eingabeseite mit einem Textfeld
-- eine Videoseite mit einem HTML-`<video>`-Element
-- Statusanzeigen
-- Steuerbuttons
-- eine hervorgehobene Codeanzeige
+- einen erklärenden Text,
+- einen größeren Code in Monospace-Darstellung.
 
----
+Die konkrete Überschrift und der genaue Zweck der Codeanzeige sind **im Quellcode nicht eindeutig erkennbar**.
 
-## 3.3 Codeanzeige
+### 3.4 Eingabefeld
 
-Die Webcam-Seite enthält ein orange umrandetes Anzeigefeld mit:
+Das zentrale Eingabefeld besitzt folgende Eigenschaften:
 
-- einem kurzen erläuternden Text
-- einem großen alphanumerischen Code in Monospace-Schrift
+- große Breite,
+- zentrierte Schrift,
+- Großschreibung durch `text-transform: uppercase`,
+- Zeichenabstand,
+- hervorgehobenen Rahmen beim Fokussieren.
 
-Die CSS-Regeln formatieren den Code mit Großbuchstaben und zusätzlichem Abstand zwischen den Zeichen. Ob der Code statisch vorbelegt, dynamisch erzeugt oder vom Server bezogen wird, ist **im Quellcode nicht eindeutig erkennbar**.
+Es wird in Großbuchstaben dargestellt. Ob die Eingabe technisch in Großbuchstaben umgewandelt oder nur optisch dargestellt wird, ist im Auszug **nicht eindeutig erkennbar**.
 
----
+### 3.5 Statusanzeige
 
-## 3.4 Eingabefeld
+Die Statusanzeige verwendet die Klassen:
 
-Es steht ein zentriertes Textfeld mit folgenden Eigenschaften zur Verfügung:
+- `status` für den normalen Zustand,
+- `status connecting` für einen Verbindungsaufbau,
+- `status connected` für eine bestehende Verbindung,
+- `status error` für einen Fehlerzustand.
 
-- breite, dominante Darstellung
-- Großbuchstaben durch `text-transform: uppercase`
-- Eingaben werden mit zusätzlichem Zeichenabstand dargestellt
-- oranges Rahmen- und Fokusverhalten
-- geeignet für einen alphanumerischen Verbindungscode
+Die Farben unterscheiden die Zustände optisch:
 
-Ob nur Zahlen, Großbuchstaben, Bindestriche oder weitere Zeichen erlaubt sind, ist im Auszug **nicht eindeutig erkennbar**.
+- neutral für den Standardzustand,
+- Gelb/Orange für „connecting“,
+- Grün für „connected“,
+- Rot für „error“.
 
----
+Der genaue Text, der in den einzelnen Zuständen angezeigt wird, ist im gekürzten Quellcode nicht vollständig erkennbar.
 
-## 3.5 Videoanzeige
+### 3.6 Videoanzeige
 
-Die Videoseite enthält ein `<video>`-Element in einer abgerundeten Karte. Vorgesehen sind:
+Der Videobereich ist als HTML5-`video`-Element angelegt. Er besitzt:
 
-- schwarzer Hintergrund
-- responsive Breite
-- mindestens 200 Pixel Höhe
-- Anzeige des entfernten oder lokalen Livebilds
+- eine responsive Breite,
+- einen schwarzen Hintergrund,
+- eine Mindesthöhe,
+- eine Einbettung in eine Karte mit Rahmen und Schatten.
 
-Im gekürzten Quellcode ist nicht eindeutig erkennbar:
+Eine konkrete Stream-URL, ein sichtbarer „Play“-Button oder eine vollständige Fehlerbehandlung für das Video sind im Auszug **nicht eindeutig erkennbar**.
 
-- ob Ton wiedergegeben wird,
-- ob Vollbild verfügbar ist,
-- ob ein Standbild oder eine Aufnahme erstellt werden kann,
-- welche Auflösung oder Bildrate verwendet wird,
-- ob das Video automatisch startet,
-- welche genauen Browserbedingungen für die Wiedergabe gelten.
+### 3.7 Kundenservice-Chat
 
----
+Unten rechts befindet sich ein runder Button mit einem Chat-Symbol. Beim Öffnen erscheint ein Chat-Fenster mit der Überschrift:
 
-## 3.6 Statusanzeige
+- **„lamacHub Kundenservice“**
+- **„KI-gestützter Support“**
 
-Für die Verbindung sind Statusklassen definiert:
+Der Chat enthält:
 
-- `connecting` – orange
-- `connected` – grün
-- `error` – rot
+- ein Eingabefeld mit dem Platzhalter **„Nachricht schreiben …“**,
+- einen runden Senden-Button,
+- einen initialen Begrüßungstext,
+- einen Scrollbereich für den Chatverlauf,
+- eine animierte Eingabeanzeige während der Verarbeitung.
 
-Die Statusanzeige wird linksseitig mit einer farbigen Linie hervorgehoben. Der genaue Text der einzelnen Zustände ist im vorliegenden Auszug nicht vollständig sichtbar.
-
----
-
-## 3.7 Steuerbuttons
-
-Ein Bereich für Steuerbuttons ist vorhanden. Im CSS wird eine vertikale Anordnung vorgesehen.
-
-Die genauen Beschriftungen und Funktionen der Buttons sind im gekürzten Quellcode **nicht eindeutig erkennbar**. Vermutlich gehören sie zu Aufbau, Trennen oder Beenden der Verbindung. Diese Zuordnung ist eine **begründete Vermutung**, aber nicht vollständig bestätigt.
+Die Nachrichteneingabe ist auf 1.800 Zeichen begrenzt und als Pflichtfeld gekennzeichnet.
 
 ---
 
-## 3.8 KI-Support-Chat
+## 4. Bedienung Schritt für Schritt
 
-Am rechten unteren Bildschirmrand befindet sich ein runder grüner Button mit einem Chat-Symbol.
+### 4.1 Seite öffnen
 
-### Chat öffnen
+1. Öffnen Sie die Website beziehungsweise die Datei `Live-WEBcam/index.html`.
+2. Prüfen Sie, ob die Kopfleiste mit Logo und Titel geladen wurde.
+3. Warten Sie auf die zunächst sichtbare Ansicht.
 
-1. Klicken Sie auf den grünen runden Button am rechten unteren Rand.
-2. Das Chatfenster „lamacHub Kundenservice“ öffnet sich.
-3. Die Begrüßung lautet: „Hallo! Wie kann ich dir weiterhelfen?“
+Falls die Seite vollständig leer bleibt, sollte die Datei über einen Webserver oder in einem normalen Browserfenster geöffnet werden. Das Verhalten beim direkten Öffnen über das Dateisystem ist im gekürzten Quellcode nicht vollständig dokumentiert.
 
-### Chat verwenden
+### 4.2 Erscheinungsbild wechseln
 
-1. Tippen Sie Ihre Frage in das Feld „Nachricht schreiben …“.
-2. Senden Sie die Nachricht über den Pfeilbutton.
-3. Ihre Eingabe erscheint als grüne Sprechblase auf der rechten Seite.
-4. Während eine Antwort verarbeitet wird, ist eine animierte Tippanzeige sichtbar.
-5. Die Antwort erscheint als weiße Sprechblase.
+1. Klicken Sie in der Kopfleiste auf den Button zur Theme-Umschaltung.
+2. Die Seite wechselt zwischen dem hellen und dem dunklen Farbschema.
+3. Beachten Sie, dass Hintergrund, Text, Karten und Rahmen gemeinsam umgestellt werden.
 
-Bestätigte Eigenschaften:
+Die genaue technische Speicherung der Auswahl ist **im Quellcode nicht eindeutig erkennbar**. Ein Neuladen kann daher die Einstellung zurücksetzen.
 
-- maximal 1800 Zeichen pro Nachricht
-- Pflichtfeld
-- kein Browser-Autoverlauf für das Eingabefeld
-- Chatverlauf kann über die Tastatur gelesen werden
-- Antworten werden als kontrolliertes HTML mit Markdown-Formatierungen dargestellt
-- das Chatfenster ist auf kleinen Bildschirmen fast vollständig breit
+### 4.3 Verbindung beziehungsweise Stream starten
 
-### Chat schließen
+Der vollständige Ablauf ist im gekürzten Auszug nicht enthalten. Erkennbar ist jedoch:
 
-Klicken Sie oben rechts im Chatfenster auf **„×“**. Der Button besitzt die Barrierefreiheitsbezeichnung „Chat schließen“.
+1. Auf der Startseite befindet sich eine Schaltflächengruppe.
+2. Über die Buttons wird vermutlich zwischen den Ansichten gewechselt oder eine Verbindung aufgebaut.
+3. Der Status wechselt optisch zwischen Verbindungsaufbau, erfolgreicher Verbindung und Fehlerzustand.
+4. Nach erfolgreicher Verbindung wird der Videobereich eingeblendet.
 
-### Unterstützte Darstellung in Antworten
+Die genaue Bezeichnung des zu klickenden Buttons sowie die Reihenfolge der Schritte sind **im Quellcode nicht eindeutig erkennbar**. Es werden daher keine nicht bestätigten Beschriftungen als Bedienanleitung verwendet.
 
-Für KI-Antworten sind folgende Formatierungen gestylt:
+### 4.4 Code eingeben
 
-- Überschriften
-- Absätze
-- Listen
-- Tabellen
-- Links
-- Codeblöcke
-- Zitate
-- horizontale Trennlinien
+1. Klicken Sie in das Eingabefeld im mittleren Bereich der Seite.
+2. Geben Sie den benötigten Code ein.
+3. Bestätigen Sie die Eingave mit der Taste **Enter** oder über die daneben vorgesehene Bedienung.
+4. Beobachten Sie die Statusanzeige unterhalb des Eingabefelds.
 
-Die Anwendung versucht, HTML aus der Antwort vor der Darstellung zu escapen und anschließend kontrolliertes HTML zu erzeugen. Das reduziert das Risiko einer direkten HTML-Injektion.
+Welche Validierungsregeln für den Code gelten und ob die Eingabe lokal oder an einen Server übertragen wird, ist **im Quellcode nicht eindeutig erkennbar**.
 
-### Verhalten bei fehlender Netzwerkverbindung
+### 4.5 Livebild verwenden
 
-Der Chat sendet Anfragen an einen externen Dienst. Bei Netzwerk- oder Serverproblemen ist im gekürzten Auszug nicht vollständig erkennbar, welche Fehlermeldung erscheint. Vermutlich wird ein roter Status angezeigt; dies ist **nicht eindeutig bestätigt**.
+1. Stellen Sie sicher, dass die Statusanzeige einen erfolgreichen Verbindungszustand anzeigt.
+2. Prüfen Sie, ob im Videobereich ein Bild erscheint.
+3. Verwenden Sie gegebenenfalls die nativen Browser-Steuerelemente des Videoelements.
 
----
+Ob Ton, Vollbild, Pause, Aufnahme, Zoom oder Bildschirmfreigabe angeboten werden, ist im Auszug **nicht eindeutig erkennbar**.
 
-## 3.9 Fußbereich
+### 4.6 KI-Support öffnen
 
-Im unteren Seitenbereich befindet sich ein Footer mit zentriertem, kleiner gedrucktem Text.
+1. Klicken Sie unten rechts auf den runden Button mit dem Chat-Symbol.
+2. Das Fenster **„lamacHub Kundenservice“** öffnet sich.
+3. Lesen Sie die Begrüßung im Chatverlauf.
+4. Tippen Sie Ihre Frage in das Feld **„Nachricht schreiben …“**.
+5. Klicken Sie auf den runden Senden-Button oder drücken Sie **Enter**.
+6. Während die Antwort verarbeitet wird, erscheint eine animierte Eingabeanzeige.
+7. Die Antwort wird unter Ihrer Nachricht im Chat angezeigt.
 
-Der konkrete Footer-Text ist im Auszug nicht eindeutig lesbar.
+### 4.7 Chat schließen
 
----
-
-# 4. Typischer Bedienungsablauf
-
-Der genaue Ablauf ist wegen des gekürzten Quellcodes nur teilweise bestätigt. Das folgende Vorgehen beschreibt die erkennbare Struktur.
-
-## 4.1 Seite öffnen
-
-1. Öffnen Sie die Website in einem aktuellen Browser.
-2. Prüfen Sie, ob die Startansicht mit den angeboten Schaltflächen erscheint.
-3. Falls gewünscht, wechseln Sie über das Sonnen-/Mond-Symbol die Darstellung.
-
-## 4.2 Eine Verbindung vorbereiten
-
-1. Wählen Sie auf der Startseite die Schaltfläche, die zum Eingeben oder Verbinden einer Kamera führt.
-2. Geben Sie den angeforderten Code in das Textfeld ein.
-3. Prüfen Sie das Eingabefeld auf Tippfehler.
-4. Bestätigen Sie die Verbindung mit der dafür vorgesehenen Schaltfläche.
-
-Die genaue Bezeichnung der relevanten Schaltflächen ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
-
-## 4.3 Livebild ansehen
-
-1. Beobachten Sie die Statusanzeige unterhalb des Eingabefeldes.
-2. Warten Sie auf den Status „Verbunden“ oder eine entsprechend grün dargestellte Statusmeldung.
-3. Das Videobild erscheint in der Videokarte.
-4. Falls das Bild nicht startet, prüfen Sie die Hinweise unter „Fehlerbehebung“.
-
-## 4.4 Verbindung beenden
-
-1. Verwenden Sie im Steuerbereich die Schaltfläche, die dem Trennen oder Beenden zugeordnet ist.
-2. Warten Sie, bis die Statusanzeige den neuen Zustand meldet.
-3. Verlassen Sie die Seite nur, wenn keine laufende Verbindung mehr benötigt wird.
-
-Die sichtbare Button-Beschriftung ist im Auszug **nicht eindeutig erkennbar**.
+1. Klicken Sie oben rechts im Chat-Fenster auf das **„×“**.
+2. Das Chat-Fenster wird ausgeblendet.
+3. Über den Chat-Button können Sie es erneut öffnen.
 
 ---
 
-# 5. Eingaben und Ausgaben
+## 5. Eingaben und Ausgaben
 
-## 5.1 Verbindungscode
+### 5.1 Zugangscode
 
-**Eingabe:** alphanumerischer Code im zentralen Textfeld.  
-**Ausgabe:** vermutlich eine WebRTC-Verbindung mit anschließender Videoanzeige.
+**Eingabe:** Der Besucher gibt einen Text in das zentrale Eingabefeld ein.  
+**Ausgabe:** Die Statusanzeige meldet den jeweiligen Verbindungszustand.
 
-Bestätigt ist, dass das Eingabefeld existiert und die Oberfläche Codes in hervorgehobener Form darstellt. Ob das System einen Code eingibt, empfängt oder gegen einen Server prüft, ist **im Quellcode nicht eindeutig erkennbar**.
+**Im Quellcode nicht eindeutig erkennbar:**
 
-## 5.2 Kamerabild
+- erlaubte Zeichen und Format,
+- maximale Länge des Zugangscodes,
+- Prüfung des Codes,
+-目的地 beziehungsweise Zielsystem der Übertragung,
+- Speicherung des Codes.
 
-**Eingabe:** Berechtigter Zugriff auf eine Webcam oder eine externe Kameraquelle.  
-**Ausgabe:** Livebild im Videoelement.
+### 5.2 Support-Nachricht
 
-## 5.3 Support-Nachricht
+**Eingabe:** Eine Textnachricht mit maximal 1.800 Zeichen.  
+**Ausgabe:** Die Nachricht erscheint als grünes Chatfenster. Anschließend wird eine KI-Antwort dargestellt.
 
-**Eingabe:** Text mit bis zu 1800 Zeichen.  
-**Ausgabe:** formatierte Antwort des KI-Supports.
+Der Quellcode enthält eine externe Worker-Adresse. Diese wird aus Sicherheitsgründen hier nicht wiedergegeben. Es handelt sich um eine technische Dienstadresse; ein API-Schlüssel oder ein vergleichbarer Geheimniswert ist im sichtbaren Auszug nicht enthalten.
 
-Der Code enthält keine sichtbare Möglichkeit, den Support-Chat zu anonymisieren, die Übertragung eines Chats zu deaktivieren oder den Gesprächsverlauf zu löschen. Eine solche Funktion ist **im Quellcode nicht eindeutig erkennbar**.
+### 5.3 Video
 
----
+**Eingabe:** Eine externe oder intern bereitgestellte Videoquelle.  
+**Ausgabe:** Ein Livebild beziehungsweise eine Videosequenz im zentralen Videobereich.
 
-# 6. Datenschutz und Berechtigungen
-
-## 6.1 Kamera- und Mikrofonzugriff
-
-Eine Webcam-Anwendung benötigt üblicherweise eine ausdrückliche Browserberechtigung. Diese Website fordert Kamera- beziehungsweise Mikrofonzugriff an; der genaue Ablauf ist im gekürzten Code jedoch nicht vollständig sichtbar.
-
-Besucher sollten darauf achten,:
-
-- die Berechtigungsabfrage nur bei einer vertrauenswürdigen Seite zu bestätigen,
-- Kamera- und Mikrofonzugriff in den Browser-Einstellungen wieder deaktivieren zu können,
-- keine Aufnahme zu starten, bevor Einwilligungen und Zweck klar sind.
-
-## 6.2 Externe Schrift
-
-Die Website lädt Inter über Google Fonts. Beim Aufruf können dadurch technische Verbindungsdaten an einen externen Dienst bekannt werden. Für die Kernfunktion der Webcam ist diese Schrift nicht zwingend erforderlich.
-
-## 6.3 KI-Support
-
-Der Support-Chat überträgt Nachrichten an einen externen KI-Dienst. Im Quellcode ist nicht eindeutig erkennbar:
-
-- welche Daten neben der Nachricht übertragen werden,
-- ob der Gesprächsverlauf serverseitig gespeichert wird,
-- wie lange Daten gespeichert werden,
-- ob eine Einwilligung vor der ersten Nutzung erforderlich ist,
-- ob der Nutzer den Chatverlauf löschen kann.
-
-Daher sollten im Support-Chat keine unnötigen personenbezogenen Daten, geheimen Zugangsdaten, Passwörter oder Tokens angegeben werden.
-
-## 6.4 Fehlende Lösch- und Einstellungsfunktionen
-
-Im sichtbaren Quellcode ist kein eigener Bereich für Datenschutzeinstellungen, Chatlöschung oder Widerruf der Kamerafreigabe erkennbar. Solche Funktionen können im nicht eingebetteten Teil der Website vorhanden sein; dies ist **im vorliegenden Quellcode nicht eindeutig erkennbar**.
+Die konkrete Quelle und das Protokoll sind im gekürzten Auszug **nicht eindeutig erkennbar**.
 
 ---
 
-# 7. Typische Probleme und Fehlerbehebung
+## 6. Kundenservice-Chat im Detail
 
-## 7.1 Die Live-Webcam bleibt schwarz
+### 6.1 Chatverlauf
 
-### Mögliche Ursachen
+Der Verlauf besitzt:
 
-- Kamerafreigabe wurde nicht erteilt.
-- Die Kamera wird bereits von einer anderen Anwendung verwendet.
-- Der Browser blockiert die WebRTC-Verbindung.
-- Der eingegebene Code ist falsch oder unvollständig.
-- Die verbindliche Gegenstelle ist nicht erreichbar.
-- Das Videoformat oder die Browserbedingungen werden nicht unterstützt.
+- eine automatische Scrollfunktion zum Ende,
+- getrennte Darstellungen für Nutzer- und Bot-Nachrichten,
+- Unterstützung für einfache Markdown-Formatierungen,
+- umbrochene Langzeilen,
+- eine Statusanzeige während der Antwortgenerierung.
 
-### Abhilfe
+Bot-Antworten können unter anderem folgende Elemente darstellen:
 
-1. Prüfen Sie, ob die Statusanzeige einen Fehler meldet.
-2. Öffnen Sie die Browser-Berechtigungen für die Website.
-3.
+- Überschriften,
+- Listen,
+- Links,
+- Zitate,
+- Codeblöcke,
+- Tabellen und
+- horizontale Linien.
+
+### 6.2 Sicherheitsverarbeitung
+
+Im Quellcode ist erkennbar, dass eine Bot-Antwort vor der Darstellung in kontrollierte HTML-Elemente umgewandelt wird. Dadurch soll verhindert werden, dass beliebiges HTML ungeprüft eingefügt wird.
+
+Eigene Nachrichten werden dagegen als normaler Text über `textContent` dargestellt.
+
+### 6.3 Chatverlauf und Persistenz
+
+Im sichtbaren JavaScript wird ein lokaler Verlauf für die laufende Sitzung angelegt. Ob Nachrichten:
+
+- dauerhaft gespeichert,
+- beim Neuladen wiederhergestellt,
+- an den Benutzer gebunden oder
+- serverseitig zu einem Konto zugeordnet werden,
+
+ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
+
+---
+
+## 7. Typische Probleme und Fehlerbehebung
+
+### 7.1 Das Video bleibt schwarz
+
+**Mögliche Ursachen:**
+
+- Die Verbindung wurde noch nicht erfolgreich aufgebaut.
+- Die Statusanzeige befindet sich noch in einem Verbindungs- oder Fehlerzustand.
+- Die Videoquelle ist nicht erreichbar.
+- Der Browser blockiert den benötigten Stream- oder Medienzugriff.
+- Kamera- oder Geräteberechtigungen wurden nicht erteilt.
+
+**Prüfung in dieser Reihenfolge:**
+
+1. Lesen Sie die Statusmeldung.
+2. Starten Sie die Verbindung beziehungsweise den Stream über die dafür vorgesehene Schaltfläche erneut.
+3. Prüfen Sie, ob das Video nach einem Neuladen der Seite erscheint.
+4. Prüfen Sie die Browser-Berechtigungen für Kamera beziehungsweise Medienzugriff.
+5. Testen Sie die Seite in einem aktuellen Browser.
+6. Prüfen Sie, ob eine Firewall oder ein Netzwerkfilter die benötigte Verbindung blockiert.
+
+Die genaue Fehlermeldung und ein vollständiger Wiederherstellungsablauf sind im gekürzten Auszug **nicht eindeutig erkennbar**.
+
+### 7.2 Die Statusanzeige zeigt einen Fehler
+
+1. Notieren Sie sich den angezeigten Fehlertext.
+2. Starten Sie den Verbindungsversuch erneut.
+3. Prüfen Sie, ob der eingegebene Code vollständig und korrekt ist.
+4. Prüfen Sie die Internetverbindung.
+5. Lassen Sie die Seite neu laden und versuchen Sie es erneut.
+
+Ein Code-Fehler ist eine plausible Vermutung, wird im gekürzten Quellcode aber nicht ausdrücklich als Ursache genannt.
+
+### 7.3 Der Code wird nicht angenommen
+
+1. Klicken Sie direkt in das Eingabefeld.
+2. Entfernen Sie Leerzeichen vor und nach der Eingabe.
+3. Prüfen Sie die sichtbare Schreibweise.
+4. Versuchen Sie die Eingabe erneut.
+
+Weitere Formatregeln sind **im Quellcode nicht eindeutig erkennbar**.
+
+### 7.4 Der Chat öffnet sich nicht
+
+1. Prüfen Sie, ob JavaScript im Browser aktiviert ist.
+2. Klicken Sie auf den runden Button unten rechts.
+3. Falls die Seite über
