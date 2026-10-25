@@ -2,388 +2,333 @@
 <!-- source-path: Live-World -->
 <!-- source-files: ["Live-World/index.html"] -->
 
-# Live-World – Support-Dokumentation
+# Live Welt – Support-Dokumentation
 
-**Website:** Live-World  
-**Vermuteter Zweck:** Live-World ist eine einzelne Dashboard-Seite, die verschiedene Welt- und Technologiewerte in Form von Kennzahlen anzeigt. Einige Werte werden im Browser fortlaufend berechnet, andere stammen aus öffentlichen APIs. Zusätzlich ist ein KI-gestützter Kundensupport-Chat integriert.  
+**Website:** Live Welt  
+**Vermuteter Zweck:** Darstellung eines Live-Dashboards mit weltweiten Bevölkerungs-, Kommunikations-, Umwelt-, Verkehrs-, Weltraum- und Finanzkennzahlen sowie einem integrierten KI-gestützten Kundenservice.  
 **Quellcode-Pfad:** `Live-World/index.html`  
-**Datum der Erstellung:** 25. März 2026
+**Datum der Erstellung:** 24. März 2026
+
+> **Hinweis zur Quellcode-Grundlage:** Die Dokumentation basiert auf dem bereitgestellten Auszug aus `Live-World/index.html`. Der Auszug kann unvollständig sein. Funktionen, Datenherkünfte und Zielgruppen werden deshalb nur dort beschrieben, wo sie im Code erkennbar sind.
 
 ---
 
 ## 1. Überblick
 
-Die Website besteht aus drei sichtbaren Bereichen:
+Live Welt ist eine einzelne HTML-Seite mit zwei zentralen Bereichen:
 
-1. **Kopfbereich mit Logo und Design-Umschalter**
-2. **Dashboard mit 20 Kennzahlenkarten**
-3. **Fest positionierter Kundensupport-Chat**
+1. **Dashboard mit Kennzahlen**
+   - zeigt eine Übersicht über 20 sichtbare Messgrößen;
+   - aktualisiert einen Teil davon sekündlich;
+   - lädt Weltbank-, Kryptowährungs- und Zeitdaten automatisch.
 
-Die Seite ist derzeit ohne Benutzerkonto, Anmeldung oder Registrierung nutzbar. Im Quellcode ist keine Sitzungsverwaltung erkennbar.
+2. **Kundenservice-Chat**
+   - wird über eine schwebende Schaltfläche geöffnet;
+   - übergibt Nachrichten an einen externen KI-Dienst;
+   - zeigt Antworten direkt im Browser an.
+
+Die Seite verwendet eine responsive Kartenansicht. Eine Umschaltfläche in der Kopfzeile wechselt zwischen einem hellen und einem dunklen Erscheinungsbild.
+
+### Bestätigte Hauptmerkmale
+
+- Responsives Layout mit automatisch angepassten Karten.
+- Helle und dunkle Darstellung.
+- Live-Anzeige der UTC-Zeit.
+- Abruf von Internetnutzungsdaten aus der World Bank API.
+- Abruf von Bitcoin- und Ethereum-Preisen aus der CoinGecko API.
+- Integrierter Kundenservice-Chat.
+- Optionale „Zurück“-Schaltfläche, wenn die Seite über eine bestimmte fremde Domain aufgerufen wurde.
 
 ---
 
 ## 2. Voraussetzungen
 
-### Für die Grunnutzung
+### Für die normale Nutzung
 
-- Ein aktueller Browser mit JavaScript-Aktivierung
-- Internetverbindung für die extern abgerufenen Daten
-- Für die korrekte Darstellung der Schrift „Inter“ eine Internetverbindung; andernfalls greift eine Ersatzschrift
+- Ein aktueller Browser mit JavaScript-Unterstützung.
+- Eine Internetverbindung, damit Karten, Schriftarten, Logos und externe Daten geladen werden können.
+- Für vollständige Kryptowährungswerte und die Weltbankzahl ist ein erreichbarer Zugriff auf die verwendeten externen API-Dienste erforderlich.
 
-### Für den Kundensupport-Chat
+### Für den Kundenservice
 
-- Eine erreichbare Verbindung zum externen Support-Dienst
-- Der Chat sendet Nachrichten und den bisherigen Gesprächsverlauf an einen externen Server
+- Eine erreichbare Verbindung zum im Quellcode hinterlegten Chat-Endpunkt.
+- Ein Browser, der `fetch`, `async/await` und moderne JavaScript-Funktionen unterstützt.
 
 ### Nicht erforderlich
 
-- Kein Benutzerkonto
-- Keine Anmeldung
-- Keine Einwilligungsabfrage für das Laden der Dashboard-Daten
+- Im Quellcode ist **keine Anmeldung** vorhanden.
+- Es ist **kein Benutzerkonto** erkennbar.
+- Es werden **keine Zahlungsdaten** abgefragt.
+- Eine Registrierung oder Freigabe von Benutzerrechten ist im bereitgestellten Code nicht erkennbar.
 
 ---
 
-## 3. Sichtbare Bereiche der Website
+## 3. Aufbau der Seite
 
-## 3.1 Kopfbereich
+### 3.1 Kopfzeile
 
-Im Kopfbereich befindet sich links:
+Oben befindet sich eine feste Kopfzeile mit:
 
-- Ein Logo
-- Der Text **„Live Welt“**
+- einem Logo,
+- der Beschriftung **„Live Welt“**,
+- einer Umschaltfläche mit einem Mondsymbol.
 
-Rechts befindet sich eine runde Schaltfläche mit dem Mond-Symbol **„🌗“**.
+Die Kopfzeile bleibt beim Scrollen sichtbar.
 
-Mit dieser Schaltfläche wechselt die Website zwischen einem hellen und einem dunklen Farbschema. Der Text **„🌗“** bleibt dabei unverändert.
+### 3.2 Dashboard
 
-**Bestätigt:** Der Moduswechsel ist vollständig im Quellcode hinterlegt und benötigt keine Serververbindung.
+Darunter folgen Karten mit den sichtbaren Beschriftungen:
 
-## 3.2 Dashboard
+#### Bevölkerung und soziale Kennzahlen
 
-Das Dashboard wird automatisch als Raster dargestellt. Auf breiten Bildschirmen stehen mehrere Kennzahlen nebeneinander; auf schmalen Bildschirmen werden sie untereinander angeordnet.
+- **Weltbevölkerung**
+- **Geburten**
+- **Todesfälle**
+- **Hochzeiten**
+- **Scheidungen**
 
-Die Kennzahlen lauten:
+#### Internet und Kommunikation
 
-### Weltbevölkerung
+- **Internetnutzer**
+- **E-Mails heute**
+- **Google-Suchen**
+- **Instagram-Posts**
+- **Spotify-Streams**
 
-- Anzeige: **„Weltbevölkerung“**
-- Startwert im Browser: `8.100.000.000`
-- Der Wert steigt im Browser jede Sekunde weiter.
+#### Umwelt und Ressourcen
 
-### Geburten
+- **Gefällte Bäume**
+- **Geschmolzenes Eis**
+- **Ölverbrauch**
 
-- Anzeige: **„Geburten“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
+#### Verkehr und Weltraum
 
-### Todesfälle
+- **Autos weltweit**
+- **Satelliten**
+- **Erde–Mond**
+- **Sonnenenergie**
 
-- Anzeige: **„Todesfälle“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
+#### Finanzmärkte und Zeit
 
-### Hochzeiten
+- **Bitcoin**
+- **Ethereum**
+- **UTC Zeit**
 
-- Anzeige: **„Hochzeiten“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-
-### Scheidungen
-
-- Anzeige: **„Scheidungen“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-- Da der Startwert nicht ganzzahlig ist, wird die Anzeige auf ganze Zahlen gerundet. Der sichtbare Wert kann deshalb kurz stagnieren, bevor er steigt.
-
-### Internetnutzer
-
-- Anzeige: **„Internetnutzer“**
-- Der Wert wird aus der Weltbevölkerung und dem prozentualen Anteil der Internetnutzer der Weltbank berechnet.
-- Die World-Bank-Schnittstelle wird beim Laden der Seite aufgerufen.
-
-### E-Mails heute
-
-- Anzeige: **„E-Mails heute“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-
-### Google-Suchen
-
-- Anzeige: **„Google-Suchen“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-
-### Instagram-Posts
-
-- Anzeige: **„Instagram-Posts“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-
-### Spotify-Streams
-
-- Anzeige: **„Spotify-Streams“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-
-### Gefällte Bäume
-
-- Anzeige: **„Gefällte Bäume“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-
-### Geschmolzenes Eis
-
-- Anzeige: **„Geschmolzenes Eis“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-
-### Ölverbrauch
-
-- Anzeige: **„Ölverbrauch“**
-- Startwert: `0`
-- Der Wert steigt jede Sekunde.
-
-### Autos weltweit
-
-- Anzeige: **„Autos weltweit“**
-- Fester Wert: `1.450.000.000`
-
-### Satelliten
-
-- Anzeige: **„Satelliten“**
-- Fester Wert: `8.500`
-
-### Erde–Mond
-
-- Anzeige: **„Erde–Mond“**
-- Fester Wert: `384.400 km`
-
-### Sonnenenergie
-
-- Anzeige: **„Sonnenenergie“**
-- Fester Wert: `173.000 TW`
-
-### Bitcoin
-
-- Anzeige: **„Bitcoin“**
-- Der Preis in US-Dollar wird über eine öffentliche Krypto-Schnittstelle geladen.
-- Aktualisierung beim Laden der Seite und danach jede Minute.
-
-### Ethereum
-
-- Anzeige: **„Ethereum“**
-- Der Preis in US-Dollar wird über dieselbe Schnittstelle geladen.
-- Aktualisierung beim Laden der Seite und danach jede Minute.
-
-### UTC Zeit
-
-- Anzeige: **„UTC Zeit“**
-- Die Uhrzeit wird im Format `HH:MM:SS` angezeigt.
-- Aktualisierung jede Sekunde.
+Die Karten werden abhängig von der verfügbaren Breite in Spalten angeordnet. Auf schmalen Bildschirmen werden sie automatisch untereinander dargestellt.
 
 ---
 
 ## 4. Bedienung Schritt für Schritt
 
-## 4.1 Dashboard aufrufen
+### 4.1 Helle oder dunkle Darstellung wählen
 
-1. Öffnen Sie die Adresse der veröffentlichten Live-World-Seite.
-2. Die Kennzahlenkarten erscheinen automatisch.
-3. Warten Sie kurz, während die Werte aus den externen Schnittstellen geladen werden.
+1. Öffnen Sie die Website.
+2. Klicken Sie oben rechts auf die Schaltfläche mit dem Symbol **🌗**.
+3. Die Website wechselt in die dunkle Darstellung.
+4. Ein erneuter Klick auf dieselbe Schaltfläche stellt die helle Darstellung wieder her.
 
-**Hinweis:** Der Name der Datei `index.html` kann bei einer direkten lokalen Öffnung im Browser funktionieren. Das Laden der externen Daten kann lokal jedoch durch Sicherheitsmechanismen des Browsers oder fehlende Internetverbindung eingeschränkt sein.
+Die Auswahl wird im bereitgestellten Quellcode **nicht dauerhaft gespeichert**. Nach einem Neuladen beginnt die Seite wieder im hellen Modus.
 
-## 4.2 Zwischen hellem und dunklem Design wechseln
+### 4.2 Live-Dashboard beobachten
 
-1. Klicken Sie oben rechts auf die Schaltfläche mit dem Symbol **„🌗“**.
-2. Das gesamte Dashboard wechselt in das dunkle Farbschema.
-3. Ein erneuter Klick auf **„🌗“** stellt das helle Design wieder her.
+1. Öffnen Sie die Website.
+2. Warten Sie, bis die Werte in den Karten erscheinen.
+3. Beobachten Sie die Karten mit dem sekündlichen Update.
+4. Verwenden Sie bei Bedarf die Anzeige **„UTC Zeit“**, um die Weltzeit unabhängig von der lokalen Zeitzone des Geräts zu prüfen.
 
-## 4.3 Den Kundensupport-Chat öffnen
+Die Anzeige **„UTC Zeit“** wird im Quellcode als Abschnitt der UTC-Datumsdarstellung erzeugt. Eine zusätzliche sekundengenaue Anzeige ist dort nicht erkennbar.
 
-1. Klicken Sie rechts unten auf die runde grüne Schaltfläche mit dem Chat-Symbol **„💬“**.
-2. Das Chat-Fenster mit der Überschrift **„lamachub Kundenservice“** öffnet sich.
-3. Unter **„KI-gestützter Support“** erscheint die Begrüßung:
-   > „Hallo! Wie kann ich Ihnen weiterhelfen?“
-4. Klicken Sie in das Feld **„Nachricht schreiben“**.
-5. Geben Sie Ihre Frage ein.
-6. Klicken Sie auf die runde Senden-Schaltfläche **„➤“** oder drücken Sie die Eingabetaste.
-7. Ihre Nachricht erscheint als grüner Chat-Bereich.
-8. Die Antwort des Support-Dienstes erscheint anschließend als weißer Bereich.
+### 4.3 Bitcoin- und Ethereum-Kurse ansehen
 
-**Bestätigt:** Leere Nachrichten werden nicht gesendet.
+1. Öffnen Sie die Website.
+2. Warten Sie auf die Werte in den Karten **„Bitcoin“** und **„Ethereum“**.
+3. Lassen Sie die Seite geöffnet, wenn Sie regelmäßige Aktualisierungen wünschen.
 
-## 4.4 Den Kundensupport-Chat schließen
+Der Quellcode lädt die Kurse beim Öffnen der Seite und anschließend einmal pro Minute neu. Die Werte werden mit einem US-Dollar-Zeichen dargestellt.
 
-1. Klicken Sie oben rechts im Chat-Fenster auf **„×“**.
-2. Das Chat-Fenster wird ausgeblendet.
-3. Die gesendeten Nachrichten bleiben im Browser gespeichert, solange die Seite nicht neu geladen wird.
+### 4.4 Internetnutzerzahl ansehen
+
+1. Öffnen Sie die Website.
+2. Warten Sie, bis die externe Weltbank-Anfrage abgeschlossen ist.
+3. Die Karte **„Internetnutzer“** zeigt anschließend einen berechneten absoluten Wert.
+
+Die Berechnung basiert auf der im Browser verwendeten Bevölkerungszahl und einem Weltbank-Anteil für Internetnutzer. Die genaue Bezugszeit des Weltbank-Anteils ist im Quellcode nicht angegeben.
+
+### 4.5 Kundenservice-Chat öffnen
+
+1. Klicken Sie rechts unten auf die runde grüne Schaltfläche mit einem Chat-Symbol.
+2. Das Chat-Fenster öffnet sich.
+3. Das Eingabefeld ist automatisch fokussiert.
+4. Geben Sie Ihre Frage in das Feld **„Nachricht schreiben“** ein.
+5. Klicken Sie auf die runde Senden-Schaltfläche rechts neben dem Eingabefeld.
+6. Ihre Nachricht erscheint als grüne Sprechblase.
+7. Die Antwort erscheint als weiße Sprechblase.
+
+### 4.6 Kundenservice-Chat schließen
+
+1. Klicken Sie oben rechts im geöffneten Chat-Fenster auf **„×“**.
+2. Das Fenster wird geschlossen.
+3. Der Kundenservice kann über die runde Schaltfläche rechts unten erneut geöffnet werden.
+
+### 4.7 Optionale „Zurück“-Schaltfläche verwenden
+
+Unter bestimmten Bedingungen wird links oben eine zusätzliche orange Schaltfläche mit der Aufschrift **„Zurück“** eingeblendet.
+
+1. Klicken Sie auf **„Zurück“**.
+2. Die Seite navigiert im selben Tab zu `www.lamachub.de`.
+
+Die Schaltfläche wird nur eingeblendet, wenn die Herkunftsseite der eingebetteten Website exakt der im Quellcode genannten HTTPS-Domain entspricht. Wird Live Welt direkt aufgerufen, ist diese Schaltfläche normalerweise nicht sichtbar.
 
 ---
 
 ## 5. Eingaben und Ausgaben
 
-## 5.1 Eingaben
+### 5.1 Manuelle Eingaben
 
-Die Website besitzt nur eine sichtbare Texteingabe:
+| Eingabe | Ort | Verhalten |
+|---|---|---|
+| Chatnachricht | Feld „Nachricht schreiben“ | Wird gekürzt, ohne Leerzeichen gesendet und dem Kundenservice übermittelt. |
+| Modusauswahl | Schaltfläche „🌗“ | Wechselt zwischen hell und dunkel. |
+| Navigation | Schaltfläche „Zurück“ | Öffnet die im Quellcode konfigurierte externe Domain. |
 
-- **„Nachricht schreiben“**
-- Maximale Länge: 1800 Zeichen
-- Leerraum am Anfang und Ende wird entfernt.
+Das Chat-Eingabefeld erlaubt maximal **1.800 Zeichen**. Eine leere oder ausschließlich aus Leerzeichen bestehende Eingabe wird nicht gesendet.
 
-## 5.2 Ausgaben
+### 5.2 Automatisch bezogene Daten
 
-### Dashboard
+| Anzeige | Datenquelle laut Quellcode | Aktualisierung |
+|---|---|---|
+| Internetnutzer | World Bank API | Einmal beim Laden |
+| Bitcoin | CoinGecko API | Beim Laden und alle 60 Sekunden |
+| Ethereum | CoinGecko API | Beim Laden und alle 60 Sekunden |
+| UTC Zeit | Lokale Browserzeit, in UTC umgerechnet | Jede Sekunde |
+| Diverse Zähler | Im Browser fortgeschriebene Startwerte | Jede Sekunde |
+| Autos, Satelliten, Erde–Mond, Sonnenenergie | Fest im Quellcode hinterlegt | Nur beim Laden |
 
-Die Kennzahlen werden als formatierte Zahlen dargestellt. Tausendertrennungen werden automatisch verwendet.
+### 5.3 Chat-Ausgaben
 
-Feste Einheiten werden direkt angezeigt:
-
-- `km` bei **„Erde–Mond“**
-- `TW` bei **„Sonnenenergie“**
-- `$` bei **„Bitcoin“** und **„Ethereum“**
-
-### Chat
-
-- Nutzertexte werden als grüne, rechtsbündige Blöcke dargestellt.
-- Antworten werden als weiße Blöcke dargestellt.
-- Lange Wörter werden innerhalb der Blöcke umgebrochen.
-- Der Chat-Bereich ist scrollbar.
-
----
-
-## 6. Erklärungen zu den angezeigten Werten
-
-## 6.1 Im Browser berechnete Live-Werte
-
-Ein großer Teil der Werte wird direkt im Browser über einen sekündlichen Timer fortgeschrieben. Diese Werte sind keine live abgefragten Weltstatistiken.
-
-**Bestätigt:** Sie entstehen aus festen Ausgangswerten und festen Erhöhungen pro Sekunde.
-
-Die Erhöhungen werden im Browser so behandelt, als würden sie jede Sekunde eintreten. Eine großzügige Bereinigung oder Zeitkorrektur bei inaktiven Tabs ist im Quellcode nicht erkennbar. In diesem Zusammenhang ist außerdem nicht eindeutig erkennbar, ob die angezeigten „Live“-Werte fachlich oder wissenschaftlich belastbar sind.
-
-## 6.2 Extern geladene Werte
-
-### Internetnutzer
-
-Die Seite verwendet den Weltbank-Welt-Datensatz für den prozentualen Anteil der Internetnutzer und multipliziert diesen mit dem im Browser hochgezählten Bevölkerungswert.
-
-**Bestätigt:** Der Wert hängt daher sowohl von der API-Antwort als auch vom aktuellen Browser-Zählerstand ab.
-
-### Bitcoin und Ethereum
-
-Die Preise werden über eine öffentliche Preis-API in US-Dollar geladen. Sie werden minütlich aktualisiert.
-
-**Bestätigt:** Die Karten „Bitcoin“ und „Ethereum“ bleiben bis zum erfolgreichen API-Aufruf zunächst auf dem im HTML hinterlegten Platzhalter.
-
-## 6.3 Fest hinterlegte Werte
-
-„Autos weltweit“, „Satelliten“, „Erde–Mond“ und „Sonnenenergie“ werden direkt aus dem Quellcode gesetzt. Diese Werte können sich nicht selbstständig aktualisieren.
-
----
-
-## 7. Typische Probleme und Fehlerbehebung
-
-## 7.1 Die Werte bleiben auf „...“ stehen
-
-**Ursache:** Die externen Daten wurden noch nicht geladen oder der Abruf ist fehlgeschlagen.
-
-**Mögliche Abhilfe:**
-
-1. Prüfen Sie die Internetverbindung.
-2. Laden Sie die Seite neu.
-3. Beachten Sie, dass nur die folgenden Karten externe Daten benötigen:
-   - **„Internetnutzer“**
-   - **„Bitcoin“**
-   - **„Ethereum“**
-4. Andere Karten sollten unabhängig davon aktualisiert werden.
-
-**Hinweis:** Im Quellcode ist für die World-Bank- und Krypto-API keine eigene Fehlermeldung hinterlegt. Ein Fehlschlag führt dort lediglich dazu, dass der jeweilige Platzhalter sichtbar bleibt.
-
-## 7.2 Der Chat öffnet sich, antwortet aber nicht
-
-**Anzeige im Chat:**
+- Eine Begrüßung: **„Hallo! Wie kann ich Ihnen weiterhelfen?“**
+- Die gesendete Nachricht.
+- Eine KI-Antwort, sofern der externe Dienst erfolgreich antwortet.
+- Bei einem Verbindungs- oder Verarbeitungsfehler:
 
 > „Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.“
 
-**Mögliche Ursachen:**
+Nach der **15. gesendeten Nachricht** wird zusätzlich folgender Hinweis angezeigt:
 
-- Keine oder instabile Internetverbindung
-- Der externe Support-Dienst ist vorübergehend nicht erreichbar
-- Die Antwort des Dienstes ist fehlerhaft oder enthält keine gültigen JSON-Daten
+> „Hinweis: Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.“
 
-**Abhilfe:**
-
-1. Prüfen Sie die Internetverbindung.
-2. Senden Sie die Nachricht erneut.
-3. Öffnen Sie bei Bedarf einen anderen Tab, um zu prüfen, ob allgemein Webseiten erreichbar sind.
-
-**Bestätigt:** Der Chat bleibt auch nach einem Fehler bedienbar und kann erneut verwendet werden.
-
-## 7.3 Die Nachricht wird nicht gesendet
-
-**Mögliche Ursachen:**
-
-- Das Eingabefeld enthält nur Leerzeichen.
-- Die Eingabetaste wurde in einem anderen Eingabefeld ausgelöst.
-
-**Abhilfe:**
-
-1. Geben Sie einen sichtbaren Text in **„Nachricht schreiben“** ein.
-2. Klicken Sie auf **„➤“**.
-
-## 7.4 Das dunkle Design wird nicht angezeigt
-
-**Abhilfe:**
-
-1. Prüfen Sie, ob Sie auf **„🌗“** und nicht nur auf das Symbol innerhalb der Schaltfläche geklickt haben.
-2. Laden Sie die Seite neu.
-3. Beachten Sie, dass der Wechsel nicht dauerhaft gespeichert ist. Beim Neuladen der Seite beginnt die Website wieder im hellen Design.
-
-## 7.5 Die Website erscheint falsch dargestellt
-
-**Abhilfe:**
-
-1. Stellen Sie die Browser-Zoomstufe auf 100 %.
-2. Öffnen Sie die Seite in einem aktuellen Browser.
-3. Falls Karten abgeschnitten oder überlagert erscheinen, laden Sie die Seite neu.
-4. Prüfen Sie, ob eine Erweiterung für Werbeblocker, Datenschutz oder Elementschutz die externen Inhalte blockiert.
-
-## 7.6 Eine externe Inhaltsquelle fehlt
-
-Das Logo wird über eine externe Adresse geladen. Wird diese Adresse blockiert oder ist sie nicht erreichbar, kann der Bildbereich im Kopfbereich leer bleiben.
-
-**Abhilfe:** Andere Browserfenster testen, Erweiterungen deaktivieren und Internetverbindung prüfen.
-
-## 7.7 „Zurück“-Schaltfläche in fremden Einbettungen
-
-In bestimmten Einbettungssituationen kann zusätzlich eine orange Schaltfläche **„Zurück“** erscheinen. Sie wird nur eingeblendet, wenn die verweisende Seite exakt als `www.lamachub.de` über HTTPS eingebettet ist.
-
-**Bestätigt:** Die Schaltfläche führt in demselben Tab zur Startseite von lamachub.de zurück.
+Der Kundenservice übergibt dem Dienst den bisherigen Gesprächsverlauf und behält dazu im Browser höchstens die letzten **zwölf Verlaufseinträge** bei. Damit sind zusammenhängende Antworten möglich; eine dauerhafte Speicherung über die Browser-Sitzung hinaus ist im Quellcode nicht erkennbar.
 
 ---
 
-## 8. Datenschutz- und Berechtigungshinweise
+## 6. Bedeutung der angezeigten Kennzahlen
 
-## 8.1 Kontakt zum Support-Dienst
+### 6.1 Voraussichtlich simulierte oder fortgeschriebene Werte
 
-Wenn ein Besucher eine Chat-Nachricht sendet, werden die aktuelle Nachricht und der bisherige Gesprächsverlauf an einen externen Support-Dienst übertragen.
+Die folgenden Werte werden im Browser aus vorgegebenen Startwerten fortgeschrieben:
 
-**Bestätigt aus dem Quellcode:**
+- Weltbevölkerung
+- Geburten
+- Todesfälle
+- Hochzeiten
+- Scheidungen
+- E-Mails heute
+- Google-Suchen
+- Instagram-Posts
+- Spotify-Streams
+- Gefällte Bäume
+- Geschmolzenes Eis
+- Ölverbrauch
 
-- Die Übertragung erfolgt per HTTPS.
-- Gesendet werden:
-  - die aktuelle Nachricht
-  - der bisherige Chat-Verlauf
-- Der Verlauf umfasst nach erfolgreichen Antwortungen die letzten zwölf gespeicherten Verlaufseinträge.
-- Bei jeder weiteren Nachricht wird die Historie erneut mitgesendet.
+Diese Werte werden einmal pro Sekunde erhöht und anschließend ganzzahlig dargestellt. Ob sie konkrete globale Messwerte oder rein illustrative Zähler darstellen, ist im Quellcode nicht eindeutig erkennbar. Insbesondere ist keine Angabe enthalten, ob die Werte auf einen bestimmten Stichtag bezogen sind.
 
-**Im Quellcode nicht eindeutig erkennbar:**
+### 6.2 Fest hinterlegte Werte
 
-- welche Aufbewahrungsfristen beim Support-Dienst gelten
-- ob der Support-Dienst personenbezogene Daten protokolliert
-- welche Einwilligungen vor der Nutzung erforderlich sind
-- welche Einstellungen ein Betreiber vornehmen kann
+- **Autos weltweit:** `1.450.000.000`
+- **Satelliten:** `8.500`
+- **Erde–Mond:** `384.400 km`
+- **Sonnenenergie:** `173.000 TW`
 
-## 8.2 Externe Daten
+Diese Angaben werden nicht dynamisch aktualisiert.
+
+### 6.3 Extern bezogene Werte
+
+- **Internetnutzer:** rechnerischer Wert aus Weltbevölkerung und Weltbank-Anteil.
+- **Bitcoin** und **Ethereum:** aktuelle von CoinGecko gelieferte USD-Preise.
+
+### 6.4 Wichtige Einordnung
+
+Die Werte werden überwiegend **ohne Einheit**, Zeitstempel oder Datenquelle in den Karten angezeigt. Aus dem Quellcode geht nicht eindeutig hervor:
+
+- welche Annahmen hinter den sekündlichen Zuwächsen stehen,
+- ob die angezeigten Größen aktuelle, historische oder modellhafte Werte darstellen,
+- welchen Stichtag die festen Werte haben,
+- ob alle Werte dieselbe Zeitperiode betreffen.
+
+Für eine belastbare Interpretation sollten daher die jeweiligen Datenherkunft und Bezugszeitpunkt berücksichtigt werden.
+
+---
+
+## 7. Gestaltung und Barrierefreiheit
+
+### Bestätigte Merkmale
+
+- Semantische Überschriften für die Navigation und den Kundenservice.
+- Beschriftete Schaltflächen über `aria-label`.
+- Feste Größe des Chat-Fensters mit begrenzter Breite.
+- Chatverlauf kann gescrollt werden.
+- Lange Chattexte werden umgebrochen.
+- Responsive Darstellung für kleinere Bildschirme.
+- Fokusdarstellung für die optionale „Zurück“-Schaltfläche.
+- Der Chat wird beim Öffnen automatisch in das Eingabefeld gesetzt.
+
+### Mögliche Einschränkungen
+
+Im bereitgestellten Quellcode ist keine vollständige Unterstützung für Tastaturbedienung, Screenreader-Ankündigungen oder reduzierte Bewegung erkennbar. Die faktische Barrierefreiheit hängt daher auch von der tatsächlichen Browser- und Betriebssystemunterstützung ab.
+
+---
+
+## 8. Datenschutz und Berechtigungen
+
+### 8.1 Kontakt mit externen Diensten
+
+Beim Laden der Seite können Verbindungen zu folgenden Diensten entstehen:
+
+- einem externen Google Fonts-Dienst,
+- einer Bildquelle für das Logo,
+- der World Bank API,
+- der CoinGecko API,
+- dem externen Chat-Endpunkt des Kundenservice.
+
+Dabei können technisch erforderliche Verbindungsdaten wie IP-Adresse, Zeitpunkt, User-Agent und angefragte Ressourcen verarbeitet werden. Die konkrete Verarbeitung dieser Verbindungsdaten durch die externen Anbieter ist anhand des vorliegenden Quellcodes nicht eindeutig feststellbar.
+
+### 8.2 Übermittlung von Chatnachrichten
+
+Wenn eine Nachricht gesendet wird, werden der Nachrichtentext und ein begrenzter Gesprächsverlauf an den im Quellcode hinterlegten externen Chat-Endpunkt übertragen. Es ist daher zu beachten:
+
+- Formulieren Sie keine unnötigen persönlichen Daten.
+- Vermeiden Sie Zugangsdaten, Passwörter, Tokens oder vertrauliche Geschäftsinformationen.
+- Eine Speicherung des Verlaufs beim externen Dienst ist im Quellcode nicht eindeutig erkennbar.
+
+### 8.3 Lokale Daten
+
+Der Chatverlauf und der Nachrichtenzähler werden in JavaScript-Variablen des Browsers gehalten. Im Quellcode ist keine dauerhafte lokale Speicherung dieser Werte erkennbar.
+
+### 8.4 Anmeldung und Zugriffsrechte
+
+- Eine Anmeldung ist nicht vorhanden.
+- Eine Rollen- oder Rechteverwaltung ist nicht erkennbar.
+- Es werden keine Benutzerprofile oder personenbezogenen Kontoinformationen abgefragt.
+- Die optionale „Zurück“-Schaltfläche ist keine Benutzerrechtefunktion, sondern eine Navigationshilfe.
+
+---
+
+## 9. Typische Probleme und Fehlerbehebung
+
+### 9.1 Kennzahlen bleiben bei „...“
+
+**Mögliche Ursache:** Die Website benötigt JavaScript, und eine automatische Initialisierung wurde nicht vollständig abgeschlossen. Die API-gestützten Werte benötigen außerdem eine Internetverbindung.
+
+**Vorgehen:**
+
+1. Laden Sie die Seite neu

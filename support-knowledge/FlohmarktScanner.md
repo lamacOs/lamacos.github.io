@@ -4,383 +4,341 @@
 
 # FlohmarktScanner – Support-Dokumentation
 
-**Vermuteter Zweck:** Der FlohmarktScanner ist eine browserbasierte Anwendung, mit der Gegenstände mithilfe der Kamera erfasst, Preise lokal gespeichert und später über einen vereinfachten Farbvergleich wiedergefunden werden können.  
-**Quellcode-Pfad:** `FlohmarktScanner`  
-**Datum der Erstellung:** 25. Mai 2026
+**Vermuteter Zweck:** Der Quellcode-Auszug zeigt für „FlohmarktScanner“ bislang nur einen fest positionierten KI-gestützten Kundensupport-Chat („lamacHub Kundenservice“). Die eigentlichen Funktionen der Website, etwa Suche, Filter, Angebotslisten oder Benutzerkonten, sind im bereitgestellten Ausschnitt **nicht erkennbar**.
 
-> Der Quellcode enthält nur die Datei `FlohmarktScanner/index.html`. Aussagen zu nicht vorhandenen Dateien, Serverfunktionen oder einer persistenten Synchronisierung sind daher **im Quellcode nicht eindeutig erkennbar**.
+**Quellcode-Pfad:** `FlohmarktScanner/index.html`  
+**Datum der Erstellung:** 14. Februar 2025
+
+> **Hinweis zur Quellcodegrundlage:** Die Datei `FlohmarktScanner/index.html` wurde nur teilweise bereitgestellt. Die vorliegende Dokumentation beschreibt deshalb ausschließlich die daraus eindeutig hervorgehenden Funktionen. Weitere Seitenbestandteile und Serverabläufe sind **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
 ## 1. Überblick
 
-Der FlohmarktScanner bietet zwei Hauptfunktionen:
+Aus dem Quellcode ist folgender sichtbarer Bereich bestätigt:
 
-1. **Neues Objekt hinzufügen**
-   - Gegenstand fotografieren
-   - Preisfeld eingeben
-   - Objekt lokal im Browser speichern
+- eine feste Support-Schaltfläche unten rechts,
+- ein aufklappbares Chat-Fenster,
+- ein Nachrichtenverlauf,
+- ein Eingabefeld für Supportanfragen,
+- eine Schaltfläche zum Absenden,
+- eine kurze Statusanzeige während die Antwort erstellt wird,
+- Unterstützung von formatierten Antworten mit Überschriften, Listen, Tabellen, Links und Codeblöcken,
+- eine mobile Anpassung der Chat-Oberfläche.
 
-2. **Objekt scannen**
-   - Gegenstand fotografieren
-   - Farbe des Fotos mit gespeicherten Objekten vergleichen
-   - Bei einem Treffer den gespeicherten Preis anzeigen
-
-Zusätzlich enthält die Seite:
-
-- einen Licht-/Dunkelmodus,
-- einen eingebetteten KI-gestützten Kundenservice,
-- eine Rückkehr-Schaltfläche zu lamachub.de unter bestimmten Einbettungsbedingungen.
+Es ist **nicht bestätigt**, dass der Chat ausschließlich Fragen zu FlohmarktScanner beantwortet. Die sichtbare Bezeichnung lautet lediglich **„lamacHub Kundenservice“**.
 
 ---
 
 ## 2. Voraussetzungen
 
-### Für die Hauptfunktionen
+### 2.1 Technische Voraussetzungen
 
-Für Kameraaufnahmen benötigt der FlohmarktScanner:
+Bestätigt sind:
 
-- einen aktuellen Browser mit Unterstützung für `navigator.mediaDevices.getUserMedia`,
-- eine Kamera,
-- die Erlaubnis des Browsers, auf die Kamera zuzugreifen,
-- eine sichere Umgebung oder eine entsprechend vom Browser zugelassene lokale Seite.
+- ein aktueller Browser mit JavaScript-Unterstützung,
+- eine funktionierende Netzwerkverbindung für den Abruf der Chatantwort,
+- eine erreichbare externe Worker-Adresse, die im Quellcode hinterlegt ist.
 
-Die Kamera muss in den meisten aktuellen Browsern über **HTTPS** oder über `localhost` verfügbar sein.
+Im Quellcode ist keine Anmeldung oder Registrierung für die Nutzung des Chats vorgesehen. Das Eingabefeld verlangt lediglich eine nicht leere Eingabe.
 
-### Für den Kundenservice
+### 2.2 Inhaltliche Voraussetzungen
 
-Der Kundenservice sendet Nachrichten an einen externen KI-Dienst. Dafür müssen:
+Für eine hilfreiche Anfrage empfiehlt es sich:
 
-- eine Internetverbindung bestehen,
-- der eingebettete Dienst erreichbar sein,
-- die Seite über eine erreichbare Browser-Implementierung von `fetch` verfügen.
+- die verwendete Seite oder Funktion zu benennen,
+- das beobachtete Verhalten beschreiben,
+- die bereits unternommenen Schritte nennen,
+- bei technischen Problemen die verwendete Browser- und Betriebssystemversion angeben,
+- Fehlermeldungen ohne sensible Daten wiedergeben.
 
-### Für die lokale Speicherung
-
-Die gespeicherten Objekte werden im `localStorage` des Browsers abgelegt. Voraussetzung ist, dass der Browser die lokale Speicherung nicht vollständig deaktiviert hat.
+Fehlermeldungen oder Screenshots sollten keine Passwörter, Zugangsdaten, Tokens, Zahlungsdaten oder personenbezogenen Informationen enthalten.
 
 ---
 
 ## 3. Sichtbare Bereiche der Website
 
-### 3.1 Kopfzeile
+### 3.1 Support-Schaltfläche
 
-Oben links befindet sich das Logo mit der Bezeichnung:
+Unten rechts befindet sich eine runde grüne Schaltfläche mit einem geöffneten Arm-Zeichen.
 
-**„FlohmarktScanner“**
+Die Schaltfläche dient zum Öffnen des Kundenservice-Chats. Sie bleibt auf kleineren Bildschirmen ebenfalls rechts unten positioniert.
 
-Rechts befindet sich eine Mond-/Sonn-Schaltfläche mit dem Symbol:
+### 3.2 Chat-Fenster
 
-**„🌗“**
+Nach dem Öffnen erscheint rechts unten ein Fenster mit der Überschrift:
 
-Mit dieser Schaltfläche wechselt die Seite zwischen dem hellen und dem dunklen Farbschema.
-
-### 3.2 Begrüßungsbereich
-
-Unter der Kopfzeile stehen:
-
-- **„FlohmarktScanner“**
-- **„Scanne Gegenstände und speichere Preise smarter 🔍“**
-
-### 3.3 Hauptkarte
-
-Die Hauptkarte enthält zunächst zwei Schaltflächen:
-
-- **„📦 Neues Objekt hinzufügen“**
-- **„🔍 Objekt scannen“**
-
-Je nach gewählter Funktion werden darunter der Kamerabereich, die Aufnahmesteuerung und gegebenenfalls das Preisfeld eingeblendet.
-
-### 3.4 Kamerabereich
-
-Nach dem Start einer Kamerafunktion erscheinen:
-
-- eine Live-Vorschau,
-- die Schaltfläche **„📸 Foto“**,
-- die Schaltfläche **„🔄 Kamera“**,
-- die Schaltfläche **„✖ Abbrechen“**.
-
-Nach einer Aufnahme wird die Live-Vorschau durch eine Aufnahme in einem quadratischen Canvas-Bereich ersetzt.
-
-### 3.5 Preiseingabe
-
-Im Modus **„Neues Objekt hinzufügen“** erscheint nach der Aufnahme ein Textfeld mit dem Platzhalter:
-
-**„z.B. 3.50“**
-
-Darunter befindet sich die Schaltfläche:
-
-**„Speichern“**
-
-### 3.6 Kundenservice
-
-Unten rechts befindet sich eine runde Chat-Schaltfläche mit einem Sprechblasen-Symbol.
-
-Nach dem Öffnen erscheint ein Fenster mit der Überschrift:
-
-- **„lamachub Kundenservice“**
+- **„lamacHub Kundenservice“**
 - **„KI-gestützter Support“**
 
-Im Chat-Verlauf wird zu Beginn die Nachricht angezeigt:
+Oben rechts befindet sich die Schaltfläche **„×“** mit der Barrierefreiheitsbezeichnung „Chat schließen“.
 
-**„Hallo! Wie kann ich Ihnen weiterhelfen?“**
+Der Chat besteht aus drei Bereichen:
 
-Unten befindet sich ein Eingabefeld mit dem Platzhalter:
+1. **Kopfbereich** mit Titel, Untertitel und Schließen-Schaltfläche,
+2. **Nachrichtenbereich** mit der Begrüßung und späteren Antworten,
+3. **Eingabebereich** mit Textfeld und Senden-Schaltfläche.
 
-**„Nachricht schreiben“**
+### 3.3 Nachrichtenbereich
 
-Rechts daneben befindet sich eine Senden-Schaltfläche mit einem Pfeilsymbol.
+Beim Öffnen ist folgende Begrüßung sichtbar:
 
----
+> Hallo! Wie kann ich dir weiterhelfen?
 
-## 4. Bedienung: Neues Objekt hinzufügen
+Eigene Nachrichten erscheinen rechts in einem hellgrünen Feld. Antworten des Kundenservice erscheinen links in einem weißen Feld.
 
-### Schritt 1: Funktion starten
+Während eine Antwort vorbereitet wird, zeigt der Chat eine animierte Statusanzeige mit drei Punkten. Sie ist als „Kundenservice antwortet“ gekennzeichnet.
 
-1. Öffnen Sie die Website.
-2. Wählen Sie **„📦 Neues Objekt hinzufügen“**.
+Der Verlauf lässt sich vertikal scrollen. Neue Nachrichten werden automatisch nach unten g scrollt.
 
-Die beiden Hauptschaltflächen werden ausgeblendet und die Kamera wird gestartet.
+### 3.4 Eingabebereich
 
-### Schritt 2: Kamera freigeben
+Das Eingabefeld trägt die Beschriftung:
 
-Beim ersten Zugriff kann der Browser eine Berechtigungsabfrage anzeigen.
+- Platzhalter: **„Nachricht schreiben …“**
+- Barrierefreiheitsbezeichnung: **„Deine Nachricht“**
 
-- Erlauben Sie den Kamerazugriff, um die Funktion nutzen zu können.
-- Wenn Sie den Zugriff ablehnen, wird eine Fehlermeldung angezeigt.
+Es gelten folgende bestätigte Einschränkungen:
 
-### Schritt 3: Kamera auswählen
+- maximal **1.800 Zeichen**,
+- das Feld darf nicht leer sein,
+- die automatische Vervollständigung ist deaktiviert,
+- während eine Anfrage verarbeitet wird, ist die Senden-Schaltfläche deaktiviert.
 
-Bei Geräten mit mehreren Kameras können Sie mit **„🔄 Kamera“** zwischen der nach vorn gerichteten und der nach hinten gerichteten Kamera wechseln.
-
-Der Kamerazugriff wird dabei neu aufgebaut. Die jeweils aktive Kamera wird in der Live-Vorschau angezeigt.
-
-### Schritt 4: Foto aufnehmen
-
-1. Richten Sie die Kamera auf den gewünschten Gegenstand.
-2. Wählen Sie **„📸 Foto“**.
-
-Das Bild wird auf 200 × 200 Pixel verkleinert und als JPEG mit reduzierter Qualität gespeichert. Die Live-Vorschau wird anschließend durch die Aufnahme ersetzt.
-
-### Schritt 5: Preis eingeben
-
-Geben Sie in das Preisfeld einen Betrag ein, beispielsweise:
-
-- `3.50`
-- `3,50`
-
-Der Code wandelt ein Komma vor der Verarbeitung in einen Punkt um. Andere Eingaben werden mit `parseFloat` verarbeitet; ein möglicherweise unvollständig interpretierbarer Betrag kann dabei zu einer anderen Zahl führen.
-
-### Schritt 6: Objekt speichern
-
-1. Wählen Sie **„Speichern“**.
-2. Nach erfolgreicher Speicherung erscheint die Meldung **„Gespeichert!“**.
-3. Der Kamerabereich und das Preisfeld werden ausgeblendet.
-4. Die beiden Hauptschaltflächen werden wieder angezeigt.
-
-Das gespeicherte Objekt enthält:
-
-- ein Bild,
-- den Preis als Zeichenkette mit zwei Nachkommastellen.
+Rechts neben dem Eingabefeld befindet sich eine runde grüne Schaltfläche mit einem Papierflieger-Symbol.
 
 ---
 
-## 5. Bedienung: Objekt scannen
+## 4. Bedienung Schritt für Schritt
 
-### Schritt 1: Scanfunktion starten
+### 4.1 Kundenservice öffnen
 
-1. Öffnen Sie die Website.
-2. Wählen Sie **„🔍 Objekt scannen“**.
+1. Öffnen Sie die Website „FlohmarktScanner“.
+2. Klicken Sie unten rechts auf die grüne Schaltfläche mit dem geöffneten Arm-Zeichen.
+3. Das Chat-Fenster **„lamacHub Kundenservice“** öffnet sich.
+4. Lesen Sie die Begrüßung und geben Sie Ihre Frage in das Feld **„Nachricht schreiben …“** ein.
+5. Klicken Sie auf die runde Schaltfläche mit dem Papierflieger-Symbol.
+6. Ihre Nachricht wird im Verlauf angezeigt.
+7. Während die Antwort geladen wird, erscheint die Statusanzeige „Kundenservice antwortet“.
+8. Die fertige Antwort erscheint links im Chat.
+9. Für eine weitere Frage können Sie direkt eine neue Nachricht senden.
 
-Die Kamera wird gestartet und die Live-Vorschau erscheint.
+### 4.2 Chat schließen
 
-### Schritt 2: Kamera einstellen
+1. Klicken Sie oben rechts im Chat-Fenster auf **„×“**.
+2. Der Chat wird ausgeblendet.
+3. Sie können ihn über die Support-Schaltfläche unten rechts erneut öffnen.
 
-- Mit **„🔄 Kamera“** können Sie die Kamera wechseln.
-- Mit **„✖ Abbrechen“** können Sie die Kamerasession beenden und zur Auswahl zurückkehren.
+### 4.3 Nachricht mit Enter senden
 
-### Schritt 3: Foto aufnehmen
-
-1. Richten Sie die Kamera auf das gespeicherte Objekt.
-2. Wählen Sie **„📸 Foto“**.
-
-Anschließend wird automatisch der Scan gestartet. Im Modus **„Objekt scannen“** wird kein Preisfeld angezeigt.
-
-### Schritt 4: Ergebnis prüfen
-
-Der Scanner berechnet die durchschnittliche Farbe des aufgenommenen Bildes und vergleicht sie mit den durchschnittlichen Farben der gespeicherten Objekte.
-
-Mögliche Ergebnisse:
-
-- **„Preis: … €“**  
-  Ein gespeichertes Objekt wurde als passendster Treffer erkannt.
-
-- **„Kein Treffer“**  
-  Es wurde kein ausreichend ähnlicher Treffer gefunden.
-
-Danach wird der Kamerabereich geschlossen und die Auswahl der Hauptfunktionen wieder angezeigt.
-
-### Erkennungsgrenzen
-
-Der Abgleich basiert ausschließlich auf der durchschnittlichen Farbe des Fotos. Daher gilt:
-
-- Unterschiedliche Objekte mit ähnlicher Durchschnittsfarbe können als Treffer erscheinen.
-- Andere Farben können zu **„Kein Treffer“** führen.
-- Form, Textur, Größe, Logos und Details werden nicht ausgewertet.
-- Unterschiedliche Lichtverhältnisse können das Ergebnis beeinflussen.
+Der Formularcode legt ein Formular mit einer Senden-Schaltfläche nahe. Ob die Eingabetaste allein eine Nachricht absendet, ist im gekürzten Ausschnitt **nicht eindeutig erkennbar**. Verwenden Sie daher für maximale Kompatibilität die sichtbare Senden-Schaltfläche.
 
 ---
 
-## 6. Kameraschaltfläche verstehen
+## 5. Eingaben und Ausgaben
 
-Mit **„🔄 Kamera“** wird die Variable `useFront` umgeschaltet:
+### 5.1 Eingabe
 
-- beim ersten Start wird standardmäßig die rückseitige beziehungsweise Umgebungskamera angefordert,
-- nach dem Wechsel wird die nach vorn gerichtete Kamera angefordert,
-- bei einem weiteren Wechsel wird wieder die Umgebungskamera verwendet.
+Der Besucher kann eine freitextförmliche Supportanfrage eingeben.
 
-Ob ein Gerät tatsächlich beide Kameras besitzt, hängt vom Gerät und Browser ab. Im Quellcode ist keine detaillierte Fehlerbehandlung für Geräte ohne Wechselmöglichkeit erkennbar.
+Zulässig sind grundsätzlich:
 
----
+- normale Fließtexte,
+- Fragen,
+- Fehlerbeschreibungen,
+- längere Schritte zur Fehlersuche,
+- bis zu 1.800 Zeichen.
 
-## 7. Abbrechen und zurück zur Startansicht
+Ob einzelne Eingaben, Dateien, Bilder oder strukturierte Formulare besonders unterstützt werden, ist **im Quellcode nicht eindeutig erkennbar**.
 
-Mit **„✖ Abbrechen“** werden folgende Schritte ausgeführt:
+### 5.2 Ausgabe
 
-1. Alle aktiven Kameraspuren werden gestoppt.
-2. Der Kamerabereich wird ausgeblendet.
-3. Das Preisfeld wird ausgeblendet.
-4. Die Startschaltflächen werden wieder angezeigt.
-5. Die Live-Vorschau wird wieder vorbereitet.
-6. Das zuletzt aufgenommene Canvas-Bild wird ausgeblendet.
+Der Kundenservice kann Antworten in verschiedenen Formaten darstellen:
 
-Die Aufnahme bleibt bis zum nächsten Foto im Arbeitsspeicher des Browsers bestehen. Beim Neustart einer Kamerasession wird sie bei der nächsten Aufnahme ersetzt.
+- Absätze,
+- Überschriften der Ebenen 1 bis 4,
+- fette und kursive Schrift,
+- durchgestrichenen Text,
+- ungeordnete und geordnete Listen,
+- Zitate,
+- Tabellen,
+- Inline-Code,
+- mehrzeilige Codeblöcke,
+- horizontale Trennlinien,
+- HTTP- und HTTPS-Links.
 
----
+Antworten können Links enthalten. Diese werden in einem neuen Tab geöffnet. Der Quellcode setzt dabei `rel="noopener noreferrer"`, um den neuen Tab vor einem Zugriff auf das Ausgangsfenster zu schützen.
 
-## 8. Licht- und Dunkelmodus
+### 5.3 Markdown-Unterstützung
 
-Die Mond-/Sonn-Schaltfläche **„🌗“** schaltet die Klassen `light` und `dark` am Dokument um.
+Ein Codeblock beginnt mit drei Backticks:
 
-Bestätigte Auswirkungen:
+````text
+```text
+Beispiel
+```
+````
 
-- Hintergrund- und Kartenfarben ändern sich,
-- Textfarben ändern sich,
-- Rahmen und einige Bedienelemente passen sich an,
-- eine Seitenübergangsanimation von 0,3 Sekunden wird verwendet.
+Der Codeblock wird mit dunklem Hintergrund und hellem Text dargestellt.
 
-Der gewählte Modus wird im Quellcode nicht dauerhaft gespeichert. Nach einem vollständigen Neuladen der Seite ist deshalb wieder der im HTML festgelegte helle Ausgangszustand zu erwarten.
+Eine einfache Tabelle kann beispielsweise so aufgebaut sein:
 
----
+```markdown
+| Problem | Mögliche Lösung |
+|---|---|
+| Chat öffnet nicht | Seite neu laden |
+```
 
-## 9. Kundenservice
-
-### 9.1 Chat öffnen
-
-1. Klicken Sie unten rechts auf die Sprechblasen-Schaltfläche.
-2. Das Chat-Fenster wird geöffnet.
-3. Das Eingabefeld erhält automatisch den Fokus.
-
-### 9.2 Nachricht senden
-
-1. Schreiben Sie Ihre Nachricht in das Feld **„Nachricht schreiben“**.
-2. Klicken Sie auf die Pfeil-Schaltfläche oder senden Sie das Formular ab.
-3. Ihre Nachricht erscheint im Chat als grüne Benutzernachricht.
-4. Das Eingabefeld wird geleert.
-5. Die Antwort wird nach erfolgreicher Verarbeitung als Bot-Nachricht angezeigt.
-
-Das Eingabefeld erlaubt maximal 1.800 Zeichen. Eine Nachricht, die nur aus Leerzeichen besteht, wird nicht versendet.
-
-### 9.3 Chatverlauf
-
-Für die Verarbeitung werden die letzten zwölf Chat-Einträge berücksichtigt. Der Verlauf wird erst nach einer erfolgreichen Antwort erweitert.
-
-Ab der 15. gesendeten Nachricht erscheint zusätzlich der Hinweis:
-
-**„Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.“**
-
-### 9.4 Chat schließen
-
-Klicken Sie im Chat-Fenster auf **„×“**. Der Chat wird geschlossen; der bis dahin sichtbare Verlauf bleibt im aktuellen Seitenaufruf im Arbeitsspeicher.
-
-### 9.5 Fehlermeldung
-
-Wenn die Kommunikation mit dem KI-Dienst fehlschlägt, erscheint:
-
-**„Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.“**
-
-Die konkrete technische Ursache wird dem Besucher nicht angezeigt.
+Im Chat wird daraus eine scrollbare Tabelle mit Kopfzeile.
 
 ---
 
-## 10. Rückkehr zu lamachub.de
+## 6. Datenschutz, Berechtigungen und Sicherheit
 
-Die Website enthält eine zusätzliche Schaltfläche:
+### 6.1 Übertragung von Nachrichten
 
-**„← Zurück“**
+Die Eingabe wird nicht nur lokal dargestellt, sondern zur Erzeugung einer Antwort an eine externe, im Quellcode festgelegte Web-Worker-Adresse übermittelt. Es ist daher zu erwarten, dass Nachrichteninhalte diese externe Dienststelle erreichen.
 
-Sie wird nur unter folgenden Bedingungen eingeblendet:
+Ob dabei:
 
-1. Die Website wurde in einem Kontext mit Referrer `https://www.lamachub.de` geöffnet.
-2. Der Referrer wird als URL mit dem Protokoll `https` und dem Hostnamen `www.lamachub.de` erkannt.
+- eine Sitzungs-ID,
+- eine Benutzer-ID,
+- IP-Adressen,
+- technische Browserinformationen,
+- Inhalte zur Qualitätssicherung,
+- eine Speicherung im Chatverlauf
 
-Die Schaltfläche befindet sich in einem separaten Shadow-DOM-Bereich und leitet anschließend zur lamachub-Hauptseite weiter.
+übertragen oder verarbeitet werden, ist **im Quellcode nicht eindeutig erkennbar**.
 
-Ob die Seite in einem iframe eingebettet ist, spielt für die angezeigte Schaltfläche keine erkennbare Rolle. Ob die Navigation aus jedem eingebetteten Kontext heraus tatsächlich möglich ist, ist **im Quellcode nicht eindeutig erkennbar**.
+### 6.2 Lokaler Chatverlauf
+
+Der Quellcode verwaltet die Chat-Historie für die laufende Sitzung im Browser. Ob und wie lange Nachrichten dauerhaft gespeichert werden, ist **im Quellcode nicht eindeutig erkennbar**.
+
+### 6.3 Keine Anmeldung im sichtbaren Code
+
+Im gezeigten Chat-Bereich gibt es:
+
+- keine Anmeldefunktion,
+- keine Registrierung,
+- keine sichtbare Rollenprüfung,
+- keine sichtbare Freigabe von Nutzerprofilen.
+
+Ob die gesamte Website FlohmarktScanner andere Anmelde- oder Berechtigungsbereiche enthält, ist **im Quellcode nicht eindeutig erkennbar**.
+
+### 6.4 Behandlung sensibler Inhalte
+
+Der Kundenservice ist KI-gestützt. Antworten können daher fehlerhaft, unvollständig oder unzutreffend sein. Besonders bei folgenden Themen sollten keine vertraulichen Daten eingegeben werden:
+
+- Passwörter und Zugangsdaten,
+- API-Schlüssel oder Tokens,
+- Zahlungs- und Bankdaten,
+- private Kontaktdaten,
+- Gesundheitsdaten,
+- vertrauliche Geschäftsinformationen.
+
+Es wird empfohlen, solche Angaben vor dem Absenden zu entfernen.
+
+### 6.5 Ausgabe von HTML und Links
+
+Der Quellcode escapt den Antwortinhalt, bevor dieser in HTML eingesetzt wird. Das reduziert das Risiko, dass beliebiges HTML aus einer Antwort direkt ausgeführt wird.
+
+Links werden nur erzeugt, wenn die Adresse ein gültiges HTTP- oder HTTPS-Schema verwendet. Andere Link-Schemata werden nicht als klickbare Hyperlinks übernommen.
 
 ---
 
-## 11. Lokale Speicherung und Datenhaltung
+## 7. Typische Probleme und Fehlerbehebung
 
-### Bestätigt
+### 7.1 Der Chat öffnet sich nicht
 
-Gespeicherte Objekte werden im Browser unter dem Schlüssel `objects` im `localStorage` abgelegt. Jeder Eintrag enthält ein Bild und einen Preis.
+**Mögliche Ursache:** JavaScript ist deaktiviert, die Seite wurde nur teilweise geladen oder die Initialisierung ist fehlgeschlagen.
 
-Die Daten werden:
+**Abhilfe:**
 
-- lokal im verwendeten Browser gespeichert,
-- nicht an eine im Quellcode erkennbare FlohmarktScanner-eigene Serverdatenbank übertragen,
-- beim nächsten Scan wieder aus dem `localStorage` gelesen.
+1. Prüfen Sie, ob JavaScript im Browser aktiviert ist.
+2. Laden Sie die Seite vollständig neu.
+3. Öffnen Sie die Website anschließend in einem aktuellen Browser.
+4. Falls möglich, entfernen Sie zwischengespeicherte Dateien dieser Seite und laden Sie sie neu.
 
-### Nicht im Quellcode erkennbar
+Ob eine gezielte Cache-Leerung offiziell unterstützt wird, ist **im Quellcode nicht eindeutig erkennbar**.
 
-- Ein Export- oder Import-Funktion.
-- Eine Synchronisierung zwischen Geräten.
-- Ein Konto oder eine Anmeldung.
-- Eine serverseitige Sicherung.
-- Eine automatische Löschung nach einer bestimmten Zeit.
-- Ein sichtbares Menü zur Verwaltung oder Löschung bereits gespeicherter Objekte.
+### 7.2 Die Nachricht wird nicht gesendet
 
-### Praktische Hinweise
+**Mögliche Ursache:** Das Eingabefeld ist leer oder die maximale Länge wurde überschritten.
 
-- Beim Löschen der Browserdaten kann auch der lokale Speicher gelöscht werden.
-- Unterschiedliche Browser, Geräte oder Browserprofile verwenden üblicherweise getrennten lokalen Speicher.
-- Im privaten Modus kann der Speicher beim Schließen des Browserfensters verschwinden.
-- Das lokale Speichern von Bildern kann den verfügbaren Browser-Speicher schnell belegen, da jedes Objekt ein Bild als Data-URL enthält.
-- Eine explizite Löschfunktion einzelner Objekte ist im Quellcode nicht vorhanden.
+**Abhilfe:**
+
+1. Geben Sie mindestens ein Zeichen ein.
+2. Kürzen Sie die Nachricht auf höchstens 1.800 Zeichen.
+3. Klicken Sie auf die Senden-Schaltfläche mit dem Papierflieger-Symbol.
+4. Warten Sie, bis die vorherige Anfrage beantwortet wurde, da die Schaltfläche während der Verarbeitung deaktiviert ist.
+
+### 7.3 Es erscheint keine Antwort
+
+**Mögliche Ursache:** Die externe Antwortdienststelle ist nicht erreichbar, die Netzwerkverbindung ist unterbrochen oder die Anfrage wird noch verarbeitet.
+
+**Abhilfe:**
+
+1. Warten Sie kurz und prüfen Sie, ob die Statusanzeige noch aktiv ist.
+2. Prüfen Sie die Netzwerkverbindung.
+3. Laden Sie die Seite neu.
+4. Formulieren Sie die Frage erneut in einem kürzeren, klaren Satz.
+5. Falls das Problem dauerhaft besteht, wenden Sie sich über einen auf der Website vorhandenen weiteren Supportkanal an die Betreiber. Ob ein solcher Kanal existiert, ist **im Quellcode nicht eindeutig erkennbar**.
+
+### 7.4 Die Antwort erscheint unvollständig oder falsch formatiert
+
+**Mögliche Ursache:** Die Antwort enthält Markdown, das nicht vollständig vom lokalen Darstellungscode unterstützt wird.
+
+**Abhilfe:**
+
+1. Bitten Sie um eine kürzere, klarer gegliederte Antwort.
+2. Bitten Sie um Aufzählungspunkte statt eines langen Fließtexts.
+3. Bitten Sie bei Code um einen eigenen Codeblock.
+4. Verwenden Sie bei Tabellen eine einfache Struktur mit Kopfzeile und Trennzeile.
+
+### 7.5 Ein Link funktioniert nicht
+
+**Mögliche Ursache:** Der Link ist ungültig, verweist nicht auf HTTP beziehungsweise HTTPS oder die Zielseite ist nicht erreichbar.
+
+**Abhilfe:**
+
+1. Prüfen Sie, ob die Zielseite in einem neuen Tab geöffnet wurde.
+2. Kopieren Sie die Adresse in einen neuen Tab, falls nötig.
+3. Prüfen Sie die Netzwerkverbindung.
+4. Bitten Sie den Kundenservice um einen aktuellen Link.
+
+### 7.6 Der Chat ist auf dem Smartphone zu klein
+
+Der Code enthält eine mobile Layoutanpassung. Das Chat-Fenster nutzt auf kleinen Bildschirmen nahezu die gesamte verfügbare Breite und wird auf die Bildschirmhöhe abgestimmt.
+
+**Abhilfe:**
+
+1. Drehen Sie das Gerät bei Bedarf in die Querlage.
+2. Schließen Sie offene Browser- oder Bedienleisten.
+3. Verkleinern Sie die Browservorinstallation, damit weniger Fläche vom Chat eingenommen wird.
+4. Aktualisieren Sie Browser und Betriebssystem.
+
+### 7.7 Die Seite sieht ungewöhnlich aus
+
+Im bereitgestellten `index.html` stehen die Inhalte in einem eingebetteten RTF-artigen Block. Diese Darstellung kann je nach HTML-Parser zu unerwarteten Ergebnissen führen.
+
+**Abhilfe:**
+
+1. Nutzen Sie einen aktuellen Standardbrowser.
+2. Laden Sie die Seite neu.
+3. Falls die gesamte Seite fehlerhaft dargestellt wird, melden Sie dies mit Browser, Gerät und Fehlerbeschreibung.
+
+Ob die Datei im Repository durch ein anderes Build-System erzeugt oder anschließend umgewandelt wird, ist **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
-## 12. Datenschutz- und Berechtigungshinweise
+## 8. Barrierefreiheit
 
-### Kamera
+Im sichtbaren Code sind folgende Maßnahmen bestätigt:
 
-Die Website fordert ausdrücklich Zugriff auf die Kamera an. Die Kamera wird erst nach Auswahl einer Kamerafunktion gestartet.
-
-### Mikrofon
-
-Im Quellcode ist keine Anforderung für Mikrofonzugriff erkennbar.
-
-### Standort
-
-Im Quellcode ist keine Geolokalisierung erkennbar.
-
-### Kundenservice und externe Ressourcen
-
-Bestätigt sind folgende externe Verbindungen:
-
-1. **KI-gestützter Kundenservice:**  
-   Nachrichten und ein begrenzter Chatverlauf werden per HTTP-Anfrage an einen externen Worker-Dienst übermittelt.
-
-2. **Schriftart:**  
-   Die Seite
+- der Open-Button besitzt die Bezeichnung „Kundensupport öffnen“,
+- der Close-Button besitzt die Bezeichnung „Chat schließen“,
+- der Senden-Button besitzt die Bezeichnung „Nachricht senden“,
+- das Eingabefeld besitzt die Bezeichnung „Deine Nachricht“,
+- der Nachrichtenbereich ist als Live-Bereich für neue Inhalte gekennzeichnet,
+- während der Antwortberechnung wird ein Status für „Kundenservice antwortet“ ausgegeben,
+- bei reduzierter Bewegungseinstellung werden Animationen
