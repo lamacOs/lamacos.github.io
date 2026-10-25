@@ -191,129 +191,959 @@ footer{
 }
 </style>
 </head>
-<div id="lamac-ai">
-  <button id="lamac-ai-open" aria-label="Kundensupport öffnen">💬</button>
+{\rtf1\ansi\ansicpg1252\cocoartf2869
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-  <section id="lamac-ai-window" aria-label="lamachub Kundensupport">
-    <header>
-      <div>
-        <strong>lamachub Kundenservice</strong>
-        <small>KI-gestützter Support</small>
-      </div>
-      <button id="lamac-ai-close" aria-label="Chat schließen">×</button>
-    </header>
-
-    <div id="lamac-ai-messages">
-      <div class="lamac-bot">Hallo! Wie kann ich Ihnen weiterhelfen?</div>
-    </div>
-
-    <form id="lamac-ai-form">
-      <input id="lamac-ai-input" placeholder="Nachricht schreiben" maxlength="1800">
-      <button aria-label="Senden">➤</button>
-    </form>
-  </section>
-</div>
-
-<style>
-  #lamac-ai { font-family:Arial,sans-serif; }
-  #lamac-ai-open {
-    position:fixed; right:24px; bottom:24px; z-index:9999;
-    width:58px; height:58px; border:0; border-radius:50%;
-    background:#007e62; color:#fff; font-size:25px; cursor:pointer;
-    box-shadow:0 8px 24px #0004;
-  }
-  #lamac-ai-window {
-    display:none; position:fixed; right:24px; bottom:94px; z-index:9999;
-    width:min(370px,calc(100vw - 32px)); height:520px;
-    overflow:hidden; border-radius:16px; background:#efeae2;
-    box-shadow:0 12px 40px #0004;
-  }
-  #lamac-ai-window.open { display:flex; flex-direction:column; }
-  #lamac-ai-window header {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:15px; color:#fff; background:#11211d;
-  }
-  #lamac-ai-window small { display:block; margin-top:2px; color:#b5c6bf; font-size:11px; }
-  #lamac-ai-close { border:0; background:transparent; color:#fff; font-size:27px; cursor:pointer; }
-  #lamac-ai-messages { flex:1; overflow:auto; padding:15px; }
-  .lamac-bot, .lamac-user {
-    max-width:82%; margin:8px 0; padding:10px; border-radius:10px;
-    white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px;
-  }
-  .lamac-bot { background:#fff; }
-  .lamac-user { margin-left:auto; background:#d8f8e8; }
-  #lamac-ai-form { display:flex; gap:8px; padding:11px; background:#f0f2f5; }
-  #lamac-ai-input { flex:1; min-width:0; border:0; border-radius:20px; padding:11px; }
-  #lamac-ai-form button { width:42px; border:0; border-radius:50%; background:#007e62; color:#fff; cursor:pointer; }
-</style>
-
-<script>
-  const WORKER_URL = "https://lamacai.oslamu.workers.dev/chat";
-
-  const chatWindow = document.querySelector("#lamac-ai-window");
-  const chatMessages = document.querySelector("#lamac-ai-messages");
-  const chatInput = document.querySelector("#lamac-ai-input");
-  let history = [];
-  let messageCount = 0;
-
-  document.querySelector("#lamac-ai-open").onclick = () => {
-    chatWindow.classList.add("open");
-    chatInput.focus();
-  };
-
-  document.querySelector("#lamac-ai-close").onclick = () => {
-    chatWindow.classList.remove("open");
-  };
-
-  function addMessage(text, type) {
-    const item = document.createElement("div");
-    item.className = type;
-    item.textContent = text;
-    chatMessages.appendChild(item);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  document.querySelector("#lamac-ai-form").onsubmit = async event => {
-    event.preventDefault();
-    const text = chatInput.value.trim();
-    if (!text) return;
-
-    addMessage(text, "lamac-user");
-    chatInput.value = "";
-    messageCount++;
-
-    if (messageCount === 15) {
-      addMessage(
-        "Hinweis: Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen.",
-        "lamac-bot"
-      );
-    }
-
-    try {
-      const response = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-
-      addMessage(data.reply, "lamac-bot");
-      history.push(
-        { role: "user", content: text },
-        { role: "assistant", content: data.reply }
-      );
-
-      history = history.slice(-12);
-    } catch {
-      addMessage(
-        "Der Kundenservice ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.",
-        "lamac-bot"
-      );
-    }
-  };
-</script>
+\f0\fs24 \cf0 <div id="lamac-ai">\
+  <button id="lamac-ai-open" aria-label="Kundensupport \'f6ffnen">\
+    \uc0\u55357 \u56492 \
+  </button>\
+\
+  <section id="lamac-ai-window" aria-label="lamacHub Kundenservice" aria-hidden="true">\
+    <header>\
+      <div>\
+        <strong>lamacHub Kundenservice</strong>\
+        <small>KI-gest\'fctzter Support</small>\
+      </div>\
+      <button id="lamac-ai-close" aria-label="Chat schlie\'dfen">\'d7</button>\
+    </header>\
+\
+    <div id="lamac-ai-messages" aria-live="polite" aria-relevant="additions">\
+      <div class="lamac-bot">\
+        Hallo! Wie kann ich dir weiterhelfen?\
+      </div>\
+    </div>\
+\
+    <form id="lamac-ai-form">\
+      <input\
+        id="lamac-ai-input"\
+        placeholder="Nachricht schreiben \'85"\
+        maxlength="1800"\
+        aria-label="Deine Nachricht"\
+        autocomplete="off"\
+        required\
+      >\
+      <button type="submit" aria-label="Nachricht senden">\uc0\u10148 </button>\
+    </form>\
+  </section>\
+</div>\
+\
+<style>\
+  #lamac-ai \{\
+    font-family: Arial, Helvetica, sans-serif;\
+    color: #17211e;\
+  \}\
+\
+  #lamac-ai *,\
+  #lamac-ai *::before,\
+  #lamac-ai *::after \{\
+    box-sizing: border-box;\
+  \}\
+\
+  #lamac-ai-open \{\
+    position: fixed;\
+    right: 24px;\
+    bottom: 24px;\
+    z-index: 99999;\
+    width: 60px;\
+    height: 60px;\
+    border: 0;\
+    border-radius: 50%;\
+    background: #007e62;\
+    color: #fff;\
+    font-size: 26px;\
+    cursor: pointer;\
+    box-shadow: 0 8px 24px #0004;\
+    transition: transform .2s, background .2s;\
+  \}\
+\
+  #lamac-ai-open:hover \{\
+    transform: scale(1.06);\
+    background: #006b53;\
+  \}\
+\
+  #lamac-ai-window \{\
+    display: none;\
+    position: fixed;\
+    right: 24px;\
+    bottom: 96px;\
+    z-index: 99999;\
+    width: min(390px, calc(100vw - 32px));\
+    height: min(570px, calc(100dvh - 125px));\
+    min-height: 300px;\
+    overflow: hidden;\
+    flex-direction: column;\
+    border: 1px solid #d8dedb;\
+    border-radius: 18px;\
+    background: #efeae2;\
+    box-shadow: 0 12px 40px #0004;\
+  \}\
+\
+  #lamac-ai-window.open \{\
+    display: flex;\
+    animation: lamac-ai-appear .22s ease-out;\
+  \}\
+\
+  @keyframes lamac-ai-appear \{\
+    from \{\
+      opacity: 0;\
+      transform: translateY(12px) scale(.98);\
+    \}\
+    to \{\
+      opacity: 1;\
+      transform: translateY(0) scale(1);\
+    \}\
+  \}\
+\
+  #lamac-ai-window > header \{\
+    display: flex;\
+    flex-shrink: 0;\
+    align-items: center;\
+    justify-content: space-between;\
+    gap: 12px;\
+    padding: 15px 17px;\
+    background: #11211d;\
+    color: #fff;\
+  \}\
+\
+  #lamac-ai-window > header strong \{\
+    display: block;\
+    font-size: 15px;\
+  \}\
+\
+  #lamac-ai-window > header small \{\
+    display: block;\
+    margin-top: 4px;\
+    color: #b5c6bf;\
+    font-size: 11px;\
+  \}\
+\
+  #lamac-ai-close \{\
+    width: 34px;\
+    height: 34px;\
+    flex-shrink: 0;\
+    border: 0;\
+    border-radius: 8px;\
+    background: transparent;\
+    color: #fff;\
+    font-size: 27px;\
+    line-height: 1;\
+    cursor: pointer;\
+  \}\
+\
+  #lamac-ai-close:hover \{\
+    background: #ffffff1c;\
+  \}\
+\
+  #lamac-ai-messages \{\
+    display: flex;\
+    flex: 1;\
+    flex-direction: column;\
+    gap: 9px;\
+    min-height: 0;\
+    overflow: auto;\
+    padding: 15px;\
+    overscroll-behavior: contain;\
+    scroll-behavior: smooth;\
+  \}\
+\
+  #lamac-ai .lamac-bot,\
+  #lamac-ai .lamac-user \{\
+    max-width: 92%;\
+    min-width: 0;\
+    padding: 11px 13px;\
+    border-radius: 13px;\
+    font-size: 14px;\
+    line-height: 1.55;\
+    overflow-wrap: anywhere;\
+    word-break: normal;\
+  \}\
+\
+  #lamac-ai .lamac-bot \{\
+    align-self: flex-start;\
+    background: #fff;\
+    border: 1px solid #e5e7e5;\
+    border-top-left-radius: 4px;\
+  \}\
+\
+  #lamac-ai .lamac-user \{\
+    align-self: flex-end;\
+    background: #d8f8e8;\
+    border: 1px solid #c3ebd8;\
+    border-top-right-radius: 4px;\
+    white-space: pre-wrap;\
+  \}\
+\
+  /* Markdown-Formatierungen */\
+\
+  #lamac-ai .lamac-bot p \{\
+    margin: 0 0 9px;\
+  \}\
+\
+  #lamac-ai .lamac-bot p:last-child \{\
+    margin-bottom: 0;\
+  \}\
+\
+  #lamac-ai .lamac-bot h1,\
+  #lamac-ai .lamac-bot h2,\
+  #lamac-ai .lamac-bot h3,\
+  #lamac-ai .lamac-bot h4 \{\
+    margin: 12px 0 6px;\
+    line-height: 1.3;\
+    color: #173c30;\
+  \}\
+\
+  #lamac-ai .lamac-bot h1 \{\
+    font-size: 20px;\
+  \}\
+\
+  #lamac-ai .lamac-bot h2 \{\
+    font-size: 18px;\
+  \}\
+\
+  #lamac-ai .lamac-bot h3 \{\
+    font-size: 16px;\
+  \}\
+\
+  #lamac-ai .lamac-bot h4 \{\
+    font-size: 14px;\
+  \}\
+\
+  #lamac-ai .lamac-bot ul,\
+  #lamac-ai .lamac-bot ol \{\
+    margin: 7px 0;\
+    padding-left: 23px;\
+  \}\
+\
+  #lamac-ai .lamac-bot li \{\
+    margin: 3px 0;\
+  \}\
+\
+  #lamac-ai .lamac-bot blockquote \{\
+    margin: 8px 0;\
+    padding: 5px 10px;\
+    border-left: 3px solid #007e62;\
+    color: #52635c;\
+  \}\
+\
+  #lamac-ai .lamac-bot a \{\
+    color: #006b53;\
+    text-decoration: underline;\
+    text-underline-offset: 2px;\
+  \}\
+\
+  #lamac-ai .lamac-bot a:hover \{\
+    color: #004c3b;\
+  \}\
+\
+  #lamac-ai .lamac-bot code \{\
+    padding: 2px 5px;\
+    border-radius: 5px;\
+    background: #edf0ed;\
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;\
+    font-size: .9em;\
+  \}\
+\
+  #lamac-ai .lamac-bot pre \{\
+    max-width: 100%;\
+    overflow: auto;\
+    margin: 8px 0;\
+    padding: 11px;\
+    border-radius: 9px;\
+    background: #17231f;\
+    color: #e8f5ed;\
+    white-space: pre;\
+    tab-size: 2;\
+  \}\
+\
+  #lamac-ai .lamac-bot pre code \{\
+    padding: 0;\
+    background: transparent;\
+    color: inherit;\
+    font-size: 12px;\
+  \}\
+\
+  #lamac-ai .lamac-bot hr \{\
+    margin: 10px 0;\
+    border: 0;\
+    border-top: 1px solid #d8dedb;\
+  \}\
+\
+  #lamac-ai .lamac-table-wrap \{\
+    max-width: 100%;\
+    margin: 9px 0;\
+    overflow-x: auto;\
+    border: 1px solid #d9e0dc;\
+    border-radius: 8px;\
+    background: #fff;\
+  \}\
+\
+  #lamac-ai .lamac-bot table \{\
+    width: 100%;\
+    border-collapse: collapse;\
+    font-size: 12px;\
+    text-align: left;\
+  \}\
+\
+  #lamac-ai .lamac-bot th,\
+  #lamac-ai .lamac-bot td \{\
+    padding: 8px;\
+    border-bottom: 1px solid #e5e9e6;\
+    vertical-align: top;\
+  \}\
+\
+  #lamac-ai .lamac-bot th \{\
+    background: #eaf3ee;\
+    font-weight: 700;\
+  \}\
+\
+  #lamac-ai .lamac-bot tr:last-child td \{\
+    border-bottom: 0;\
+  \}\
+\
+  /* Animierte Tipp-Anzeige */\
+\
+  #lamac-ai .lamac-typing \{\
+    display: flex;\
+    align-items: center;\
+    gap: 5px;\
+    width: fit-content;\
+    min-width: 65px;\
+    padding: 14px 15px;\
+  \}\
+\
+  #lamac-ai .lamac-typing-dot \{\
+    width: 7px;\
+    height: 7px;\
+    border-radius: 50%;\
+    background: #668078;\
+    animation: lamac-ai-bounce 1.15s infinite ease-in-out;\
+  \}\
+\
+  #lamac-ai .lamac-typing-dot:nth-child(2) \{\
+    animation-delay: .15s;\
+  \}\
+\
+  #lamac-ai .lamac-typing-dot:nth-child(3) \{\
+    animation-delay: .3s;\
+  \}\
+\
+  @keyframes lamac-ai-bounce \{\
+    0%, 60%, 100% \{\
+      transform: translateY(0);\
+      opacity: .45;\
+    \}\
+    30% \{\
+      transform: translateY(-6px);\
+      opacity: 1;\
+    \}\
+  \}\
+\
+  /* Eingabe */\
+\
+  #lamac-ai-form \{\
+    display: flex;\
+    flex-shrink: 0;\
+    align-items: center;\
+    gap: 9px;\
+    padding: 11px;\
+    border-top: 1px solid #e0e4e1;\
+    background: #f7f8f7;\
+  \}\
+\
+  #lamac-ai-input \{\
+    flex: 1;\
+    width: 0;\
+    min-width: 0;\
+    height: 43px;\
+    padding: 0 15px;\
+    border: 1px solid #d9dfdb;\
+    border-radius: 23px;\
+    outline: none;\
+    background: #fff;\
+    color: #17211e;\
+    font-family: inherit;\
+    font-size: 14px;\
+  \}\
+\
+  #lamac-ai-input:focus \{\
+    border-color: #007e62;\
+    box-shadow: 0 0 0 3px #007e621c;\
+  \}\
+\
+  #lamac-ai-form button \{\
+    display: grid;\
+    width: 43px;\
+    height: 43px;\
+    flex-shrink: 0;\
+    place-items: center;\
+    border: 0;\
+    border-radius: 50%;\
+    background: #007e62;\
+    color: #fff;\
+    font-size: 20px;\
+    cursor: pointer;\
+    transition: background .2s, opacity .2s;\
+  \}\
+\
+  #lamac-ai-form button:hover:not(:disabled) \{\
+    background: #00644e;\
+  \}\
+\
+  #lamac-ai-form button:disabled \{\
+    opacity: .5;\
+    cursor: not-allowed;\
+  \}\
+\
+  @media (max-width: 480px) \{\
+    #lamac-ai-open \{\
+      right: 16px;\
+      bottom: 16px;\
+    \}\
+\
+    #lamac-ai-window \{\
+      right: 8px;\
+      bottom: 86px;\
+      width: calc(100vw - 16px);\
+      height: min(620px, calc(100dvh - 100px));\
+      border-radius: 15px;\
+    \}\
+\
+    #lamac-ai-messages \{\
+      padding: 11px;\
+    \}\
+  \}\
+\
+  @media (prefers-reduced-motion: reduce) \{\
+    #lamac-ai-window.open \{\
+      animation: none;\
+    \}\
+\
+    #lamac-ai .lamac-typing-dot \{\
+      animation: none;\
+      opacity: .8;\
+    \}\
+\
+    #lamac-ai-open \{\
+      transition: none;\
+    \}\
+  \}\
+</style>\
+\
+<script>\
+(() => \{\
+  "use strict";\
+\
+  // Dieselbe Worker-Adresse f\'fcr alle Websites verwenden.\
+  const WORKER_URL =\
+    "https://carescape-ai.oslamuoslamu.workers.dev/";\
+\
+  const root = document.querySelector("#lamac-ai");\
+\
+  // Verhindert doppelte Initialisierung, falls der Code versehentlich\
+  // zweimal auf derselben Seite eingebunden wurde.\
+  if (!root || root.dataset.initialized === "true") return;\
+  root.dataset.initialized = "true";\
+\
+  const chatWindow = root.querySelector("#lamac-ai-window");\
+  const openButton = root.querySelector("#lamac-ai-open");\
+  const closeButton = root.querySelector("#lamac-ai-close");\
+  const chatMessages = root.querySelector("#lamac-ai-messages");\
+  const chatInput = root.querySelector("#lamac-ai-input");\
+  const chatForm = root.querySelector("#lamac-ai-form");\
+  const sendButton = chatForm.querySelector("button");\
+\
+  let history = [];\
+  let busy = false;\
+\
+  function scrollToBottom() \{\
+    chatMessages.scrollTop = chatMessages.scrollHeight;\
+  \}\
+\
+  function addUserMessage(text) \{\
+    const item = document.createElement("div");\
+    item.className = "lamac-user";\
+    item.textContent = text;\
+    chatMessages.appendChild(item);\
+    scrollToBottom();\
+  \}\
+\
+  function addBotMessage(text) \{\
+    const item = document.createElement("div");\
+    item.className = "lamac-bot";\
+\
+    // Markdown wird in kontrollierte HTML-Elemente umgewandelt.\
+    // HTML aus der Antwort wird vorher escaped.\
+    item.innerHTML = renderMarkdown(text);\
+\
+    chatMessages.appendChild(item);\
+    scrollToBottom();\
+  \}\
+\
+  function showTyping() \{\
+    const typing = document.createElement("div");\
+    typing.className = "lamac-bot lamac-typing";\
+    typing.setAttribute("role", "status");\
+    typing.setAttribute("aria-label", "Kundenservice antwortet");\
+    typing.innerHTML =\
+      '<span class="lamac-typing-dot"></span>' +\
+      '<span class="lamac-typing-dot"></span>' +\
+      '<span class="lamac-typing-dot"></span>';\
+\
+    chatMessages.appendChild(typing);\
+    scrollToBottom();\
+\
+    return typing;\
+  \}\
+\
+  function escapeHTML(value) \{\
+    return String(value)\
+      .replace(/&/g, "&amp;")\
+      .replace(/</g, "&lt;")\
+      .replace(/>/g, "&gt;")\
+      .replace(/"/g, "&quot;")\
+      .replace(/'/g, "&#39;");\
+  \}\
+\
+  function safeLink(url) \{\
+    try \{\
+      const parsed = new URL(url);\
+\
+      if (\
+        parsed.protocol === "https:" ||\
+        parsed.protocol === "http:"\
+      ) \{\
+        return parsed.href;\
+      \}\
+    \} catch (_) \{\}\
+\
+    return null;\
+  \}\
+\
+  function renderInline(text) \{\
+    // Zuerst den gesamten Inhalt escapen, damit die KI\
+    // keine eigenen HTML-Tags einschleusen kann.\
+    let value = escapeHTML(text);\
+\
+    // Inline-Code vor anderen Formatierungen sch\'fctzen.\
+    const codeParts = [];\
+\
+    value = value.replace(/`([^`\\n]+)`/g, (_, code) => \{\
+      const index = codeParts.length;\
+      codeParts.push("<code>" + code + "</code>");\
+      return "LAMACCODE" + index + "END";\
+    \});\
+\
+    // Markdown-Links: ausschlie\'dflich HTTP(S) erlauben.\
+    value = value.replace(\
+      /\\[([^\\]]+)\\]\\((https?:\\/\\/[^)\\s]+)\\)/g,\
+      (match, label, url) => \{\
+        const safe = safeLink(url.replace(/&amp;/g, "&"));\
+\
+        if (!safe) return label;\
+\
+        return (\
+          '<a href="' + escapeHTML(safe) +\
+          '" target="_blank" rel="noopener noreferrer">' +\
+          label + "</a>"\
+        );\
+      \}\
+    );\
+\
+    // URLs, die die KI ohne Markdown ausgibt, ebenfalls verlinken.\
+    value = value.replace(\
+      /(^|[\\s(])(https?:\\/\\/[^\\s<]+)/g,\
+      (match, prefix, url) => \{\
+        const cleanURL = url.replace(/[.,!?;:]+$/, "");\
+        const trailing = url.slice(cleanURL.length);\
+        const safe = safeLink(\
+          cleanURL.replace(/&amp;/g, "&")\
+        );\
+\
+        if (!safe) return match;\
+\
+        return (\
+          prefix +\
+          '<a href="' + escapeHTML(safe) +\
+          '" target="_blank" rel="noopener noreferrer">' +\
+          cleanURL + "</a>" + trailing\
+        );\
+      \}\
+    );\
+\
+    // Fett und kursiv.\
+    value = value.replace(\
+      /\\*\\*\\*(.+?)\\*\\*\\*/g,\
+      "<strong><em>$1</em></strong>"\
+    );\
+    value = value.replace(\
+      /___(.+?)___/g,\
+      "<strong><em>$1</em></strong>"\
+    );\
+    value = value.replace(\
+      /\\*\\*(.+?)\\*\\*/g,\
+      "<strong>$1</strong>"\
+    );\
+    value = value.replace(\
+      /__(.+?)__/g,\
+      "<strong>$1</strong>"\
+    );\
+    value = value.replace(\
+      /(^|[^*])\\*([^*\\n]+)\\*(?!\\*)/g,\
+      "$1<em>$2</em>"\
+    );\
+    value = value.replace(\
+      /(^|[^_])_([^_\\n]+)_(?!_)/g,\
+      "$1<em>$2</em>"\
+    );\
+    value = value.replace(\
+      /~~(.+?)~~/g,\
+      "<del>$1</del>"\
+    );\
+\
+    // Gesch\'fctzte Inline-Code-Stellen wieder einsetzen.\
+    value = value.replace(\
+      /LAMACCODE(\\d+)END/g,\
+      (_, index) => codeParts[Number(index)] || ""\
+    );\
+\
+    return value;\
+  \}\
+\
+  function isTableSeparator(line) \{\
+    const cells = line.trim().replace(/^\\||\\|$/g, "").split("|");\
+\
+    return (\
+      cells.length > 0 &&\
+      cells.every(cell =>\
+        /^\\s*:?-\{3,\}:?\\s*$/.test(cell)\
+      )\
+    );\
+  \}\
+\
+  function parseTableRow(line) \{\
+    return line\
+      .trim()\
+      .replace(/^\\||\\|$/g, "")\
+      .split("|")\
+      .map(cell => cell.trim());\
+  \}\
+\
+  function renderMarkdown(markdown) \{\
+    const lines = String(markdown || "")\
+      .replace(/\\r\\n?/g, "\\n")\
+      .split("\\n");\
+\
+    const output = [];\
+    let paragraph = [];\
+    let listType = null;\
+    let inCodeBlock = false;\
+    let codeLines = [];\
+\
+    function flushParagraph() \{\
+      if (!paragraph.length) return;\
+\
+      output.push(\
+        "<p>" +\
+        paragraph.map(renderInline).join("<br>") +\
+        "</p>"\
+      );\
+\
+      paragraph = [];\
+    \}\
+\
+    function closeList() \{\
+      if (listType) \{\
+        output.push("</" + listType + ">");\
+        listType = null;\
+      \}\
+    \}\
+\
+    function closeParagraphAndList() \{\
+      flushParagraph();\
+      closeList();\
+    \}\
+\
+    function renderTable(headerLine, bodyLines) \{\
+      const headers = parseTableRow(headerLine);\
+      const rows = bodyLines.map(parseTableRow);\
+\
+      let html = '<div class="lamac-table-wrap"><table><thead><tr>';\
+\
+      for (const cell of headers) \{\
+        html += "<th>" + renderInline(cell) + "</th>";\
+      \}\
+\
+      html += "</tr></thead><tbody>";\
+\
+      for (const row of rows) \{\
+        html += "<tr>";\
+\
+        headers.forEach((_, index) => \{\
+          html += "<td>" +\
+            renderInline(row[index] || "") +\
+            "</td>";\
+        \});\
+\
+        html += "</tr>";\
+      \}\
+\
+      html += "</tbody></table></div>";\
+\
+      return html;\
+    \}\
+\
+    for (let i = 0; i < lines.length; i++) \{\
+      const line = lines[i];\
+\
+      // Mehrzeilige Codebl\'f6cke.\
+      if (/^\\s*```/.test(line)) \{\
+        if (inCodeBlock) \{\
+          output.push(\
+            "<pre><code>" +\
+            escapeHTML(codeLines.join("\\n")) +\
+            "</code></pre>"\
+          );\
+\
+          codeLines = [];\
+          inCodeBlock = false;\
+        \} else \{\
+          closeParagraphAndList();\
+          inCodeBlock = true;\
+          codeLines = [];\
+        \}\
+\
+        continue;\
+      \}\
+\
+      if (inCodeBlock) \{\
+        codeLines.push(line);\
+        continue;\
+      \}\
+\
+      // Markdown-Tabelle mit Kopfzeile und Trennzeile.\
+      if (\
+        line.includes("|") &&\
+        i + 1 < lines.length &&\
+        isTableSeparator(lines[i + 1])\
+      ) \{\
+        closeParagraphAndList();\
+\
+        const header = line;\
+        i += 2;\
+\
+        const rows = [];\
+\
+        while (\
+          i < lines.length &&\
+          lines[i].trim() &&\
+          lines[i].includes("|")\
+        ) \{\
+          rows.push(lines[i]);\
+          i++;\
+        \}\
+\
+        i--;\
+\
+        output.push(renderTable(header, rows));\
+        continue;\
+      \}\
+\
+      // Leerzeile trennt Abs\'e4tze.\
+      if (!line.trim()) \{\
+        closeParagraphAndList();\
+        continue;\
+      \}\
+\
+      // \'dcberschriften.\
+      const heading = line.match(/^(#\{1,4\})\\s+(.+)$/);\
+\
+      if (heading) \{\
+        closeParagraphAndList();\
+\
+        const level = heading[1].length;\
+\
+        output.push(\
+          "<h" + level + ">" +\
+          renderInline(heading[2]) +\
+          "</h" + level + ">"\
+        );\
+\
+        continue;\
+      \}\
+\
+      // Horizontale Trennlinie.\
+      if (/^\\s*(---+|\\*\\*\\*+|___+)\\s*$/.test(line)) \{\
+        closeParagraphAndList();\
+        output.push("<hr>");\
+        continue;\
+      \}\
+\
+      // Aufz\'e4hlungen und nummerierte Listen.\
+      const unordered = line.match(/^\\s*[-*+]\\s+(.+)$/);\
+      const ordered = line.match(/^\\s*\\d+[.)]\\s+(.+)$/);\
+\
+      if (unordered || ordered) \{\
+        flushParagraph();\
+\
+        const nextType = unordered ? "ul" : "ol";\
+\
+        if (listType !== nextType) \{\
+          closeList();\
+          output.push("<" + nextType + ">");\
+          listType = nextType;\
+        \}\
+\
+        const itemText = (unordered || ordered)[1];\
+\
+        output.push(\
+          "<li>" + renderInline(itemText) + "</li>"\
+        );\
+\
+        continue;\
+      \}\
+\
+      // Zitat.\
+      const quote = line.match(/^\\s*>\\s?(.*)$/);\
+\
+      if (quote) \{\
+        closeParagraphAndList();\
+\
+        output.push(\
+          "<blockquote>" +\
+          renderInline(quote[1]) +\
+          "</blockquote>"\
+        );\
+\
+        continue;\
+      \}\
+\
+      closeList();\
+      paragraph.push(line);\
+    \}\
+\
+    if (inCodeBlock) \{\
+      output.push(\
+        "<pre><code>" +\
+        escapeHTML(codeLines.join("\\n")) +\
+        "</code></pre>"\
+      );\
+    \}\
+\
+    closeParagraphAndList();\
+\
+    return output.join("");\
+  \}\
+\
+  function setBusy(value) \{\
+    busy = value;\
+    sendButton.disabled = value;\
+    chatInput.disabled = value;\
+    sendButton.setAttribute("aria-busy", String(value));\
+  \}\
+\
+  openButton.addEventListener("click", () => \{\
+    chatWindow.classList.add("open");\
+    chatWindow.setAttribute("aria-hidden", "false");\
+    chatInput.focus();\
+  \});\
+\
+  closeButton.addEventListener("click", () => \{\
+    chatWindow.classList.remove("open");\
+    chatWindow.setAttribute("aria-hidden", "true");\
+    openButton.focus();\
+  \});\
+\
+  chatForm.addEventListener("submit", async event => \{\
+    event.preventDefault();\
+\
+    const text = chatInput.value.trim();\
+\
+    if (!text || busy) return;\
+\
+    addUserMessage(text);\
+    chatInput.value = "";\
+\
+    // Bisherige Nachrichten plus neue Nutzernachricht.\
+    const messages = [\
+      ...history,\
+      \{ role: "user", content: text \}\
+    ];\
+\
+    setBusy(true);\
+\
+    // Sofort sichtbar: Der Bot verarbeitet die Nachricht.\
+    const typingIndicator = showTyping();\
+\
+    try \{\
+      const response = await fetch(WORKER_URL, \{\
+        method: "POST",\
+        headers: \{\
+          "Content-Type": "application/json"\
+        \},\
+        body: JSON.stringify(\{\
+          mode: "support",\
+          messages\
+        \})\
+      \});\
+\
+      const rawResponse = await response.text();\
+      let data;\
+\
+      try \{\
+        data = JSON.parse(rawResponse);\
+      \} catch (_) \{\
+        throw new Error("Ung\'fcltige Antwort vom Kundenservice");\
+      \}\
+\
+      if (!response.ok) \{\
+        throw new Error(\
+          data.error || "Support nicht erreichbar"\
+        );\
+      \}\
+\
+      if (\
+        typeof data.reply !== "string" ||\
+        !data.reply.trim()\
+      ) \{\
+        throw new Error("Leere Antwort vom Kundenservice");\
+      \}\
+\
+      typingIndicator.remove();\
+      addBotMessage(data.reply);\
+\
+      // Verlauf begrenzen, damit Anfragen nicht unbegrenzt wachsen.\
+      history = [\
+        ...messages,\
+        \{ role: "assistant", content: data.reply \}\
+      ].slice(-12);\
+\
+    \} catch (error) \{\
+      typingIndicator.remove();\
+\
+      console.error(\
+        "lamacHub Support-Chat:",\
+        error?.message || error\
+      );\
+\
+      addBotMessage(\
+        "Der Kundenservice ist gerade nicht erreichbar. Bitte versuche es sp\'e4ter erneut."\
+      );\
+\
+    \} finally \{\
+      setBusy(false);\
+\
+      if (chatWindow.classList.contains("open")) \{\
+        chatInput.focus();\
+      \}\
+    \}\
+  \});\
+\})();\
+</script>}
 <body>
 
 <nav class="navbar">
