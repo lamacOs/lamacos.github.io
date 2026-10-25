@@ -96,6 +96,8 @@ Ob **Admin** nur für bestimmte Benutzerkonten sichtbar wird, ist im gekürzten 
 3. Verwenden Sie anschließend die sichtbaren Steuerflächen:
    - **←** für „Zurück bewegen“
    - **→** für „Vorwärts bewegen“
+   - **↑** für „Nach oben bewegen“
+   - **↓** für „Nach unten bewegen“
 
 Alternativ können Sie die Pfeiltasten Ihrer Tastatur verwenden.
 
@@ -152,6 +154,7 @@ Ob das Speichern ohne Anmeldung möglich ist und wo gespeicherte Level erscheine
    - Mittel
    - Schwer
    - Extrem
+(Oder eine vom Admin erstellte Schwierigkeit)
 5. Wählen Sie unter **Fahrzeuge** einen ungefähren Bereich:
    - **6–8**
    - **9–12**
@@ -187,6 +190,7 @@ Wählen Sie den Reiter **Level entdecken**. Der Bereich enthält:
   - Mittel
   - Schwer
   - Extrem
+  - (Andere vom Admin erstellte Schwierigkeiten)
 - einen Kartenbereich für gefundene Level
 - einen Statusbereich für Lade- und Fehlermeldungen
 
@@ -239,6 +243,7 @@ Das Spielfeld besitzt ein **6 × 6-Raster**. Fahrzeuge dürfen sich nicht überl
    - Mittel
    - Schwer
    - Extrem
+   - (Oder eine der vom Admin erstellten Schwierigkeiten)
 3. Geben Sie optional in **Serie** einen Seriennamen ein.
    - Maximallänge: 50 Zeichen.
    - Beispielplatzhalter: „Eigene Serie“.
@@ -312,8 +317,19 @@ Bestätigt ist lediglich, dass CarEscape diese Ansicht anbietet. Ob dort gespeic
 
 ---
 
-# 9. Hilfe & Support
+# 9. Schwierigkeiten
 
-Die Website besitzt einen eigenen Reiter **Hilfe & Support**. Der vollständige Inhalt dieser Ansicht ist im gekürzten Auszug nicht sichtbar.
+CarEscape enthält vier Haupt-Schwierigkeiten. Diese sind mit einer jeweiligen Farbe gekennzeichnet.
+- Leicht (Grün)
+- Mittel (Gelb)
+- Schwer (Blau)
+- Extrem (Rot)
+Das Admin-Team hat allerdings die Möglichkeit, weitere Schwierigkeiten mit Farben zu erstellen. Diese können dann von jedem genutzt werden.
+
+---
+
+# 10. Hilfe & Support
+
+Die Website besitzt einen eigenen Reiter **Hilfe & Support**. Dort kann mit der trainierten Support-KI kommuniziert werden.Der vollständige Inhalt dieser Ansicht ist im gekürzten Auszug nicht sichtbar.
 
 Die Navigation bestätigt, dass CarEscape Hilfen bereitstellt. Welche einzelnen Artikel, Kontaktmöglichkeiten oder Bedienungsanleitungen dort enthalten sind, ist im Quellcode-A
