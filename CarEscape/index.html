@@ -109,7 +109,7 @@
       width: min(100%, 765px); aspect-ratio: 1; position: relative; overflow: hidden;
       border: 2px solid var(--border); border-radius: 15px;
       background-color: var(--surface2);
-      background-image: url("assets/gameplace.png");
+      background-image: var(--board-img, url("assets/gameplace.png"));
       background-size: 100% 100%;
       touch-action: manipulation;
     }
@@ -224,7 +224,7 @@
 <div class="app">
   <header>
     <div class="brand">
-      <img src="assets/cars/logo.png" alt="CarEscape Logo" onerror="this.style.display='none'">
+      <img id="logoImg" src="assets/cars/logo.png" alt="CarEscape Logo" onerror="this.style.display='none'">
       <div>
         <h1>Car<span>Escape</span></h1>
         <div class="subtitle">Escape the grid. Build your own challenge.</div>
@@ -554,6 +554,74 @@ const VEHICLE_TYPES = [
 const TYPE_BY_ID = Object.fromEntries(VEHICLE_TYPES.map(v => [v.id, v]));
 const CAR_IMAGE_BASE = "assets/cars/";
 
+/* -------------------------------------------------------
+   Bild-Cache: Bilder werden einmal geladen und dauerhaft
+   im Cache Storage des Geräts gespeichert (alles in dieser Datei).
+   Version erhöhen, wenn du Bilder austauschst: v1 -> v2
+   ------------------------------------------------------- */
+const IMAGE_CACHE_NAME = "carescape-images-v1";
+const LOGO_PATH = "assets/cars/logo.png";
+const BOARD_PATH = "assets/gameplace.png";
+const ALL_IMAGE_PATHS = [
+  LOGO_PATH,
+  BOARD_PATH,
+  ...VEHICLE_TYPES.map(t => CAR_IMAGE_BASE + t.file)
+];
+const imageURLs = new Map(); // Pfad -> Blob-URL (oder Originalpfad als Rückfall)
+
+// Liefert die lokale Blob-URL, falls vorhanden, sonst den normalen Pfad.
+function imgSrc(file) {
+  const path = file.includes("/") ? file : CAR_IMAGE_BASE + file;
+  return imageURLs.get(path) || path;
+}
+function applyCachedStaticImages() {
+  const logo = document.getElementById("logoImg");
+  if (logo && imageURLs.has(LOGO_PATH)) logo.src = imageURLs.get(LOGO_PATH);
+  if (imageURLs.has(BOARD_PATH)) {
+    document.documentElement.style.setProperty("--board-img", 'url("' + imageURLs.get(BOARD_PATH) + '")');
+  }
+}
+function rerenderAfterImageCache() {
+  applyCachedStaticImages();
+  if (!levelSolved && !autoplaying && currentLevel) renderBoard($("board"), currentLevel);
+  renderEditor();
+}
+async function initImageCache() {
+  if (!("caches" in window)) return; // z. B. unsicherer Kontext (kein https) -> normales Laden
+  try {
+    // Alte Cache-Versionen aufräumen
+    for (const name of await caches.keys()) {
+      if (name.startsWith("carescape-images-") && name !== IMAGE_CACHE_NAME) await caches.delete(name);
+    }
+    const cache = await caches.open(IMAGE_CACHE_NAME);
+
+    // 1) Schon gespeicherte Bilder sofort vom Gerät holen
+    let changed = false;
+    await Promise.all(ALL_IMAGE_PATHS.map(async path => {
+      const hit = await cache.match(path);
+      if (hit) { imageURLs.set(path, URL.createObjectURL(await hit.blob())); changed = true; }
+    }));
+    if (changed) rerenderAfterImageCache();
+
+    // 2) Fehlende Bilder laden und dauerhaft speichern
+    const missing = ALL_IMAGE_PATHS.filter(p => !imageURLs.has(p));
+    if (!missing.length) return;
+    let loadedNew = false;
+    await Promise.all(missing.map(async path => {
+      try {
+        const res = await fetch(path);
+        if (!res.ok) return;
+        await cache.put(path, res.clone());
+        imageURLs.set(path, URL.createObjectURL(await res.blob()));
+        loadedNew = true;
+      } catch (error) { console.warn("Bild konnte nicht gecacht werden:", path, error); }
+    }));
+    if (loadedNew) rerenderAfterImageCache();
+  } catch (error) {
+    console.warn("Bild-Cache nicht verfügbar:", error);
+  }
+}
+
 let auth = null;
 let db = null;
 let currentUser = null;
@@ -850,7 +918,7 @@ function renderBoard(target, level, isEditor = false) {
     button.style.height = ((v.orientation === "v" ? type.length : 1) * 100 / GRID) + "%";
     button.style.setProperty("--car-color", type.color);
     const img = document.createElement("img");
-    img.src = CAR_IMAGE_BASE + type.file;
+    img.src = imgSrc(type.file);
     img.alt = type.name;
     img.draggable = false;
     if (type.length === 3) img.dataset.size = "large";
@@ -1195,7 +1263,7 @@ function renderInventory() {
     button.type = "button";
     button.disabled = count >= limit || editorVehicles.length >= MAX_VEHICLES;
     if (editorSelectedType === type.id) button.style.outline = "3px solid var(--cyan)";
-    button.innerHTML = `<img src="${CAR_IMAGE_BASE + type.file}" alt=""><strong>${escapeHTML(type.name)}</strong><span>${count}/${limit}</span>`;
+    button.innerHTML = `<img src="${imgSrc(type.file)}" alt=""><strong>${escapeHTML(type.name)}</strong><span>${count}/${limit}</span>`;
     button.addEventListener("click", () => {
       editorSelectedType = type.id;
       editorSelectedVehicleId = null;
@@ -2005,7 +2073,7 @@ async function createBoardImage() {
     let drawn = false;
     try {
       const img = new Image();
-      img.src = CAR_IMAGE_BASE + type.file;
+      img.src = imgSrc(type.file);
       await new Promise((resolve,reject) => { img.onload=resolve; img.onerror=reject; });
       const large = type.length === 3;
       const sx = large ? largeScale : carScale;
@@ -2133,6 +2201,7 @@ computeMinMoves();
 editorVehicles = [newEditorPolice()];
 renderEditor();
 initFirebase();
+initImageCache();
 
 // Nach Firebase-Initialisierung kann ein geteilter Level-Link geladen werden.
 setTimeout(openLinkedLevel, 900);
