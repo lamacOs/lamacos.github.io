@@ -4,289 +4,291 @@
 
 # FlohmarktScanner – Support-Dokumentation
 
-## Übersicht
+**Website:** FlohmarktScanner  
+**Vermuteter Zweck:** Im Quellcode erkennbar ist vor allem ein KI-gestützter Kundensupport für die Website „FlohmarktScanner“. Der eigentliche Zweck und die übrigen Inhalte der Website sind anhand des bereitgestellten, gekürzten Quellcodes nicht eindeutig erkennbar.  
+**Quellcode-Pfad:** `FlohmarktScanner/index.html`  
+**Datum der Erstellung:** 30. Januar 2026
 
-| Angabe | Information |
-|---|---|
-| **Website-Name** | FlohmarktScanner |
-| **Vermuteter Zweck** | Die bereitgestellten Quellcode-Auszüge enthalten ausschließlich einen KI-gestützten Kundensupport-Chat für die Website. Der eigentliche Zweck von „FlohmarktScanner“ – etwa das Scannen oder Auffinden von Flohmarktangeboten – ist **im Quellcode nicht eindeutig erkennbar**. |
-| **Quellcode-Pfad** | `FlohmarktScanner/index.html` |
-| **Datum der Erstellung** | 27. März 2026 |
-| **Dokumentationsgrundlage** | Ausschließlich die bereitgestellten, teilweise gekürzten Quellcode-Auszüge |
-
-> **Wichtiger Hinweis:** Der Quellcode-Auszug ist gekürzt. Die Dokumentation beschreibt daher nur Funktionen, die im sichtbaren Ausschnitt eindeutig erkennbar sind. Weitere Bereiche der Website, insbesondere der eigentliche Flohmarkt-Scanner, werden im Ausschnitt nicht gezeigt.
+> **Hinweis zur Quellcode-Basis:** Die Analyse basiert auf einem gekürzten Auszug aus `FlohmarktScanner/index.html`. Nicht geprüft werden konnten unter anderem das Ende der Markdown-Auswertung, die vollständige Netzwerkkommunikation, mögliche Fehlerbehandlungen sowie weitere Seiten oder Dateien des Projekts. Aussagen dazu sind jeweils entsprechend gekennzeichnet.
 
 ---
 
-## 1. Zweck der Website
+## 1. Was Besucher auf der Website sehen
 
-### 1.1 Bestätigter Zweck
+Der geprüfte Quellcode enthält keine sichtbaren Inhalte der eigentlichen Flohmarktseite. Im Vordergrund steht ein fest positioniertes Support-Widget mit folgenden sichtbaren Elementen:
 
-Die Website enthält einen fest positionierten **„lamacHub Kundenservice“** mit der Untertitelung **„KI-gestützter Support“**. Nutzer können dort Fragen eingeben und Antworten von einem KI-gestützten Supportdienst erhalten.
+- eine runde Schaltfläche mit einem Kopf-Symbol unten rechts,
+- ein zunächst geschlossenes Chat-Fenster,
+- die Überschrift **„lamacHub Kundenservice“**,
+- der Hinweis **„KI-gestützter Support“**,
+- ein Begrüßungstext des Kundenservice,
+- ein Nachrichtenbereich,
+- ein Eingabefeld mit dem Platzhalter **„Nachricht schreiben …“**,
+- eine runde Senden-Schaltfläche mit Pfeil-Symbol.
 
-Der Support-Chat wird als technische Erweiterung in die bestehende Website eingebettet. Er soll Besucher bei allgemeinen Fragen zur Website unterstützen.
-
-### 1.2 Zweck der eigentlichen FlohmarktScanner-Funktion
-
-**Im Quellcode nicht eindeutig erkennbar.**
-
-Der Name „FlohmarktScanner“ legt nahe, dass die Website Angebote auf Flohmärkten oder in Online-Flohmarkt-Angeboten findet, automatisch erfasst oder auswertet. Im bereitgestellten Ausschnitt ist jedoch keine Scanner-, Such-, Angebots- oder Filternfunktion sichtbar. Aussagen zu Abläufen, Ergebnissen oder Preisen wären daher spekulativ.
+Im geprüften Code ist kein Logo, keine Navigation, keine Suchfunktion und keine Angebotsliste des Flohmarkts sichtbar. Diese Bereiche können in anderen, nicht eingeblendeten Dateien oder im nicht gezeigten Teil der HTML-Datei liegen.
 
 ---
 
 ## 2. Voraussetzungen
 
-### Technische Voraussetzungen
+Für die sichtbaren Support-Funktionen genügt ein moderner Webbrowser mit aktiviertem JavaScript.
 
-Für die Nutzung des eingebetteten Support-Chats gelten im Quellcode erkennbare Anforderungen:
+Bestätigt im Quellcode:
 
-1. **Aktueller Webbrowser mit JavaScript-Unterstützung**  
-   Der Chat öffnet, schließt und verarbeitet Nachrichten vollständig über JavaScript. Ohne JavaScript bleibt der Support-Chat geschlossen.
-
-2. **Verbindung zum externen Support-Dienst**  
-   Der Chat sendet Anfragen an einen externen Worker-Endpunkt. Für Antworten ist daher eine funktionierende Internetverbindung erforderlich.
-
-3. **Ungestörte Ausführung des eingebetteten Skripts**  
-   Browser-Erweiterungen, Content-Blocker, Strict-Content-Security-Policies oder Netzwerkregeln können die Verbindung zum Support-Dienst blockieren.
-
-4. **Unterstützte Bildschirmgröße**  
-   Der Chat passt sich dem Viewport an. Auf schmalen Bildschirmen nutzt er fast die gesamte Breite und berücksichtigt die verfügbare Bildschirmhöhe.
-
-### Nicht erforderlich
-
-- Im Quellcode ist **keine Anmeldung**, **kein Benutzerkonto**, **keine Zahlung** und **keine Installation** für den Support-Chat erkennbar.
-- Ob die übrige Website FlohmarktScanner eine Anmeldung oder Registrierung voraussetzt, ist **im Quellcode nicht eindeutig erkennbar**.
-
----
-
-## 3. Sichtbare Bereiche der Website
-
-### 3.1 Support-Schaltfläche
-
-Unten rechts auf der Seite befindet sich eine runde, grüne Schaltfläche mit einem sichtbaren Chat-Symbol. Sie trägt die Barrierefreiheitsbezeichnung **„Kundensupport öffnen“**.
-
-Positionierung:
-
-- Desktop: 24 Pixel vom rechten und unteren Bildschirmrand
-- Mobil: 16 Pixel vom rechten und unteren Bildschirmrand
-- Die Schaltfläche bleibt beim Scrollen am Bildschirm fixiert.
-
-### 3.2 Support-Fenster
-
-Nach dem Öffnen erscheint rechts unten ein Dialogfenster mit folgenden Bereichen:
-
-#### Kopfbereich
-
-- Titel: **„lamacHub Kundenservice“**
-- Untertitel: **„KI-gestützter Support“**
-- Rechts befindet sich eine Schaltfläche mit dem Zeichen **„×“** und der Bezeichnung **„Chat schließen“**.
-
-#### Nachrichtenbereich
-
-Der Bereich trägt die technische Bezeichnung **„lamac-ai-messages“** und ist für Screenreader als Live-Bereich konfiguriert.
-
-Er enthält:
-
-- eine Begrüßung des Kundenservice mit **„Hallo! Wie kann ich dir weiterhelfen?“**
-- eingehende Nachrichten des Besuchers
-- Antworten des Kundenservice
-- während einer laufenden Antwort eine animierte Statusanzeige mit drei Punkten und der Bezeichnung **„Kundenservice antwortet“**
-
-Der Nachrichtenbereich ist scrollbar. Neue Nachrichten werden automatisch nach unten scrolliert.
-
-#### Eingabebereich
-
-- Eingabefeld mit dem Platzhalter **„Nachricht schreiben …“**
-- Barrierefreiheitsbezeichnung **„Deine Nachricht“**
-- maximale Länge: **1.800 Zeichen**
-- automatische Vervollständigung ist deaktiviert
-- Das Feld ist erforderlich; eine leere Nachricht kann nicht gesendet werden.
-- rechts daneben befindet sich eine runde grüne Schaltfläche mit einem Papierflügel-Symbol und der Bezeichnung **„Nachricht senden“**
-
-### 3.3 Darstellung auf Mobilgeräten
-
-Auf schmalen Bildschirmen:
-
-- Das Chat-Fenster nimmt fast die gesamte Breite ein.
-- Der Rand zum Bildschirmrand beträgt jeweils 8 Pixel.
-- Die Höhe wird an die verfügbare Bildschirmhöhe angepasst.
-- Die Nachrichten erhalten etwas geringere Innenabstände.
-
-Bei aktivierten Einstellungen zur reduzierten Bewegung werden Einblend- und Sprunganimationen abgeschaltet. Die statische Funktionalität bleibt erhalten.
-
----
-
-## 4. Bedienung Schritt für Schritt
-
-### 4.1 Support-Chat öffnen
-
-1. Besuchen Sie die Website **FlohmarktScanner**.
-2. Scrollen Sie bei Bedarf zur rechten unteren Bildschirmecke.
-3. Klicken Sie auf die grüne Schaltfläche mit dem Chat-Symbol.
-4. Das Fenster **„lamacHub Kundenservice“** wird eingeblendet.
-5. Die Begrüßung **„Hallo! Wie kann ich dir weiterhelfen?“** erscheint im Nachrichtenbereich.
-
-### 4.2 Eine Frage stellen
-
-1. Klicken Sie in das Eingabefeld **„Nachricht schreiben …“**.
-2. Tippen oder schreiben Sie Ihre Frage.
-3. Senden Sie die Nachricht über eine der folgenden Möglichkeiten:
-   - Drücken Sie die Eingabetaste.
-   - Klicken Sie auf die Schaltfläche **„Nachricht senden“**.
-4. Ihre Nachricht erscheint rechts im grünlichen Nachrichtenstil.
-5. Während die Verarbeitung läuft, erscheint die animierte Statusanzeige.
-6. Die Antwort erscheint anschließend links im weißen Nachrichtenstil.
-7. Der Nachrichtenbereich scrollt automatisch zur neuesten Nachricht.
-
-### 4.3 Den Chat schließen
-
-1. Klicken Sie oben rechts im Chat-Fenster auf **„×“**.
-2. Das Fenster wird ausgeblendet.
-3. Die Support-Schaltfläche unten rechts bleibt sichtbar.
-4. Sie können den Chat erneut über dieselbe Schaltfläche öffnen.
-
-### 4.4 Unterstützte Formatierungen in Antworten
-
-Der Kundenservice kann Antworten in Markdown-ähnlicher Formatierung darstellen. Im Quellcode sind folgende Formate bestätigt:
-
-- Überschriften der Ebenen 1 bis 4
-- Absätze und erzwungene Zeilenumbrüche
-- fett, kursiv, fett-kursiv und durchgestrichen
-- ungeordnete und geordnete Listen
-- Zitate
-- Tabellen
-- Inline-Code
-- mehrzeilige Codeblöcke
-- Trennlinien
-- Links und automatisch erkannte HTTP- beziehungsweise HTTPS-Adressen
-
-Links öffnen sich in einem neuen Tab. Der Quellcode setzt dabei `rel="noopener noreferrer"`, um den neuen Tab sicher vom Ausgangsfenster zu isolieren.
-
----
-
-## 5. Eingaben und Ausgaben
-
-### 5.1 Eingaben
-
-| Element | Bestätigte Eigenschaften |
-|---|---|
-| Nachrichteneingabefeld | Einzeiliges Textfeld, Pflichtfeld, maximal 1.800 Zeichen, keine automatische Vervollständigung |
-| Schaltfläche „Nachricht senden“ | Sendet das Eingabefeld; wird während der laufenden Verarbeitung deaktiviert |
-| Schaltfläche „Chat schließen“ | Blendet das Support-Fenster aus |
-
-### 5.2 Ausgaben
-
-- Die eigene Nachricht wird unverändert als Text angezeigt.
-- Antworten werden in ein eigenes Nachrichtenelement eingefügt.
-- Während der Verarbeitung wird ein Status mit drei animierten Punkten angezeigt.
-- Das Fenster verfügt über eine kurze Einblendanimation.
-- Die Scrollposition wird nach neuen Nachrichten automatisch angepasst.
-
-### 5.3 Sicherheitsverarbeitung von Antworten
-
-Der Quellcode enthält mehrere Maßnahmen zur sicheren Darstellung von Antworten:
-
-1. **HTML-Escaping:** Antwortinhalte werden grundsätzlich maskiert, bevor Formatierungen eingefügt werden.
-2. **URL-Prüfung:** Als Link zugelassen werden ausschließlich `http:`- und `https:`-Adressen.
-3. **Link-Isolierung:** Öffnungslinks erhalten `noopener noreferrer`.
-4. **Codeblock-Escaping:** Codeblöcke werden ebenfalls maskiert dargestellt.
-
-Eigene HTML-Tags in einer Antwort werden somit nicht als ausführbarer HTML-Code übernommen.
-
----
-
-## 6. Technische Einordnung
-
-### 6.1 Kommunikation mit dem Support-Dienst
-
-Der Chat sendet Nachrichten und den bisherigen Gesprächsverlauf an einen externen Worker-Dienst. Die Adresse ist im Quellcode hinterlegt; sie wird in dieser Dokumentation aus Sicherheitsgründen nicht wiedergegeben.
-
-Im Quellcode ist erkennbar:
-
-- Die Adresse wird für alle Websites einheitlich verwendet.
-- Der Gesprächsverlauf wird im Browser gespeichert und zusammen mit neuen Anfragen an den Dienst übertragen.
-- Der Dienst liefert die Antwort, die im Chat dargestellt wird.
+- JavaScript wird für das Öffnen des Chats, das Senden und die Darstellung der Antworten benötigt.
+- Die Oberfläche ist für Desktop- und mobile Bildschirmgrößen gestaltet.
+- Für Geräte mit reduzierter Bewegung wird die Animation abgeschaltet.
+- Das Chat-Fenster passt sich an die verfügbare Bildschirmhöhe an.
+- Die Website versucht, Support-Anfragen an einen externen KI-Dienst zu senden.
 
 **Im Quellcode nicht eindeutig erkennbar:**
 
-- ob Nachrichten dauerhaft auf dem Server gespeichert werden,
-- welche Server-Standort- und Aufbewahrungsregeln gelten,
-- ob eine Weitergabe an Dritte stattfindet,
-- welche Inhalte der Support-Dienst fachlich abdeckt,
-- ob es eine Fehlerbehandlung für einen nicht erreichbaren Dienst gibt.
-
-### 6.2 Initialisierung
-
-Der Einbettungscode prüft, ob das Chat-Element bereits vorhanden ist und ob es bereits initialisiert wurde. Dadurch verhindert der Code eine doppelte Initialisierung, falls derselbe Code versehentlich zweimal eingebunden wird.
+- Unterstützte Browser und Mindestversionen.
+- Ob eine Anmeldung für die Nutzung des Chats erforderlich ist.
+- Ob der Support auch ohne Netzwerkverbindung erreichbar ist.
+- Ob ein Konto, ein Login oder eine Registrierung für FlohmarktScanner insgesamt notwendig ist.
 
 ---
 
-## 7. Datenschutz- und Berechtigungshinweise
+## 3. Den Kundenservice öffnen
 
-### 7.1 Übermittlung von Nachrichten
+1. Öffnen Sie die Website FlohmarktScanner.
+2. Warten Sie, bis die Seite vollständig geladen ist.
+3. Klicken Sie unten rechts auf die runde grüne Schaltfläche mit dem Kopf-Symbol.
+4. Das Fenster **„lamacHub Kundenservice“** öffnet sich.
+5. Die erste sichtbare Nachricht lautet:  
+   **„Hallo! Wie kann ich dir weiterhelfen?“**
 
-Wenn Sie im Support-Chat eine Nachricht senden, wird diese zur Verarbeitung an einen externen Support-Dienst übertragen. Es handelt sich um einen externen Dienst; der Betreiber der Website und der Betreiber dieses Dienstes müssen nicht identisch sein.
+Bei schmalen Bildschirmen befindet sich die Support-Schaltfläche weiterhin unten rechts, mit etwas geringerem Abstand zum Rand.
 
-### 7.2 Empfehlung für sensible Inhalte
+---
 
-- Geben Sie keine Passwörter, Zugangsdaten, API-Schlüssel, Tokens oder personenbezogenen Daten in den Chat ein.
-- Vermeiden Sie sensible Informationen über Dritte.
-- Beschreiben Sie technische Probleme möglichst allgemein.
-- Wenn der Support eine konkrete Datei oder Konfiguration benötigt, ist im Quellcode nicht erkennbar, wie eine sichere Übertragung erfolgen soll.
+## 4. Eine Nachricht senden
 
-### 7.3 Browserinterne Speicherung
+1. Tippen Sie Ihre Frage in das Eingabefeld **„Nachricht schreiben …“**.
+2. Das Eingabefeld erlaubt höchstens **1.800 Zeichen**.
+3. Klicken Sie auf die runde Pfeil-Schaltfläche rechts neben dem Eingabefeld.
+4. Ihre Nachricht erscheint im Chat als grün hinterlegte NutzerNachricht.
+5. Während der Bearbeitung wird eine animierte Statusanzeige mit dem Hinweis **„Kundenservice antwortet“** eingeblendet.
+6. Anschließend erscheint die Antwort des Kundenservice.
 
-Der Quellcode zeigt keine persistierte Speicherung des Chatverlaufs im Browser, beispielsweise in `localStorage` oder `sessionStorage`. Der Verlauf existiert während der geladenen Seite im Arbeitsspeicher des Skripts.
+Das Eingabefeld ist als Pflichtfeld gekennzeichnet. Eine leere Nachricht kann daher nicht abgeschickt werden.
+
+### Bearbeitung während einer laufenden Anfrage
+
+Der Quellcode enthält einen Zustand namens `busy`. Es ist daher anzunehmen, dass während einer laufend verarbeiteten Anfrage weitere Sendevorgänge gesperrt oder zurückgewiesen werden.
 
 **Im Quellcode nicht eindeutig erkennbar:**
 
-- eine Datenschutzerklärung,
-- ein Hinweis auf die Rechtsgrundlage der Verarbeitung,
-- eine Aufbewahrungsfrist auf dem Server,
-- Betroffenenrechte,
-- eine Kontaktmöglichkeit für Datenschutzanfragen.
-
-### 7.4 Berechtigungen
-
-Für den Support-Chat ist keine Anmeldung erkennbar. Damit verbunden sind im Quellcode **keine bestätigten Rollen, Rechte oder Zugangsbeschränkungen** dokumentiert.
-
-Ob andere Bereiche von FlohmarktScanner Anmeldungen oder besondere Berechtigungen vorsehen, ist **im Quellcode nicht eindeutig erkennbar**.
-
-### 7.5 Externe Links
-
-Antworten können Links enthalten. Diese verlassen die Website und unterliegen den Datenschutzbestimmungen des jeweiligen Zielanbieters. Prüfen Sie die Zieladresse, bevor Sie personenbezogene Daten übermitteln.
+- ob der Senden-Knopf deaktiviert wird,
+- ob eine zweite Nachricht blockiert wird,
+- ob eine Fehlermeldung erscheint,
+- ob eine abgebrochene oder fehlgeschlagene Anfrage wiederholt werden kann.
 
 ---
 
-## 8. Typische Probleme und Fehlerbehebung
+## 5. Den Chat schließen
 
-### 8.1 Der Support-Chat öffnet sich nicht
+1. Klicken Sie im geöffneten Fenster oben rechts auf **„×“**.
+2. Das Chat-Fenster wird geschlossen.
+3. Die Support-Schaltfläche mit dem Kopf-Symbol bleibt unten rechts sichtbar.
+4. Durch erneutes Klicken auf diese Schaltfläche öffnen Sie den Support erneut.
 
-**Mögliche Ursachen und Prüfungen:**
+Im Quellcode ist kein sichtbarer Verlauf gespeichert, der außerhalb eines neu geöffneten Chats angezeigt wird. **Im Quellcode nicht eindeutig erkennbar** ist, ob der Chatverlauf beim Schließen oder erneuten Öffnen erhalten bleibt.
 
-1. **JavaScript ist deaktiviert.**  
-   Aktivieren Sie JavaScript für die Website und laden Sie die Seite neu.
+---
 
-2. **Ein Inhaltsblocker blockiert Skripte oder Netzwerkzugriffe.**  
-   Prüfen Sie, ob eine Browser-Erweiterung, ein privater Browsermodus oder eine Firewall die Website blockiert.
+## 6. Antworten und Formatierungen
 
-3. **Die Seite wurde nicht vollständig geladen.**  
-   Laden Sie die Seite vollständig neu.
+Der Kundenservice kann Antworten in Markdown-ähnlicher Formatierung darstellen. Bestätigt unterstützt sind:
 
-4. **Ein Skriptkonflikt verhindert die Initialisierung.**  
-   Im Quellcode ist eine Schutzprüfung gegen doppelte Initialisierung vorhanden. Falls andere Seitenbestandteile dieselben Element-IDs verwenden oder den Chatbereich verändern, kann die Initialisierung ausbleiben.
+- Absätze und Zeilenumbrüche,
+- Überschriften der Ebenen 1 bis 4,
+- fett und kursiv,
+- durchgestrichener Text,
+- nummerierte und unnummerierte Listen,
+- Inline-Code,
+- mehrzeilige Codeblöcke,
+- Tabellen,
+- Zitate,
+- Links,
+- horizontale Trennlinien.
 
-### 8.2 Die Senden-Schaltfläche reagiert nicht
+Links werden in einem neuen Tab geöffnet. Vom Chatcode werden nur HTTP- und HTTPS-Adressen als klickbare Links zugelassen. Andere Linkformate werden nicht zu aktiven Links gemacht.
 
-1. Prüfen Sie, ob das Eingabefeld leer ist. Leere Nachrichten werden nicht gesendet.
-2. Prüfen Sie, ob die maximale Länge von 1.800 Zeichen erreicht ist.
-3. Klicken Sie während einer laufenden Antwort nicht erneut. Die Schaltfläche ist während der Verarbeitung deaktiviert.
-4. Warten Sie, bis die Statusanzeige verschwindet, und versuchen Sie es erneut.
+---
 
-### 8.3 Es erscheint keine Antwort
+## 7. Typische Probleme und Fehlerbehebung
 
-1. Prüfen Sie die Internetverbindung.
-2. Warten Sie einige Sekunden: Der Dienst benötigt möglicherweise Zeit für die Verarbeitung.
-3. Fragen Sie in einer neuen, kürzeren Nachricht erneut.
-4. Öffnen Sie die Entwicklerwerkzeuge des Browsers und prüfen Sie das Netzwerk-Protokoll auf fehlgeschlagene Anfragen.
-5. Prüfen Sie, ob Inhaltsblocker oder Firewall-Regeln den externen Support-Dienst auss
+### 7.1 Der Kundenservice lässt sich nicht öffnen
+
+**Mögliche Ursache im Quellcode:** Der eingebettete Quellcode beginnt ungewöhnlich mit Dokument- beziehungsweise RTF-artigen Zeichen. Dadurch könnte die Datei in manchen Umgebungen nicht korrekt als normales HTML interpretiert werden.
+
+**Abhilfe:**
+
+1. Öffnen Sie die Website direkt in einem aktuellen Browser.
+2. Aktualisieren Sie die Seite vollständig.
+3. Prüfen Sie, ob andere eingebettete Skripte oder Erweiterungen die Seite beeinträchtigen.
+4. Testen Sie die Seite gegebenenfalls im privaten Fenster oder mit deaktivierten Erweiterungen.
+5. Wenden Sie sich an die betreibende Stelle, wenn der Support weiterhin fehlt.
+
+Ob der Code in der veröffentlichten Website tatsächlich unverändert verwendet wird, ist **im bereitgestellten Quellcode nicht eindeutig erkennbar**.
+
+### 7.2 Die Nachricht wird nicht gesendet
+
+**Mögliche Ursachen:**
+
+- Das Eingabefeld ist leer.
+- Es wird bereits eine Anfrage verarbeitet.
+- Die Verbindung zum externen Supportdienst ist nicht verfügbar.
+- Der Browser blockiert die Netzwerkanfrage.
+
+**Abhilfe:**
+
+1. Schreiben Sie einen vollständigen Text in das Eingabefeld.
+2. Warten Sie, bis eine vorherige Antwort abgeschlossen ist.
+3. Senden Sie die Nachricht erneut.
+4. Prüfen Sie die Internetverbindung.
+5. Laden Sie die Seite neu.
+6. Falls möglich, testen Sie einen anderen Browser oder das private Fenster.
+
+**Im Quellcode nicht eindeutig erkennbar:** Eine konkrete Fehlermeldung oder ein Wiederholen-Button ist im geprüften Auszug nicht sichtbar.
+
+### 7.3 Es erscheint keine Antwort
+
+**Mögliche Ursachen:**
+
+- Der externe KI-Dienst antwortet nicht rechtzeitig.
+- Die Anfrage konnte nicht übermittelt werden.
+- Die Antwort benötigt länger als erwartet.
+
+**Abhilfe:**
+
+1. Warten Sie zunächst, bis die Statusanzeige verschwindet.
+2. Prüfen Sie die Internetverbindung.
+3. Versuchen Sie es mit einer kürzeren Nachricht.
+4. Aktualisieren Sie die Seite und senden Sie die Frage erneut.
+5. Verwenden Sie bei einer laufenden Statusanzeige nicht mehrere weitere Nachrichten.
+
+### 7.4 Das Chat-Fenster ist auf dem Smartphone schwer zu bedienen
+
+Der Code enthält ein responsives Layout. Bei sehr kleinen Bildschirmen kann das Fenster den verfügbaren Platz jedoch stark beanspruchen.
+
+**Abhilfe:**
+
+1. Drehen Sie das Gerät bei Bedarf in die Querlage.
+2. Schließen Sie den Chat über **„×“**, wenn Sie zurück auf die Website wechseln möchten.
+3. Scrollen Sie innerhalb des Nachrichtenbereichs, um ältere Nachrichten anzuzeigen.
+
+### 7.5 Animationen sind unangenehm oder das Fenster flackert
+
+Der Code berücksichtigt die Browsereinstellung „Bewegung reduzieren“. Falls Animationen trotzdem stören:
+
+1. Öffnen Sie die Browser-Einstellungen.
+2. Suchen Sie nach einer Option wie „Bewegung reduzieren“ oder „Animationen reduzieren“.
+3. Aktivieren Sie diese Einstellung.
+4. Laden Sie die Seite neu.
+
+---
+
+## 8. Datenschutz und Berechtigungen
+
+### Bestätigte technische Merkmale
+
+- Der Chat sendet Nachrichten an einen externen, über das Internet erreichbaren KI-Dienst.
+- Eine lokale Chat-Historie ist im JavaScript vorgesehen.
+- Der Browsercode maskiert Zeichen wie `<`, `>` und `&` in Antworten, bevor er sie in HTML einfügt.
+- Unterstützt und als klickbar ausgegeben werden nur HTTP- und HTTPS-Links.
+- Bei externen Links wird zusätzlich `rel="noopener noreferrer"` gesetzt.
+- Der Quellcode enthält keine sichtbaren Hinweise auf eine Speicherung von Chatinhalten durch FlohmarktScanner selbst.
+
+### Wichtige Hinweise
+
+- Beim Absenden verlassen die eingegebenen Inhalte die Website und werden an den externen Supportdienst übertragen.
+- Vermeiden Sie deshalb die Übermittlung von:
+  - Passwörtern,
+  - API-Schlüsseln oder Zugriffstoken,
+  - Zahlungsdaten,
+  - Ausweisdaten,
+  - privaten Kontaktdaten,
+  - vertraulichen Geschäftsinformationen.
+- Eine konkrete Datenschutzerklärung, ein Hinweis auf die Speicherdauer, ein Standort des Dienstleisters oder Angaben zum Auftragsverarbeitungsvertrag sind **im bereitgestellten Quellcode nicht eindeutig erkennbar**.
+- Ob die externe Antwort fachlich verbindlich ist, ist nicht dokumentiert. Entscheidungen zu Terminen, Zahlungen oder Verträgen sollten über die offiziellen Kontaktwege der verantwortlichen Stelle getroffen werden.
+
+### Möglicher Geheimniswert
+
+Im Quellcode ist eine mögliche Geheimniswert-Konfiguration vorhanden. Diese wird hier aus Sicherheitsgründen nicht wiedergegeben. Im geprüften Auszug ist keine zusätzliche explizite Platzierung von Geheimnissen in der HTML-Datei erkennbar. Dies kann jedoch nicht für den vollständigen, gekürzten Quellcode garantiert werden.
+
+---
+
+## 9. Barrierefreiheit
+
+Im Quellcode sind mehrere Maßnahmen zur Barrierefreiheit erkennbar:
+
+- die Support-Schaltfläche besitzt eine beschreibende `aria-label`-Angabe,
+- die Schließen-Schaltfläche ist mit „Chat schließen“ beschriftet,
+- der Senden-Knopf besitzt die Beschriftung „Nachricht senden“,
+- der Nachrichtenbereich verwendet `aria-live="polite"`,
+- die Statusanzeige hat die Rolle `status` und die Beschreibung „Kundenservice antwortet“,
+- das Eingabefeld besitzt die Beschriftung „Deine Nachricht“,
+- der Browser vervollständigt eingegebene Nachrichten nicht automatisch.
+
+**Im Quellcode nicht eindeutig erkennbar:**
+
+- vollständige Tastaturbedienung,
+- Fokusmanagement beim Öffnen und Schließen,
+- Unterstützung von Screenreader-Software,
+- ausreichende Farbkontraste in allen Betriebssystem- und Browser-Einstellungen.
+
+---
+
+## 10. FAQ
+
+### Gibt es eineRegistrierung?
+
+Eine Anmeldung oder Registrierung ist im bereitgestellten Quellcode nicht erkennbar. Für den gezeigten Kundenservice wird kein Login verlangt.
+
+### Kann ich den Kundenservice auch auf dem Smartphone nutzen?
+
+Ja. Der Quellcode enthält ein eigenes Layout für Bildschirmbreiten bis 480 Pixel. Das Chat-Fenster passt sich dabei an die Bildschirmgröße an.
+
+### Kann ich meine Frage länger als 1.800 Zeichen senden?
+
+Nein. Das Eingabefeld ist auf 1.800 Zeichen begrenzt. Für ausführlichere Angaben können Sie eine Nachricht aufteilen.
+
+### Bleibt der Chatverlauf erhalten?
+
+**Im Quellcode nicht eindeutig erkennbar.** Es gibt zwar eine interne Chat-Historie, aber der gekürzte Auszug zeigt nicht, ob diese dauerhaft gespeichert oder beim Schließen zurückgesetzt wird.
+
+### Kann der Kundenservice Links und Codebeispiele anzeigen?
+
+Ja. Der Chatcode unterstützt Links, Inline-Code, Codeblöcke, Tabellen und weitere Markdown-ähnliche Formatierungen.
+
+### Funktionieren alle Links?
+
+Links werden nur als klickbare Links übernommen, wenn sie mit `http://` oder `https://` beginnen. Andere Formate bleiben normaler Text. Ob jeder externe Link erreichbar ist, kann der Websitecode nicht garantieren.
+
+### Werden meine Nachrichten an Dritte weitergegeben?
+
+Die Nachrichten werden zur Bearbeitung an einen externen KI-Supportdienst gesendet. Über Umfang, Speicherung, Löschung und Auftragsverarbeitung enthält der bereitgestellte Quellcode keine ausreichenden Angaben. Bitte senden Sie keine sensiblen Daten.
+
+### Ist die Antwort des Supports verbindlich?
+
+Das ist im Quellcode nicht dokumentiert. Für verbindliche Auskünfte zu Käufen, Terminen, Preisen, Rückgaben oder Verträgen sollte ein offizieller Kontaktweg der verantwortlichen Stelle genutzt werden.
+
+### Kann ich den Support schließen?
+
+Ja. Klicken Sie oben rechts im Chat-Fenster auf **„×“**. Die Support-Schaltfläche bleibt anschließend sichtbar.
+
+### Was passiert bei einer sehr langen Antwort?
+
+Der Nachrichtenbereich ist scrollbar. Die Ansicht wird nach Eingang einer Antwort automatisch nach unten bewegt. Ältere Nachrichten können durch manuelles Scrollen eingesehen werden.
+
+### Warum wird eine Statusanzeige dauerhaft angezeigt?
+
+Das kann auf eine verzögerte Netzwerkverbindung oder ein Problem beim externen Supportdienst hindeuten. Warten Sie kurz, prüfen Sie die Internetverbindung und laden Sie anschließend die Seite neu. Eine automatische Wiederholung oder eine konkrete Fehlermeldung ist im geprüften Auszug nicht erkennbar.
+
+---
+
+## 11
