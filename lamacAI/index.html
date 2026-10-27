@@ -3,116 +3,976 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11211d">
   <title>lamacAI</title>
+
   <style>
-    :root { --green:#007e62; --deep:#11211d; --cream:#f7f5ef; --bubble:#d8f8e8; --muted:#61716b; }
-    * { box-sizing:border-box; }
-    body { min-height:100vh; margin:0; color:var(--deep); font:15px/1.45 Inter,ui-sans-serif,system-ui,sans-serif; background:linear-gradient(135deg,#e9faf3,#f8f5ec); }
-    main { width:min(840px,calc(100% - 28px)); min-height:100vh; margin:auto; display:flex; flex-direction:column; box-shadow:0 0 50px #1a504020; background:#efeae2; }
-    header { display:flex; align-items:center; gap:12px; padding:17px 22px; color:white; background:var(--deep); }
-    .avatar { display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#00b884,#007e62); font-size:19px; font-weight:800; }
-    h1 { margin:0; font-size:17px; } .status { color:#b5c6bf; font-size:12px; }
-    .privacy { margin-left:auto; color:#b5c6bf; font-size:12px; text-align:right; }
-    #messages { flex:1; min-height:620px; padding:27px clamp(14px,5vw,60px); overflow:auto; background-image:radial-gradient(#d7d0c2 1px,transparent 1px); background-size:19px 19px; }
-    .day { width:max-content; margin:0 auto 22px; padding:5px 10px; border-radius:7px; background:#fff; color:#5c6b66; font-size:11px; box-shadow:0 1px 2px #0001; }
-    .msg { max-width:min(82%,570px); margin:9px 0; padding:9px 11px 6px; border-radius:9px; background:white; box-shadow:0 1px 1px #00000018; white-space:pre-wrap; overflow-wrap:anywhere; }
-    .msg.me { margin-left:auto; border-top-right-radius:0; background:var(--bubble); }.msg.bot { border-top-left-radius:0; }
-    .time { display:block; margin-top:3px; color:#72817b; text-align:right; font-size:10px; }.notice { border-left:3px solid #e4ac2d; background:#fff9e7; color:#675d33; }
-    form { display:flex; gap:9px; padding:13px 18px; background:#f0f2f5; } input { flex:1; min-width:0; border:0; border-radius:24px; padding:12px 16px; outline:0; font:inherit; } button { width:47px; border:0; border-radius:50%; color:white; background:var(--green); cursor:pointer; font-size:18px; } button:disabled { opacity:.55; cursor:wait; }
-    footer { padding:0 18px 12px; background:#f0f2f5; color:var(--muted); text-align:center; font-size:11px; }
-    @media (max-width:600px) { main { width:100%; } #messages { min-height:calc(100vh - 145px); } .privacy { display:none; } }
+    :root {
+      --green: #007e62;
+      --deep: #11211d;
+      --cream: #f7f5ef;
+      --bubble: #d8f8e8;
+      --muted: #61716b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--deep);
+      font: 15px/1.45 Inter, ui-sans-serif, system-ui, sans-serif;
+      background: linear-gradient(135deg, #e9faf3, #f8f5ec);
+    }
+
+    main {
+      width: min(840px, 100%);
+      min-height: 100vh;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      background: #efeae2;
+      box-shadow: 0 0 50px #1a504020;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 17px 22px;
+      color: white;
+      background: var(--deep);
+    }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00b884, #007e62);
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .status {
+      color: #b5c6bf;
+      font-size: 12px;
+    }
+
+    .privacy {
+      margin-left: auto;
+      color: #b5c6bf;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    #messages {
+      flex: 1;
+      min-height: 0;
+      padding: 27px clamp(14px, 5vw, 60px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      background-image: radial-gradient(#d7d0c2 1px, transparent 1px);
+      background-size: 19px 19px;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+    }
+
+    .day {
+      width: max-content;
+      margin: 0 auto 22px;
+      padding: 5px 10px;
+      border-radius: 7px;
+      background: #fff;
+      color: #5c6b66;
+      font-size: 11px;
+      box-shadow: 0 1px 2px #0001;
+    }
+
+    .msg {
+      max-width: min(82%, 570px);
+      min-width: 0;
+      margin: 9px 0;
+      padding: 10px 12px 6px;
+      border-radius: 9px;
+      background: white;
+      box-shadow: 0 1px 1px #00000018;
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+
+    .msg.me {
+      margin-left: auto;
+      border-top-right-radius: 0;
+      background: var(--bubble);
+      white-space: pre-wrap;
+    }
+
+    .msg.bot {
+      border-top-left-radius: 0;
+    }
+
+    .time {
+      display: block;
+      margin-top: 5px;
+      color: #72817b;
+      text-align: right;
+      font-size: 10px;
+    }
+
+    .notice {
+      border-left: 3px solid #e4ac2d;
+      background: #fff9e7;
+      color: #675d33;
+    }
+
+    /* Markdown */
+
+    .msg.bot p {
+      margin: 0 0 9px;
+    }
+
+    .msg.bot p:last-child {
+      margin-bottom: 0;
+    }
+
+    .msg.bot h1,
+    .msg.bot h2,
+    .msg.bot h3,
+    .msg.bot h4 {
+      margin: 12px 0 6px;
+      line-height: 1.3;
+      color: #173c30;
+    }
+
+    .msg.bot h1 { font-size: 20px; }
+    .msg.bot h2 { font-size: 18px; }
+    .msg.bot h3 { font-size: 16px; }
+    .msg.bot h4 { font-size: 14px; }
+
+    .msg.bot ul,
+    .msg.bot ol {
+      margin: 7px 0;
+      padding-left: 23px;
+    }
+
+    .msg.bot li {
+      margin: 3px 0;
+    }
+
+    .msg.bot blockquote {
+      margin: 8px 0;
+      padding: 5px 10px;
+      border-left: 3px solid var(--green);
+      color: #52635c;
+    }
+
+    .msg.bot a {
+      color: #006b53;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      overflow-wrap: anywhere;
+    }
+
+    .msg.bot code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #edf0ed;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: .9em;
+    }
+
+    .msg.bot pre {
+      max-width: 100%;
+      overflow: auto;
+      margin: 8px 0;
+      padding: 11px;
+      border-radius: 9px;
+      background: #17231f;
+      color: #e8f5ed;
+      white-space: pre;
+      tab-size: 2;
+    }
+
+    .msg.bot pre code {
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font-size: 12px;
+    }
+
+    .msg.bot hr {
+      margin: 10px 0;
+      border: 0;
+      border-top: 1px solid #d8dedb;
+    }
+
+    .table-wrap {
+      max-width: 100%;
+      margin: 9px 0;
+      overflow-x: auto;
+      border: 1px solid #d9e0dc;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .msg.bot table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .msg.bot th,
+    .msg.bot td {
+      padding: 8px;
+      border-bottom: 1px solid #e5e9e6;
+      vertical-align: top;
+    }
+
+    .msg.bot th {
+      background: #eaf3ee;
+      font-weight: 700;
+    }
+
+    .msg.bot tr:last-child td {
+      border-bottom: 0;
+    }
+
+    /* Tipp-Anzeige */
+
+    .typing {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      width: fit-content;
+      min-width: 65px;
+      padding: 14px 15px;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #668078;
+      animation: bounce 1.15s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: .15s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: .3s;
+    }
+
+    @keyframes bounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: .45;
+      }
+      30% {
+        transform: translateY(-6px);
+        opacity: 1;
+      }
+    }
+
+    /* Eingabe */
+
+    #chat {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 18px;
+      border-top: 1px solid #e0e4e1;
+      background: #f0f2f5;
+    }
+
+    #text {
+      flex: 1;
+      width: 0;
+      min-width: 0;
+      height: 45px;
+      padding: 12px 16px;
+      border: 1px solid #d9dfdb;
+      border-radius: 24px;
+      outline: none;
+      background: #fff;
+      color: var(--deep);
+      font: inherit;
+    }
+
+    #text:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px #007e621c;
+    }
+
+    #send {
+      display: grid;
+      place-items: center;
+      width: 45px;
+      height: 45px;
+      flex-shrink: 0;
+      border: 0;
+      border-radius: 50%;
+      color: white;
+      background: var(--green);
+      cursor: pointer;
+      font-size: 20px;
+      transition: background .2s, opacity .2s;
+    }
+
+    #send:hover:not(:disabled) {
+      background: #00644e;
+    }
+
+    #send:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+
+    footer {
+      padding: 0 18px 12px;
+      background: #f0f2f5;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        width: 100%;
+      }
+
+      #messages {
+        padding: 18px 12px;
+      }
+
+      .msg {
+        max-width: 90%;
+      }
+
+      .privacy {
+        display: none;
+      }
+
+      .app-header {
+        padding: 13px 15px;
+      }
+
+      #chat {
+        padding: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #messages {
+        scroll-behavior: auto;
+      }
+
+      .typing-dot {
+        animation: none;
+        opacity: .8;
+      }
+    }
   </style>
 </head>
+
 <body>
   <main>
-    <header><div class="avatar">LC</div><div><h1>lamacAI</h1><div class="status">Kurznachrichten KI</div></div><div class="privacy">Keine Notfallhilfe<br>Bitte keine sensiblen Daten senden</div></header>
-    <section id="messages" aria-live="polite"><div class="day">HEUTE</div><div class="msg bot">Hallo! Wie kann ich Ihnen helfen?<span class="time">jetzt</span></div></section>
-    <form id="chat"><input id="text" autocomplete="off" placeholder="Nachricht schreiben" maxlength="1800" aria-label="Nachricht"><button id="send" aria-label="Senden">➤</button></form>
-    <footer>Antworten werden KI-generiert und können Fehler enthalten.</footer>
+    <header class="app-header">
+      <div class="avatar">LC</div>
+
+      <div>
+        <h1>lamacAI</h1>
+        <div class="status">KI-gestützter Kundenservice</div>
+      </div>
+
+      <div class="privacy">
+        Keine Notfallhilfe<br>
+        Bitte keine sensiblen Daten senden
+      </div>
+    </header>
+
+    <section id="messages" aria-live="polite" aria-relevant="additions">
+      <div class="day">HEUTE</div>
+      <div class="msg bot">
+        Hallo! Wie kann ich dir weiterhelfen?
+        <span class="time">jetzt</span>
+      </div>
+    </section>
+
+    <form id="chat">
+      <input
+        id="text"
+        type="text"
+        autocomplete="off"
+        placeholder="Nachricht schreiben …"
+        maxlength="1800"
+        aria-label="Deine Nachricht"
+        required
+      >
+
+      <button id="send" type="submit" aria-label="Nachricht senden">
+        ➤
+      </button>
+    </form>
+
+    <footer>
+      Antworten werden KI-generiert und können Fehler enthalten.
+    </footer>
   </main>
+
   <script>
-    // Nach dem Veröffentlichen des Cloudflare Workers diese Adresse ersetzen.
-    const WORKER_URL = 'https://lamacai.oslamu.workers.dev/chat';
-    const messages = document.querySelector('#messages'), input = document.querySelector('#text'), form = document.querySelector('#chat'), send = document.querySelector('#send');
-    let history = [], sentCount = 0, warningShown = false;
-    const now = () => new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-    function add(text, kind, extra='') { const el=document.createElement('div'); el.className='msg '+kind+' '+extra; el.textContent=text; const time=document.createElement('span'); time.className='time'; time.textContent=now(); el.append(time); messages.append(el); messages.scrollTop=messages.scrollHeight; return el; }
-    function showWarning() { if (!warningShown && sentCount === 15) { warningShown=true; add('Hinweis: Bitte fassen Sie Ihr Anliegen möglichst in wenigen, konkreten Nachrichten zusammen. So kann unser Support schneller helfen.','bot','notice'); } }
-    form.addEventListener('submit', async event => {
-      event.preventDefault(); const text=input.value.trim(); if (!text || send.disabled) return;
-      if (WORKER_URL.includes('DEIN-WORKER')) { add('Der Kundenservice wird noch eingerichtet. Bitte später erneut versuchen.','bot','notice'); return; }
-      add(text,'me'); input.value=''; sentCount++; showWarning(); send.disabled=true;
-      const typing=document.createElement('div'); typing.className='msg bot'; typing.textContent='Support antwortet …'; messages.append(typing); messages.scrollTop=messages.scrollHeight;
-      try {
-        const response=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history})});
-        const data=await response.json().catch(()=>({})); if(!response.ok) throw new Error(data.error || 'Der Support ist momentan nicht erreichbar.');
-        add(data.reply,'bot'); history.push({role:'user',content:text},{role:'assistant',content:data.reply});
-        if(history.length>12) history=history.slice(-12);
-      } catch(error) { add(error.message || 'Verbindung fehlgeschlagen. Bitte versuchen Sie es später erneut.','bot','notice'); }
-      finally { typing.remove(); send.disabled=false; input.focus(); }
-    });
-  </script>
-  <script>
-(function () {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    (() => {
+      "use strict";
 
-  // 1) Nur anzeigen, wenn der Referrer exakt https://www.lamachub.de ist
-  let referrer = '';
-  try { referrer = new URL(document.referrer); } catch (e) {}
-  if (
-    referrer.protocol !== 'https:' ||
-    referrer.hostname.toLowerCase() !== 'www.lamachub.de'
-  ) return;
+      // Vorhandenen lamacHub-Worker verwenden.
+      const WORKER_URL =
+        "https://carescape-ai.oslamuoslamu.workers.dev/";
 
-  // 2) Container in Shadow DOM, damit die Styles der Host-Seite nicht stören
-  const root = document.createElement('div');
-  root.setAttribute('data-lamachub-back', '');
-  Object.assign(root.style, {
-    all: 'initial',
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    zIndex: '2147483647',
-    pointerEvents: 'none'
-  });
-  document.documentElement.appendChild(root);
+      const messagesEl = document.querySelector("#messages");
+      const input = document.querySelector("#text");
+      const form = document.querySelector("#chat");
+      const send = document.querySelector("#send");
 
-  const shadow = root.attachShadow({ mode: 'open' });
-  shadow.innerHTML = `
-    <style>
-      :host { all: initial; }
-      button {
-        pointer-events: auto;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin: 12px;
-        padding: 10px 16px;
-        background: #ff6a00;
-        color: #fff;
-        font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        border: 0;
-        border-radius: 8px;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,.2);
-        transition: background .15s ease, transform .1s ease;
+      let history = [];
+      let sentCount = 0;
+      let warningShown = false;
+      let busy = false;
+
+      const now = () => new Date().toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      function scrollToBottom() {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
       }
-      button:hover  { background: #e65f00; }
-      button:active { transform: scale(.97); }
-      button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-      .arrow { font-size: 16px; line-height: 1; }
-    </style>
-    <button type="button" aria-label="Zurück zu lamachub.de">
-      <span class="arrow">←</span>
-      <span>Zurück</span>
-    </button>
-  `;
 
-  shadow.querySelector('button').addEventListener('click', () => {
-    // Navigation im selben Tab (window.top bricht ggf. aus iFrames aus)
-    window.top.location.href = 'https://www.lamachub.de/';
-  });
-})();
-</script>
+      function add(text, kind, extra = "", markdown = false) {
+        const el = document.createElement("div");
+        el.className = "msg " + kind + (extra ? " " + extra : "");
+
+        if (markdown && kind === "bot") {
+          el.innerHTML = renderMarkdown(text);
+        } else {
+          el.textContent = text;
+        }
+
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = now();
+        el.appendChild(time);
+
+        messagesEl.appendChild(el);
+        scrollToBottom();
+
+        return el;
+      }
+
+      function showWarning() {
+        if (!warningShown && sentCount === 15) {
+          warningShown = true;
+
+          add(
+            "Hinweis: Bitte fasse dein Anliegen möglichst in wenigen, konkreten Nachrichten zusammen. So kann der Support schneller helfen.",
+            "bot",
+            "notice"
+          );
+        }
+      }
+
+      function escapeHTML(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function safeLink(url) {
+        try {
+          const parsed = new URL(url);
+
+          if (
+            parsed.protocol === "https:" ||
+            parsed.protocol === "http:"
+          ) {
+            return parsed.href;
+          }
+        } catch (_) {}
+
+        return null;
+      }
+
+      function renderInline(text) {
+        let value = escapeHTML(text);
+        const codeParts = [];
+
+        value = value.replace(/`([^`\n]+)`/g, (_, code) => {
+          const index = codeParts.length;
+          codeParts.push("<code>" + code + "</code>");
+          return "LAMACCODE" + index + "END";
+        });
+
+        // Markdown-Links. Nur HTTP(S) wird zugelassen.
+        value = value.replace(
+          /$begin:math:display$\(\[\^$end:math:display$]+)\]$begin:math:text$\(https\?\:\\\/\\\/\[\^\)\\s\]\+\)$end:math:text$/g,
+          (_, label, url) => {
+            const safe = safeLink(url.replace(/&amp;/g, "&"));
+
+            if (!safe) return label;
+
+            return '<a href="' + escapeHTML(safe) +
+              '" target="_blank" rel="noopener noreferrer">' +
+              label + "</a>";
+          }
+        );
+
+        // Einfache URLs verlinken.
+        value = value.replace(
+          /(^|[\s(])(https?:\/\/[^\s<]+)/g,
+          (match, prefix, url) => {
+            const cleanURL = url.replace(/[.,!?;:]+$/, "");
+            const trailing = url.slice(cleanURL.length);
+            const safe = safeLink(cleanURL.replace(/&amp;/g, "&"));
+
+            if (!safe) return match;
+
+            return prefix +
+              '<a href="' + escapeHTML(safe) +
+              '" target="_blank" rel="noopener noreferrer">' +
+              cleanURL + "</a>" + trailing;
+          }
+        );
+
+        value = value.replace(
+          /\*\*\*(.+?)\*\*\*/g,
+          "<strong><em>$1</em></strong>"
+        );
+        value = value.replace(
+          /\*\*(.+?)\*\*/g,
+          "<strong>$1</strong>"
+        );
+        value = value.replace(
+          /(^|[^*])\*([^*\n]+)\*(?!\*)/g,
+          "$1<em>$2</em>"
+        );
+        value = value.replace(
+          /~~(.+?)~~/g,
+          "<del>$1</del>"
+        );
+
+        value = value.replace(
+          /LAMACCODE(\d+)END/g,
+          (_, index) => codeParts[Number(index)] || ""
+        );
+
+        return value;
+      }
+
+      function parseTableRow(line) {
+        return line
+          .trim()
+          .replace(/^\||\|$/g, "")
+          .split("|")
+          .map(cell => cell.trim());
+      }
+
+      function isTableSeparator(line) {
+        const cells = parseTableRow(line);
+
+        return cells.length > 0 &&
+          cells.every(cell => /^\s*:?-{3,}:?\s*$/.test(cell));
+      }
+
+      function renderTable(headerLine, bodyLines) {
+        const headers = parseTableRow(headerLine);
+        const rows = bodyLines.map(parseTableRow);
+
+        let html = '<div class="table-wrap"><table><thead><tr>';
+
+        for (const cell of headers) {
+          html += "<th>" + renderInline(cell) + "</th>";
+        }
+
+        html += "</tr></thead><tbody>";
+
+        for (const row of rows) {
+          html += "<tr>";
+
+          headers.forEach((_, index) => {
+            html += "<td>" + renderInline(row[index] || "") + "</td>";
+          });
+
+          html += "</tr>";
+        }
+
+        return html + "</tbody></table></div>";
+      }
+
+      function renderMarkdown(markdown) {
+        const lines = String(markdown || "")
+          .replace(/\r\n?/g, "\n")
+          .split("\n");
+
+        const output = [];
+        let paragraph = [];
+        let listType = null;
+        let inCodeBlock = false;
+        let codeLines = [];
+
+        function flushParagraph() {
+          if (!paragraph.length) return;
+
+          output.push(
+            "<p>" + paragraph.map(renderInline).join("<br>") + "</p>"
+          );
+
+          paragraph = [];
+        }
+
+        function closeList() {
+          if (listType) {
+            output.push("</" + listType + ">");
+            listType = null;
+          }
+        }
+
+        function closeBlocks() {
+          flushParagraph();
+          closeList();
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+
+          if (/^\s*```/.test(line)) {
+            if (inCodeBlock) {
+              output.push(
+                "<pre><code>" +
+                escapeHTML(codeLines.join("\n")) +
+                "</code></pre>"
+              );
+
+              codeLines = [];
+              inCodeBlock = false;
+            } else {
+              closeBlocks();
+              inCodeBlock = true;
+            }
+
+            continue;
+          }
+
+          if (inCodeBlock) {
+            codeLines.push(line);
+            continue;
+          }
+
+          if (
+            line.includes("|") &&
+            i + 1 < lines.length &&
+            isTableSeparator(lines[i + 1])
+          ) {
+            closeBlocks();
+
+            const header = line;
+            i += 2;
+
+            const rows = [];
+
+            while (
+              i < lines.length &&
+              lines[i].trim() &&
+              lines[i].includes("|")
+            ) {
+              rows.push(lines[i]);
+              i++;
+            }
+
+            i--;
+
+            output.push(renderTable(header, rows));
+            continue;
+          }
+
+          if (!line.trim()) {
+            closeBlocks();
+            continue;
+          }
+
+          const heading = line.match(/^(#{1,4})\s+(.+)$/);
+
+          if (heading) {
+            closeBlocks();
+            const level = heading[1].length;
+
+            output.push(
+              "<h" + level + ">" +
+              renderInline(heading[2]) +
+              "</h" + level + ">"
+            );
+
+            continue;
+          }
+
+          if (/^\s*(---+|\*\*\*+|___+)\s*$/.test(line)) {
+            closeBlocks();
+            output.push("<hr>");
+            continue;
+          }
+
+          const unordered = line.match(/^\s*[-*+]\s+(.+)$/);
+          const ordered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+
+          if (unordered || ordered) {
+            flushParagraph();
+
+            const nextType = unordered ? "ul" : "ol";
+
+            if (listType !== nextType) {
+              closeList();
+              output.push("<" + nextType + ">");
+              listType = nextType;
+            }
+
+            output.push(
+              "<li>" + renderInline((unordered || ordered)[1]) + "</li>"
+            );
+
+            continue;
+          }
+
+          const quote = line.match(/^\s*>\s?(.*)$/);
+
+          if (quote) {
+            closeBlocks();
+
+            output.push(
+              "<blockquote>" +
+              renderInline(quote[1]) +
+              "</blockquote>"
+            );
+
+            continue;
+          }
+
+          closeList();
+          paragraph.push(line);
+        }
+
+        if (inCodeBlock) {
+          output.push(
+            "<pre><code>" +
+            escapeHTML(codeLines.join("\n")) +
+            "</code></pre>"
+          );
+        }
+
+        closeBlocks();
+
+        return output.join("");
+      }
+
+      function showTyping() {
+        const el = document.createElement("div");
+        el.className = "msg bot typing";
+        el.setAttribute("role", "status");
+        el.setAttribute("aria-label", "lamacAI antwortet");
+
+        for (let i = 0; i < 3; i++) {
+          const dot = document.createElement("span");
+          dot.className = "typing-dot";
+          el.appendChild(dot);
+        }
+
+        messagesEl.appendChild(el);
+        scrollToBottom();
+
+        return el;
+      }
+
+      function setBusy(value) {
+        busy = value;
+        send.disabled = value;
+        input.disabled = value;
+        send.setAttribute("aria-busy", String(value));
+      }
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const text = input.value.trim();
+
+        if (!text || busy) return;
+
+        add(text, "me");
+        input.value = "";
+        sentCount++;
+        showWarning();
+
+        const messages = [
+          ...history,
+          { role: "user", content: text }
+        ];
+
+        setBusy(true);
+        const typing = showTyping();
+
+        try {
+          const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              mode: "support",
+              messages
+            })
+          });
+
+          const raw = await response.text();
+          let data;
+
+          try {
+            data = JSON.parse(raw);
+          } catch (_) {
+            throw new Error(
+              "Der Kundenservice hat eine ungültige Antwort geliefert."
+            );
+          }
+
+          if (!response.ok) {
+            throw new Error(
+              data.error || "Der Support ist momentan nicht erreichbar."
+            );
+          }
+
+          if (
+            typeof data.reply !== "string" ||
+            !data.reply.trim()
+          ) {
+            throw new Error("Der Kundenservice hat leer geantwortet.");
+          }
+
+          typing.remove();
+          add(data.reply, "bot", "", true);
+
+          history = [
+            ...messages,
+            { role: "assistant", content: data.reply }
+          ].slice(-12);
+
+        } catch (error) {
+          typing.remove();
+
+          console.error("lamacAI:", error);
+
+          add(
+            "Die KI ist gerade nicht erreichbar. Bitte versuche es später erneut.",
+            "bot",
+            "notice"
+          );
+
+        } finally {
+          setBusy(false);
+          input.focus();
+        }
+      });
+    })();
+  </script>
+
+  <!-- Zurück-Button von lamacHub -->
+  <script>
+    (() => {
+      "use strict";
+
+      let referrer;
+
+      try {
+        referrer = new URL(document.referrer);
+      } catch (_) {
+        return;
+      }
+
+      if (
+        referrer.protocol !== "https:" ||
+        referrer.hostname.toLowerCase() !== "www.lamachub.de"
+      ) {
+        return;
+      }
+
+      const root = document.createElement("div");
+
+      Object.assign(root.style, {
+        all: "initial",
+        position: "fixed",
+        top: "0",
+        left: "0",
+        zIndex: "2147483647",
+        pointerEvents: "none"
+      });
+
+      document.documentElement.appendChild(root);
+
+      const shadow = root.attachShadow({ mode: "open" });
+
+      shadow.innerHTML = `
+        <style>
+          button {
+            pointer-events: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 12px;
+            padding: 10px 16px;
+            background: #ff6a00;
+            color: #fff;
+            font: 600 14px/1 -apple-system, BlinkMacSystemFont,
+              "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+          }
+
+          button:hover {
+            background: #e65f00;
+          }
+
+          button:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+          }
+
+          .arrow {
+            font-size: 16px;
+          }
+        </style>
+
+        <button type="button" aria-label="Zurück zu lamacHub">
+          <span class="arrow">←</span>
+          <span>Zurück</span>
+        </button>
+      `;
+
+      shadow.querySelector("button").addEventListener("click", () => {
+        window.top.location.href = "https://www.lamachub.de/";
+      });
+    })();
+  </script>
 </body>
 </html>
