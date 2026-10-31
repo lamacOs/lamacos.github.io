@@ -1,0 +1,696 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lamacHub AI Studio</title>
+<link rel="icon" href="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+ --bg:#f7f7f8;
+ --card:#fff;
+ --text:#171717;
+ --muted:#777;
+ --border:#e9e9e9;
+ --accent:#ff7a00;
+ --soft:#fff1e5;
+}
+body.dark{
+ --bg:#0f1115;
+ --card:#1a1d23;
+ --text:#f2f2f2;
+ --muted:#aaa;
+ --border:#2a2f3a;
+ --soft:#392718;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+ font-family:Inter,sans-serif;
+ background:var(--bg);
+ color:var(--text);
+ min-height:100vh;
+ transition:.2s;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+header{
+ height:68px;
+ background:var(--card);
+ border-bottom:1px solid var(--border);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:0 22px;
+ position:sticky;
+ top:0;
+ z-index:10;
+}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800}
+.brand img{width:36px;height:36px;border-radius:9px}
+.brand span{color:var(--accent)}
+.header-right{display:flex;gap:10px;align-items:center}
+.icon{
+ border:1px solid var(--border);
+ background:var(--card);
+ color:var(--text);
+ border-radius:10px;
+ padding:9px 12px;
+}
+.layout{
+ display:grid;
+ grid-template-columns:235px 1fr;
+ min-height:calc(100vh - 68px);
+}
+aside{
+ background:var(--card);
+ border-right:1px solid var(--border);
+ padding:22px 14px;
+}
+.side-title{
+ color:var(--muted);
+ font-size:11px;
+ font-weight:700;
+ letter-spacing:1px;
+ padding:12px 10px;
+}
+.navbtn{
+ display:flex;
+ gap:12px;
+ align-items:center;
+ width:100%;
+ border:0;
+ background:transparent;
+ color:var(--text);
+ padding:13px;
+ border-radius:11px;
+ text-align:left;
+ margin-bottom:4px;
+ font-size:13px;
+}
+.navbtn:hover,.navbtn.active{
+ background:var(--soft);
+ color:var(--accent);
+}
+main{
+ width:100%;
+ max-width:1100px;
+ margin:auto;
+ padding:38px 25px 70px;
+}
+.page{display:none}
+.page.active{display:block}
+h1{font-size:29px;font-weight:800}
+.subtitle{color:var(--muted);font-size:13px;margin-top:9px;line-height:1.7}
+.card{
+ background:var(--card);
+ border:1px solid var(--border);
+ border-radius:17px;
+ padding:22px;
+ margin-top:22px;
+}
+.card h2{font-size:17px;margin-bottom:15px}
+textarea,input[type=text]{
+ width:100%;
+ padding:14px;
+ border:1px solid var(--border);
+ background:var(--bg);
+ color:var(--text);
+ border-radius:11px;
+ outline:none;
+ resize:vertical;
+}
+textarea:focus,input:focus{border-color:var(--accent)}
+textarea{min-height:130px;line-height:1.6}
+.primary{
+ border:0;
+ border-radius:10px;
+ padding:12px 19px;
+ color:white;
+ background:var(--accent);
+ font-weight:700;
+ font-size:13px;
+}
+.primary:hover{filter:brightness(.94)}
+.secondary{
+ border:1px solid var(--border);
+ background:var(--card);
+ color:var(--text);
+ padding:11px 15px;
+ border-radius:10px;
+ font-size:13px;
+}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:13px}
+.messages{
+ display:flex;
+ flex-direction:column;
+ gap:13px;
+ margin-top:20px;
+}
+.message{
+ padding:14px 16px;
+ border-radius:13px;
+ max-width:90%;
+ font-size:13px;
+ line-height:1.7;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.user{align-self:flex-end;background:var(--soft)}
+.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--border)}
+.status{font-size:12px;color:var(--muted);margin-top:12px}
+.upload{
+ border:2px dashed var(--border);
+ padding:35px 15px;
+ text-align:center;
+ border-radius:13px;
+ cursor:pointer;
+ color:var(--muted);
+}
+.upload:hover{border-color:var(--accent)}
+.upload input{display:none}
+.preview{
+ max-width:100%;
+ max-height:350px;
+ object-fit:contain;
+ margin-top:15px;
+ border-radius:12px;
+}
+.output{
+ background:var(--bg);
+ border:1px solid var(--border);
+ border-radius:11px;
+ padding:15px;
+ margin-top:15px;
+ overflow-wrap:anywhere;
+ white-space:pre-wrap;
+ font-size:12px;
+ max-height:350px;
+ overflow:auto;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+ gap:15px;
+ margin-top:22px;
+}
+.toolcard{
+ background:var(--card);
+ border:1px solid var(--border);
+ border-radius:15px;
+ padding:20px;
+ cursor:pointer;
+ transition:.2s;
+}
+.toolcard:hover{border-color:var(--accent);transform:translateY(-3px)}
+.toolcard .emoji{font-size:27px;margin-bottom:13px}
+.toolcard h3{font-size:15px}
+.toolcard p{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
+@media(max-width:700px){
+ .layout{grid-template-columns:1fr}
+ aside{
+  border-right:0;
+  border-bottom:1px solid var(--border);
+  padding:8px;
+  display:flex;
+  overflow-x:auto;
+  gap:4px;
+ }
+ .side-title{display:none}
+ .navbtn{width:auto;white-space:nowrap;padding:12px}
+ main{padding:27px 15px}
+ h1{font-size:24px}
+ .card{padding:16px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="brand">
+  <img src="https://raw.githubusercontent.com/lamacOs/lamacos.github.io/refs/heads/main/logo.png">
+  <div>lamac<span>Hub</span> AI Studio</div>
+ </div>
+ <div class="header-right">
+  <button class="icon" onclick="toggleDark()">🌙</button>
+ </div>
+</header>
+
+<div class="layout">
+
+<aside>
+ <div class="side-title">WORKSPACE</div>
+ <button class="navbtn active" data-page="home">🏠 Übersicht</button>
+ <button class="navbtn" data-page="chat">💬 KI-Chat</button>
+ <button class="navbtn" data-page="encoder">🖼️ Bild → Text</button>
+ <button class="navbtn" data-page="decoder">🔄 Text → Bild</button>
+ <button class="navbtn" data-page="generator">✨ Bildgenerator</button>
+</aside>
+
+<main>
+
+<!-- HOME -->
+<section class="page active" id="home">
+ <h1>AI Studio 🚀</h1>
+ <p class="subtitle">
+ Willkommen im lamacHub AI Studio.<br>
+ Deine KI-Werkzeuge an einem Ort.
+ </p>
+
+ <div class="grid">
+  <div class="toolcard" onclick="showPage('chat')">
+   <div class="emoji">💬</div>
+   <h3>KI-Chat</h3>
+   <p>Kommuniziere mit der lamacHub KI.</p>
+  </div>
+  <div class="toolcard" onclick="showPage('encoder')">
+   <div class="emoji">🖼️</div>
+   <h3>Bild zu Text</h3>
+   <p>Wandle Bilder in Base64 um.</p>
+  </div>
+  <div class="toolcard" onclick="showPage('decoder')">
+   <div class="emoji">🔄</div>
+   <h3>Text zu Bild</h3>
+   <p>Stelle Bilder aus Base64 wieder her.</p>
+  </div>
+  <div class="toolcard" onclick="showPage('generator')">
+   <div class="emoji">✨</div>
+   <h3>Bildgenerator</h3>
+   <p>Bereite Bildideen für deine KI auf.</p>
+  </div>
+ </div>
+
+ <div class="card">
+  <h2>Über das AI Studio</h2>
+  <p class="subtitle">
+  Die Text-KI verwendet deinen bestehenden Cloudflare Worker.
+  Die Bildcodierung und Decodierung funktionieren direkt im Browser.
+  Für echte KI-Bildgenerierung ist ein entsprechender API-Endpunkt erforderlich.
+  </p>
+ </div>
+</section>
+
+<!-- CHAT -->
+<section class="page" id="chat">
+ <h1>KI-Chat 💬</h1>
+ <p class="subtitle">Kommuniziere direkt mit deiner bestehenden lamacHub KI.</p>
+
+ <div class="card">
+  <div id="messages" class="messages">
+   <div class="message bot">Hallo! Ich bin der lamacHub Kundenservice. Wie kann ich dir helfen?</div>
+  </div>
+  <form id="chatForm">
+   <textarea id="chatInput" placeholder="Schreibe deine Nachricht..." required></textarea>
+   <div class="actions">
+    <button class="primary" type="submit" id="send">Nachricht senden ➤</button>
+    <button class="secondary" type="button" onclick="clearChat()">Chat löschen</button>
+   </div>
+  </form>
+  <div class="status" id="chatStatus">Verbunden über deinen bestehenden Worker.</div>
+ </div>
+</section>
+
+<!-- ENCODER -->
+<section class="page" id="encoder">
+ <h1>Bild → Text 🖼️</h1>
+ <p class="subtitle">Wandle ein Bild in einen Base64-Text um.</p>
+
+ <div class="card">
+  <h2>Bild auswählen</h2>
+  <label class="upload">
+   <input type="file" id="imageFile" accept="image/*">
+   <div>📁</div>
+   <p>Bild auswählen oder hier klicken</p>
+   <small>PNG, JPG, WebP und weitere Browserformate</small>
+  </label>
+  <img id="encoderPreview" class="preview hidden">
+  <div class="actions">
+   <button class="primary" onclick="encodeImage()">In Text umwandeln</button>
+  </div>
+  <textarea id="encodedText" placeholder="Hier erscheint dein Base64-Text..." style="margin-top:15px" readonly></textarea>
+  <div class="actions">
+   <button class="secondary" onclick="copyEncoded()">Text kopieren</button>
+   <button class="secondary" onclick="downloadEncoded()">TXT herunterladen</button>
+  </div>
+ </div>
+</section>
+
+<!-- DECODER -->
+<section class="page" id="decoder">
+ <h1>Text → Bild 🔄</h1>
+ <p class="subtitle">Wandle Base64-Text wieder in ein Bild um.</p>
+
+ <div class="card">
+  <h2>Base64 eingeben</h2>
+  <textarea id="decodeInput" placeholder="data:image/png;base64,..."></textarea>
+  <div class="actions">
+   <button class="primary" onclick="decodeImage()">Bild decodieren</button>
+  </div>
+  <div id="decodeResult"></div>
+ </div>
+</section>
+
+<!-- GENERATOR -->
+<section class="page" id="generator">
+ <h1>KI-Bildgenerator ✨</h1>
+ <p class="subtitle">
+ Beschreibe dein gewünschtes Bild. Deine Text-KI kann dir helfen, den Prompt zu verbessern.
+ </p>
+
+ <div class="card">
+  <h2>Deine Bildidee</h2>
+  <textarea id="imagePrompt" placeholder="Beispiel: Eine futuristische Minecraft-Stadt bei Sonnenuntergang..."></textarea>
+
+  <div class="actions">
+   <button class="primary" onclick="improvePrompt()">✨ Prompt mit KI verbessern</button>
+   <button class="secondary" onclick="resetPrompt()">Zurücksetzen</button>
+  </div>
+
+  <div class="status" id="generatorStatus"></div>
+
+  <h2 style="margin-top:25px">Fertiger Bild-Prompt</h2>
+  <textarea id="finalPrompt" placeholder="Hier erscheint dein verbesserter Prompt..."></textarea>
+
+  <div class="actions">
+   <button class="secondary" onclick="copyPrompt()">Prompt kopieren</button>
+  </div>
+
+  <div class="status">
+   Hinweis: Das Erstellen eines echten Bildes benötigt einen Bildgenerierungsdienst.
+   Der bestehende Worker liefert nach dem bekannten API-Vertrag nur Textantworten.
+  </div>
+ </div>
+</section>
+
+</main>
+</div>
+
+<footer>© 2026 lamacHub — AI Studio</footer>
+
+<script>
+const WORKER_URL =
+ "https://carescape-ai.oslamuoslamu.workers.dev/";
+
+let history = [];
+let busy = false;
+
+function showPage(name){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.querySelectorAll(".navbtn").forEach(b=>b.classList.remove("active"));
+
+ document.getElementById(name).classList.add("active");
+
+ const button=document.querySelector('[data-page="'+name+'"]');
+ if(button)button.classList.add("active");
+
+ window.scrollTo(0,0);
+}
+
+document.querySelectorAll(".navbtn").forEach(btn=>{
+ btn.addEventListener("click",()=>showPage(btn.dataset.page));
+});
+
+function toggleDark(){
+ document.body.classList.toggle("dark");
+ localStorage.setItem("lamac-dark",document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("lamac-dark")==="true"){
+ document.body.classList.add("dark");
+}
+
+// ---------------- KI CHAT ----------------
+
+function addMessage(text,type){
+ const div=document.createElement("div");
+ div.className="message "+type;
+ div.textContent=text;
+ document.getElementById("messages").appendChild(div);
+ div.scrollIntoView({behavior:"smooth",block:"end"});
+ return div;
+}
+
+function clearChat(){
+ history=[];
+ document.getElementById("messages").innerHTML="";
+ addMessage("Chat zurückgesetzt. Wie kann ich dir helfen?","bot");
+}
+
+document.getElementById("chatForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+
+ if(busy)return;
+
+ const input=document.getElementById("chatInput");
+ const send=document.getElementById("send");
+ const status=document.getElementById("chatStatus");
+ const text=input.value.trim();
+
+ if(!text)return;
+
+ input.value="";
+ addMessage(text,"user");
+
+ const messages=[
+  ...history,
+  {role:"user",content:text}
+ ];
+
+ busy=true;
+ send.disabled=true;
+ status.textContent="KI antwortet...";
+
+ const typing=addMessage("Die KI denkt nach...","bot");
+
+ try{
+  const response=await fetch(WORKER_URL,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    mode:"support",
+    messages
+   })
+  });
+
+  const raw=await response.text();
+  let data;
+
+  try{
+   data=JSON.parse(raw);
+  }catch{
+   throw new Error("Ungültige Serverantwort");
+  }
+
+  if(!response.ok){
+   throw new Error(data.error||"Serverfehler");
+  }
+
+  if(typeof data.reply!=="string"||!data.reply.trim()){
+   throw new Error("Keine Antwort erhalten");
+  }
+
+  typing.remove();
+  addMessage(data.reply,"bot");
+
+  history=[
+   ...messages,
+   {role:"assistant",content:data.reply}
+  ].slice(-12);
+
+  status.textContent="Antwort erhalten.";
+
+ }catch(error){
+  typing.remove();
+  addMessage("Fehler: "+error.message,"bot");
+  status.textContent="Verbindung fehlgeschlagen.";
+ }finally{
+  busy=false;
+  send.disabled=false;
+ }
+});
+
+// ---------------- BILD ENCODER ----------------
+
+let selectedImage=null;
+
+document.getElementById("imageFile").addEventListener("change",e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+
+ if(!file.type.startsWith("image/")){
+  alert("Bitte wähle eine Bilddatei.");
+  return;
+ }
+
+ selectedImage=file;
+
+ const reader=new FileReader();
+ reader.onload=()=>{
+  const preview=document.getElementById("encoderPreview");
+  preview.src=reader.result;
+  preview.classList.remove("hidden");
+ };
+ reader.readAsDataURL(file);
+});
+
+function encodeImage(){
+ if(!selectedImage){
+  alert("Bitte wähle zuerst ein Bild.");
+  return;
+ }
+
+ const reader=new FileReader();
+
+ reader.onload=()=>{
+  document.getElementById("encodedText").value=reader.result;
+ };
+
+ reader.readAsDataURL(selectedImage);
+}
+
+async function copyEncoded(){
+ const text=document.getElementById("encodedText").value;
+ if(!text)return alert("Kein Text vorhanden.");
+
+ await navigator.clipboard.writeText(text);
+ alert("Base64-Text kopiert!");
+}
+
+function downloadEncoded(){
+ const text=document.getElementById("encodedText").value;
+ if(!text)return alert("Kein Text vorhanden.");
+
+ downloadFile(text,"bild-base64.txt","text/plain");
+}
+
+// ---------------- BILD DECODER ----------------
+
+function decodeImage(){
+ const input=document.getElementById("decodeInput").value.trim();
+ const result=document.getElementById("decodeResult");
+
+ if(!input)return alert("Bitte Base64-Text eingeben.");
+
+ try{
+  let dataURL=input;
+
+  if(!input.startsWith("data:image/")){
+   dataURL="data:image/png;base64,"+input;
+  }
+
+  const img=new Image();
+
+  img.onload=()=>{
+   result.innerHTML="";
+   img.className="preview";
+   result.appendChild(img);
+
+   const btn=document.createElement("button");
+   btn.className="primary";
+   btn.style.marginTop="15px";
+   btn.textContent="Bild herunterladen";
+
+   btn.onclick=()=>{
+    const a=document.createElement("a");
+    a.href=dataURL;
+    a.download="lamachub-bild.png";
+    a.click();
+   };
+
+   result.appendChild(btn);
+  };
+
+  img.onerror=()=>{
+   alert("Das Bild konnte nicht decodiert werden. Prüfe deinen Base64-Text.");
+  };
+
+  img.src=dataURL;
+
+ }catch(error){
+  alert("Ungültiger Text.");
+ }
+}
+
+// ---------------- KI PROMPT GENERATOR ----------------
+
+async function improvePrompt(){
+ const idea=document.getElementById("imagePrompt").value.trim();
+ const status=document.getElementById("generatorStatus");
+
+ if(!idea)return alert("Bitte beschreibe deine Bildidee.");
+
+ status.textContent="KI verbessert deinen Prompt...";
+
+ try{
+  const response=await fetch(WORKER_URL,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    mode:"support",
+    messages:[
+     {
+      role:"user",
+      content:
+       "Du bist ein professioneller KI-Bildprompt-Experte. "+
+       "Erstelle aus meiner Idee einen ausführlichen, hochwertigen Bildgenerierungs-Prompt. "+
+       "Beschreibe Motiv, Umgebung, Licht, Perspektive, Farben und Stil. "+
+       "Gib ausschließlich den fertigen Prompt zurück.\n\n"+
+       "Meine Idee: "+idea
+     }
+    ]
+   })
+  });
+
+  const raw=await response.text();
+  let data;
+
+  try{
+   data=JSON.parse(raw);
+  }catch{
+   throw new Error("Ungültige Antwort");
+  }
+
+  if(!response.ok)throw new Error(data.error||"Serverfehler");
+  if(typeof data.reply!=="string"||!data.reply.trim()){
+   throw new Error("Keine Antwort");
+  }
+
+  document.getElementById("finalPrompt").value=data.reply;
+  status.textContent="Prompt erfolgreich erstellt!";
+
+ }catch(error){
+  status.textContent="Fehler: "+error.message;
+ }
+}
+
+function resetPrompt(){
+ document.getElementById("imagePrompt").value="";
+ document.getElementById("finalPrompt").value="";
+ document.getElementById("generatorStatus").textContent="";
+}
+
+async function copyPrompt(){
+ const text=document.getElementById("finalPrompt").value;
+ if(!text)return alert("Kein Prompt vorhanden.");
+
+ await navigator.clipboard.writeText(text);
+ alert("Prompt kopiert!");
+}
+
+function downloadFile(content,name,type){
+ const blob=new Blob([content],{type});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download=name;
+ a.click();
+ URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
