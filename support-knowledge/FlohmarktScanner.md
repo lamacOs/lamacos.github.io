@@ -2,293 +2,156 @@
 <!-- source-path: FlohmarktScanner -->
 <!-- source-files: ["FlohmarktScanner/index.html"] -->
 
-# FlohmarktScanner – Support-Dokumentation
+# Support-Dokumentation: FlohmarktScanner
 
-**Website:** FlohmarktScanner  
-**Vermuteter Zweck:** Im Quellcode erkennbar ist vor allem ein KI-gestützter Kundensupport für die Website „FlohmarktScanner“. Der eigentliche Zweck und die übrigen Inhalte der Website sind anhand des bereitgestellten, gekürzten Quellcodes nicht eindeutig erkennbar.  
+**Website-Name:** FlohmarktScanner  
+**Vermuteter Zweck:** Basierend auf dem Repository-Namen und dem eingebetteten Widget handelt es sich um eine Website zum Scannen/Analysieren von Flohmarkt-Artikeln. Die Hauptfunktionalität der eigentlichen FlohmarktScanner-Anwendung ist **im bereitgestellten Quellcode nicht enthalten**. Der vorliegende Code implementiert ausschließlich das **lamacHub KI-Kundensupport-Widget** (Chat-Interface), das auf der Seite eingebunden ist.  
 **Quellcode-Pfad:** `FlohmarktScanner/index.html`  
-**Datum der Erstellung:** 30. Januar 2026
-
-> **Hinweis zur Quellcode-Basis:** Die Analyse basiert auf einem gekürzten Auszug aus `FlohmarktScanner/index.html`. Nicht geprüft werden konnten unter anderem das Ende der Markdown-Auswertung, die vollständige Netzwerkkommunikation, mögliche Fehlerbehandlungen sowie weitere Seiten oder Dateien des Projekts. Aussagen dazu sind jeweils entsprechend gekennzeichnet.
+**Datum der Erstellung:** 2025-08-15 (basierend auf heutigem Datum)
 
 ---
 
-## 1. Was Besucher auf der Website sehen
+## 1. Überblick & Voraussetzungen
 
-Der geprüfte Quellcode enthält keine sichtbaren Inhalte der eigentlichen Flohmarktseite. Im Vordergrund steht ein fest positioniertes Support-Widget mit folgenden sichtbaren Elementen:
+### 1.1 Was ist das lamacHub Widget?
+Das Widget ist ein **KI-gestützter Support-Chat**, der fest in die FlohmarktScanner-Website integriert ist. Es ermöglicht Besuchern, Fragen zu stellen und automatisierte Antworten zu erhalten.
 
-- eine runde Schaltfläche mit einem Kopf-Symbol unten rechts,
-- ein zunächst geschlossenes Chat-Fenster,
-- die Überschrift **„lamacHub Kundenservice“**,
-- der Hinweis **„KI-gestützter Support“**,
-- ein Begrüßungstext des Kundenservice,
-- ein Nachrichtenbereich,
-- ein Eingabefeld mit dem Platzhalter **„Nachricht schreiben …“**,
-- eine runde Senden-Schaltfläche mit Pfeil-Symbol.
+### 1.2 Technische Voraussetzungen (Client-Seite)
+| Voraussetzung | Status | Hinweis |
+| :--- | :--- | :--- |
+| **JavaScript** | **Erforderlich** | Das Widget ist eine reine Client-Side-Applikation (IIFE). Ohne JS ist es nicht sichtbar/benutzbar. |
+| **Moderner Browser** | Empfohlen | Nutzt `fetch`, `URL` API, `dataset`, `arrow functions`, `const/let`, CSS Custom Properties, `calc()`, `dvh`-Einheiten. |
+| **Netzwerkzugriff** | **Erforderlich** | Muss `https://carescape-ai.oslamuoslamu.workers.dev/` erreichen können (CORS-fähig). |
+| **Cookies / LocalStorage** | Nicht genutzt | Der Chat-Verlauf (`history`) wird nur im Speicher (RAM) gehalten und beim Neuladen verworfen. |
 
-Im geprüften Code ist kein Logo, keine Navigation, keine Suchfunktion und keine Angebotsliste des Flohmarkts sichtbar. Diese Bereiche können in anderen, nicht eingeblendeten Dateien oder im nicht gezeigten Teil der HTML-Datei liegen.
-
----
-
-## 2. Voraussetzungen
-
-Für die sichtbaren Support-Funktionen genügt ein moderner Webbrowser mit aktiviertem JavaScript.
-
-Bestätigt im Quellcode:
-
-- JavaScript wird für das Öffnen des Chats, das Senden und die Darstellung der Antworten benötigt.
-- Die Oberfläche ist für Desktop- und mobile Bildschirmgrößen gestaltet.
-- Für Geräte mit reduzierter Bewegung wird die Animation abgeschaltet.
-- Das Chat-Fenster passt sich an die verfügbare Bildschirmhöhe an.
-- Die Website versucht, Support-Anfragen an einen externen KI-Dienst zu senden.
-
-**Im Quellcode nicht eindeutig erkennbar:**
-
-- Unterstützte Browser und Mindestversionen.
-- Ob eine Anmeldung für die Nutzung des Chats erforderlich ist.
-- Ob der Support auch ohne Netzwerkverbindung erreichbar ist.
-- Ob ein Konto, ein Login oder eine Registrierung für FlohmarktScanner insgesamt notwendig ist.
+### 1.3 Barrierefreiheit (a11y)
+*   **ARIA-Labels:** Alle interaktiven Elemente (`button`, `input`, `form`, `section`) besitzen `aria-label` oder `aria-labelledby`.
+*   **Live Region:** Der Nachrichtenbereich (`#lamac-ai-messages`) nutzt `aria-live="polite"` und `aria-relevant="additions"` für Screenreader.
+*   **Tastaturbedienung:** Fokus-Reihenfolge logisch (Schließen → Header → Verlauf → Eingabe → Senden). `Enter` zum Senden, `Escape` **nicht** im Code implementiert (nur Klick auf Close-Button).
+*   **Reduced Motion:** Respektiert `@media (prefers-reduced-motion: reduce)` (deaktiviert Animationen).
 
 ---
 
-## 3. Den Kundenservice öffnen
+## 2. Sichtbare Bereiche & Bedienelemente
 
-1. Öffnen Sie die Website FlohmarktScanner.
-2. Warten Sie, bis die Seite vollständig geladen ist.
-3. Klicken Sie unten rechts auf die runde grüne Schaltfläche mit dem Kopf-Symbol.
-4. Das Fenster **„lamacHub Kundenservice“** öffnet sich.
-5. Die erste sichtbare Nachricht lautet:  
-   **„Hallo! Wie kann ich dir weiterhelfen?“**
+Das Widget besteht aus zwei Hauptzuständen: **Geschlossen (FAB)** und **Geöffnet (Chat-Fenster)**.
 
-Bei schmalen Bildschirmen befindet sich die Support-Schaltfläche weiterhin unten rechts, mit etwas geringerem Abstand zum Rand.
+### 2.1 Zustand: Geschlossen (Floating Action Button)
+*   **Element:** `<button id="lamac-ai-open">`
+*   **Position:** Fixiert, rechts unten (24px / 16px mobile).
+*   **Beschriftung (aria-label):** *"Kundensupport öffnen"*
+*   **Icon:** Emoji `💬` (Unicode: `\u55357 \u56492`).
+*   **Design:** Grün (`#007e62`), rund, Schatten, Hover-Skalierung.
 
----
-
-## 4. Eine Nachricht senden
-
-1. Tippen Sie Ihre Frage in das Eingabefeld **„Nachricht schreiben …“**.
-2. Das Eingabefeld erlaubt höchstens **1.800 Zeichen**.
-3. Klicken Sie auf die runde Pfeil-Schaltfläche rechts neben dem Eingabefeld.
-4. Ihre Nachricht erscheint im Chat als grün hinterlegte NutzerNachricht.
-5. Während der Bearbeitung wird eine animierte Statusanzeige mit dem Hinweis **„Kundenservice antwortet“** eingeblendet.
-6. Anschließend erscheint die Antwort des Kundenservice.
-
-Das Eingabefeld ist als Pflichtfeld gekennzeichnet. Eine leere Nachricht kann daher nicht abgeschickt werden.
-
-### Bearbeitung während einer laufenden Anfrage
-
-Der Quellcode enthält einen Zustand namens `busy`. Es ist daher anzunehmen, dass während einer laufend verarbeiteten Anfrage weitere Sendevorgänge gesperrt oder zurückgewiesen werden.
-
-**Im Quellcode nicht eindeutig erkennbar:**
-
-- ob der Senden-Knopf deaktiviert wird,
-- ob eine zweite Nachricht blockiert wird,
-- ob eine Fehlermeldung erscheint,
-- ob eine abgebrochene oder fehlgeschlagene Anfrage wiederholt werden kann.
+### 2.2 Zustand: Geöffnet (Chat-Fenster)
+*   **Container:** `<section id="lamac-ai-window">` (initial `display: none`, bei `.open` → `display: flex`).
+*   **Größe:** Max 390px Breite / 570px Höhe (Desktop), fast Vollbild (Mobile).
+*   **Bestandteile:**
+    1.  **Header** (`<header>`): Dunkelgrün (`#11211d`).
+        *   Titel: **"lamacHub Kundenservice"** (`<strong>`).
+        *   Untertitel: **"KI-gestützter Support"** (`<small>`).
+        *   **Schließen-Button** (`#lamac-ai-close`): `×` (Multiplikationszeichen), `aria-label="Chat schließen"`.
+    2.  **Nachrichtenbereich** (`#lamac-ai-messages`): Scrollbar, flexibel.
+        *   **Bot-Nachrichten** (`.lamac-bot`): Weiß, linker Rand abgerundet, unterstützt **Markdown-Rendering** (siehe 3.2).
+        *   **User-Nachrichten** (`.lamac-user`): Hellgrün (`#d8f8e8`), rechter Rand abgerundet, `white-space: pre-wrap` (Zeilenumbrüche bleiben erhalten).
+        *   **Typing-Indikator** (`.lamac-typing`): Drei pulsierende Punkte ("Kundenservice antwortet").
+    3.  **Eingabeformular** (`#lamac-ai-form`): Unten fixiert.
+        *   **Eingabefeld** (`#lamac-ai-input`): `placeholder="Nachricht schreiben …"`, `maxlength="1800"`, `required`, `autocomplete="off"`.
+        *   **Senden-Button** (`button[type="submit"]`): Papierflieger-Icon (`\u10148` / 📤), deaktiviert während Ladevorgang (`busy`).
 
 ---
 
-## 5. Den Chat schließen
+## 3. Bedienung: Schritt für Schritt
 
-1. Klicken Sie im geöffneten Fenster oben rechts auf **„×“**.
-2. Das Chat-Fenster wird geschlossen.
-3. Die Support-Schaltfläche mit dem Kopf-Symbol bleibt unten rechts sichtbar.
-4. Durch erneutes Klicken auf diese Schaltfläche öffnen Sie den Support erneut.
+### 3.1 Chat eröffnen
+1.  Klicke auf den grünen **Runden Button (💬)** unten rechts ("Kundensupport öffnen").
+2.  Das Fenster fährt mit Animation von unten nach oben auf.
+3.  Der Fokus springt **nicht** automatisch in das Eingabefeld (im Code nicht implementiert) → Manuell in das Feld klicken/tabben.
 
-Im Quellcode ist kein sichtbarer Verlauf gespeichert, der außerhalb eines neu geöffneten Chats angezeigt wird. **Im Quellcode nicht eindeutig erkennbar** ist, ob der Chatverlauf beim Schließen oder erneuten Öffnen erhalten bleibt.
+### 3.2 Erste Begrüßung
+*   Sofort nach Öffnen erscheint die **Bot-Nachricht**: *"Hallo! Wie kann ich dir weiterhelfen?"*
 
----
+### 3.3 Nachricht senden
+1.  Klicke in das Eingabefeld ("Nachricht schreiben …").
+2.  Tippe deine Frage (max. **1.800 Zeichen**).
+3.  Drücke **Enter** (Absenden des Formulars) **oder** klicke den **Papierflieger-Button (📤)**.
+    *   *Hinweis:* `Shift+Enter` für Zeilenumbruch ist **nicht** explizit im Code behandelt (Standard-Verhalten `textarea` vs `input`: hier `input`, also Enter = Submit).
 
-## 6. Antworten und Formatierungen
+### 3.4 Ablauf nach Absenden
+1.  Deine Nachricht erscheint **sofort rechtsbündig (grün)**.
+2.  Das Eingabefeld wird geleert, Senden-Button **deaktiviert** (`busy = true`, Opazität 50%).
+3.  **Typing-Indikator** (3 Punkte) erscheint linksbündig.
+4.  **Im Hintergrund:** `POST`-Request an `https://carescape-ai.oslamuoslamu.workers.dev/` mit JSON-Body:
+    ```json
+    {
+      "messages": [ { "role": "user", "content": "..." }, ... ],
+      "systemPrompt": "Du bist der Kundenservice von lamacHub..."
+    }
+    ```
+    *   `messages` enthält: System-Prompt + kompletter bisheriger Verlauf (`history`) + aktuelle User-Nachricht.
+5.  **Bei Erfolg (Streaming):**
+    *   Typing-Indikator wird entfernt.
+    *   Antwort wird **Zeichen für Zeichen (Stream)** in einer neuen Bot-Nachricht (weiß, Markdown-gerendert) aufgebaut.
+    *   Scrollen folgt automatisch nach unten.
+6.  **Bei Fehler (Netzwerk, HTTP-Fehler, Abbruch):**
+    *   Typing-Indikator wird entfernt.
+    *   Fehlermeldung als Bot-Nachricht: *"Entschuldige, da ist etwas schiefgelaufen. Bitte versuche es noch einmal."*
+7.  Senden-Button wird wieder aktiviert (`busy = false`), Fokus zurück ins Eingabefeld.
 
-Der Kundenservice kann Antworten in Markdown-ähnlicher Formatierung darstellen. Bestätigt unterstützt sind:
+### 3.5 Chat schließen
+*   Klicke auf das **`×` (Schließen-Button)** oben rechts im Header ("Chat schließen").
+*   Fenster wird ausgeblendet (`display: none`), Verlauf bleibt im Speicher erhalten bis Seiten-Reload.
 
-- Absätze und Zeilenumbrüche,
-- Überschriften der Ebenen 1 bis 4,
-- fett und kursiv,
-- durchgestrichener Text,
-- nummerierte und unnummerierte Listen,
-- Inline-Code,
-- mehrzeilige Codeblöcke,
-- Tabellen,
-- Zitate,
-- Links,
-- horizontale Trennlinien.
-
-Links werden in einem neuen Tab geöffnet. Vom Chatcode werden nur HTTP- und HTTPS-Adressen als klickbare Links zugelassen. Andere Linkformate werden nicht zu aktiven Links gemacht.
-
----
-
-## 7. Typische Probleme und Fehlerbehebung
-
-### 7.1 Der Kundenservice lässt sich nicht öffnen
-
-**Mögliche Ursache im Quellcode:** Der eingebettete Quellcode beginnt ungewöhnlich mit Dokument- beziehungsweise RTF-artigen Zeichen. Dadurch könnte die Datei in manchen Umgebungen nicht korrekt als normales HTML interpretiert werden.
-
-**Abhilfe:**
-
-1. Öffnen Sie die Website direkt in einem aktuellen Browser.
-2. Aktualisieren Sie die Seite vollständig.
-3. Prüfen Sie, ob andere eingebettete Skripte oder Erweiterungen die Seite beeinträchtigen.
-4. Testen Sie die Seite gegebenenfalls im privaten Fenster oder mit deaktivierten Erweiterungen.
-5. Wenden Sie sich an die betreibende Stelle, wenn der Support weiterhin fehlt.
-
-Ob der Code in der veröffentlichten Website tatsächlich unverändert verwendet wird, ist **im bereitgestellten Quellcode nicht eindeutig erkennbar**.
-
-### 7.2 Die Nachricht wird nicht gesendet
-
-**Mögliche Ursachen:**
-
-- Das Eingabefeld ist leer.
-- Es wird bereits eine Anfrage verarbeitet.
-- Die Verbindung zum externen Supportdienst ist nicht verfügbar.
-- Der Browser blockiert die Netzwerkanfrage.
-
-**Abhilfe:**
-
-1. Schreiben Sie einen vollständigen Text in das Eingabefeld.
-2. Warten Sie, bis eine vorherige Antwort abgeschlossen ist.
-3. Senden Sie die Nachricht erneut.
-4. Prüfen Sie die Internetverbindung.
-5. Laden Sie die Seite neu.
-6. Falls möglich, testen Sie einen anderen Browser oder das private Fenster.
-
-**Im Quellcode nicht eindeutig erkennbar:** Eine konkrete Fehlermeldung oder ein Wiederholen-Button ist im geprüften Auszug nicht sichtbar.
-
-### 7.3 Es erscheint keine Antwort
-
-**Mögliche Ursachen:**
-
-- Der externe KI-Dienst antwortet nicht rechtzeitig.
-- Die Anfrage konnte nicht übermittelt werden.
-- Die Antwort benötigt länger als erwartet.
-
-**Abhilfe:**
-
-1. Warten Sie zunächst, bis die Statusanzeige verschwindet.
-2. Prüfen Sie die Internetverbindung.
-3. Versuchen Sie es mit einer kürzeren Nachricht.
-4. Aktualisieren Sie die Seite und senden Sie die Frage erneut.
-5. Verwenden Sie bei einer laufenden Statusanzeige nicht mehrere weitere Nachrichten.
-
-### 7.4 Das Chat-Fenster ist auf dem Smartphone schwer zu bedienen
-
-Der Code enthält ein responsives Layout. Bei sehr kleinen Bildschirmen kann das Fenster den verfügbaren Platz jedoch stark beanspruchen.
-
-**Abhilfe:**
-
-1. Drehen Sie das Gerät bei Bedarf in die Querlage.
-2. Schließen Sie den Chat über **„×“**, wenn Sie zurück auf die Website wechseln möchten.
-3. Scrollen Sie innerhalb des Nachrichtenbereichs, um ältere Nachrichten anzuzeigen.
-
-### 7.5 Animationen sind unangenehm oder das Fenster flackert
-
-Der Code berücksichtigt die Browsereinstellung „Bewegung reduzieren“. Falls Animationen trotzdem stören:
-
-1. Öffnen Sie die Browser-Einstellungen.
-2. Suchen Sie nach einer Option wie „Bewegung reduzieren“ oder „Animationen reduzieren“.
-3. Aktivieren Sie diese Einstellung.
-4. Laden Sie die Seite neu.
+### 3.6 Chat-Verlauf bei Neuladen
+*   **Wird gelöscht.** `history` ist eine JS-Variable im Speicher. Kein `localStorage`/`sessionStorage` im Code vorhanden.
 
 ---
 
-## 8. Datenschutz und Berechtigungen
+## 4. Eingaben, Ausgaben & Markdown-Unterstützung
 
-### Bestätigte technische Merkmale
+### 4.1 Eingabe (User)
+*   **Typ:** Plain Text.
+*   **Länge:** Max 1.800 Zeichen (Client-seitig via `maxlength`, Server-seitig unbekannt).
+*   **Sonderzeichen:** Werden escaped (XSS-Schutz). Kein HTML erlaubt.
+*   **Zeilenumbrüche:** Werden im User-Bubble via `white-space: pre-wrap` dargestellt.
 
-- Der Chat sendet Nachrichten an einen externen, über das Internet erreichbaren KI-Dienst.
-- Eine lokale Chat-Historie ist im JavaScript vorgesehen.
-- Der Browsercode maskiert Zeichen wie `<`, `>` und `&` in Antworten, bevor er sie in HTML einfügt.
-- Unterstützt und als klickbar ausgegeben werden nur HTTP- und HTTPS-Links.
-- Bei externen Links wird zusätzlich `rel="noopener noreferrer"` gesetzt.
-- Der Quellcode enthält keine sichtbaren Hinweise auf eine Speicherung von Chatinhalten durch FlohmarktScanner selbst.
+### 4.2 Ausgabe (Bot / KI) – Markdown-Rendering
+Der Bot-Antwort-Text wird durch eine **eigene Markdown-Parser-Funktion (`renderMarkdown`)** in sicheres HTML umgewandelt. **Rohe HTML-Tags der KI werden escaped (entfernt/unschädlich gemacht).**
 
-### Wichtige Hinweise
+**Unterstützte Syntax (Bestätigt im Code):**
 
-- Beim Absenden verlassen die eingegebenen Inhalte die Website und werden an den externen Supportdienst übertragen.
-- Vermeiden Sie deshalb die Übermittlung von:
-  - Passwörtern,
-  - API-Schlüsseln oder Zugriffstoken,
-  - Zahlungsdaten,
-  - Ausweisdaten,
-  - privaten Kontaktdaten,
-  - vertraulichen Geschäftsinformationen.
-- Eine konkrete Datenschutzerklärung, ein Hinweis auf die Speicherdauer, ein Standort des Dienstleisters oder Angaben zum Auftragsverarbeitungsvertrag sind **im bereitgestellten Quellcode nicht eindeutig erkennbar**.
-- Ob die externe Antwort fachlich verbindlich ist, ist nicht dokumentiert. Entscheidungen zu Terminen, Zahlungen oder Verträgen sollten über die offiziellen Kontaktwege der verantwortlichen Stelle getroffen werden.
+| Element | Syntax | Ausgabe-Beispiel |
+| :--- | :--- | :--- |
+| **Überschriften** | `# H1` bis `#### H4` | `<h1>`–`<h4>` (Farbe `#173c30`) |
+| **Fett** | `**Text**` oder `__Text__` | `<strong>` |
+| **Kursiv** | `*Text*` oder `_Text_` | `<em>` |
+| **Fett + Kursiv** | `***Text***` oder `___Text___` | `<strong><em>` |
+| **Durchgestrichen** | `~~Text~~` | `<del>` |
+| **Inline-Code** | `` `code` `` | `<code>` (Hintergrund `#edf0ed`) |
+| **Code-Block** | ``` ```code``` ``` | `<pre><code>` (Dunkel `#17231f`, Scrollbar) |
+| **Links (MD)** | `[Text](https://url)` | `<a target="_blank" rel="noopener noreferrer">` (Nur `http/https`) |
+| **Autolinks** | `https://example.com` | Automatisch verlinkt (Nur `http/https`) |
+| **Listen** | `- Item` oder `1. Item` | `<ul>` / `<ol>` (Einzug 23px) |
+| **Zitat** | `> Text` | `<blockquote>` (Grüner Rand links `#007e62`) |
+| **Tabellen** | `\| H1 \| H2 \|\n\|---\|---\|\n\| Z1 \| Z2 \|` | Responsive `<table>` in Wrapper (Horizontal scrollbar) |
+| **Trennlinie** | `---` | `<hr>` |
+| **Absätze** | Leerzeile trennt | `<p>` mit `<br>` bei Zeilenumbrüchen im Quelltext |
 
-### Möglicher Geheimniswert
-
-Im Quellcode ist eine mögliche Geheimniswert-Konfiguration vorhanden. Diese wird hier aus Sicherheitsgründen nicht wiedergegeben. Im geprüften Auszug ist keine zusätzliche explizite Platzierung von Geheimnissen in der HTML-Datei erkennbar. Dies kann jedoch nicht für den vollständigen, gekürzten Quellcode garantiert werden.
-
----
-
-## 9. Barrierefreiheit
-
-Im Quellcode sind mehrere Maßnahmen zur Barrierefreiheit erkennbar:
-
-- die Support-Schaltfläche besitzt eine beschreibende `aria-label`-Angabe,
-- die Schließen-Schaltfläche ist mit „Chat schließen“ beschriftet,
-- der Senden-Knopf besitzt die Beschriftung „Nachricht senden“,
-- der Nachrichtenbereich verwendet `aria-live="polite"`,
-- die Statusanzeige hat die Rolle `status` und die Beschreibung „Kundenservice antwortet“,
-- das Eingabefeld besitzt die Beschriftung „Deine Nachricht“,
-- der Browser vervollständigt eingegebene Nachrichten nicht automatisch.
-
-**Im Quellcode nicht eindeutig erkennbar:**
-
-- vollständige Tastaturbedienung,
-- Fokusmanagement beim Öffnen und Schließen,
-- Unterstützung von Screenreader-Software,
-- ausreichende Farbkontraste in allen Betriebssystem- und Browser-Einstellungen.
+**Sicherheits-Hinweise zur Ausgabe:**
+*   **XSS-Schutz:** Kompletter Input wird initial per `escapeHTML` maskiert. Nur erlaubte MD-Patterns werden wieder in Tags umgewandelt.
+*   **Link-Sicherheit:** Nur `http:` und `https:` Protokolle erlaubt. `javascript:`, `data:`, `mailto:` etc. werden **entfernt/ignoriert** (`safeLink` Funktion). Links öffnen **immer** in neuem Tab (`target="_blank"`) mit `noopener noreferrer`.
 
 ---
 
-## 10. FAQ
+## 5. Typische Probleme & Fehlerbehebung
 
-### Gibt es eineRegistrierung?
-
-Eine Anmeldung oder Registrierung ist im bereitgestellten Quellcode nicht erkennbar. Für den gezeigten Kundenservice wird kein Login verlangt.
-
-### Kann ich den Kundenservice auch auf dem Smartphone nutzen?
-
-Ja. Der Quellcode enthält ein eigenes Layout für Bildschirmbreiten bis 480 Pixel. Das Chat-Fenster passt sich dabei an die Bildschirmgröße an.
-
-### Kann ich meine Frage länger als 1.800 Zeichen senden?
-
-Nein. Das Eingabefeld ist auf 1.800 Zeichen begrenzt. Für ausführlichere Angaben können Sie eine Nachricht aufteilen.
-
-### Bleibt der Chatverlauf erhalten?
-
-**Im Quellcode nicht eindeutig erkennbar.** Es gibt zwar eine interne Chat-Historie, aber der gekürzte Auszug zeigt nicht, ob diese dauerhaft gespeichert oder beim Schließen zurückgesetzt wird.
-
-### Kann der Kundenservice Links und Codebeispiele anzeigen?
-
-Ja. Der Chatcode unterstützt Links, Inline-Code, Codeblöcke, Tabellen und weitere Markdown-ähnliche Formatierungen.
-
-### Funktionieren alle Links?
-
-Links werden nur als klickbare Links übernommen, wenn sie mit `http://` oder `https://` beginnen. Andere Formate bleiben normaler Text. Ob jeder externe Link erreichbar ist, kann der Websitecode nicht garantieren.
-
-### Werden meine Nachrichten an Dritte weitergegeben?
-
-Die Nachrichten werden zur Bearbeitung an einen externen KI-Supportdienst gesendet. Über Umfang, Speicherung, Löschung und Auftragsverarbeitung enthält der bereitgestellte Quellcode keine ausreichenden Angaben. Bitte senden Sie keine sensiblen Daten.
-
-### Ist die Antwort des Supports verbindlich?
-
-Das ist im Quellcode nicht dokumentiert. Für verbindliche Auskünfte zu Käufen, Terminen, Preisen, Rückgaben oder Verträgen sollte ein offizieller Kontaktweg der verantwortlichen Stelle genutzt werden.
-
-### Kann ich den Support schließen?
-
-Ja. Klicken Sie oben rechts im Chat-Fenster auf **„×“**. Die Support-Schaltfläche bleibt anschließend sichtbar.
-
-### Was passiert bei einer sehr langen Antwort?
-
-Der Nachrichtenbereich ist scrollbar. Die Ansicht wird nach Eingang einer Antwort automatisch nach unten bewegt. Ältere Nachrichten können durch manuelles Scrollen eingesehen werden.
-
-### Warum wird eine Statusanzeige dauerhaft angezeigt?
-
-Das kann auf eine verzögerte Netzwerkverbindung oder ein Problem beim externen Supportdienst hindeuten. Warten Sie kurz, prüfen Sie die Internetverbindung und laden Sie anschließend die Seite neu. Eine automatische Wiederholung oder eine konkrete Fehlermeldung ist im geprüften Auszug nicht erkennbar.
-
----
-
-## 11
+| Symptom | Mögliche Ursache (Code-Basiert) | Lösung / Prüfung |
+| :--- | :--- | :--- |
+| **Widget erscheint gar nicht** | 1. JS deaktiviert / Fehler in anderer JS-Datei bricht Ausführung ab.<br>2. Container `#lamac-ai` fehlt im HTML.<br>3. Script wird doppelt geladen (Schutz: `dataset.initialized` verhindert 2. Instanz). | 1. JS aktivieren, Konsole prüfen.<br>2. Prüfen, ob `<div id="lamac-ai">...</div>` im HTML existiert (der Code erwartet das Markup *in* der HTML-Datei).<br>3. Nur einmal einbinden. |
+| **Fenster öffnet sich nicht beim Klick** | Click-Listener auf `#lamac-ai-open` fehlt oder Element nicht gefunden. | DevTools: Event Listener prüfen. `openButton` Variable prüfen. |
+| **Nachricht wird nicht gesendet / Button bleibt deaktiviert** | 1. `busy` Flag hängt (vorheriger Request läuft noch/fehlgeschlagen ohne Cleanup).<br>2. `fetch` schlägt fehl (CORS, Netzwerk, Worker down).<br>3. Eingabe leer (HTML5 `required` verhindert Submit). | 1. Seite neu laden (setzt `busy=false`).<br>2. Netzwerk-Tab prüfen: Request an `carescape-ai.oslamuoslamu.workers.dev`? Status? CORS-Header?<br>3. Text eingeben. |
+| **Antwort der KI erscheint nicht / "Typing" bleibt stehen** | Stream-Reader bricht ab (`reader.read()` Fehler), `controller.abort()` wurde nicht korrekt gehandhabt, oder `done: true` kommt nie. | Netzwerk-Tab: Response Body prüfen (Chunked Transfer?). Konsole auf JS-Fehler im `try/catch` Block prüfen. |
+| **Markdown wird falsch dargestellt (z.B. Tabelle kaputt)** | Parser-Logik (`renderMarkdown`) deckt Edge-Cases nicht ab (z.B. Zellen mit `|` im Text, ungleiche Spaltenanzahl). | Im Quellcode nicht behebbar (Client-seitig fest verdrahtet). Kürzere Tabellen nutzen. |
+| **Links in KI-Antwort funktionieren nicht / fehlen** | KI liefert Protokoll außer `http/https` (z.B. `mailto:`, `tel:`, relativer Pfad `/kontakt`). `safeLink` verwirft diese. | KI-Prompt (Server-seitig) anpassen, damit nur absolute HTTPS-Links ausgegeben werden. |
+| **Layout bricht auf Mobile / Kleinem Bildschirm** | CSS `calc(100dvh - ...)` oder `min(390px, ...)` wird von sehr alten Browsern nicht unterstützt. | Browser aktualisieren. Fallback im Code: `height: min(620px, calc(100dvh - 100px))` für Mobile. |
+| **Eingabefeld verliert Fokus nach Senden (Mobile)** | `chatInput.focus()` am Ende von `finally`-Block. Funktioniert meist, aber iOS Safari blockiert Fokus manchmal ohne User-Geste

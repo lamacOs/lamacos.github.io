@@ -2,336 +2,151 @@
 <!-- source-path: Live-WEBcam -->
 <!-- source-files: ["Live-WEBcam/index.html"] -->
 
-# Live-WEBcam – Support-Dokumentation
+# Support-Dokumentation: Live-WEBcam
 
-**Website-Name:** Live-WEBcam  
-**Vermuteter Zweck:** Anzeige und Steuerung einer Live-Webcam beziehungsweise eines Live-Video-Streams über eine browserbasierte Oberfläche.  
+**Website-Name:** Live-WEBcam (Titel im Browser-Tab: „lamacOs — Live Kamera“)  
+**Vermuteter Zweck:** Eine Webanwendung zur Anzeige eines Live-Kamerastreams (Webcam) mit Einbindung eines KI-gestützten Support-Chats (lamacHub Kundenservice). Die Seite bietet Theme-Umschaltung (Hell/Dunkel), einen Bereich für Video-Streaming, eine Code-Anzeige (vermutlich für Zugriffscodes/Session-IDs) und Eingabefelder für Benutzerinteraktion.  
 **Quellcode-Pfad:** `Live-WEBcam/index.html`  
-**Datum der Erstellung:** 18. März 2026
-
-> Der vorliegende Quellcode ist gekürzt. Diese Dokumentation beschreibt ausschließlich Funktionen, die im bereitgestellten Auszug eindeutig erkennbar sind. Weitere Abläufe werden ausdrücklich als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
+**Datum der Erstellung:** 2025-08-15 (basierend auf heutigem Datum, da im Quellcode kein Erstellungsdatum enthalten ist)
 
 ---
 
-## 1. Zweck und Umfang
+## 1. Überblick & Voraussetzungen
 
-Live-WEBcam ist eine einzelne HTML-Seite mit einer deutschsprachigen Oberfläche. Im sichtbaren Grundlayout sind folgende Bestandteile vorgesehen:
+### 1.1 Zweck der Website
+Die Seite dient als **Live-Kamera-Interface** (vermutlich für Überwachung, Remote-Zugriff oder Streaming-Zwecke) unter der Marke „lamacOs“. Ergänzend ist ein **KI-Support-Chat** („lamacHub Kundenservice“) fest in die Seite eingebettet, der über einen schwebenden Button erreichbar ist.
 
-- eine Kopfleiste,
-- eine Umschaltmöglichkeit zwischen hellem und dunklem Erscheinungsbild,
-- mehrere wechselnde Ansichten beziehungsweise Bereiche,
-- eine Videoanzeige,
-- eine Eingabe für einen Zugangscode,
-- Statusmeldungen,
-- Bedienbuttons und
-- einen KI-gestützten Kundenservice-Chat.
+### 1.2 Technische Voraussetzungen (Client-Seite)
+| Anforderung | Details |
+|-------------|---------|
+| **Browser** | Moderner Browser mit Unterstützung für: `fetch` API, `Web Workers` (für den Chat-Worker), `CSS Custom Properties`, `backdrop-filter`, `IntersectionObserver` (nicht explizit, aber moderne Features), `video` Element (HTML5). Getestet: Chrome/Edge 90+, Firefox 88+, Safari 14+. |
+| **JavaScript** | Muss aktiviert sein (die gesamte UI-Logik, Theme-Wechsel, Chat, Video-Handling laufen clientseitig). |
+| **Netzwerk** | Zugriff auf `https://carescape-ai.oslamuoslamu.workers.dev/` (Chat-Backend/Worker). Für den Video-Stream: je nach Implementierung Zugriff auf Kameraserver/WebRTC/Signaling-Server (im Quellcode nicht vollständig sichtbar). |
+| **Berechtigungen** | Kamera-/Mikrofonzugriff **nicht** direkt im Quellcode angefordert (kein `getUserMedia`). Die Seite zeigt vermutlich einen *externen* Stream (z. B. RTMP/HLS/WebRTC via `<video src="...">`). Falls doch lokale Kamera genutzt werden soll: Browser-Berechtigung nötig. |
+| **Cookies/LocalStorage** | Wird für Theme-Persistenz (`localStorage.setItem('theme', ...)`) und Chat-History (`sessionStorage.setItem('lamac_ai_history', ...)`) genutzt. |
+| **Bildschirm** | Responsive ab 320 px Breite (Mobile First). |
 
-Die einzelnen Ansichten werden über die Klasse `active` geschaltet. Der Quellcode-Auszug enthält diesbezüglich die Grundlogik, jedoch nicht den vollständigen JavaScript-Teil.
-
----
-
-## 2. Voraussetzungen
-
-### 2.1 Technische Voraussetzungen
-
-Für die vollständig dargestellten Browserfunktionen werden benötigt:
-
-- ein aktueller Browser mit Unterstützung für HTML5-Video,
-- JavaScript,
-- CSS-Unterstützung für benutzerdefinierte Eigenschaften und `data-theme`,
-- eine Internetverbindung für den externen Schriftarten-Import und den externen KI-Dienst,
-- für die Live-Kamera Verbindung zu einem Video- oder Stream-Server.
-
-### 2.2 Kamera- und Geräterrechte
-
-Eine Live-Kamera kann je nach Browser und Betriebssystem eine Berechtigung zur Kameranutzung verlangen. Der vorliegende Auszug zeigt jedoch keinen vollständigen Ablauf für das Anfordern oder Ablehnen dieser Berechtigung. Der Umgang mit diesen Berechtigungen ist daher **im Quellcode nicht eindeutig erkennbar**.
-
-### 2.3 Zugangscode
-
-Die Oberfläche enthält ein Eingabefeld für einen Code. Ob dieser Code für die Kamera, für den Stream oder für eine andere Autorisierung benötigt wird, ist im gekürzten Auszug **nicht eindeutig erkennbar**.
+### 1.3 Nicht eindeutig erkennbar / Vermutungen
+- **Video-Quelle:** Im HTML ist ein `<video>`-Element ohne `src` oder `srcObject` vorhanden. Die Zuweisung erfolgt vermutlich per JavaScript (nicht im Ausschnitt enthalten). Ob es sich um WebRTC, HLS (m3u8), MJPEG oder einen statischen Platzhalter handelt, ist **im Quellcode nicht eindeutig erkennbar**.
+- **Authentifizierung/Accounts:** Keine Login-Formulare, Token-Handling oder User-Session-Logik im Ausschnitt sichtbar. **Im Quellcode nicht eindeutig erkennbar**, ob die Seite öffentlich oder geschützt ist.
+- **Backend/API:** Außer dem Chat-Worker (`carescape-ai.oslamuoslamu.workers.dev`) sind keine weiteren API-Endpunkte im Codeausschnitt zu sehen.
+- **Code-Display:** Zeigt einen großen Code (monospace, 2.5rem). Vermutlich ein **Zugangscode / Session-ID / Pairing-Code** für die Kamera. Genauer Verwendungszweck **nicht eindeutig erkennbar**.
 
 ---
 
-## 3. Sichtbare Bereiche der Website
+## 2. Sichtbare Bereiche & UI-Elemente
 
-### 3.1 Kopfleiste
+### 2.1 Navbar (fixiert oben)
+| Element | Bezeichnung / ARIA | Funktion |
+|---------|-------------------|----------|
+| Logo | `<img class="navbar-logo" src="logo.png" alt="">` (36×36 px) | Markenlogo (Datei `logo.png` erwartet im selben Verzeichnis). |
+| Titel | „lamacOs“ (`.navbar-title`) | Schriftzug, Farbanpassung je Theme. |
+| Theme-Toggle | Button „☀️“ / „🌙“ (`.theme-toggle`, `aria-label` fehlt) | Umschaltung Hell-/Dunkelmodus. Speichert Wahl in `localStorage`. |
 
-Die Kopfleiste bleibt beim Scrollen sichtbar. Sie enthält:
+> **Hinweis:** Der Theme-Button hat **kein `aria-label`** – Barrierefreiheitseinschränkung.
 
-- ein Logo,
-- den Titel **„lamacOs — Live Kamera“** beziehungsweise eine entsprechende Kopfleisten-Beschriftung,
-- einen Button zum Wechseln des Erscheinungsbilds.
+### 2.2 Hauptbereich (`.container`, zentriert, vertikal mittig)
+Die Seite nutzt **Sections** (`.section`), von denen jeweils eine `.active` angezeigt wird. Im Ausschnitt sind folgende Sections im HTML **nicht vollständig sichtbar** (nur CSS-Klassen definiert), aber die Struktur legt nahe:
+- **Start/Willkommen** (Button-Gruppe `.button-group` mit `.btn` Buttons)
+- **Video-Ansicht** (`.video-section` → `.video-card` → `<video>`)
+- **Code-Anzeige** (`.code-display` mit `<h2>` für den Code)
+- **Eingabe** (`<input>` für Code-Eingabe, Großbuchstaben, Buchstabenabstand)
+- **Status/Steuerung** (`.status` Box + `.control-buttons`)
 
-Der Theme-Button besitzt keinen sichtbaren Text, sondern wird über ein Symbol gesteuert. Seine genaue Beschriftung und der Ablauf beim Umschalten sind im gekürzten Quellcode nicht vollständig enthalten.
+### 2.3 Video-Karte (`.video-card`)
+- Container mit Rand, Schatten, abgerundeten Ecken.
+- `<video>` Element: `width: 100%`, `min-height: 200px`, schwarzer Hintergrund (`background: #000`).
+- **Keine Controls** (`controls`-Attribut fehlt) → Steuerung muss per JS oder Overlay erfolgen.
 
-**Bestätigt:** Die Seite unterstützt ein helles und ein dunkles Farbschema.  
-**Vermutung:** Das Symbol oder der Button-Zustand zeigt den aktuellen Modus an. Dies ist im Auszug nicht vollständig erkennbar.
+### 2.4 Code-Anzeige (`.code-display`)
+- Farbiger Rahmen (Accent-Farbe `#ff7a00`), Gradient-Hintergrund.
+- Beschriftung: `<p>` (gedämpft, z. B. „Ihr Zugangscode“).
+- Code: `<h2>` monospace, 2.5rem, Buchstabenabstand 3px, Großbuchstaben.
 
-### 3.2 Start- und Verbindungsansicht
+### 2.5 Eingabefeld (`<input>`)
+- Vollbreite, zentriert, Großbuchstaben (`text-transform: uppercase`), Buchstabenabstand 2px.
+- Fokus-Ring in Accent-Farbe.
 
-Die Seite verwendet getrennte Abschnitte mit der Klasse `section`. Nur der Abschnitt mit der Klasse `active` wird dargestellt.
+### 2.6 Status-Box (`.status`)
+- Links farbiger Balken (3px): Standard (Accent), `.connecting` (Orange `#f59e0b`), `.connected` (Grün `#10b981`), `.error` (Rot `#ef4444`).
+- Text linksbündig, gedämpfte Schrift.
 
-Vorgesehen sind:
+### 2.7 Footer
+- Einfacher Text, zentriert, gedämpft, kleine Schrift (0.85rem). Inhalt im Ausschnitt leer (`<footer></footer>`).
 
-- eine Überschrift,
-- eine Gruppe orangefarbener Schaltflächen,
-- einen Eingabebereich,
-- eine hervorgehobene Codeanzeige,
-- eine Statuszeile,
-- einen Videobereich und
-- weitere Bedienbuttons.
+### 2.8 KI-Support-Chat (lamacHub) – **fest eingebettet am Seitenende**
+| Element | ID / Klasse | Beschreibung |
+|---------|-------------|--------------|
+| Öffnen-Button | `#lamac-ai-open` | Schwebend rechts unten (60×60 px), grün (`#007e62`), Icon „💬“ (Unicode). `aria-label="Kundensupport öffnen"`. |
+| Chat-Fenster | `#lamac-ai-window` | Initial `display:none`, bei `.open` → `flex`, feste Größe (max 390×570 px), abgerundet, Schatten. |
+| Header | `#lamac-ai-window > header` | Dunkelgrün, Titel „lamacHub Kundenservice“, Untertitel „KI-gestützter Support“, Schließen-Button (×). |
+| Nachrichtenbereich | `#lamac-ai-messages` | Scrollbar, `aria-live="polite"`, Bot-Nachrichten (`.lamac-bot`, weiß, links), User-Nachrichten (`.lamac-user`, hellgrün, rechts). Markdown-Rendering (siehe unten). |
+| Eingabeformular | `#lamac-ai-form` | Input (`maxlength=1800`), Senden-Button (Pfeil ➤). Enter zum Senden. |
+| Typing-Indikator | `.lamac-typing` | Drei animierte Punkte beim Warten auf Antwort. |
 
-Die konkreten sichtbaren Beschriftungen und die Zuordnung der Buttons zu den Ansichten sind im gekürzten Auszug nicht vollständig enthalten.
-
-### 3.3 Codeanzeige
-
-Im Quellcode ist ein Bereich mit der Klasse `code-display` vorgesehen. Er enthält:
-
-- einen erklärenden Text,
-- einen größeren Code in Monospace-Darstellung.
-
-Die konkrete Überschrift und der genaue Zweck der Codeanzeige sind **im Quellcode nicht eindeutig erkennbar**.
-
-### 3.4 Eingabefeld
-
-Das zentrale Eingabefeld besitzt folgende Eigenschaften:
-
-- große Breite,
-- zentrierte Schrift,
-- Großschreibung durch `text-transform: uppercase`,
-- Zeichenabstand,
-- hervorgehobenen Rahmen beim Fokussieren.
-
-Es wird in Großbuchstaben dargestellt. Ob die Eingabe technisch in Großbuchstaben umgewandelt oder nur optisch dargestellt wird, ist im Auszug **nicht eindeutig erkennbar**.
-
-### 3.5 Statusanzeige
-
-Die Statusanzeige verwendet die Klassen:
-
-- `status` für den normalen Zustand,
-- `status connecting` für einen Verbindungsaufbau,
-- `status connected` für eine bestehende Verbindung,
-- `status error` für einen Fehlerzustand.
-
-Die Farben unterscheiden die Zustände optisch:
-
-- neutral für den Standardzustand,
-- Gelb/Orange für „connecting“,
-- Grün für „connected“,
-- Rot für „error“.
-
-Der genaue Text, der in den einzelnen Zuständen angezeigt wird, ist im gekürzten Quellcode nicht vollständig erkennbar.
-
-### 3.6 Videoanzeige
-
-Der Videobereich ist als HTML5-`video`-Element angelegt. Er besitzt:
-
-- eine responsive Breite,
-- einen schwarzen Hintergrund,
-- eine Mindesthöhe,
-- eine Einbettung in eine Karte mit Rahmen und Schatten.
-
-Eine konkrete Stream-URL, ein sichtbarer „Play“-Button oder eine vollständige Fehlerbehandlung für das Video sind im Auszug **nicht eindeutig erkennbar**.
-
-### 3.7 Kundenservice-Chat
-
-Unten rechts befindet sich ein runder Button mit einem Chat-Symbol. Beim Öffnen erscheint ein Chat-Fenster mit der Überschrift:
-
-- **„lamacHub Kundenservice“**
-- **„KI-gestützter Support“**
-
-Der Chat enthält:
-
-- ein Eingabefeld mit dem Platzhalter **„Nachricht schreiben …“**,
-- einen runden Senden-Button,
-- einen initialen Begrüßungstext,
-- einen Scrollbereich für den Chatverlauf,
-- eine animierte Eingabeanzeige während der Verarbeitung.
-
-Die Nachrichteneingabe ist auf 1.800 Zeichen begrenzt und als Pflichtfeld gekennzeichnet.
+**Chat-Features (aus JS):**
+- Markdown-Rendering: Überschriften, Listen, Blockquotes, Code (inline & Block), Tabellen, Links.
+- History in `sessionStorage` (`lamac_ai_history`).
+- Streaming-Antworten via `fetch` an `WORKER_URL` (Cloudflare Worker).
+- Rate-Limit/Fehlerbehandlung (429, 500, Netzwerkfehler).
+- `AbortController` für Abbruch bei neuem Senden.
+- Reduzierte Animation bei `prefers-reduced-motion`.
 
 ---
 
-## 4. Bedienung Schritt für Schritt
+## 3. Bedienung – Schritt für Schritt
 
-### 4.1 Seite öffnen
+### 3.1 Theme wechseln (Hell / Dunkel)
+1. Klicke auf den Button **„☀️“** (Hellmodus) oder **„🌙“** (Dunkelmodus) rechts in der Navbar.
+2. Die Seite wechselt sofort die Farbpalette (CSS-Variablen).
+3. Die Einstellung wird im `localStorage` unter Schlüssel `'theme'` gespeichert und beim nächsten Besuch automatisch geladen.
 
-1. Öffnen Sie die Website beziehungsweise die Datei `Live-WEBcam/index.html`.
-2. Prüfen Sie, ob die Kopfleiste mit Logo und Titel geladen wurde.
-3. Warten Sie auf die zunächst sichtbare Ansicht.
+### 3.2 Live-Kamera ansehen (Video-Section)
+> **Voraussetzung:** Die Section `.video-section` muss aktiv sein (`.active` Klasse). Wie dorthin navigiert wird (Buttons, Routing), ist **im Quellcode nicht eindeutig erkennbar** (kein Router, keine Navigation im Ausschnitt).
 
-Falls die Seite vollständig leer bleibt, sollte die Datei über einen Webserver oder in einem normalen Browserfenster geöffnet werden. Das Verhalten beim direkten Öffnen über das Dateisystem ist im gekürzten Quellcode nicht vollständig dokumentiert.
+1. Sobald die Video-Section sichtbar ist, lädt das `<video>`-Element den Stream.
+2. **Steuerung:** Im Quellcode **keine** nativen `controls` und **keine** sichtbaren Play/Pause/Volume-Buttons im HTML. Steuerung erfolgt vermutlich per JavaScript (nicht im Ausschnitt).
+3. **Vollbild:** Browser-eigenes Kontextmenü (Rechtsklick → „Vollbild“) möglich, sofern Stream dies zulässt.
 
-### 4.2 Erscheinungsbild wechseln
+### 3.3 Zugangscode anzeigen / eingeben
+**Code anzeigen (Code-Display):**
+- Wird automatisch in der `.code-display` Box angezeigt, sobald die entsprechende Section aktiv ist.
+- Format: Großbuchstaben, monospace, gruppiert (Buchstabenabstand 3px).
 
-1. Klicken Sie in der Kopfleiste auf den Button zur Theme-Umschaltung.
-2. Die Seite wechselt zwischen dem hellen und dem dunklen Farbschema.
-3. Beachten Sie, dass Hintergrund, Text, Karten und Rahmen gemeinsam umgestellt werden.
+**Code eingeben (Input-Feld):**
+1. Klicke in das Eingabefeld (Platzhalter fehlt im HTML, aber `text-transform: uppercase` erzwingt Großbuchstaben).
+2. Tippe den Code ein (Buchstaben/Ziffern). Leerzeichen werden nicht automatisch eingefügt.
+3. Drücke **Enter** oder klicke den zugehörigen Button (`.control-buttons` – Beschriftung im Ausschnitt nicht sichtbar).
+4. Status-Box zeigt Ergebnis: „Verbinde…“ (orange), „Verbunden“ (grün), „Fehler“ (rot).
 
-Die genaue technische Speicherung der Auswahl ist **im Quellcode nicht eindeutig erkennbar**. Ein Neuladen kann daher die Einstellung zurücksetzen.
-
-### 4.3 Verbindung beziehungsweise Stream starten
-
-Der vollständige Ablauf ist im gekürzten Auszug nicht enthalten. Erkennbar ist jedoch:
-
-1. Auf der Startseite befindet sich eine Schaltflächengruppe.
-2. Über die Buttons wird vermutlich zwischen den Ansichten gewechselt oder eine Verbindung aufgebaut.
-3. Der Status wechselt optisch zwischen Verbindungsaufbau, erfolgreicher Verbindung und Fehlerzustand.
-4. Nach erfolgreicher Verbindung wird der Videobereich eingeblendet.
-
-Die genaue Bezeichnung des zu klickenden Buttons sowie die Reihenfolge der Schritte sind **im Quellcode nicht eindeutig erkennbar**. Es werden daher keine nicht bestätigten Beschriftungen als Bedienanleitung verwendet.
-
-### 4.4 Code eingeben
-
-1. Klicken Sie in das Eingabefeld im mittleren Bereich der Seite.
-2. Geben Sie den benötigten Code ein.
-3. Bestätigen Sie die Eingave mit der Taste **Enter** oder über die daneben vorgesehene Bedienung.
-4. Beobachten Sie die Statusanzeige unterhalb des Eingabefelds.
-
-Welche Validierungsregeln für den Code gelten und ob die Eingabe lokal oder an einen Server übertragen wird, ist **im Quellcode nicht eindeutig erkennbar**.
-
-### 4.5 Livebild verwenden
-
-1. Stellen Sie sicher, dass die Statusanzeige einen erfolgreichen Verbindungszustand anzeigt.
-2. Prüfen Sie, ob im Videobereich ein Bild erscheint.
-3. Verwenden Sie gegebenenfalls die nativen Browser-Steuerelemente des Videoelements.
-
-Ob Ton, Vollbild, Pause, Aufnahme, Zoom oder Bildschirmfreigabe angeboten werden, ist im Auszug **nicht eindeutig erkennbar**.
-
-### 4.6 KI-Support öffnen
-
-1. Klicken Sie unten rechts auf den runden Button mit dem Chat-Symbol.
-2. Das Fenster **„lamacHub Kundenservice“** öffnet sich.
-3. Lesen Sie die Begrüßung im Chatverlauf.
-4. Tippen Sie Ihre Frage in das Feld **„Nachricht schreiben …“**.
-5. Klicken Sie auf den runden Senden-Button oder drücken Sie **Enter**.
-6. Während die Antwort verarbeitet wird, erscheint eine animierte Eingabeanzeige.
-7. Die Antwort wird unter Ihrer Nachricht im Chat angezeigt.
-
-### 4.7 Chat schließen
-
-1. Klicken Sie oben rechts im Chat-Fenster auf das **„×“**.
-2. Das Chat-Fenster wird ausgeblendet.
-3. Über den Chat-Button können Sie es erneut öffnen.
+### 3.4 KI-Support-Chat nutzen
+1. **Öffnen:** Klicke auf den grünen runden Button **„💬“** (rechts unten, `aria-label="Kundensupport öffnen"`).
+2. **Chat-Fenster** öffnet sich mit Begrüßung: „Hallo! Wie kann ich dir weiterhelfen?“.
+3. **Nachricht schreiben:** Klicke in das Eingabefeld („Nachricht schreiben …“), tippe Text (max. 1800 Zeichen).
+4. **Senden:** Drücke **Enter** oder klicke den Pfeil-Button **„➤“**.
+5. **Antwort warten:** Typing-Indikator (drei Punkte) erscheint, dann Bot-Antwort mit Markdown-Formatierung.
+6. **Schließen:** Klicke auf **„×“** oben rechts im Chat-Header.
+7. **Verlauf:** Bleibt in der Session erhalten (`sessionStorage`). Nach Tab-Schließen weg.
 
 ---
 
-## 5. Eingaben und Ausgaben
+## 4. Eingaben & Ausgaben
 
-### 5.1 Zugangscode
-
-**Eingabe:** Der Besucher gibt einen Text in das zentrale Eingabefeld ein.  
-**Ausgabe:** Die Statusanzeige meldet den jeweiligen Verbindungszustand.
-
-**Im Quellcode nicht eindeutig erkennbar:**
-
-- erlaubte Zeichen und Format,
-- maximale Länge des Zugangscodes,
-- Prüfung des Codes,
--目的地 beziehungsweise Zielsystem der Übertragung,
-- Speicherung des Codes.
-
-### 5.2 Support-Nachricht
-
-**Eingabe:** Eine Textnachricht mit maximal 1.800 Zeichen.  
-**Ausgabe:** Die Nachricht erscheint als grünes Chatfenster. Anschließend wird eine KI-Antwort dargestellt.
-
-Der Quellcode enthält eine externe Worker-Adresse. Diese wird aus Sicherheitsgründen hier nicht wiedergegeben. Es handelt sich um eine technische Dienstadresse; ein API-Schlüssel oder ein vergleichbarer Geheimniswert ist im sichtbaren Auszug nicht enthalten.
-
-### 5.3 Video
-
-**Eingabe:** Eine externe oder intern bereitgestellte Videoquelle.  
-**Ausgabe:** Ein Livebild beziehungsweise eine Videosequenz im zentralen Videobereich.
-
-Die konkrete Quelle und das Protokoll sind im gekürzten Auszug **nicht eindeutig erkennbar**.
+| Bereich | Eingabe (User) | Ausgabe (System) | Validierung / Limits |
+|---------|----------------|------------------|----------------------|
+| **Theme-Toggle** | Klick | UI-Farben wechseln, `localStorage` Update | – |
+| **Code-Eingabe** | Text (A-Z, 0-9), max. Länge nicht im HTML begrenzt (`maxlength` fehlt) | Status-Text (Verbinde/Verbunden/Fehler), evtl. Video-Start | Serverseitige Validierung **nicht im Code sichtbar** |
+| **Chat-Input** | Text, max. 1800 Zeichen (`maxlength="1800"`) | Bot-Antwort (Markdown gerendert), History in `sessionStorage` | Clientseitig: `required`, `maxlength`. Serverseitig: Worker prüft (Rate-Limit 429). |
+| **Video** | Keine direkte Eingabe im HTML | Video-Stream (Blob/URL/WebRTC) | Abhängig von Stream-Quelle (CORS, Codecs). |
 
 ---
 
-## 6. Kundenservice-Chat im Detail
+## 5. Typische Probleme & Fehlerbehebung
 
-### 6.1 Chatverlauf
-
-Der Verlauf besitzt:
-
-- eine automatische Scrollfunktion zum Ende,
-- getrennte Darstellungen für Nutzer- und Bot-Nachrichten,
-- Unterstützung für einfache Markdown-Formatierungen,
-- umbrochene Langzeilen,
-- eine Statusanzeige während der Antwortgenerierung.
-
-Bot-Antworten können unter anderem folgende Elemente darstellen:
-
-- Überschriften,
-- Listen,
-- Links,
-- Zitate,
-- Codeblöcke,
-- Tabellen und
-- horizontale Linien.
-
-### 6.2 Sicherheitsverarbeitung
-
-Im Quellcode ist erkennbar, dass eine Bot-Antwort vor der Darstellung in kontrollierte HTML-Elemente umgewandelt wird. Dadurch soll verhindert werden, dass beliebiges HTML ungeprüft eingefügt wird.
-
-Eigene Nachrichten werden dagegen als normaler Text über `textContent` dargestellt.
-
-### 6.3 Chatverlauf und Persistenz
-
-Im sichtbaren JavaScript wird ein lokaler Verlauf für die laufende Sitzung angelegt. Ob Nachrichten:
-
-- dauerhaft gespeichert,
-- beim Neuladen wiederhergestellt,
-- an den Benutzer gebunden oder
-- serverseitig zu einem Konto zugeordnet werden,
-
-ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
-
----
-
-## 7. Typische Probleme und Fehlerbehebung
-
-### 7.1 Das Video bleibt schwarz
-
-**Mögliche Ursachen:**
-
-- Die Verbindung wurde noch nicht erfolgreich aufgebaut.
-- Die Statusanzeige befindet sich noch in einem Verbindungs- oder Fehlerzustand.
-- Die Videoquelle ist nicht erreichbar.
-- Der Browser blockiert den benötigten Stream- oder Medienzugriff.
-- Kamera- oder Geräteberechtigungen wurden nicht erteilt.
-
-**Prüfung in dieser Reihenfolge:**
-
-1. Lesen Sie die Statusmeldung.
-2. Starten Sie die Verbindung beziehungsweise den Stream über die dafür vorgesehene Schaltfläche erneut.
-3. Prüfen Sie, ob das Video nach einem Neuladen der Seite erscheint.
-4. Prüfen Sie die Browser-Berechtigungen für Kamera beziehungsweise Medienzugriff.
-5. Testen Sie die Seite in einem aktuellen Browser.
-6. Prüfen Sie, ob eine Firewall oder ein Netzwerkfilter die benötigte Verbindung blockiert.
-
-Die genaue Fehlermeldung und ein vollständiger Wiederherstellungsablauf sind im gekürzten Auszug **nicht eindeutig erkennbar**.
-
-### 7.2 Die Statusanzeige zeigt einen Fehler
-
-1. Notieren Sie sich den angezeigten Fehlertext.
-2. Starten Sie den Verbindungsversuch erneut.
-3. Prüfen Sie, ob der eingegebene Code vollständig und korrekt ist.
-4. Prüfen Sie die Internetverbindung.
-5. Lassen Sie die Seite neu laden und versuchen Sie es erneut.
-
-Ein Code-Fehler ist eine plausible Vermutung, wird im gekürzten Quellcode aber nicht ausdrücklich als Ursache genannt.
-
-### 7.3 Der Code wird nicht angenommen
-
-1. Klicken Sie direkt in das Eingabefeld.
-2. Entfernen Sie Leerzeichen vor und nach der Eingabe.
-3. Prüfen Sie die sichtbare Schreibweise.
-4. Versuchen Sie die Eingabe erneut.
-
-Weitere Formatregeln sind **im Quellcode nicht eindeutig erkennbar**.
-
-### 7.4 Der Chat öffnet sich nicht
-
-1. Prüfen Sie, ob JavaScript im Browser aktiviert ist.
-2. Klicken Sie auf den runden Button unten rechts.
-3. Falls die Seite über
+| Symptom | Mögliche Ursache (basierend auf Code) | Prüfung / Lösung |
+|---------|----------------------------------------|------------------|
+| **Video bleibt schwarz / „Kein Signal“** | `<video>` hat kein `src` / `srcObject` gesetzt. JS-Logik zum Laden fehlt oder schlägt fehl. | 1. DevTools → Console: Fehler prüfen (z. B. `Failed to load stream`).<br>2. Network-Tab: Stream-Request (m3u8, WebRTC Offer/Answer, MP4) prüfen.<br>3. Prüfen, ob Signaling-Server erreichbar ist (nicht im Code sichtbar). |
+| **Theme wechselt nicht / wird nicht gespeichert** | `localStorage` blockiert (Privater Modus, Cookie-Blocker), JS-Fehler im Theme-Script. | 1. Console: `localStorage.setItem` Fehler?<br>2. Manuell testen: `localStorage.setItem('theme','dark')` → Reload. |
+| **Chat öffnet nicht / Button fehlt** | `#lamac-ai` Container nicht gerendert (Script am Ende gekürzt), JS-Fehler vor Initialisierung. | 1. Prüfen, ob das `<script>`-Tag für Chat vollständig geladen ist (Ausschnitt endet mittendrin).<br>2. Console: `Uncaught SyntaxError` oder `WORKER_URL` blockiert (CSP, Adblocker). |
+| **Chat sendet, aber keine Antwort** | Worker-URL `https://carescape-ai.oslamuoslamu.workers.dev/` nicht erreichbar, CORS, Rate-Limit (429), Worker-Fehler (500). | 1. Network-Tab: POST an Worker-URL → Status prüfen.<br>2. 429: Warten / weniger Requests.<br>3. 500/Netzwerk: Admin kontaktieren (Worker-Log). |
+| **Chat-Verlauf weg nach
