@@ -2,314 +2,196 @@
 <!-- source-path: HTMLBuilder -->
 <!-- source-files: ["HTMLBuilder/index.html"] -->
 
-# HTMLBuilder – Support-Dokumentation
+# Support-Dokumentation: HTMLBuilder
 
-**Website:** HTMLBuilder  
-**Vermuteter Zweck:** Browserbasierter HTML-Editor mit Eingabefeld, generiertem HTML-Code und Live-Vorschau. Zusätzlich ist ein KI-gestützter Kundenservice-Chat integriert.  
+**Website-Name:** HTMLBuilder  
+**Vermuteter Zweck:** Ein webbasiertes Tool zum Erstellen, Bearbeiten und Vorschau von HTML-Code mit Live-Rendering, Syntax-Highlighting (via Prism.js) und Export-Funktionen.  
 **Quellcode-Pfad:** `HTMLBuilder/index.html`  
-**Datum der Erstellung:** 16. Juni 2025  
-
-> **Hinweis zur Quellcode-Basis:** Die Dokumentation basiert auf einem gekürzten Auszug aus `HTMLBuilder/index.html`. Nicht vollständig sichtbare Funktionen werden als **„Im Quellcode nicht eindeutig erkennbar“** gekennzeichnet.
+**Datum der Erstellung:** 2025-08-14 (basierend auf Systemdatum)  
 
 ---
 
 ## 1. Überblick
 
-HTMLBuilder ist eine einzelne HTML-Seite für die Erstellung und Vorschau von HTML-Code.
+HTMLBuilder ist eine **Single-Page-Application (SPA)**, die vollständig in einer `index.html` Datei enthalten ist. Sie ermöglicht Benutzern:
+- HTML-Code in einem Editor zu schreiben (mit Zeilennummern und Syntax-Highlighting).
+- Eine **Live-Vorschau** des gerenderten HTML in einem `iframe` zu sehen.
+- Den Code zu **speichern** (als `.html` Datei), zu **kopieren**, zu **löschen** oder **Beispiele** zu laden.
+- Zwischen **Hell-/Dunkelmodus** zu wechseln.
+- Ein **KI-Support-Widget** (lamacHub) ist eingebettet, um Fragen zur Nutzung zu stellen.
 
-Die Seite enthält laut Quellcode:
-
-- eine Navigationsleiste mit Logo, dem Namen „HTML Builder“ und themenabhängigen Schaltflächen,
-- einen zentralen Bereich mit Überschrift und kurzer Beschreibung,
-- ein zweispaltiges Layout aus Editor und Ausgabe/Vorschau,
-- einen KI-Chat namens **„lamacHub Kundenservice“**,
-- einen mobilen Layoutumbruch bei einer Fensterbreite von höchstens 1.000 Pixeln.
-
-Die Seite unterstützt ein helles und ein dunkles Erscheinungsbild. Der Wechsel wird über das Attribut `data-theme` gesteuert.
-
----
-
-## 2. Voraussetzungen
-
-### 2.1 Technische Voraussetzungen
-
-Für die Verwendung des HTML-Editors werden benötigt:
-
-- ein aktueller Browser mit JavaScript-Unterstützung,
-- eine Internetverbindung, sofern die Schriftart von Google Fonts geladen und der KI-Chat verwendet werden soll,
-- für den Chat eine erreichbare Verbindung zum im Quellcode hinterlegten Support-Dienst.
-
-### 2.2 Inhaltliche Voraussetzungen
-
-Für den Editor sind keine Anmeldung und kein Konto erforderlich.
-
-Die technische Bearbeitung setzt Grundkenntnisse in HTML voraus. Das gilt insbesondere beim manuellen Schreiben von HTML-Code.
+**Voraussetzungen für Besucher:**
+- Moderner Browser (Chrome, Firefox, Edge, Safari – ES6+ Unterstützung).
+- JavaScript muss aktiviert sein.
+- Internetverbindung für externe Ressourcen (Google Fonts, Prism.js CDN, lamacHub Worker).
 
 ---
 
-## 3. Sichtbare Bereiche der Website
+## 2. Sichtbare Bereiche & UI-Elemente
 
-### 3.1 Navigationsleiste
+### 2.1 Navigationsleiste (`.navbar`)
+| Element | Bezeichnung / Icon | Funktion |
+|---------|-------------------|----------|
+| Logo + Titel | `<img src="logo.png">` + `HTML Builder` | Markenidentität (Logo wird geladen, falls vorhanden). |
+| Theme-Button | `☀️` / `🌙` (ID: `themeToggle`) | Umschalten zwischen Hell- und Dunkelmodus. Speichert Präferenz in `localStorage`. |
 
-Oben befindet sich eine schmale Navigationsleiste mit:
+### 2.2 Hauptbereich (`.container` → `.grid`)
+Zweispaltiges Layout (auf Mobilgeräten einspaltig).
 
-- einem Logo,
-- der Bezeichnung **„HTML Builder“**,
-- themenabhängig beschrifteten Schaltflächen.
+#### Linke Spalte: Editor (`.card`)
+| Bereich | Element | Details |
+|---------|---------|---------|
+| Header | `<h2>HTML Editor</h2>` | Titel. |
+| Zeilennummern | `<div id="lineNumbers">` | Automatisch generiert, scrollt synchron mit Editor. |
+| Editor | `<textarea id="editor">` | Monospace, `min-height: 250px`, vertikal skalierbar. **Kein Tab-Einzug nativ** – wird per JS nachgerüstet (2 Leerzeichen). |
+| Aktionen (`.actions`) | Buttons (`.action-btn`) | **Speichern** (Download), **Kopieren**, **Löschen**, **Beispiel laden**. |
+| Ausgabe | `<div id="output" class="output">` | Zeigt Statusmeldungen (Erfolg, Fehler, Kopiert). |
 
-Die genaue Beschriftung sowie die genaue Zuordnung der Schaltflächen zu ihren Funktionen sind im gekürzten Quellcode nicht vollständig erkennbar. Sichtbar bestätigt ist jedoch, dass mindestens Schaltflächen mit den CSS-Klassen `theme-btn` und `action-btn` vorhanden sind.
+#### Rechte Spalte: Live-Vorschau (`.card`)
+| Element | Details |
+|---------|---------|
+| Header | `<h2>Live-Vorschau</h2>` |
+| Vorschau | `<iframe id="preview" class="preview" height="500px">` | Rendert den Editor-Inhalt als vollständiges HTML-Dokument (inkl. `<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`). **Sandbox-Attribute:** `allow-scripts`, `allow-same-origin`, `allow-forms`. |
 
-### 3.2 Hero-Bereich
+### 2.3 Footer
+Einfacher Hinweis: `Erstellt mit ❤️ für Entwickler`.
 
-Unterhalb der Navigationsleiste steht ein zentraler Textbereich mit:
-
-- einer großen orangefarbenen Überschrift,
-- einem erklärenden Untertext.
-
-Der genaue Wortlaut der Texte ist im vorliegenden Auszug nicht vollständig enthalten.
-
-### 3.3 Editorbereich
-
-Der Editorbereich befindet sich in einer Karte. Er enthält:
-
-- eine Überschrift der Ebene 2,
-- ein mehrzeiliges Textfeld,
-- eine Höhe von mindestens 250 Pixeln,
-- eine vertikal skalierbare Größe,
-- eine Monospace-Schrift.
-
-Der Inhalt des Textfelds wird mit `textarea` verarbeitet. Eine Beschriftung des Eingabefelds ist im Auszug nicht sichtbar.
-
-### 3.4 Aktionsbereich
-
-Unterhalb des Editors befindet sich ein Bereich mit der CSS-Klasse `actions`. Er ist für mehrere Schaltflächen vorgesehen und kann bei schmalen Bildschirmen umbrechen.
-
-Welche Aktionen dort im vollständigen Code verfügbar sind, ist aus dem gekürzten Auszug **nicht eindeutig erkennbar**. Die Klasse `action-btn` bestätigt zumindest das Vorhandensein einer orangefarbenen Aktionsschaltfläche.
-
-### 3.5 Ausgabebereich
-
-Ein weiterer Bereich besitzt die Klasse `output`. Darin befindet sich ein Element mit der ID `output` und einer Mindesthöhe von 250 Pixeln.
-
-Dieser Bereich dient wahrscheinlich der Darstellung des erzeugten HTML-Codes. Die genaue Funktionszuordnung ist im gekürzten Quellcode **nicht eindeutig erkennbar**.
-
-### 3.6 Vorschau
-
-Das Stylesheet enthält außerdem eine Klasse `preview`. Sie ist für einen eingebetteten Rahmen mit folgenden Eigenschaften vorgesehen:
-
-- Breite: 100 %,
-- Höhe: 500 Pixel,
-- weißer Hintergrund,
-- abgerundete Ecken.
-
-Ob und wie die Vorschau im vollständigen Quellcode aktiviert wird, ist im gekürzten Auszug **nicht eindeutig erkennbar**.
-
-### 3.7 Fußbereich
-
-Am Ende der Seite befindet sich ein zentrierter Fußbereich mit grauer Textfarbe. Der konkrete Inhalt ist im Auszug nicht vollständig sichtbar.
+### 2.4 KI-Support-Widget (lamacHub) – `#lamac-ai`
+**Position:** Fest unten rechts (60×60 px Button 🤖).  
+**Fenster:** 390×570 px (responsive), öffnet sich per Klick.  
+**Funktionen:** Chat-Interface mit Markdown-Rendering (Tabellen, Code, Links), Typing-Animation, History im `sessionStorage`.  
+**Backend:** `https://carescape-ai.oslamuoslamu.workers.dev/` (Cloudflare Worker).  
+**Hinweis:** Das Widget ist **nicht** Kernfunktion von HTMLBuilder, sondern ein eingebetteter Support-Service.
 
 ---
 
-## 4. HTML-Code bearbeiten
+## 3. Bedienung – Schritt für Schritt
 
-### 4.1 Code eingeben
+### 3.1 HTML schreiben & Live-Vorschau sehen
+1. Öffne die Website.
+2. Klicke in das **Textarea-Feld** („HTML Editor“).
+3. Tippe HTML-Code ein (z. B. `<h1>Hallo</h1><p>Welt</p>`).
+   - **Taste `Tab`** fügt **2 Leerzeichen** ein (Standard-Verhalten verhindert).
+   - Zeilennummern aktualisieren sich automatisch bei Eingabe, Scroll, Resize.
+4. Die **Vorschau (rechts)** aktualisiert sich **automatisch ca. 300 ms nach Tastaturpause** (Debounce).
 
-1. Öffnen Sie die Website.
-2. Klicken Sie in das große Eingabefeld im linken Kartenbereich.
-3. Geben Sie Ihren HTML- oder CSS-Code ein.
-4. Nutzen Sie die Größe des Eingabefelds bei Bedarf durch Ziehen des unteren Randes.
+### 3.2 Beispiel laden
+1. Klicke auf Button **„Beispiel laden“**.
+2. Der Editor wird mit einem vordefinierten HTML-Template befüllt (inkl. CSS-Variablen, Grid-Layout, Karten).
+3. Vorschau zeigt das gerenderte Beispiel.
 
-### 4.2 Code auswählen und kopieren
+### 3.3 Code speichern (als Datei)
+1. Klicke auf **„Speichern“**.
+2. Browser lädt `meine-seite.html` herunter (UTF-8, Blob-basiert).
 
-1. Setzen Sie den Cursor in das Eingabefeld.
-2. Wählen Sie den gewünschten Text mit `Strg + A` beziehungsweise `Cmd + A` aus.
-3. Kopieren Sie die Auswahl mit `Strg + C` beziehungsweise `Cmd + C`.
+### 3.4 Code kopieren
+1. Klicke auf **„Kopieren“**.
+2. Inhalt des Editors landet in der Zwischenablage.
+3. Erfolgsmeldung in `#output`: „✅ Code in Zwischenablage kopiert!“.
 
-### 4.3 Code leeren
+### 3.5 Editor leeren
+1. Klicke auf **„Löschen“**.
+2. Editor wird geleert, Zeilennummern zurückgesetzt, Vorschau geleert.
+3. Meldung: „🗑️ Editor geleert“.
 
-1. Klicken Sie in das Eingabefeld.
-2. Markieren Sie den gesamten Inhalt.
-3. Löschen Sie ihn oder drücken Sie die Entf-Taste.
+### 3.6 Theme wechseln
+1. Klicke auf **☀️ / 🌙** in der Navbar.
+2. Farben invertieren sofort (CSS-Variablen).
+3. Auswahl wird in `localStorage` (`theme`) gespeichert → bleibt nach Reload erhalten.
 
-### 4.4 Hinweise zur Bearbeitung
-
-- Das Feld besitzt keine sichtbare automatische Syntaxhervorhebung.
-- Der Quellcode enthält keine sichtbare Fehlermeldung für ungültiges HTML.
-- Eine automatische Formatierung oder automatische Vervollständigung ist im Auszug nicht erkennbar.
-- Der genaue Ablauf nach einer Änderung – etwa ob Code sofort erzeugt wird oder erst nach einem Klick – ist im gekürzten Auszug nicht vollständig erkennbar.
-
----
-
-## 5. Ausgabe und Vorschau verwenden
-
-Der Quellcode enthält separate Bereiche für Ausgabe und Vorschau. Die sichtbaren Bezeichnungen und die genauen Schaltflächen zum Auslösen dieser Funktionen sind im vorliegenden Auszug jedoch nicht enthalten.
-
-Daher gelten folgende Aussagen nur als **begründete Vermutung**:
-
-- Der Inhalt des Eingabefelds wird in HTML umgewandelt und im Ausgabebereich dargestellt.
-- Eine Vorschau verwendet den erzeugten Code in einem eingebetteten Rahmen.
-
-Für die tatsächliche Bedienung gilt: Verwenden Sie ausschließlich die in der vollständigen Seite sichtbaren Schaltflächen und Bezeichnungen. Im gekürzten Quellcode ist kein eindeutig benannter Vorschau- oder Generierungsbefehl erkennbar.
-
----
-
-## 6. Darstellung zwischen hellem und dunklem Design wechseln
-
-Bestätigt ist, dass die Website zwei Farbschemata definiert:
-
-- **Helles Design** als Standard,
-- **Dunkles Design** über `data-theme="dark"`.
-
-### 6.1 Wechsel durchführen
-
-1. Suchen Sie in der Navigationsleiste die Schaltfläche mit der Klasse `theme-btn`.
-2. Klicken Sie darauf.
-3. Prüfen Sie, ob Hintergrund, Textfarben und Karten Darstellung entsprechend wechseln.
-
-### 6.2 Mögliche Ursache, wenn der Wechsel nicht funktioniert
-
-Falls sich das Design nicht ändert:
-
-1. Öffnen Sie die Browser-Entwicklerwerkzeuge.
-2. Prüfen Sie, ob das Element `html` oder `body` das Attribut `data-theme="dark"` erhält.
-3. Prüfen Sie, ob die zugehörige JavaScript-Funktion auf einen Klick reagiert.
-4. Laden Sie die Seite neu und wiederholen Sie den Test.
-
-Ob die gewählte Theme-Einstellung dauerhaft gespeichert wird, ist im Auszug **nicht eindeutig erkennbar**.
+### 3.7 KI-Support nutzen
+1. Klicke auf **🤖** (unten rechts).
+2. Schreibe Nachricht (max. 1800 Zeichen), drücke Enter oder Senden-Button (➤).
+3. Antwort erscheint mit Markdown-Formatierung.
+4. Schließen via **×** oben rechts.
 
 ---
 
-## 7. KI-Chat „lamacHub Kundenservice“
+## 4. Eingaben & Ausgaben
 
-### 7.1 Zweck
-
-Der Chat ist als **„KI-gestützter Support“** gekennzeichnet. Er soll Besuchern helfen, Fragen zur Nutzung von HTMLBuilder zu stellen.
-
-Der Chat wird über eine feste Schaltfläche unten rechts geöffnet.
-
-### 7.2 Chat öffnen
-
-1. Klicken Sie auf die runde, grüne Schaltfläche unten rechts mit dem Smiley-Symbol.
-2. Das Chatfenster mit der Überschrift **„lamacHub Kundenservice“** öffnet sich.
-3. Die erste Nachricht lautet: **„Hallo! Wie kann ich dir weiterhelfen?“**
-
-### 7.3 Nachricht senden
-
-1. Klicken Sie in das Eingabefeld mit dem Platzhalter **„Nachricht schreiben …“**.
-2. Geben Sie Ihre Frage ein.
-3. Klicken Sie auf die runde Senden-Schaltfläche rechts neben dem Eingabefeld.
-4. Ihre Nachricht erscheint im Chat als grüne Nachricht.
-5. Während der Antwort wird eine animierte Tipp-Anzeige eingeblendet.
-6. Die Antwort erscheint anschließend als helle Nachricht.
-
-Alternativ kann die Nachricht mit der Eingabetaste gesendet werden, sofern das Formular dies standardmäßig behandelt.
-
-### 7.4 Unterstützte Formatierungen in Antworten
-
-Der Chat kann Markdown-ähnliche Formatierungen darstellen:
-
-- Überschriften,
-- Absätze,
-- Listen,
-- Links,
-- fett, kursiv und durchgestrichen,
-- Inline-Code,
-- Codeblöcke,
-- Tabellen,
-- Zitatblöcke,
-- horizontale Linien.
-
-Links werden nur für HTTP- beziehungsweise HTTPS-Adressen erzeugt und öffnen sich in einem neuen Tab. Der Quellcode setzt dabei zusätzliche Sicherheitsattribute.
-
-### 7.5 Chat schließen
-
-1. Klicken Sie oben rechts im Chatfenster auf das **„×“**.
-2. Das Fenster wird ausgeblendet.
-3. Die grüne Smiley-Schaltfläche öffnet den Chat erneut.
-
-### 7.6 Verhalten während einer laufenden Antwort
-
-Der Quellcode sieht einen Status `busy` vor:
-
-- Während eine Antwort verarbeitet wird, wird die Senden-Schaltfläche deaktiviert.
-- Dadurch soll verhindert werden, dass mehrere Anfragen gleichzeitig gesendet werden.
-- Nach Abschluss der Antwort wird der Status wieder freigegeben.
+| Aktion | Eingabe | Ausgabe / Reaktion |
+|--------|---------|---------------------|
+| Tippen im Editor | Text (HTML) | Live-Vorschau (verzögert), Zeilennummern-Update |
+| „Beispiel laden“ | Klick | Editor: Vorlage-HTML; Vorschau: gerendertes Beispiel |
+| „Speichern“ | Klick | Download: `meine-seite.html` |
+| „Kopieren“ | Klick | Clipboard: Editor-Inhalt; Toast in `#output` |
+| „Löschen“ | Klick | Editor leer; Vorschau leer; Toast in `#output` |
+| Theme-Button | Klick | CSS-Vars wechseln; Icon wechselt; `localStorage` Update |
+| KI-Chat | Text + Enter | Bot-Antwort (Markdown gerendert) im Chat-Fenster |
 
 ---
 
-## 8. Datenschutz und Berechtigungen
+## 5. Typische Probleme & Fehlerbehebung
 
-### 8.1 Keine Anmeldung im gezeigten Quellcode
-
-In `HTMLBuilder/index.html` ist kein Anmeldeformular erkennbar. Eine Anmeldung oder ein Benutzerkonto wird daher nicht vorausgesetzt.
-
-### 8.2 Übertragung von Chatnachrichten
-
-Der Chat sendet Nachrichten an einen externen Support-Dienst. Im Quellcode ist dafür eine feste Web-Worker-Adresse hinterlegt. Aus Sicherheitsgründen wird dieser Wert hier nicht wiedergegeben.
-
-Daraus ergeben sich folgende praktische Hinweise:
-
-- Chatnachrichten werden zur Verarbeitung an einen externen Dienst übertragen.
-- Vermeiden Sie die Eingabe von Passwörtern, API-Schlüsseln, Tokens oder anderen vertraulichen Informationen.
-- Personenbezogene Daten sollten nur übermittelt werden, wenn dies für die konkrete Supportfrage erforderlich ist.
-- Der genaue Umfang der serverseitigen Verarbeitung, Speicherung und Löschung ist im vorliegenden Quellcode **nicht eindeutig erkennbar**.
-
-### 8.3 Verarbeitung des HTML-Codes
-
-Der sichtbare Quellcode enthält keine sichtbare Übermittlungsfunktion für den HTML-Editorinhalt an den Support-Dienst. Ob eine solche Funktion im gekürzten Teil existiert, ist **nicht eindeutig erkennbar**.
-
-### 8.4 In der Vorschau ausgeführter Code
-
-Eine HTML-Vorschau kann grundsätzlich HTML, CSS und JavaScript ausführen. Da der konkrete Mechanismus der Vorschau im gekürzten Quellcode nicht vollständig erkennbar ist, wird empfohlen:
-
-- nur eigenen oder vertrauenswürdigen Code verwenden,
-- keine unbekannten Skripte aus dem Internet einfügen,
-- sensible Formulare oder Daten nicht in eine Vorschau übernehmen.
-
-Ob die Website Vorschauinhalte in einer abgeschotteten Umgebung ausführt, ist im Quellcode **nicht eindeutig erkennbar**.
-
-### 8.5 Drittanbieter-Ressourcen
-
-Die Seite lädt die Schriftart „Inter“ von Google Fonts. Damit stellt die Seite eine Verbindung zu einem Drittanbieter her. Weitere Datenschutzbestimmungen, etwa ein Impressum oder eine Datenschutzerklärung, sind im gekürzten Auszug nicht erkennbar.
+| Problem | Mögliche Ursache | Lösung / Workaround |
+|---------|------------------|----------------------|
+| **Vorschau bleibt leer / weiß** | Editor enthält ungültiges HTML, `iframe` blockiert Skripte, oder CSP-Fehler. | Prüfe Editor-Inhalt auf Syntaxfehler. Öffne DevTools → Console im `iframe` (Rechtsklick → Untersuchen). |
+| **Syntax-Highlighting fehlt** | Prism.js nicht geladen (Netzwerkfehler, CDN blockiert). | Prüfe Netzwerk-Tab: `prism.js`, `prism-line-numbers.min.js`. Lade Seite neu. |
+| **Zeilennummern stimmen nicht / fehlen** | `updateLineNumbers()` nicht getriggert (z. B. nach programmatischem `value`-Set). | Funktion wird nach `loadExample()` & `clearEditor()` manuell aufgerufen. Bei eigenem JS: `editor.dispatchEvent(new Event('input'))`. |
+| **Theme wechselt nicht** | `localStorage` deaktiviert / privat (z. B. Safari Privatmodus). | Manuell per Button wechseln. Präferenz nicht persistiert. |
+| **„Kopieren“ schlägt fehl** | `navigator.clipboard` API verweigert (unsichere HTTP-Seite, iframe ohne `allow-clipboard`). | Seite über **HTTPS** oder `localhost` öffnen. |
+| **KI-Widget öffnet nicht / keine Antwort** | Worker-URL blockiert (Firewall, AdBlocker), CORS-Fehler, Netzwerk offline. | Prüfe Console: `fetch` zu `carescape-ai.oslamuoslamu.workers.dev`. Deaktiviere Blocker testweise. |
+| **Tab-Taste springt aus Editor** | Browser-Fokus-Verhalten (z. B. bei Screenreadern). | Im Code: `e.preventDefault()` bei `Tab` → 2 Leerzeichen. Funktioniert nur bei aktivem Fokus. |
 
 ---
 
-## 9. Barrierefreiheit und mobile Nutzung
+## 6. Datenschutz, Berechtigungen & Sicherheit
 
-### 9.1 Tastaturbedienung
-
-- Das Chat-Eingabefeld ist erforderlich und auf 1.800 Zeichen begrenzt.
-- Der Senden-Button besitzt eine sprechende Beschriftung.
-- Der Schließen-Button besitzt die Beschriftung **„Chat schließen“**.
-- Die öffnende Schaltfläche besitzt die Beschriftung **„Kundensupport öffnen“**.
-- Der Chatbereich verwendet `aria-live="polite"`, damit neue Antworten assistiven Technischen Systemen gemeldet werden können.
-- Die Reduzierung von Animationen wird bei entsprechender Browsereinstellung berücksichtigt.
-
-### 9.2 Mobile Darstellung
-
-Bis zu einer Breite von 1.000 Pixeln werden die beiden großen Karten untereinander angezeigt.
-
-Für den Chat gilt:
-
-- Bis 480 Pixel Breite nutzt er fast die gesamte Bildschirmbreite.
-- Das Chatfenster bleibt auf kleinen Bildschirmen nach oben und rechts mit einem kleinen Abstand positioniert.
-- Der Editor und die Ausgabe benötigen auf mobilen Geräten weiterhin horizontales Scrollen, falls Zeilen oder Codeblöcke zu breit sind.
+| Aspekt | Details |
+|--------|---------|
+| **Lokale Speicherung** | `localStorage`: `theme` (String: `"dark"`/`"light"`). Keine personenbezogenen Daten. |
+| **Session-Speicherung (KI-Widget)** | `sessionStorage`: `lamacHistory` (Chat-Verlauf, max. 20 Einträge). Wird bei Tab-Schluss gelöscht. |
+| **Externe Ressourcen** | - Google Fonts (`fonts.googleapis.com`) → IP-Übertragung an Google.<br>- Prism.js CDN (`cdnjs.cloudflare.com`) → IP an Cloudflare.<br>- lamacHub Worker (`carescape-ai.oslamuoslamu.workers.dev`) → Chat-Inhalte an Worker. |
+| **Kein Backend / Kein Tracking** | Keine Cookies, keine Analytics, keine User-Accounts. |
+| **Clipboard API** | Erfordert sicheren Kontext (HTTPS/localhost). |
+| **iframe Sandbox** | `allow-scripts allow-same-origin allow-forms` → **Vorsicht:** Geladene Skripte im Preview haben Same-Origin-Zugriff auf den `iframe`-Inhalt, aber **nicht** auf die Elternseite (Cross-Origin). |
+| **Möglicher Geheimniswert** | Im KI-Widget-Code ist eine feste Worker-URL hardcoded. Keine API-Keys im Frontend sichtbar. |
 
 ---
 
-## 10. Typische Probleme und Fehlerbehebung
+## 7. FAQ
 
-### 10.1 Der Chat lässt sich nicht öffnen
+### ❓ Warum wird mein `<script>` in der Vorschau nicht ausgeführt?
+Die Vorschau nutzt ein `iframe` mit `sandbox="allow-scripts allow-same-origin allow-forms"`. Inline-Skripte **sollten** laufen. Prüfe die Console **im iframe** (Rechtsklick in Vorschau → Untersuchen → Console). Externe Skripte (`<script src="...">`) benötigen CORS-Erlaubnis.
 
-1. Prüfen Sie, ob die grüne Smiley-Schaltfläche unten rechts sichtbar ist.
-2. Klicken Sie direkt auf das Symbol.
-3. Laden Sie die Seite neu, falls das Fenster nicht erscheint.
-4. Prüfen Sie in den Entwicklerwerkzeugen, ob die Elemente `lamac-ai-open` und `lamac-ai-window` vorhanden sind.
+### ❌ Kann ich CSS/JS in separaten Dateien einbinden?
+**Nein.** Der Editor akzeptiert nur **ein einzelnes HTML-Dokument**. Du musst `<style>` und `<script>` Tags direkt im Editor schreiben. Das Beispiel zeigt dies vor.
 
-### 10.2 Der Chat öffnet sich, antwortet aber nicht
+### 💾 Wird mein Code serverseitig gespeichert?
+**Nein.** Alles läuft clientseitig. „Speichern“ löst nur einen lokalen Download aus. Beim Neuladen ist der Editor leer (außer du lädst das Beispiel).
 
-Mögliche Ursache: Die Verbindung zum externen Support-Dienst ist nicht verfügbar oder wird blockiert.
+### 🌙 Warum ist der Dunkelmodus nach Neuladen weg?
+`localStorage` wird verwendet. Wenn du im **Privatmodus** (Incognito) bist oder `localStorage` blockierst, fällt es auf Default (Hellmodus) zurück.
 
-1. Prüfen Sie Ihre Internetverbindung.
-2. Öffnen Sie die Website in einem anderen aktuellen Browser.
-3. Prüfen Sie, ob Inhalte von Drittanbietern oder Skripte blockiert werden.
-4. Wiederholen
+### 🤖 Was passiert mit meinen Chat-Nachrichten im KI-Widget?
+Sie werden an `https://carescape-ai.oslamuoslamu.workers.dev/` gesendet. Der Verlauf liegt nur in `sessionStorage` (Browser-Tab). **Keine Garantie** für Vertraulichkeit – lies die Datenschutzrichtlinie des Anbieters (lamacHub), falls vorhanden.
+
+### ⌨️ Warum funktioniert `Tab` nicht wie in VS Code (Einzug ganzer Blöcke)?
+Der Editor ist ein natives `<textarea>`. Der Code fängt nur **einzelne Tab-Tasten** ab und fügt **2 Leerzeichen** ein. Block-Einzug (Shift+Tab, Mehrzeilig) ist **nicht implementiert**.
+
+### 📱 Funktioniert es auf Mobilgeräten?
+**Ja**, Layout wird bei `<1000px` einspaltig. Editor & Vorschau stapeln sich. Touch-Scroll im Editor funktioniert. KI-Widget ist responsive.
+
+### 🔧 Kann ich Prism-Themes ändern?
+Im Quellcode ist `prism-tomorrow.min.css` fest eingebunden. **Nicht konfigurierbar** ohne Code-Änderung.
+
+---
+
+## 8. Technische Hinweise für Entwickler (aus Quellcode ersichtlich)
+
+- **Kein Build-Schritt** – alles Vanilla JS/HTML/CSS in einer Datei.
+- **Prism.js** wird für Highlighting & Zeilennummern genutzt (`data-line` Attribut wird nicht verwendet, Zeilennummern via `#lineNumbers` Div).
+- **Debounce** (300 ms) auf `input`-Event für Preview-Update.
+- **Blob-Download** für Speichern (`URL.createObjectURL`).
+- **Theme-Logik**: `data-theme="dark"` auf `<html>` + CSS-Variablen.
+- **KI-Widget** ist ein **fremdes Modul** (RTF-ähnlicher String im HTML-Kommentar? → **Im Quellcode nicht eindeutig erkennbar**, wie es injiziert wird. Es steht als Text im `<head>` nach `</style>`, aber **nicht** im DOM-Baum. Vermutlich per Server-Side-Include oder Build-Tool eingefügt. Im gelieferten Quelltext erscheint es als roher Text *außerhalb* von HTML-Tags – **das ist ein Artefakt der Quellcode-Lieferung**, kein lauffähiger Code an dieser Stelle.)
+
+> **Hinweis:** Der KI-Widget-Code im Quelltext erscheint **nach `</style>` und vor `<body>` als roher RTF/HTML-Mix**. In einer echten `index.html` wäre er entweder im `<body>` oder per JS injiziert. **Im Quellcode nicht eindeutig erkennbar**, wie er produktiv eingebunden wird.
+
+---
+
+## 9. Bekannte Limitationen (aus Code ableitbar)
+
+1. **Kein Undo/Redo** über Buttons (nur Browser-nativ via Strg+Z).
+2. **Keine Datei-Öffnen-Funktion** (nur Download).
+3. **Ke
