@@ -1,6 +1,4 @@
-{
-  "version": "1.0.0",
-  "downloadUrl": "",
-  "changelog": "Erste öffentliche Version des LinkUp Clients.",
-  "mandatory": false
-}
+const RELEASE_CONFIG = {
+  released: false,
+  version: "1.0.0"
+};
