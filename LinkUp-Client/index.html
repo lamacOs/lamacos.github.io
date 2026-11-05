@@ -512,14 +512,78 @@
       color: var(--muted);
     }
 
-    .disabled-button {
-      display: inline-flex;
-      padding: 12px 20px;
-      border-radius: 12px;
-      color: #6f8190;
-      background: #e8eef2;
-      font-weight: 750;
-      cursor: not-allowed;
+    .download-recommendation {
+      max-width: 650px;
+      margin: 28px auto 25px;
+      padding: 22px;
+      border: 1px solid #bcecf8;
+      border-radius: 18px;
+      background: #fff;
+      text-align: left;
+    }
+
+    .download-recommendation strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 1.05rem;
+    }
+
+    .download-recommendation p {
+      margin: 0 auto 16px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .download-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 650px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .download-option {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+
+    .download-option:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px #12516c12;
+    }
+
+    .download-option strong {
+      font-size: .98rem;
+    }
+
+    .download-option span {
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .download-option.recommended {
+      border-color: var(--cyan);
+      background: #f0fcff;
+    }
+
+    .download-status {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    @media (max-width: 520px) {
+      .download-options {
+        grid-template-columns: 1fr;
+      }
     }
 
     .legal {
@@ -965,16 +1029,51 @@
       <div class="container">
         <div class="download-box">
           <div class="download-symbol" aria-hidden="true">↓</div>
-          <span class="section-kicker">Download</span>
-          <h2>Bereit, wenn LinkUp bereit ist.</h2>
+          <span class="section-kicker">Offizielle Downloads</span>
+          <h2>LinkUp Client herunterladen</h2>
           <p>
-            Eine öffentliche Version steht noch nicht bereit.
-            Sobald ein getesteter Download verfügbar ist, kann hier
-            der offizielle Download gestartet werden.
+            Wähle die passende Version für dein Betriebssystem.
+            Dein Gerät wird automatisch erkannt und ein Download empfohlen.
+            Du kannst jederzeit auch eine andere Version auswählen.
           </p>
-          <span class="disabled-button" aria-disabled="true">
-            Noch nicht verfügbar
-          </span>
+
+          <div class="download-recommendation">
+            <strong id="recommendedTitle">Gerät wird erkannt …</strong>
+            <p id="recommendedDescription">
+              Einen Moment bitte. Die verfügbaren Downloads werden vorbereitet.
+            </p>
+            <a
+              class="button button-primary"
+              id="recommendedDownload"
+              href="#download"
+            >Empfohlenen Download auswählen ↓</a>
+          </div>
+
+          <div class="download-options" aria-label="Alle verfügbaren Downloads">
+            <a class="download-option" id="downloadMacIntel" href="#" rel="noopener">
+              <strong>macOS – Intel</strong>
+              <span>mac_intel.dmg</span>
+            </a>
+
+            <a class="download-option" id="downloadMacSilicon" href="#" rel="noopener">
+              <strong>macOS – Apple Silicon</strong>
+              <span>mac_silicon.dmg</span>
+            </a>
+
+            <a class="download-option" id="downloadWindows" href="#" rel="noopener">
+              <strong>Windows</strong>
+              <span>windows.exe</span>
+            </a>
+
+            <a class="download-option" id="downloadLinux" href="#" rel="noopener">
+              <strong>Linux</strong>
+              <span>linux.deb</span>
+            </a>
+          </div>
+
+          <p class="download-status" id="downloadStatus" aria-live="polite">
+            Alle Downloads werden direkt aus dem offiziellen GitHub-Repository geladen.
+          </p>
         </div>
       </div>
     </section>
@@ -1046,6 +1145,161 @@
 
     document.getElementById("year").textContent =
       new Date().getFullYear();
+
+    // Offizielle Download-Dateien im GitHub-Repository.
+    const DOWNLOAD_BASE =
+      "https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/LinkUp-Client/";
+
+    const DOWNLOADS = {
+      mac_intel: {
+        file: "mac_intel.dmg",
+        title: "macOS – Intel",
+        description: "Für Macs mit Intel-Prozessor."
+      },
+      mac_silicon: {
+        file: "mac_silicon.dmg",
+        title: "macOS – Apple Silicon",
+        description: "Für Macs mit Apple-Silicon-Chip (M1, M2, M3, M4 usw.)."
+      },
+      windows: {
+        file: "windows.exe",
+        title: "Windows",
+        description: "Installer für Windows."
+      },
+      linux: {
+        file: "linux.deb",
+        title: "Linux",
+        description: "Debian-/Ubuntu-Paket im .deb-Format."
+      }
+    };
+
+    function setDownloadLink(elementId, downloadKey) {
+      const element = document.getElementById(elementId);
+      const download = DOWNLOADS[downloadKey];
+
+      if (!element || !download) return;
+
+      element.href = DOWNLOAD_BASE + download.file;
+      element.setAttribute("aria-label", download.title + " herunterladen");
+    }
+
+    function detectOperatingSystem() {
+      const ua = navigator.userAgent || "";
+      const platform = navigator.userAgentData?.platform ||
+        navigator.platform || "";
+
+      if (/Windows/i.test(platform) || /Windows/i.test(ua)) {
+        return { key: "windows", certainty: "detected" };
+      }
+
+      if (/Android/i.test(ua)) {
+        return { key: null, certainty: "unsupported" };
+      }
+
+      if (/Linux/i.test(platform) || /Linux/i.test(ua)) {
+        return { key: "linux", certainty: "detected" };
+      }
+
+      if (/Mac/i.test(platform) || /Macintosh|Mac OS X/i.test(ua)) {
+        return { key: "mac_intel", certainty: "mac-architecture-unknown" };
+      }
+
+      return { key: null, certainty: "unknown" };
+    }
+
+    async function detectMacArchitecture() {
+      // User-Agent Client Hints können die Architektur liefern,
+      // werden aber nicht von allen Browsern unterstützt.
+      try {
+        if (navigator.userAgentData?.getHighEntropyValues) {
+          const info = await navigator.userAgentData.getHighEntropyValues([
+            "architecture"
+          ]);
+
+          const architecture = String(info.architecture || "").toLowerCase();
+
+          if (architecture.includes("arm")) return "mac_silicon";
+          if (architecture.includes("x86")) return "mac_intel";
+        }
+      } catch (error) {
+        // Bei nicht unterstützten Browsern bleibt die manuelle Auswahl.
+      }
+
+      // Browser geben auf Macs nicht immer die echte CPU-Architektur preis.
+      // Deshalb ist Intel nur eine Vorauswahl; Apple-Silicon-Nutzer können
+      // direkt darunter die passende Silicon-Version auswählen.
+      return "mac_intel";
+    }
+
+    function showRecommendedDownload(key, note) {
+      const download = DOWNLOADS[key];
+      const title = document.getElementById("recommendedTitle");
+      const description = document.getElementById("recommendedDescription");
+      const button = document.getElementById("recommendedDownload");
+
+      if (!download || !title || !description || !button) return;
+
+      title.textContent = "Empfohlen: " + download.title;
+      description.textContent = download.description + (note ? " " + note : "");
+      button.href = DOWNLOAD_BASE + download.file;
+      button.textContent = download.file + " herunterladen ↓";
+
+      document.querySelectorAll(".download-option").forEach(option => {
+        option.classList.remove("recommended");
+      });
+
+      const optionIds = {
+        mac_intel: "downloadMacIntel",
+        mac_silicon: "downloadMacSilicon",
+        windows: "downloadWindows",
+        linux: "downloadLinux"
+      };
+
+      document.getElementById(optionIds[key])?.classList.add("recommended");
+    }
+
+    // Links für alle vier Systeme setzen – unabhängig vom erkannten Gerät.
+    setDownloadLink("downloadMacIntel", "mac_intel");
+    setDownloadLink("downloadMacSilicon", "mac_silicon");
+    setDownloadLink("downloadWindows", "windows");
+    setDownloadLink("downloadLinux", "linux");
+
+    async function initializeDownloads() {
+      const detected = detectOperatingSystem();
+      const status = document.getElementById("downloadStatus");
+
+      if (detected.key === "windows" || detected.key === "linux") {
+        showRecommendedDownload(detected.key);
+        status.textContent =
+          "Dein Betriebssystem wurde erkannt. Du kannst trotzdem jede andere Version auswählen.";
+        return;
+      }
+
+      if (detected.certainty === "mac-architecture-unknown") {
+        const macKey = await detectMacArchitecture();
+
+        showRecommendedDownload(
+          macKey,
+          macKey === "mac_intel"
+            ? "Die Browser-Erkennung der Mac-Architektur ist nicht immer zuverlässig. Falls dein Mac einen Apple-Chip (M1, M2, M3, M4 usw.) hat, wähle bitte mac_silicon.dmg."
+            : ""
+        );
+
+        status.textContent =
+          "Mac erkannt. Die CPU-Architektur kann der Browser möglicherweise nicht zuverlässig feststellen. Bitte prüfe Intel oder Apple Silicon.";
+        return;
+      }
+
+      document.getElementById("recommendedTitle").textContent =
+        "Wähle dein Betriebssystem";
+      document.getElementById("recommendedDescription").textContent =
+        "Dein Betriebssystem konnte nicht eindeutig erkannt werden. Wähle unten den passenden Download.";
+      document.getElementById("recommendedDownload").style.display = "none";
+      status.textContent =
+        "Alle vier Versionen stehen zur Auswahl. Achte darauf, die passende Datei für dein System zu verwenden.";
+    }
+
+    initializeDownloads();
   </script>
 </body>
 </html>
