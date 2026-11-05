@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#01C7FC">
-  <meta name="description" content="Die offizielle Informationsseite von LinkUp Client.">
+  <meta name="description" content="Die offizielle Seite von LinkUp Client – Minecraft, neu gedacht.">
   <title>LinkUp Client – Minecraft, neu gedacht.</title>
 
   <style>
@@ -20,52 +20,28 @@
       --shadow: 0 12px 40px rgba(16, 67, 93, .07);
     }
 
-    [hidden] {
-      display: none !important;
-    }
+    [hidden] { display: none !important; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 90px;
-    }
+    html { scroll-behavior: smooth; scroll-padding-top: 90px; }
 
     body {
-      font-family: Inter, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
       background: var(--background);
       line-height: 1.65;
       overflow-wrap: anywhere;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
 
-    button {
-      font: inherit;
-    }
-
-    button, a {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .container {
-      width: min(1160px, calc(100% - 40px));
-      margin: 0 auto;
-    }
+    .container { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
 
     .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 100;
       background: rgba(255,255,255,.9);
       backdrop-filter: blur(18px);
       border-bottom: 1px solid rgba(225,237,243,.85);
@@ -73,101 +49,54 @@
 
     .nav-inner {
       min-height: 76px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 24px;
+      display: flex; justify-content: space-between; align-items: center; gap: 24px;
     }
 
     .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 11px;
-      font-weight: 850;
-      font-size: 1.12rem;
-      letter-spacing: -.6px;
-      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 11px;
+      font-weight: 850; font-size: 1.12rem; letter-spacing: -.6px; white-space: nowrap;
     }
 
     .brand-icon {
-      display: grid;
-      place-items: center;
-      width: 39px;
-      height: 39px;
-      color: #fff;
+      display: grid; place-items: center;
+      width: 39px; height: 39px; color: #fff;
       background: linear-gradient(135deg, #01c7fc, #008fdb);
-      border-radius: 13px;
-      box-shadow: 0 5px 15px #01c7fc45;
-      font-size: 21px;
+      border-radius: 13px; box-shadow: 0 5px 15px #01c7fc45; font-size: 21px;
     }
 
-    .brand span:last-child span {
-      color: var(--cyan-dark);
-    }
+    .brand span:last-child span { color: var(--cyan-dark); }
 
     .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 27px;
-      color: #506173;
-      font-size: .92rem;
-      font-weight: 600;
+      display: flex; align-items: center; gap: 27px;
+      color: #506173; font-size: .92rem; font-weight: 600;
     }
 
-    .nav-links a:hover,
-    .footer-links a:hover {
-      color: var(--cyan-dark);
-    }
+    .nav-links a:hover, .footer-links a:hover { color: var(--cyan-dark); }
 
     .nav-cta, .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 19px;
-      border-radius: 13px;
-      font-weight: 750;
-      transition: transform .2s, box-shadow .2s, background .2s;
-      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 19px; border-radius: 13px; font-weight: 750;
+      transition: transform .2s, box-shadow .2s, background .2s; cursor: pointer;
     }
 
     .nav-cta, .button-primary {
-      color: #062b39;
-      background: var(--cyan);
-      box-shadow: 0 7px 18px #01c7fc30;
+      color: #062b39; background: var(--cyan); box-shadow: 0 7px 18px #01c7fc30;
     }
 
     .nav-cta:hover, .button-primary:hover {
-      background: #32d2ff;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px #01c7fc45;
+      background: #32d2ff; transform: translateY(-2px); box-shadow: 0 10px 24px #01c7fc45;
     }
 
-    .button-secondary {
-      color: var(--ink);
-      background: #fff;
-      border: 1px solid var(--border);
-    }
-
-    .button-secondary:hover {
-      border-color: var(--cyan);
-      transform: translateY(-2px);
-    }
+    .button-secondary { color: var(--ink); background: #fff; border: 1px solid var(--border); }
+    .button-secondary:hover { border-color: var(--cyan); transform: translateY(-2px); }
 
     .menu-toggle {
-      display: none;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: #fff;
-      padding: 9px 12px;
-      font-size: 1.2rem;
-      cursor: pointer;
+      display: none; border: 1px solid var(--border); border-radius: 12px;
+      background: #fff; padding: 9px 12px; font-size: 1.2rem; cursor: pointer;
     }
 
     .hero {
-      position: relative;
-      overflow: hidden;
-      padding: 105px 0 95px;
+      position: relative; overflow: hidden; padding: 105px 0 95px;
       background:
         radial-gradient(ellipse at 80% 20%, #01c7fc18, transparent 35%),
         radial-gradient(ellipse at 15% 80%, #7ce8ff20, transparent 35%),
@@ -175,616 +104,261 @@
     }
 
     .hero::before {
-      content: "";
-      position: absolute;
-      width: 420px;
-      height: 420px;
-      border: 1px solid #01c7fc18;
-      border-radius: 50%;
-      right: -160px;
-      top: 30px;
-      pointer-events: none;
+      content: ""; position: absolute; width: 420px; height: 420px;
+      border: 1px solid #01c7fc18; border-radius: 50%;
+      right: -160px; top: 30px; pointer-events: none;
     }
 
     .hero-grid {
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 60px;
-      align-items: center;
+      display: grid; grid-template-columns: 1.15fr .85fr; gap: 60px; align-items: center;
     }
 
     .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      padding: 7px 12px;
-      border: 1px solid #01c7fc45;
-      border-radius: 999px;
-      background: #e8faff;
-      color: #08799b;
-      font-size: .8rem;
-      font-weight: 800;
-      letter-spacing: .3px;
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 7px 12px; border: 1px solid #01c7fc45; border-radius: 999px;
+      background: #e8faff; color: #08799b; font-size: .8rem; font-weight: 800; letter-spacing: .3px;
     }
 
     .status-dot {
-      width: 8px;
-      height: 8px;
-      background: #00a9d9;
-      border-radius: 50%;
+      width: 8px; height: 8px; background: #00a9d9; border-radius: 50%;
       box-shadow: 0 0 0 4px #01c7fc20;
     }
 
     h1 {
       margin: 25px 0 20px;
       font-size: clamp(2.8rem, 6.2vw, 5.4rem);
-      line-height: 1.04;
-      letter-spacing: -4px;
-      font-weight: 900;
+      line-height: 1.04; letter-spacing: -4px; font-weight: 900;
     }
 
     .gradient-text {
       color: var(--cyan-dark);
       background: linear-gradient(100deg, #01b9ed, #007fca);
-      -webkit-background-clip: text;
-      background-clip: text;
+      -webkit-background-clip: text; background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .hero-copy {
-      max-width: 550px;
-      color: var(--muted);
-      font-size: 1.08rem;
-      line-height: 1.85;
-    }
+    .hero-copy { max-width: 550px; color: var(--muted); font-size: 1.08rem; line-height: 1.85; }
 
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 30px;
-    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 
-    .hero-note {
-      margin-top: 19px;
-      color: #8191a1;
-      font-size: .83rem;
-    }
+    .hero-note { margin-top: 19px; color: #8191a1; font-size: .83rem; }
 
-    .preview {
-      position: relative;
-      min-height: 370px;
-      display: grid;
-      place-items: center;
-    }
+    .preview { position: relative; min-height: 370px; display: grid; place-items: center; }
 
     .preview-glow {
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      background: #01c7fc25;
-      border-radius: 50%;
-      filter: blur(40px);
+      position: absolute; width: 300px; height: 300px;
+      background: #01c7fc25; border-radius: 50%; filter: blur(40px);
     }
 
     .preview-card {
-      position: relative;
-      width: min(100%, 380px);
-      padding: 24px;
-      border: 1px solid #fff;
-      border-radius: 26px;
-      background: rgba(255,255,255,.87);
-      box-shadow: 0 25px 80px #12516c16, 0 0 0 1px #dceff7;
-      transform: rotate(2deg);
+      position: relative; width: min(100%, 380px); padding: 24px;
+      border: 1px solid #fff; border-radius: 26px; background: rgba(255,255,255,.87);
+      box-shadow: 0 25px 80px #12516c16, 0 0 0 1px #dceff7; transform: rotate(2deg);
     }
 
     .preview-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding-bottom: 18px; border-bottom: 1px solid var(--border);
     }
 
-    .preview-label {
-      color: var(--muted);
-      font-size: .77rem;
-    }
+    .preview-label { color: var(--muted); font-size: .77rem; }
 
     .preview-status {
-      padding: 5px 9px;
-      border-radius: 9px;
-      color: #08799b;
-      background: #e4faff;
-      font-size: .7rem;
-      font-weight: 800;
+      padding: 5px 9px; border-radius: 9px; color: #08799b;
+      background: #e4faff; font-size: .7rem; font-weight: 800;
     }
 
     .preview-logo {
-      display: grid;
-      place-items: center;
-      width: 75px;
-      height: 75px;
-      margin: 28px auto 15px;
-      border-radius: 23px;
+      display: grid; place-items: center; width: 75px; height: 75px;
+      margin: 28px auto 15px; border-radius: 23px;
       background: linear-gradient(135deg, #01c7fc, #007fca);
-      color: white;
-      font-size: 38px;
-      box-shadow: 0 12px 28px #01c7fc45;
+      color: white; font-size: 38px; box-shadow: 0 12px 28px #01c7fc45;
     }
 
-    .preview-card h3 {
-      text-align: center;
-      font-size: 1.4rem;
-      letter-spacing: -.7px;
-    }
+    .preview-card h3 { text-align: center; font-size: 1.4rem; letter-spacing: -.7px; }
 
-    .preview-subtitle {
-      text-align: center;
-      color: var(--muted);
-      font-size: .85rem;
-      margin-top: 4px;
-    }
+    .preview-subtitle { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 4px; }
 
-    .preview-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 9px;
-      margin-top: 24px;
-    }
+    .preview-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-top: 24px; }
 
     .stat {
-      padding: 13px 5px;
-      text-align: center;
-      background: #f1faff;
-      border: 1px solid #e0f3fa;
-      border-radius: 13px;
+      padding: 13px 5px; text-align: center; background: #f1faff;
+      border: 1px solid #e0f3fa; border-radius: 13px;
     }
 
-    .stat strong {
-      display: block;
-      font-size: .9rem;
-    }
+    .stat strong { display: block; font-size: .9rem; }
+    .stat small { color: var(--muted); font-size: .67rem; }
 
-    .stat small {
-      color: var(--muted);
-      font-size: .67rem;
-    }
+    .section { padding: 90px 0; }
+    .section-white { background: #fff; }
 
-    .section {
-      padding: 90px 0;
-    }
-
-    .section-white {
-      background: #fff;
-    }
-
-    .section-heading {
-      max-width: 690px;
-      margin: 0 auto 45px;
-      text-align: center;
-    }
+    .section-heading { max-width: 690px; margin: 0 auto 45px; text-align: center; }
 
     .section-kicker {
-      color: var(--cyan-dark);
-      font-size: .78rem;
-      text-transform: uppercase;
-      letter-spacing: 1.8px;
-      font-weight: 850;
+      color: var(--cyan-dark); font-size: .78rem; text-transform: uppercase;
+      letter-spacing: 1.8px; font-weight: 850;
     }
 
     h2 {
-      margin-top: 10px;
-      font-size: clamp(2rem, 4vw, 3.15rem);
-      line-height: 1.15;
-      letter-spacing: -1.7px;
+      margin-top: 10px; font-size: clamp(2rem, 4vw, 3.15rem);
+      line-height: 1.15; letter-spacing: -1.7px;
     }
 
-    .section-heading p {
-      margin-top: 15px;
-      color: var(--muted);
-    }
+    .section-heading p { margin-top: 15px; color: var(--muted); }
 
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 19px;
-    }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 19px; }
 
     .feature-card {
-      padding: 27px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      padding: 27px; background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
       transition: transform .22s, border-color .22s;
     }
 
-    .feature-card:hover {
-      transform: translateY(-5px);
-      border-color: #9ceaff;
-    }
+    .feature-card:hover { transform: translateY(-5px); border-color: #9ceaff; }
 
     .feature-icon {
-      display: grid;
-      place-items: center;
-      width: 49px;
-      height: 49px;
-      margin-bottom: 20px;
-      border-radius: 15px;
-      background: #e7faff;
-      color: #008fb9;
-      font-size: 23px;
+      display: grid; place-items: center; width: 49px; height: 49px;
+      margin-bottom: 20px; border-radius: 15px; background: #e7faff;
+      color: #008fb9; font-size: 23px;
     }
 
-    .feature-card h3 {
-      font-size: 1.13rem;
-      letter-spacing: -.3px;
-    }
-
-    .feature-card p {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: .91rem;
-    }
+    .feature-card h3 { font-size: 1.13rem; letter-spacing: -.3px; }
+    .feature-card p { margin-top: 10px; color: var(--muted); font-size: .91rem; }
 
     .tag {
-      display: inline-flex;
-      margin-top: 18px;
-      padding: 5px 9px;
-      border-radius: 8px;
-      background: #fff4d9;
-      color: #8a6415;
-      font-size: .72rem;
-      font-weight: 800;
-    }
-
-    .tag-existing {
-      background: #e6f8ec;
-      color: #187744;
-    }
-
-    .tag-planned {
-      background: #e8f7ff;
-      color: #08799b;
+      display: inline-flex; margin-top: 18px; padding: 5px 9px; border-radius: 8px;
+      background: #e6f8ec; color: #187744; font-size: .72rem; font-weight: 800;
     }
 
     .status-panel {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      padding: 34px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: linear-gradient(125deg, #fff, #effbff);
-      box-shadow: var(--shadow);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 34px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: linear-gradient(125deg, #fff, #effbff); box-shadow: var(--shadow);
     }
 
-    .status-panel h3 {
-      font-size: 1.3rem;
-    }
+    .status-panel h3 { font-size: 1.3rem; }
+    .status-panel p { margin-top: 10px; color: var(--muted); }
 
-    .status-panel p {
-      margin-top: 10px;
-      color: var(--muted);
-    }
+    .status-list { list-style: none; display: grid; gap: 12px; }
 
-    .status-list {
-      list-style: none;
-      display: grid;
-      gap: 12px;
-    }
-
-    .status-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: .92rem;
-    }
-
-    .status-list li span {
-      color: var(--cyan-dark);
-      font-weight: 900;
-    }
+    .status-list li { display: flex; align-items: flex-start; gap: 10px; font-size: .92rem; }
+    .status-list li > span { color: var(--cyan-dark); font-weight: 900; }
+    .status-list small { color: var(--muted); font-size: .92rem; }
 
     .download-box {
-      text-align: center;
-      padding: 55px 30px;
+      text-align: center; padding: 55px 30px;
       background: linear-gradient(135deg, #e9faff, #fff);
-      border: 1px solid #cceffa;
-      border-radius: 28px;
+      border: 1px solid #cceffa; border-radius: 28px;
     }
 
     .download-symbol {
-      display: grid;
-      place-items: center;
-      width: 65px;
-      height: 65px;
-      margin: 0 auto 18px;
-      border-radius: 20px;
-      color: #007eaa;
-      background: #fff;
-      border: 1px solid #d5f2fa;
-      font-size: 29px;
+      display: grid; place-items: center; width: 65px; height: 65px;
+      margin: 0 auto 18px; border-radius: 20px; color: #007eaa;
+      background: #fff; border: 1px solid #d5f2fa; font-size: 29px;
     }
 
-    .download-box p {
-      max-width: 600px;
-      margin: 15px auto 23px;
-      color: var(--muted);
-    }
+    .download-box > p { max-width: 600px; margin: 15px auto 23px; color: var(--muted); }
 
     .download-recommendation {
-      max-width: 650px;
-      margin: 28px auto 25px;
-      padding: 22px;
-      border: 1px solid #bcecf8;
-      border-radius: 18px;
-      background: #fff;
-      text-align: left;
+      max-width: 650px; margin: 28px auto 25px; padding: 22px;
+      border: 1px solid #bcecf8; border-radius: 18px; background: #fff; text-align: left;
     }
 
-    .download-recommendation strong {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 1.05rem;
-    }
+    .download-recommendation strong { display: block; margin-bottom: 5px; font-size: 1.05rem; }
 
-    .download-recommendation p {
-      margin: 0 auto 16px;
-      color: var(--muted);
-      font-size: .9rem;
-    }
+    .download-recommendation p { margin: 0 auto 16px; color: var(--muted); font-size: .9rem; }
 
     .download-options {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      max-width: 650px;
-      margin: 0 auto;
-      text-align: left;
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px; max-width: 650px; margin: 0 auto; text-align: left;
     }
 
     .download-option {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      padding: 17px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: #fff;
+      display: flex; flex-direction: column; gap: 4px; padding: 17px;
+      border: 1px solid var(--border); border-radius: 14px; background: #fff;
       transition: border-color .2s, transform .2s, box-shadow .2s;
     }
 
     .download-option:hover {
-      border-color: var(--cyan);
-      transform: translateY(-2px);
+      border-color: var(--cyan); transform: translateY(-2px);
       box-shadow: 0 8px 22px #12516c12;
     }
 
-    .download-option strong {
-      font-size: .98rem;
-    }
+    .download-option strong { font-size: .98rem; }
+    .download-option span { color: var(--muted); font-size: .82rem; }
+    .download-option.recommended { border-color: var(--cyan); background: #f0fcff; }
 
-    .download-option span {
-      color: var(--muted);
-      font-size: .82rem;
-    }
+    .download-status { margin-top: 16px; color: var(--muted); font-size: .82rem; }
 
-    .download-option.recommended {
-      border-color: var(--cyan);
-      background: #f0fcff;
-    }
-
-    .download-status {
-      margin-top: 16px;
-      color: var(--muted);
-      font-size: .82rem;
-    }
-
-    @media (max-width: 520px) {
-      .download-options {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .legal {
-      background: #fff;
-    }
+    .legal { background: #fff; }
 
     .legal-card {
-      max-width: 850px;
-      margin: 0 auto;
-      padding: clamp(23px, 5vw, 44px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: #fff;
-      box-shadow: var(--shadow);
+      max-width: 850px; margin: 0 auto; padding: clamp(23px, 5vw, 44px);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: #fff; box-shadow: var(--shadow);
     }
 
-    .legal-card h3 {
-      margin: 28px 0 8px;
-      font-size: 1.08rem;
-    }
+    .legal-card h3 { margin: 28px 0 8px; font-size: 1.08rem; }
+    .legal-card h3:first-of-type { margin-top: 0; }
+    .legal-card p { color: #536577; font-size: .94rem; margin-top: 7px; }
 
-    .legal-card h3:first-of-type {
-      margin-top: 25px;
-    }
-
-    .legal-card p {
-      color: #536577;
-      font-size: .94rem;
-      margin-top: 7px;
-    }
-
-    .placeholder {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 5px;
-      color: #08799b;
-      background: #e8faff;
-      font-weight: 650;
-    }
-
-    .legal-warning {
-      margin-top: 25px;
-      padding: 15px;
-      border-radius: 12px;
-      background: #fff8e8;
-      color: #795d20;
-      font-size: .86rem;
-    }
-
-    footer {
-      padding: 30px 0;
-      background: #f0f8fc;
-      border-top: 1px solid var(--border);
-    }
+    footer { padding: 30px 0; background: #f0f8fc; border-top: 1px solid var(--border); }
 
     .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 20px; flex-wrap: wrap;
     }
 
-    .footer-copy {
-      color: #718296;
-      font-size: .84rem;
-    }
+    .footer-copy { color: #718296; font-size: .84rem; }
 
-    .footer-links {
-      display: flex;
-      gap: 20px;
-      color: #526577;
-      font-size: .87rem;
-      font-weight: 650;
-    }
+    .footer-links { display: flex; gap: 20px; color: #526577; font-size: .87rem; font-weight: 650; }
 
-    .fade-in {
-      animation: fadeIn .7s ease both;
-    }
+    .fade-in { animation: fadeIn .7s ease both; }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(13px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(13px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
-        scroll-behavior: auto !important;
-        animation: none !important;
-        transition: none !important;
+        scroll-behavior: auto !important; animation: none !important; transition: none !important;
       }
     }
 
     @media (max-width: 900px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-        gap: 35px;
-      }
-
-      .hero {
-        padding: 75px 0 55px;
-      }
-
-      .hero-copy {
-        max-width: 680px;
-      }
-
-      .preview {
-        min-height: 330px;
-      }
-
-      .feature-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .nav-links {
-        gap: 15px;
-      }
+      .hero-grid { grid-template-columns: 1fr; gap: 35px; }
+      .hero { padding: 75px 0 55px; }
+      .hero-copy { max-width: 680px; }
+      .preview { min-height: 330px; }
+      .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .nav-links { gap: 15px; }
     }
 
     @media (max-width: 650px) {
-      .container {
-        width: min(100% - 30px, 1160px);
-      }
-
-      .nav-inner {
-        min-height: 68px;
-        flex-wrap: wrap;
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
+      .container { width: min(100% - 30px, 1160px); }
+      .nav-inner { min-height: 68px; flex-wrap: wrap; }
+      .menu-toggle { display: block; }
       .nav-links {
-        display: none;
-        width: 100%;
-        padding: 0 0 18px;
-        align-items: stretch;
-        flex-direction: column;
-        gap: 0;
+        display: none; width: 100%; padding: 0 0 18px;
+        align-items: stretch; flex-direction: column; gap: 0;
       }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 10px 4px; }
+      .nav-cta { text-align: center; }
+      h1 { letter-spacing: -2.5px; }
+      .hero { padding-top: 60px; }
+      .section { padding: 65px 0; }
+      .feature-grid, .status-panel { grid-template-columns: 1fr; }
+      .feature-card { padding: 23px; }
+      .download-box { padding: 38px 20px; }
+      .preview-card { padding: 20px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
+      .footer-links { flex-wrap: wrap; }
+    }
 
-      .nav-links.open {
-        display: flex;
-      }
-
-      .nav-links a {
-        padding: 10px 4px;
-      }
-
-      .nav-cta {
-        text-align: center;
-      }
-
-      h1 {
-        letter-spacing: -2.5px;
-      }
-
-      .hero {
-        padding-top: 60px;
-      }
-
-      .section {
-        padding: 65px 0;
-      }
-
-      .feature-grid,
-      .status-panel {
-        grid-template-columns: 1fr;
-      }
-
-      .feature-card {
-        padding: 23px;
-      }
-
-      .download-box {
-        padding: 38px 20px;
-      }
-
-      .preview-card {
-        padding: 20px;
-      }
-
-      .footer-inner {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .footer-links {
-        flex-wrap: wrap;
-      }
+    @media (max-width: 520px) {
+      .download-options { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -796,18 +370,12 @@
         <span>LinkUp <span>Client</span></span>
       </a>
 
-      <button
-        class="menu-toggle"
-        id="menuToggle"
-        type="button"
-        aria-label="Navigation öffnen"
-        aria-expanded="false"
-        aria-controls="navLinks"
-      >☰</button>
+      <button class="menu-toggle" id="menuToggle" type="button"
+        aria-label="Navigation öffnen" aria-expanded="false" aria-controls="navLinks">☰</button>
 
       <nav class="nav-links" id="navLinks" aria-label="Hauptnavigation">
         <a href="#funktionen">Funktionen</a>
-        <a href="#entwicklung">Entwicklung</a>
+        <a href="#entwicklung">Status</a>
         <a href="#download">Download</a>
         <a href="#impressum">Impressum</a>
         <a class="nav-cta" href="#download">Zum Download ↓</a>
@@ -821,7 +389,7 @@
         <div class="fade-in">
           <div class="eyebrow">
             <span class="status-dot"></span>
-            <span id="heroProjectStatus">Eigenständiges Projekt · In Entwicklung</span>
+            <span>Offiziell veröffentlicht · Version <span class="js-version">1.0.0</span></span>
           </div>
 
           <h1>
@@ -830,24 +398,22 @@
           </h1>
 
           <p class="hero-copy">
-            Willkommen bei LinkUp Client. Hier entsteht ein eigenes
-            Minecraft-Client-Projekt mit dem Ziel, Spielkomfort,
-            individuelle Einstellungen und nützliche Funktionen
-            in einer gemeinsamen Oberfläche zusammenzubringen.
+            Willkommen bei LinkUp Client. Ein eigenes Minecraft-Client-Projekt,
+            das Spielkomfort, individuelle Einstellungen und nützliche
+            Funktionen in einer gemeinsamen Oberfläche zusammenbringt.
           </p>
 
           <div class="hero-actions">
-            <a class="button button-primary" href="#funktionen">
-              Funktionen entdecken <span aria-hidden="true">↗</span>
+            <a class="button button-primary" href="#download">
+              Jetzt herunterladen <span aria-hidden="true">↓</span>
             </a>
-            <a class="button button-secondary" href="#entwicklung">
-              Entwicklungsstand ansehen
+            <a class="button button-secondary" href="#funktionen">
+              Funktionen ansehen
             </a>
           </div>
 
-          <p class="hero-note" id="heroProjectNote">
-            Hinweis: LinkUp Client befindet sich im Aufbau. Noch sind
-            nicht alle geplanten Funktionen verfügbar.
+          <p class="hero-note">
+            Verfügbar für macOS, Windows und Linux.
           </p>
         </div>
 
@@ -858,30 +424,19 @@
             <div class="preview-top">
               <div>
                 <strong>LinkUp Client</strong><br>
-                <span class="preview-label">Projektvorschau</span>
+                <span class="preview-label">Minecraft Client</span>
               </div>
-              <span class="preview-status" id="previewStatus">IN ENTWICKLUNG</span>
+              <span class="preview-status">VERSION <span class="js-version">1.0.0</span></span>
             </div>
 
             <div class="preview-logo" aria-hidden="true">L</div>
             <h3>LinkUp Client</h3>
-            <p class="preview-subtitle">
-              Eine eigene Client-Erfahrung für Minecraft
-            </p>
+            <p class="preview-subtitle">Eine eigene Client-Erfahrung für Minecraft</p>
 
             <div class="preview-stats">
-              <div class="stat">
-                <strong>HUD</strong>
-                <small>Geplant</small>
-              </div>
-              <div class="stat">
-                <strong>Profile</strong>
-                <small>Geplant</small>
-              </div>
-              <div class="stat">
-                <strong>Mods</strong>
-                <small>Geplant</small>
-              </div>
+              <div class="stat"><strong>HUD</strong><small>Enthalten</small></div>
+              <div class="stat"><strong>Profile</strong><small>Enthalten</small></div>
+              <div class="stat"><strong>Mods</strong><small>Enthalten</small></div>
             </div>
           </div>
         </div>
@@ -892,73 +447,51 @@
       <div class="container">
         <div class="section-heading">
           <span class="section-kicker">Möglichkeiten</span>
-          <h2>Was LinkUp Client bieten soll</h2>
-          <p>
-            Die folgenden Karten zeigen mögliche Entwicklungsbereiche.
-            Sie sind keine Bestätigung, dass die Funktionen bereits
-            implementiert sind.
-          </p>
+          <h2>Was LinkUp Client bietet</h2>
+          <p>Alles, was du für ein komfortables und persönliches Minecraft-Erlebnis brauchst.</p>
         </div>
 
         <div class="feature-grid">
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">▦</div>
             <h3>Individuelles HUD</h3>
-            <p>
-              Eine übersichtliche Ingame-Anzeige mit frei konfigurierbaren
-              Elementen und persönlichen Einstellungen.
-            </p>
-            <span class="tag tag-planned">Geplant</span>
+            <p>Eine übersichtliche Ingame-Anzeige mit frei konfigurierbaren Elementen und persönlichen Einstellungen.</p>
+            <span class="tag">Enthalten</span>
           </article>
 
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">⚙</div>
             <h3>Client-Einstellungen</h3>
-            <p>
-              Zentrale Menüs für Optionen, Tastenkürzel und die
-              Konfiguration der verfügbaren Client-Funktionen.
-            </p>
-            <span class="tag tag-planned">Geplant</span>
+            <p>Zentrale Menüs für Optionen, Tastenkürzel und die Konfiguration aller Client-Funktionen.</p>
+            <span class="tag">Enthalten</span>
           </article>
 
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">▤</div>
             <h3>Mod-Verwaltung</h3>
-            <p>
-              Ein möglicher Bereich zur Verwaltung kompatibler Mods,
-              Spielprofile und individueller Konfigurationen.
-            </p>
-            <span class="tag tag-planned">Geplant</span>
+            <p>Ein Bereich zur Verwaltung kompatibler Mods, Spielprofile und individueller Konfigurationen.</p>
+            <span class="tag">Enthalten</span>
           </article>
 
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">⌨</div>
             <h3>Praktische Spielanzeigen</h3>
-            <p>
-              Mögliche Anzeigen für Koordinaten, Tastenanschläge,
-              Bildrate und weitere ausgewählte Spielinformationen.
-            </p>
-            <span class="tag tag-planned">Geplant</span>
+            <p>Anzeigen für Koordinaten, Tastenanschläge, Bildrate und weitere ausgewählte Spielinformationen.</p>
+            <span class="tag">Enthalten</span>
           </article>
 
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">◈</div>
             <h3>Personalisierung</h3>
-            <p>
-              Ein anpassbares Erscheinungsbild mit eigenen Farben,
-              Oberflächen und Einstellungen.
-            </p>
-            <span class="tag tag-planned">Geplant</span>
+            <p>Ein anpassbares Erscheinungsbild mit eigenen Farben, Oberflächen und Einstellungen.</p>
+            <span class="tag">Enthalten</span>
           </article>
 
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">⇧</div>
             <h3>Eigener Launcher</h3>
-            <p>
-              Eine mögliche Desktop-Oberfläche zum Starten und
-              Verwalten unterstützter Minecraft-Installationen.
-            </p>
-            <span class="tag tag-planned">Geplant</span>
+            <p>Eine Desktop-Oberfläche zum Starten und Verwalten unterstützter Minecraft-Installationen.</p>
+            <span class="tag">Enthalten</span>
           </article>
         </div>
       </div>
@@ -967,60 +500,36 @@
     <section class="section" id="entwicklung">
       <div class="container">
         <div class="section-heading">
-          <span class="section-kicker">Transparenz</span>
-          <h2 id="developmentHeading">Ein Projekt im Aufbau</h2>
-          <p id="developmentIntro">
-            Hier wird zwischen vorhandenen Projektbestandteilen und
-            zukünftigen Ideen unterschieden.
-          </p>
+          <span class="section-kicker">Status</span>
+          <h2>LinkUp Client ist veröffentlicht</h2>
+          <p>Die erste öffentliche Version von LinkUp Client ist verfügbar.</p>
         </div>
 
         <div class="status-panel">
           <div>
-            <h3 id="developmentStatusTitle">Aktueller Entwicklungsstand</h3>
-            <p id="developmentStatusDescription">
-              Das Projekt wird schrittweise aufgebaut. Die technische
-              Grundlage wird zuerst eingerichtet, bevor weitere
-              Funktionen entwickelt und getestet werden.
+            <h3>Veröffentlichungsstatus</h3>
+            <p>
+              LinkUp Client wurde veröffentlicht. Die Installationsdateien für
+              alle unterstützten Systeme findest du im Download-Bereich.
             </p>
           </div>
 
           <ul class="status-list">
             <li>
               <span>✓</span>
-              <div>
-                <strong>Projekt angelegt</strong><br>
-                <span style="color:#64748b;font-weight:400">
-                  Das Grundprojekt wurde erstellt.
-                </span>
-              </div>
+              <div><strong>Projekt angelegt</strong><br><small>Das Grundprojekt wurde erstellt.</small></div>
             </li>
             <li>
-              <span>…</span>
-              <div>
-                <strong>Fabric-Integration</strong><br>
-                <span style="color:#64748b;font-weight:400">
-                  Einrichtung und Funktionstest stehen an.
-                </span>
-              </div>
+              <span>✓</span>
+              <div><strong>Fabric-Integration</strong><br><small>Eingerichtet und getestet.</small></div>
             </li>
             <li>
-              <span>○</span>
-              <div>
-                <strong>Ingame-Funktionen</strong><br>
-                <span style="color:#64748b;font-weight:400">
-                  Werden nach und nach umgesetzt.
-                </span>
-              </div>
+              <span>✓</span>
+              <div><strong>Ingame-Funktionen</strong><br><small>Umgesetzt und enthalten.</small></div>
             </li>
             <li>
-              <span>○</span>
-              <div>
-                <strong id="publicDownloadTitle">Öffentlicher Download</strong><br>
-                <span id="publicDownloadStatus" style="color:#64748b;font-weight:400">
-                  Noch nicht verfügbar.
-                </span>
-              </div>
+              <span>✓</span>
+              <div><strong>Öffentlicher Download</strong><br><small>Verfügbar · Version <span class="js-version">1.0.0</span></small></div>
             </li>
           </ul>
         </div>
@@ -1031,50 +540,41 @@
       <div class="container">
         <div class="download-box">
           <div class="download-symbol" aria-hidden="true">↓</div>
-          <span class="section-kicker" id="downloadKicker">Download</span>
-          <h2 id="downloadHeading">LinkUp Client – bald verfügbar</h2>
-          <p id="downloadIntro">
-            LinkUp Client befindet sich noch in Entwicklung. Die offiziellen
-            Downloads werden hier freigeschaltet, sobald die Veröffentlichung erfolgt.
+          <span class="section-kicker">Offizielle Downloads</span>
+          <h2>LinkUp Client herunterladen</h2>
+          <p>
+            Wähle die passende Version für dein Betriebssystem. Dein Gerät wird
+            automatisch erkannt und ein Download empfohlen. Du kannst jederzeit
+            auch eine andere Version auswählen.
           </p>
-          <p id="downloadUnavailable" class="download-status">Der öffentliche Download ist noch nicht freigegeben.</p>
-          <p id="downloadVersion" class="download-status" hidden></p>
+          <p class="download-status">Version <span class="js-version">1.0.0</span></p>
 
-          <div class="download-recommendation" id="downloadRecommendation" hidden>
+          <div class="download-recommendation" id="downloadRecommendation">
             <strong id="recommendedTitle">Gerät wird erkannt …</strong>
-            <p id="recommendedDescription">
-              Einen Moment bitte. Die verfügbaren Downloads werden vorbereitet.
-            </p>
-            <a
-              class="button button-primary"
-              id="recommendedDownload"
-              href="#download"
-            >Empfohlenen Download auswählen ↓</a>
+            <p id="recommendedDescription">Einen Moment bitte.</p>
+            <a class="button button-primary" id="recommendedDownload" href="#download" hidden>Herunterladen ↓</a>
           </div>
 
-          <div class="download-options" id="downloadOptions" aria-label="Alle verfügbaren Downloads" hidden>
+          <div class="download-options" aria-label="Alle verfügbaren Downloads">
             <a class="download-option" id="downloadMacIntel" href="#" rel="noopener">
               <strong>macOS – Intel</strong>
               <span>mac_intel.dmg</span>
             </a>
-
             <a class="download-option" id="downloadMacSilicon" href="#" rel="noopener">
               <strong>macOS – Apple Silicon</strong>
               <span>mac_silicon.dmg</span>
             </a>
-
             <a class="download-option" id="downloadWindows" href="#" rel="noopener">
               <strong>Windows</strong>
               <span>windows.exe</span>
             </a>
-
             <a class="download-option" id="downloadLinux" href="#" rel="noopener">
-              <strong>Linux</strong>
+              <strong>Linux (Debian/Ubuntu)</strong>
               <span>linux.deb</span>
             </a>
           </div>
 
-          <p class="download-status" id="downloadStatus" aria-live="polite" hidden>
+          <p class="download-status" id="downloadStatus" aria-live="polite">
             Alle Downloads werden direkt aus dem offiziellen GitHub-Repository geladen.
           </p>
         </div>
@@ -1090,15 +590,10 @@
 
         <div class="legal-card">
           <h3>Anbieter / verantwortliche Stelle</h3>
-          <p>
-            Name bzw. vollständige Anbieterbezeichnung:<br>
-            <span class="placeholder">lamacHub/lamacOs-Technolygies</span>
-          </p>
+          <p>lamacHub/lamacOs-Technolygies</p>
+
           <h3>Kontakt</h3>
-          <p>
-            E-Mail:<br>
-            <span class="placeholder">linkupclient@lamachub.de</span>
-          </p>
+          <p>E-Mail: <a href="mailto:linkupclient@lamachub.de">linkupclient@lamachub.de</a></p>
         </div>
       </div>
     </section>
@@ -1111,9 +606,7 @@
         <span>LinkUp <span>Client</span></span>
       </a>
 
-      <p class="footer-copy">
-        © <span id="year"></span> LinkUp Client · Unabhängiges Projekt
-      </p>
+      <p class="footer-copy">© <span id="year"></span> LinkUp Client · Unabhängiges Projekt</p>
 
       <div class="footer-links">
         <a href="#funktionen">Funktionen</a>
@@ -1122,43 +615,30 @@
       </div>
     </div>
   </footer>
-    <script>
+
+  <script>
+    // ---------- Navigation ----------
     const menuToggle = document.getElementById("menuToggle");
     const navLinks = document.getElementById("navLinks");
 
-    menuToggle.addEventListener("click", () => {
-      const isOpen = navLinks.classList.toggle("open");
-      menuToggle.setAttribute("aria-expanded", String(isOpen));
-      menuToggle.setAttribute(
-        "aria-label",
-        isOpen ? "Navigation schließen" : "Navigation öffnen"
-      );
-      menuToggle.textContent = isOpen ? "✕" : "☰";
-    });
+    function setMenu(open) {
+      navLinks.classList.toggle("open", open);
+      menuToggle.setAttribute("aria-expanded", String(open));
+      menuToggle.setAttribute("aria-label", open ? "Navigation schließen" : "Navigation öffnen");
+      menuToggle.textContent = open ? "✕" : "☰";
+    }
 
-    navLinks.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", () => {
-        navLinks.classList.remove("open");
-        menuToggle.setAttribute("aria-expanded", "false");
-        menuToggle.setAttribute("aria-label", "Navigation öffnen");
-        menuToggle.textContent = "☰";
-      });
-    });
+    menuToggle.addEventListener("click", () => setMenu(!navLinks.classList.contains("open")));
+    navLinks.querySelectorAll("a").forEach(link => link.addEventListener("click", () => setMenu(false)));
 
-    document.getElementById("year").textContent =
-      new Date().getFullYear();
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-    // ================================================================
-    // RELEASE-EINSTELLUNGEN
-    // Für die Veröffentlichung später nur RELEASE_CONFIG.released
-    // auf true setzen und die Versionsnummer aktualisieren.
-    // ================================================================
-    const RELEASE_CONFIG = {
-      released: false,       // false = Entwicklung, true = veröffentlicht
-      version: "1.0.0"
-    };
+    // ---------- Version ----------
+    const VERSION = "1.0.0";
+    document.querySelectorAll(".js-version").forEach(el => { el.textContent = VERSION; });
 
-    // Offizielle Download-Dateien im GitHub-Repository.
+    // ---------- Downloads ----------
+    // Repository: lamacOs/lamacos.github.io, Branch main, Ordner LinkUp-Client
     const DOWNLOAD_BASE =
       "https://raw.githubusercontent.com/lamacOs/lamacos.github.io/main/LinkUp-Client/";
 
@@ -1166,217 +646,135 @@
       mac_intel: {
         file: "mac_intel.dmg",
         title: "macOS – Intel",
-        description: "Für Macs mit Intel-Prozessor."
+        description: "Für Macs mit Intel-Prozessor.",
+        elementId: "downloadMacIntel"
       },
       mac_silicon: {
         file: "mac_silicon.dmg",
         title: "macOS – Apple Silicon",
-        description: "Für Macs mit Apple-Silicon-Chip (M1, M2, M3, M4 usw.)."
+        description: "Für Macs mit Apple-Silicon-Chip (M1, M2, M3, M4 usw.).",
+        elementId: "downloadMacSilicon"
       },
       windows: {
         file: "windows.exe",
         title: "Windows",
-        description: "Installer für Windows."
+        description: "Installer für Windows.",
+        elementId: "downloadWindows"
       },
       linux: {
         file: "linux.deb",
         title: "Linux (Debian/Ubuntu)",
-        description: "Debian-/Ubuntu-Paket im .deb-Format."
+        description: "Debian-/Ubuntu-Paket im .deb-Format.",
+        elementId: "downloadLinux"
       }
     };
 
-    function setDownloadLink(elementId, downloadKey) {
-      const element = document.getElementById(elementId);
-      const download = DOWNLOADS[downloadKey];
-      if (!element || !download) return;
+    // Links für alle Optionen setzen
+    Object.values(DOWNLOADS).forEach(d => {
+      const el = document.getElementById(d.elementId);
+      el.href = DOWNLOAD_BASE + d.file;
+      el.setAttribute("download", d.file);
+      el.setAttribute("aria-label", d.title + " herunterladen");
+    });
 
-      element.href = DOWNLOAD_BASE + download.file;
-      element.setAttribute("download", download.file);
-      element.setAttribute("aria-label", download.title + " herunterladen");
-    }
+    const titleEl = document.getElementById("recommendedTitle");
+    const descEl = document.getElementById("recommendedDescription");
+    const buttonEl = document.getElementById("recommendedDownload");
+    const statusEl = document.getElementById("downloadStatus");
 
     function detectOperatingSystem() {
       const ua = navigator.userAgent || "";
       const platform = navigator.userAgentData?.platform || navigator.platform || "";
 
-      if (/Windows/i.test(platform) || /Windows/i.test(ua)) {
-        return { key: "windows", certainty: "detected" };
-      }
-
-      if (/Android|iPhone|iPad|iPod/i.test(ua)) {
-        return { key: null, certainty: "unsupported" };
-      }
-
-      if (/Linux/i.test(platform) || /Linux/i.test(ua)) {
-        return { key: "linux", certainty: "detected" };
-      }
-
+      if (/Android|iPhone|iPad|iPod/i.test(ua)) return "mobile";
+      if (/Windows/i.test(platform) || /Windows/i.test(ua)) return "windows";
+      if (/Linux/i.test(platform) || /Linux|X11/i.test(ua)) return "linux";
       if (/Mac/i.test(platform) || /Macintosh|Mac OS X/i.test(ua)) {
-        return { key: null, certainty: "mac-architecture-unknown" };
+        // iPadOS meldet sich als Mac, hat aber Touch-Bedienung
+        return navigator.maxTouchPoints > 1 ? "mobile" : "mac";
       }
-
-      return { key: null, certainty: "unknown" };
+      return "unknown";
     }
 
     async function detectMacArchitecture() {
-      // Manche Browser stellen die CPU-Architektur über Client Hints bereit.
       try {
         if (navigator.userAgentData?.getHighEntropyValues) {
-          const info = await navigator.userAgentData.getHighEntropyValues([
-            "architecture"
-          ]);
-          const architecture = String(info.architecture || "").toLowerCase();
-
-          if (architecture.includes("arm")) return "mac_silicon";
-          if (architecture.includes("x86")) return "mac_intel";
+          const info = await navigator.userAgentData.getHighEntropyValues(["architecture"]);
+          const arch = String(info.architecture || "").toLowerCase();
+          if (arch.includes("arm")) return "mac_silicon";
+          if (arch.includes("x86")) return "mac_intel";
         }
-      } catch (error) {
-        // Dann wird keine Architektur geraten.
-      }
+      } catch (e) { /* keine Architektur raten */ }
+
+      // Fallback: WebGL-Renderer auslesen (Apple GPU = Apple Silicon)
+      try {
+        const canvas = document.createElement("canvas");
+        const gl = canvas.getContext("webgl");
+        const ext = gl && gl.getExtension("WEBGL_debug_renderer_info");
+        if (ext) {
+          const renderer = String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || "");
+          if (/Apple M\d|Apple GPU/i.test(renderer)) return "mac_silicon";
+          if (/Intel|AMD|Radeon|NVIDIA/i.test(renderer)) return "mac_intel";
+        }
+      } catch (e) { /* ignorieren */ }
+
       return null;
     }
 
-    function showRecommendedDownload(key, note) {
-      const download = DOWNLOADS[key];
-      const title = document.getElementById("recommendedTitle");
-      const description = document.getElementById("recommendedDescription");
-      const button = document.getElementById("recommendedDownload");
-      if (!download || !title || !description || !button) return;
+    function showRecommended(key, note) {
+      const d = DOWNLOADS[key];
+      titleEl.textContent = "Empfohlen: " + d.title;
+      descEl.textContent = d.description;
+      buttonEl.href = DOWNLOAD_BASE + d.file;
+      buttonEl.setAttribute("download", d.file);
+      buttonEl.textContent = d.file + " herunterladen ↓";
+      buttonEl.hidden = false;
 
-      title.textContent = "Empfohlen: " + download.title;
-      description.textContent = download.description + (note ? " " + note : "");
-      button.href = DOWNLOAD_BASE + download.file;
-      button.setAttribute("download", download.file);
-      button.textContent = download.file + " herunterladen ↓";
+      document.querySelectorAll(".download-option").forEach(o => o.classList.remove("recommended"));
+      document.getElementById(d.elementId).classList.add("recommended");
 
-      document.querySelectorAll(".download-option").forEach(option => {
-        option.classList.remove("recommended");
-      });
-
-      const optionIds = {
-        mac_intel: "downloadMacIntel",
-        mac_silicon: "downloadMacSilicon",
-        windows: "downloadWindows",
-        linux: "downloadLinux"
-      };
-      document.getElementById(optionIds[key])?.classList.add("recommended");
+      statusEl.textContent = note ||
+        "Dein Betriebssystem wurde erkannt. Du kannst trotzdem jede andere Version auswählen.";
     }
-
-    function configureReleaseMode() {
-      const released = RELEASE_CONFIG.released;
-      const version = RELEASE_CONFIG.version;
-
-      document.getElementById("heroProjectStatus").textContent = released
-        ? "Offiziell veröffentlicht · Version " + version
-        : "Eigenständiges Projekt · In Entwicklung";
-
-      document.getElementById("heroProjectNote").textContent = released
-        ? "LinkUp Client ist veröffentlicht. Wähle unten den passenden Installer für dein Betriebssystem."
-        : "Hinweis: LinkUp Client befindet sich im Aufbau. Noch sind nicht alle geplanten Funktionen verfügbar.";
-
-      document.getElementById("previewStatus").textContent = released
-        ? "VERSION " + version
-        : "IN ENTWICKLUNG";
-
-      document.getElementById("developmentHeading").textContent = released
-        ? "LinkUp Client ist veröffentlicht"
-        : "Ein Projekt im Aufbau";
-
-      document.getElementById("developmentIntro").textContent = released
-        ? "Die erste öffentliche Version von LinkUp Client ist verfügbar."
-        : "Hier wird zwischen vorhandenen Projektbestandteilen und zukünftigen Ideen unterschieden.";
-
-      document.getElementById("developmentStatusTitle").textContent = released
-        ? "Veröffentlichungsstatus"
-        : "Aktueller Entwicklungsstand";
-
-      document.getElementById("developmentStatusDescription").textContent = released
-        ? "LinkUp Client wurde veröffentlicht. Die verfügbaren Installationsdateien findest du im Download-Bereich."
-        : "Das Projekt wird schrittweise aufgebaut. Die technische Grundlage wird zuerst eingerichtet, bevor weitere Funktionen entwickelt und getestet werden.";
-
-      document.getElementById("publicDownloadTitle").textContent = released
-        ? "Öffentlicher Download"
-        : "Öffentlicher Download";
-
-      document.getElementById("publicDownloadStatus").textContent = released
-        ? "Verfügbar · Version " + version
-        : "Noch nicht verfügbar.";
-
-      document.getElementById("downloadKicker").textContent = released
-        ? "Offizielle Downloads"
-        : "Download";
-
-      document.getElementById("downloadHeading").textContent = released
-        ? "LinkUp Client herunterladen"
-        : "LinkUp Client – bald verfügbar";
-
-      document.getElementById("downloadIntro").textContent = released
-        ? "Wähle die passende Version für dein Betriebssystem. Dein Gerät wird automatisch erkannt und ein Download empfohlen. Du kannst jederzeit auch eine andere Version auswählen."
-        : "LinkUp Client befindet sich noch in Entwicklung. Die offiziellen Downloads werden hier freigeschaltet, sobald die Veröffentlichung erfolgt.";
-
-      document.getElementById("downloadUnavailable").hidden = released;
-      document.getElementById("downloadRecommendation").hidden = !released;
-      document.getElementById("downloadOptions").hidden = !released;
-      document.getElementById("downloadStatus").hidden = !released;
-
-      const versionElement = document.getElementById("downloadVersion");
-      versionElement.hidden = !released;
-      versionElement.textContent = "Version " + version;
-    }
-
-    // Alle vier Links werden vorbereitet. Sie werden erst im Release-Modus
-    // sichtbar und anklickbar.
-    setDownloadLink("downloadMacIntel", "mac_intel");
-    setDownloadLink("downloadMacSilicon", "mac_silicon");
-    setDownloadLink("downloadWindows", "windows");
-    setDownloadLink("downloadLinux", "linux");
 
     async function initializeDownloads() {
-      if (!RELEASE_CONFIG.released) return;
+      const os = detectOperatingSystem();
 
-      const detected = detectOperatingSystem();
-      const status = document.getElementById("downloadStatus");
-
-      if (detected.key === "windows" || detected.key === "linux") {
-        showRecommendedDownload(detected.key);
-        status.textContent =
-          "Dein Betriebssystem wurde erkannt. Du kannst trotzdem jede andere Version auswählen.";
+      if (os === "windows" || os === "linux") {
+        showRecommended(os);
         return;
       }
 
-      if (detected.certainty === "mac-architecture-unknown") {
+      if (os === "mac") {
         const macKey = await detectMacArchitecture();
-
         if (macKey) {
-          showRecommendedDownload(macKey);
-          status.textContent =
-            "Mac erkannt. Bitte prüfe trotzdem, ob dein Mac einen Intel- oder Apple-Silicon-Chip besitzt.";
+          showRecommended(
+            macKey,
+            "Mac erkannt. Bitte prüfe trotzdem unter Apple-Menü › Über diesen Mac, ob dein Mac einen Intel- oder Apple-Silicon-Chip besitzt."
+          );
         } else {
-          document.getElementById("recommendedTitle").textContent =
-            "Mac erkannt – wähle deine Prozessor-Version";
-          document.getElementById("recommendedDescription").textContent =
-            "Die Browser-Erkennung kann Intel und Apple Silicon nicht zuverlässig unterscheiden. Wähle unten macOS – Intel oder macOS – Apple Silicon.";
-          document.getElementById("recommendedDownload").hidden = true;
-          status.textContent =
-            "Beide Mac-Versionen sind verfügbar. Prüfe unter  > Über diesen Mac, welcher Prozessor verbaut ist.";
+          titleEl.textContent = "Mac erkannt – wähle deine Prozessor-Version";
+          descEl.textContent =
+            "Dein Browser kann Intel und Apple Silicon nicht zuverlässig unterscheiden. Wähle unten macOS – Intel oder macOS – Apple Silicon.";
+          statusEl.textContent =
+            "Prüfe unter Apple-Menü › Über diesen Mac, welcher Prozessor verbaut ist.";
         }
         return;
       }
 
-      document.getElementById("recommendedTitle").textContent =
-        detected.certainty === "unsupported"
-          ? "Kein mobiler Installer verfügbar"
-          : "Wähle dein Betriebssystem";
-      document.getElementById("recommendedDescription").textContent =
-        detected.certainty === "unsupported"
-          ? "Die angebotenen Installationsdateien sind für macOS, Windows und Linux gedacht. Öffne diese Seite auf deinem Computer."
-          : "Dein Betriebssystem konnte nicht eindeutig erkannt werden. Wähle unten den passenden Download.";
-      document.getElementById("recommendedDownload").hidden = true;
-      status.textContent =
+      if (os === "mobile") {
+        titleEl.textContent = "Kein mobiler Installer verfügbar";
+        descEl.textContent =
+          "Die Installationsdateien sind für macOS, Windows und Linux gedacht. Öffne diese Seite auf deinem Computer.";
+      } else {
+        titleEl.textContent = "Wähle dein Betriebssystem";
+        descEl.textContent =
+          "Dein Betriebssystem konnte nicht eindeutig erkannt werden. Wähle unten den passenden Download.";
+      }
+      statusEl.textContent =
         "Alle vier Versionen stehen zur Auswahl. Achte darauf, die passende Datei für dein System zu verwenden.";
     }
 
-    configureReleaseMode();
     initializeDownloads();
   </script>
 </body>
