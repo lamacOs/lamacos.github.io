@@ -2,349 +2,158 @@
 <!-- source-path: coolvisualize -->
 <!-- source-files: ["coolvisualize/index.html", "coolvisualize/shortcut.txt"] -->
 
-# coolvisualize
+# Support-Dokumentation: lamacOs Music Visualizer (coolvisualize)
 
-**Vermuteter Zweck:** Der Music Visualizer „lamacOs Music Visualizer“ („coolvisualize“) kombiniert ein lokal ausgewähltes Hintergrundvideo, synchronisierte Lyrics aus `.lrc`- oder `.lcr`-Dateien, ein optionales Coverbild, eine frei wählbare Animationsfarbe und einen simulierten Kreis-Puls. Er ist für die Nutzung in Verbindung mit dem macOS-Kurzbefehl **„Start“** vorgesehen.
-
-**Quellcode-Pfad:** `coolvisualize`  
-**Primäre Quellcodedatei:** `coolvisualize/index.html`  
-**Ergänzende Datei:** `coolvisualize/shortcut.txt`  
-**Datum der Erstellung:** 16. Juni 2026
-
-> **Hinweis zur Quellcode-Basis:** Die Dokumentation basiert auf den bereitgestellten Auszügen. Ein möglicher geheimer Wert in `shortcut.txt` wird aus Sicherheitsgründen nicht wiedergegeben.
+**Website-Name:** lamacOs Music Visualizer  
+**Repository-Pfad:** `coolvisualize`  
+**Erstellungsdatum:** 2024 (basierend auf Quellcode-Analyse)  
+**Hauptdatei:** `index.html` (Single-Page-Application, keine Build-Schritte nötig)  
+**Zusätzliche Ressource:** `shortcut.txt` (Link zu einem iCloud-Kurzbefehl)
 
 ---
 
-## 1. Überblick
+## 1. Zweck & Zielgruppe
 
-„coolvisualize“ ist eine einzelne, in HTML, CSS und JavaScript umgesetzte Website. Sie benötigt keinen sichtbaren Anmeldungsbereich und stellt im Quellcode keine Benutzerkonten oder serverseitigen Funktionen bereit.
+**Zweck:**  
+Eine browserbasierte Visualisierungs-Oberfläche für Musikwiedergabe auf macOS. Sie synchronisiert ein lokales Hintergrundvideo, Liedtexte (Lyrics) im LRC/LCR-Format und eine pulsierende Orb-Animation. Die eigentliche Musikwiedergabe wird über einen macOS-Kurzbefehl („Shortcut“) namens **„Start“** gesteuert, der per `shortcuts://`-URL-Schema aufgerufen wird.
 
-Die Website kann:
+**Zielgruppe:**  
+macOS-Nutzer, die lokale Musikdateien, Videos und Lyrics-Dateien besitzen und diese in einer immersiven, fullscreen-fähigen Darstellung (z. B. für Partys, Proben, Streaming-Overlays) zusammenführen möchten.
 
-- ein Hintergrundvideo aus dem lokalen Dateisystem auswählen,
-- ein optionales Coverbild anzeigen,
-- eine einzelne Lyrics-Datei einlesen,
-- einen Ordner mit mehreren Lyrics-Dateien und Unterordnern einlesen,
-- Lyrics-Dateien numerisch sortieren,
-- zeitgestempelte Lyrics anzeigen,
-- zwischen mehreren Lyrics-Dateien wechseln,
-- die Animation pausieren und fortsetzen,
-- in den Vollbildmodus wechseln,
-- einen Apple-Music-Playlist-Link in einem neuen Tab öffnen,
-- den macOS-Kurzbefehl **„Start“** aufrufen,
-- eine feste Animationsfarbe auswählen.
-
-Die Website ist im Quellcode nicht ausdrücklich als mobiles oder als Desktop-only-Anwendung gekennzeichnet. Das Layout enthält jedoch eine Anpassung für Bildschirmbreiten bis 520 Pixel.
+**Voraussetzungen:**
+- macOS mit Safari oder einem Browser, der `shortcuts://`-Links und Fullscreen-API unterstützt.
+- Ein in der **Kurzbefehle-App** angelegter Shortcut mit dem exakten Namen **„Start“**, der die Musikwiedergabe startet (z. B. Apple Music, lokale Datei, etc.).
+- Lokale Mediendateien: Video (MP4/WebM), Coverbild (optional), Lyrics-Dateien (`.lrc` / `.lcr`).
+- Keine Server-Komponente, keine Installation – Öffnen der `index.html` genügt.
 
 ---
 
-## 2. Voraussetzungen
+## 2. Benutzeroberfläche – Sichtbare Bereiche
 
-### 2.1 Technische Voraussetzungen
-
-Für die grundlegende Darstellung der Website ist ein aktueller Browser erforderlich, der Folgendes unterstützt:
-
-- HTML5-Video,
-- JavaScript,
-- die File API,
-- `URL.createObjectURL()`,
-- `requestAnimationFrame()`,
-- Fullscreen API,
-- `webkitdirectory` für die Ordnerauswahl.
-
-Die vollständige Bedienung ist im Quellcode für **Safari auf macOS** ausgelegt, insbesondere durch:
-
-- den Aufruf des macOS-Kurzbefehls `shortcuts://`,
-- den Hinweis, dass Safari/macOS beim ersten Öffnen des Kurzbefehls eine Bestätigung verlangen kann.
-
-Ob die Website auch in anderen Browsern oder auf anderen Betriebssystemen vollständig funktioniert, ist im Quellcode nicht eindeutig erkennbar.
-
-### 2.2 Inhaltliche Voraussetzungen
-
-Je nach gewünschter Ansicht benötigt der Besucher:
-
-- ein Hintergrundvideo,
-- eine einzelne `.lrc`- oder `.lcr`-Datei,
-- alternativ einen Ordner mit solchen Dateien,
-- optional ein Coverbild,
-- optional einen gültigen Link zu `music.apple.com` oder `itunes.apple.com`.
-
-### 2.3 macOS-Kurzbefehl
-
-Die Website versucht beim Start, den macOS-Kurzbefehl mit dem Namen **„Start“** auszuführen. Dafür muss dieser Kurzbefehl auf dem verwendeten macOS-Gerät vorhanden und für die Verwendung mit der Website eingerichtet sein.
-
-Ein Verweis auf einen iCloud-Kurzbefehl ist in `shortcut.txt` enthalten. Der eigentliche Inhalt beziehungsweise die Schritte des Kurzbefehls sind im bereitgestellten Quellcode nicht eindeutig erkennbar.
+| Bereich | Beschreibung | Standard-Sichtbarkeit |
+| :--- | :--- | :--- |
+| **Hintergrund-Video (`#background`)** | Fullscreen-Video-Layer (z-index -3), loopend, `playsinline`. | Ausgeblendet (`display: none`), wird beim Start eingeblendet. |
+| **Cover (`#cover`)** | 76×76 px Bild links oben (Radius 13px). Platzhalter grau. | Sichtbar. |
+| **Track-Info (`#track`)** | Titelzeile (Dateiname der aktiven Lyrics) + Status-Zeile (`#status`). | Sichtbar. |
+| **Orb (`#orb`)** | Grüner Kreis rechts oben (54×54 px), pulsiert im Takt (simuliert alle 1,35 s). | Sichtbar. |
+| **Lyrics-Anzeige (`#lyrics`)** | Zentriert, groß, weiß mit schwarzer Kontur (`text-stroke`). Zeigt aktuelle Lyric-Zeile oder Hinweistext. | Sichtbar. |
+| **Steuer-Panel (`#panel`)** | Zentriertes Glas-Modal (Backdrop-Blur) mit allen Konfigurations-Inputs. | **Sichtbar beim Laden**. |
+| **Toolbar (`#toolbar`)** | Untere Leiste mit Wiedergabe-Steuerung, Navigation, Einstellungen, Vollbild. | **Ausgeblendet**, erscheint nach „Alles starten“. |
+| **Queue-Info (`#queueInfo`)** | Kleiner Banner über Toolbar: „Lyrics X / Y · Dateiname“. | Ausgeblendet, wenn keine Queue. |
+| **Fortschrittsbalken (`#progress`)** | 3 px hoher Balken unten, zeigt Video-Fortschritt in Akzentfarbe. | Sichtbar (Breite 0%). |
 
 ---
 
-## 3. Sichtbare Bereiche der Website
+## 3. Bedienung – Schritt für Schritt
 
-### 3.1 Hintergrund
+### 3.1 Ersteinrichtung (einmalig)
+1.  **Kurzbefehl anlegen:** Öffnen Sie die **Kurzbefehle-App** auf macOS. Erstellen Sie einen neuen Shortcut mit dem Namen **„Start“**. Dieser muss die Musikwiedergabe starten (z. B. Aktion „Musik wiedergeben“, „Datei öffnen“, Apple Music Playlist starten).
+    *   *Hinweis:* Der im Repository liegende `shortcut.txt` verlinkt auf einen iCloud-Shortcut (`ba602c51c79040f0b4e00b315004e43e`). Ob dieser exakt „Start“ heißt und funktioniert, ist **im Quellcode nicht eindeutig erkennbar**. Der Code ruft fest `shortcuts://run-shortcut?name=Start` auf.
+2.  **Datei öffnen:** Doppelklicken Sie `index.html` im Finder (öffnet in Standardbrowser) oder ziehen Sie sie in ein Browser-Fenster.
 
-Die Website besitzt einen dunklen Seitenhintergrund. Wenn ein Hintergrundvideo ausgewählt und gestartet wurde, wird es hinter allen Bedienelementen eingeblendet. Eine dunkle Schicht legt sich darüber, damit Text und Bedienelemente lesbar bleiben.
+### 3.2 Konfiguration im Panel (vor dem Start)
+Das Panel ist beim Laden offen. Füllen Sie die Felder nach Bedarf:
 
-### 3.2 Coverbild
+1.  **Apple-Music-Playlist-Link (optional)**  
+    Input `#playlist`: Fügen Sie einen Link wie `https://music.apple.com/...` ein. Beim Start wird dieser in neuem Tab geöffnet.
+2.  **Hintergrundvideo auswählen**  
+    Input `#videoFile`: Wählen Sie eine lokale Videodatei (MP4, WebM, etc.). Das Video wird sofort in den `<video>`-Tag geladen (Object-URL), aber **nicht** automatisch abgespielt.
+3.  **Einzelne Lyrics-Datei**  
+    Input `#lyricsFile`: Wählen Sie **eine** `.lrc` oder `.lcr` Datei. Diese wird als Queue mit einem Eintrag geladen.
+4.  **Lyrics-Ordner mit Unterordnern**  
+    Input `#folderFiles`: Wählen Sie einen **Ordner** (nicht Dateien). Der Browser liest rekursiv alle Dateien (`webkitdirectory multiple`).  
+    *Sortierung:* Natürlich (1, 2, 10 statt 1, 10, 2). Nur Dateien mit Endung `.lrc`/`.lcr` (case-insensitive) werden berücksichtigt. Doppelte Pfade (case-insensitive) werden entfernt.
+5.  **Coverbild (optional)**  
+    Input `#coverFile`: Ersetzt das graue Platzhalterbild links oben.
+6.  **Feste Animationsfarbe**  
+    Input `#accent` (Color-Picker): Standard `#55ff9b`. Ändert die CSS-Variable `--accent` für Orb, Fortschrittsbalken, Buttons. **Kein Farbzyklus** (Code-Kommentar: „Keep the selected color fixed“).
 
-Oben links befindet sich ein quadratisches Coverbild. Solange kein Coverbild ausgewählt wurde, bleibt der vorgesehene Platz leer beziehungsweise zeigt den Hintergrund des Elements.
+### 3.3 Starten
+- Button **„▶ Alles starten“ (`#start`)** klicken.
+    1.  Löst `shortcuts://run-shortcut?name=Start` aus (macOS fraggt ggf. beim ersten Mal nach Erlaubnis).
+    2.  Öffnet Playlist-Link (falls gesetzt) in neuem Tab.
+    3.  Fordert Fullscreen an (`document.documentElement.requestFullscreen()`).
+    4.  Startet Video-Wiedergabe (falls Video geladen), setzt `running = true`.
+    5.  Blendet Panel aus, Toolbar ein.
+    6.  Startet Animations-Loop (`requestAnimationFrame`) und Beat-Intervall (1350 ms Orb-Puls).
 
-### 3.3 Track-Anzeige
+### 3.4 Steuerung während der Laufzeit (Toolbar)
+| Button | Aktion | Code-Funktion |
+| :--- | :--- | :--- |
+| **▶ Start** (`#play`) | Fortsetzen nach Pause. Setzt Zeitbasis neu (`startedAt = now`). | `resumeAll()` |
+| **Ⅱ Pause** (`#pause`) | Pausiert Video, stoppt Animation/Beat, merkt verstrichene Zeit (`elapsedBeforePause`). | `pauseAll()` |
+| **⏮ Lyrics zurück** (`#previous`) | Springt zum vorherigen Eintrag in der Lyrics-Queue (falls `queueIndex > 0`). Setzt Zeit auf 0. | `showQueueTrack(index - 1)` |
+| **Lyrics weiter ⏭** (`#next`) | Springt zum nächsten Eintrag in der Queue (falls `queueIndex < length-1`). Setzt Zeit auf 0. | `showQueueTrack(index + 1)` |
+| **⚙** (`#settings`) | Blendet das Konfigurations-Panel wieder ein (Pause bleibt aktiv). | `panel.classList.remove("hidden")` |
+| **⛶ Vollbild** (`#fullButton`) | Toggelt Fullscreen-Modus. Text wechselt zu „Vollbild aktiv“. | `enterFullscreen()` |
 
-Neben dem Coverbild werden der aktuell ausgewählte Dateiname und darunter der Status angezeigt.
-
-Mögliche Statusmeldungen im Quellcode sind:
-
-- „Bereit zum Starten“
-- „Visualizer läuft“
-- „Visualizer pausiert“
-- Angaben zur Anzahl geladener Lyrics-Dateien
-- „Keine Lyrics geladen“
-- „Video konnte nicht automatisch starten.“
-- „Vollbild nicht verfügbar – bitte über das Browsermenü aktivieren.“
-
-### 3.4 Kreis mit Puls-Animation
-
-Oben rechts befindet sich ein leuchtender Kreis. Während der Visualizer läuft, wird seine Größe in einem regelmäßigen Takt kurz vergrößert und wieder verkleinert.
-
-Die Animation ist ausdrücklich **simuliert**. Sie analysiert im Quellcode nicht die Musik und leitet den Puls auch nicht aus der tatsächlichen Audio- oder Videofrequenz ab.
-
-### 3.5 Lyrics-Anzeige
-
-In der Mitte der Seite steht der aktuell zeitgestempelte Liedtext. Der Text wird groß, fett und mit schwarzer Kontur sowie Schatten dargestellt.
-
-Vor dem ersten gültigen Zeitstempel bleibt der Bereich leer. Wenn eine Datei geladen wurde, aber keine zeitgestempelten Lyrics enthalten sind, erscheint:
-
-> Keine zeitgestempelten Lyrics gefunden.
-
-### 3.6 Einstellungsbereich
-
-Beim Öffnen der Website ist ein mittig positioniertes, halbtransparentes Panel mit dem Titel:
-
-> 🎵 Music Visualizer
-
-Darunter steht:
-
-> Deine Musik. Dein Video. Dein Style.
-
-Das Panel enthält:
-
-1. ein Eingabefeld für einen Apple-Music-Playlist-Link,
-2. eine Dateiauswahl für ein Hintergrundvideo,
-3. eine Dateiauswahl für eine einzelne Lyrics-Datei,
-4. eine Ordnerauswahl für Lyrics-Dateien,
-5. eine Dateiauswahl für ein Coverbild,
-6. eine Farbauswahl,
-7. die Schaltflächen **„▶ Alles starten“** und **„⛶ Vollbild“**,
-8. erläuternde Hinweise.
-
-Nach dem Start wird das Panel ausgeblendet. Über die Schaltfläche **„⚙“** in der unteren Werkzeugleiste kann es erneut geöffnet werden.
-
-### 3.7 Untere Werkzeugleiste
-
-Nach dem Start erscheint am unteren Bildschirmrand eine Werkzeugleiste mit:
-
-- **„▶ Start“**
-- **„Ⅱ Pause“**
-- **„⏮ Lyrics zurück“**
-- **„Lyrics weiter ⏭“**
-- **„⚙“**
-- **„⛶ Vollbild“**
-
-### 3.8 Queue-Anzeige
-
-Über der Werkzeugleiste wird der aktuelle Eintrag der Lyrics-Liste angezeigt, beispielsweise:
-
-> Lyrics 1 / 3 · 1/song.lrc
-
-Die Anzeige wird ausgeblendet, wenn keine Lyrics geladen wurden.
-
-### 3.9 Fortschrittsanzeige
-
-Am unteren Seitenrand befindet sich eine dünne grüne Fortschrittsleiste. Sie zeigt den Fortschritt des Hintergrundvideos an, sofern dessen Dauer bekannt ist.
+### 3.5 Lyrics-Offset (Nicht im UI, nur Code)
+Variable `lyricOffset` existiert (Default 0), wird im Code aber **nicht über UI-Elemente verändert**. **Im Quellcode nicht eindeutig erkennbar**, wie man diesen Offset manuell justieren soll (z. B. bei Versatz zwischen Musik und Lyrics).
 
 ---
 
-## 4. Erste Einrichtung
+## 4. Eingaben & Ausgaben
 
-### Schritt 1: Website öffnen
+### Eingaben (User-Inputs)
+| Element | Typ | Validierung / Verarbeitung |
+| :--- | :--- | :--- |
+| `#playlist` | `input[type="url"]` | Client-seitige URL-Prüfung: Host muss `music.apple.com` oder `itunes.apple.com` sein. Sonst `alert`. |
+| `#videoFile` | `input[type="file"]` | Erzeugt `blob:`-URL via `URL.createObjectURL()`. Vorherige URL wird revoked. |
+| `#coverFile` | `input[type="file"]` | Erzeugt `blob:`-URL, setzt `src` von `#cover`. Vorherige URL revoked. |
+| `#lyricsFile` | `input[type="file"]` | Liest Datei als Text, parst LRC, baut Queue mit 1 Eintrag. |
+| `#folderFiles` | `input[type="file"]` (webkitdirectory) | Liest alle Dateien rekursiv, filtert `.lrc/.lcr`, sortiert natürlich, parst parallel (`Promise.all`), baut Queue. Fehlerhafte Dateien werden geloggt (`console.warn`), Rest wird geladen. |
+| `#accent` | `input[type="color"]` | Setzt CSS-Variable `--accent` live. |
 
-Öffnen Sie `coolvisualize/index.html` in einem unterstützten Browser. Für die vollständige macOS-Integration ist Safari auf macOS im Quellcode ausdrücklich berücksichtigt.
-
-### Schritt 2: Apple-Music-Link optional eingeben
-
-Im Feld **„Apple-Music-Playlist-Link (optional, öffnet zusätzlich die Playlist)“** kann ein vollständiger Link eingefügt werden, beispielsweise:
-
-```text
-https://music.apple.com/...
-```
-
-Zulässig sind laut Code nur die Hostnamen:
-
-- `music.apple.com`
-- `itunes.apple.com`
-
-Das Feld ist optional. Ohne Eintrag wird beim Start kein Playlist-Tab geöffnet.
-
-### Schritt 3: Hintergrundvideo auswählen
-
-1. Öffnen Sie die Dateiauswahl **„Hintergrundvideo auswählen“**.
-2. Wählen Sie ein lokales Video aus.
-3. Das Video wird für die spätere Wiedergabe vorgemerkt.
-
-Das Video beginnt nicht automatisch beim Auswählen, sondern erst beim Start beziehungsweise Fortsetzen.
-
-### Schritt 4: Lyrics auswählen
-
-Sie können entweder:
-
-- eine einzelne Datei über **„Einzelne Lyrics-Datei (.lrc oder .lcr)“** auswählen,
-- oder über **„Lyrics-Ordner mit Unterordnern auswählen“** einen ganzen Ordner auswählen.
-
-Für die Ordnerauswahl wird eine Funktion verwendet, die in Safari verfügbar sein sollte. Der Browser muss dabei die Auswahl eines Verzeichnisses erlauben.
-
-### Schritt 5: Coverbild optional auswählen
-
-1. Öffnen Sie die Dateiauswahl **„Coverbild (optional)“**.
-2. Wählen Sie ein Bild aus.
-
-Das Bild wird sofort oben links eingesetzt.
-
-### Schritt 6: Farbe optional anpassen
-
-Die Auswahl **„Feste Animationsfarbe“** steuert die Akzentfarbe des Kreises, der Fortschrittsleiste und der hervorgehobenen Schaltflächen.
-
-Die Farbe bleibt während der Laufzeit fest. Es gibt keine automatische Farbwechsel-Animation.
+### Ausgaben (Visuell / System)
+- **DOM-Updates:** Lyrics-Text, Track-Name, Status-Text, Queue-Info, Progress-Balkenbreite, Orb-Puls-Klasse, Panel/Toolbar-Visibility, Fullscreen-Status.
+- **System-Interaktion:** `window.location.href = "shortcuts://..."` (verlässt Browser-Kontext), `window.open()` (neuer Tab), Fullscreen-API.
+- **Console-Logs:** Warnungen beim Lesen fehlerhafter Lyrics-Dateien.
 
 ---
 
-## 5. Bedienung
+## 5. Technische Details & Datenverarbeitung
 
-## 5.1 Alles starten
+### LRC/LCR Parsing (`parseLRC`)
+- **Unterstützte Zeitstempel:** `[mm:ss]`, `[mm:ss.x]`, `[mm:ss.xx]`, `[mm:ss.xxx]` (Punkt oder Doppelpunkt als Trenner).
+- **Mehrere Tags pro Zeile:** Werden alle ausgewertet (z. B. `[00:12.00][00:15.00]Text` → zwei Einträge mit gleichem Text).
+- **Textbereinigung:** Tags entfernt, `trim()`.
+- **Sortierung:** Nach Zeit aufsteigend.
+- **Encoding:** BOM (`\uFEFF`) wird beim Lesen entfernt.
 
-1. Wählen Sie bei Bedarf ein Hintergrundvideo aus.
-2. Wählen Sie eine einzelne Lyrics-Datei oder einen Lyrics-Ordner aus.
-3. Wählen Sie optional ein Coverbild und eine Farbe aus.
-4. Klicken Sie auf **„▶ Alles starten“**.
+### Queue-Logik
+- **Struktur:** Array von Objekten `{ name, file, lines[] }`.
+- **Sortierung:** `numericCompare` (Intl.Collator `numeric: true`) auf `webkitRelativePath` (normalisiert: NFC, Slashes, kein `./`).
+- **Deduplizierung:** Case-insensitive auf normalisiertem Pfad.
+- **Navigation:** `next`/`previous` springen diskret zwischen Dateien, **nicht** innerhalb einer Datei. Zeit wird auf 0 zurückgesetzt.
 
-Beim Klick werden folgende Aktionen angestoßen:
+### Animation & Timing
+- **Zeitbasis:** `performance.now()` + `elapsedBeforePause` (Pause-fähig).
+- **Lyric-Sync:** Findet letzten Eintrag mit `time <= currentTime + lyricOffset`.
+- **Video-Progress:** `video.currentTime / video.duration` → Breite `#progress`.
+- **Orb-Puls:** Reines CSS/Intervall (`setInterval` 1350 ms, Klasse `.pulse` für 520 ms). **Keine Audio-Analyse (Web Audio API)**. Der Kommentar bestätigt: „Die Kreis-Pulse sind simuliert“.
 
-1. Der macOS-Kurzbefehl **„Start“** wird aufgerufen.
-2. Falls ein Apple-Music-Link eingetragen wurde, wird die Playlist in einem neuen Browser-Tab geöffnet.
-3. Der Browser wechselt in den Vollbildmodus, sofern die Fullscreen API dies erlaubt.
-4. Das Hintergrundvideo beginnt, falls eines ausgewählt wurde.
-5. Das Einstellungsfenster wird geschlossen.
-6. Die untere Werkzeugleiste erscheint.
-7. Die Lyrics-Animation und der simulierte Kreis-Puls beginnen.
-
-Wenn kein Hintergrundvideo ausgewählt wurde, starten der Visualizer und die Lyrics trotzdem. Die Videoanzeige bleibt dann ausgeblendet.
-
-### Verhalten bei bereits laufendem Visualizer
-
-Ein erneuter Klick auf **„▶ Alles starten“** startet das Video erneut beziehungsweise setzt es auf den Anfang. Die laufende Animationsschleife wird nicht doppelt erzeugt, da der Code einen bereits laufenden Zustand erkennt.
-
-## 5.2 Pause und Fortsetzen
-
-- **„Ⅱ Pause“** hält Video, Lyrics-Timer und Pulsanimation an.
-- **„▶ Start“** setzt alle drei Abläufe fort.
-
-Die verstrichene Lyrics-Zeit bleibt beim Pausieren erhalten.
-
-## 5.3 Zwischen Lyrics-Dateien wechseln
-
-- **„Lyrics weiter ⏭“** springt zur nächsten geladenen Datei.
-- **„⏮ Lyrics zurück“** springt zur vorherigen Datei.
-
-Beim Wechsel:
-
-- wird der neue Dateiname in der Track-Anzeige dargestellt,
-- beginnt die Lyrics-Zeit wieder bei null,
-- wird die Queue-Anzeige aktualisiert,
-- beginnt die Zeitanzeige der Lyrics erneut.
-
-An der ersten beziehungsweise letzten Datei führen die Schaltflächen keine weitere Aktion aus.
-
-## 5.4 Einstellungen erneut öffnen
-
-Klicken Sie in der unteren Werkzeugleiste auf **„⚙“**. Das Einstellungsfenster wird über der laufenden Visualizer-Ansicht eingeblendet.
-
-Ob die laufende Wiedergabe beim Öffnen oder Schließen des Panels pausiert, ist im Quellcode nicht eindeutig erkennbar. Der Code enthält keinen entsprechenden automatischen Pauseaufruf.
-
-## 5.5 Vollbild
-
-Es gibt zwei sichtbare Schaltflächen:
-
-- **„⛶ Vollbild“** im Einstellungsfenster,
-- **„⛶ Vollbild“** in der unteren Werkzeugleiste.
-
-Der Vollbildstatus wird in der Werkzeugleiste durch die Beschriftung **„⛶ Vollbild aktiv“** dargestellt.
-
-Beim Verlassen des Vollbildmodus wechselt die Beschriftung zurück zu **„⛶ Vollbild“**.
-
-## 5.6 Apple-Music-Playlist öffnen
-
-Der Link wird beim Klick auf **„▶ Alles starten“** zusätzlich geöffnet, sofern das Feld nicht leer ist.
-
-Ein eigener separater Button zum Öffnen des Playlist-Links ist im Quellcode nicht vorhanden.
+### Speicherverwaltung
+- `URL.revokeObjectURL()` wird bei neuem Video/Cover aufgerufen (Verhindert Memory Leaks bei häufigem Wechsel).
+- Keine Persistenz (localStorage, IndexedDB). Nach Reload ist alles weg.
 
 ---
 
-## 6. Eingaben und Ausgaben
+## 6. Datenschutz & Berechtigungen
 
-## 6.1 Apple-Music-Playlist-Link
+- **Keine Server-Kommunikation:** Alles läuft lokal im Browser. Keine Analytics, kein Tracking, keine externen Skripte (außer iCloud-Link in `shortcut.txt`, der aber nicht automatisch geladen wird).
+- **Dateizugriff:** Nur über `input[type="file"]` (User-Geste). Dateien werden als `blob:`-URLs im Speicher gehalten, nie hochgeladen.
+- **Shortcut-Aufruf:** `shortcuts://`-Link erfordert Benutzerinteraktion (Klick auf „Alles starten“). macOS zeigt ggf. Bestätigungsdialog („Möchten Sie die App ‚Kurzbefehle‘ öffnen?“).
+- **Fullscreen:** Erfordert User-Gesture (Klick), Browser kann ablehnen (dann Fallback-Text in `#status`).
+- **Popup-Blocker:** `window.open` für Playlist wird synchron im Click-Handler aufgerufen, um Blocking zu minimieren.
 
-**Eingabe:** URL im Feld **„Apple-Music-Playlist-Link (optional, öffnet zusätzlich die Playlist)“**.
+---
 
-**Verarbeitung:**
+## 7. Typische Probleme & Fehlerbehebung
 
-- Der Link wird getrimmt.
-- Er muss als absolute URL parsebar sein.
-- Der Hostname muss exakt `music.apple.com` oder `itunes.apple.com` sein.
-- Der Link wird in einem neuen Tab geöffnet.
-
-**Ausgabe beziehungsweise Meldung:** Bei einem ungültigen Hostnamen oder einem nicht parsebaren Link erscheint ein Browser-Alert:
-
-> Bitte einen gültigen Apple-Music-Link eingeben.
-
-## 6.2 Hintergrundvideo
-
-**Eingabe:** Eine lokale Videodatei.
-
-**Ausgabe:**
-
-- eine temporäre lokale Object-URL,
-- ein Hintergrundvideo hinter der Benutzeroberfläche,
-- eine Fortschrittsleiste entsprechend der Videolänge.
-
-Die Datei wird nicht an einen Server übertragen. Im Quellcode ist kein Upload-Vorgang vorhanden.
-
-## 6.3 Lyrics-Datei
-
-**Eingabe:** Eine `.lrc`- oder `.lcr`-Datei.
-
-**Unterstützte Zeitstempelformate:**
-
-```text
-[mm:ss]
-[mm:ss.x]
-[mm:ss.xx]
-[mm:ss.xxx]
-```
-
-Dabei gilt:
-
-- `mm`: ein- oder zweistellige Minuten,
-- `ss`: zweistellige Sekunden,
-- der Punktwert ist optional,
-- ein Doppelpunkt kann anstelle eines Punktes als Dezimaltrennzeichen verwendet werden.
-
-Beispiel:
-
-```text
-[00:12.50]Erster Liedtext
-[01:03.00]Zweiter Liedtext
-```
-
-Mehrere Zeitstempel in derselben Zeile werden unterstützt. Eine solche Zeile erzeugt mehrere Zeitpunkte mit demselben Text.
-
-## 6.4 Lyrics-Ordner
-
-**Eingabe:** Ein Verzeichnis mit Lyrics-
+| Symptom | Mögliche Ursache (Code-basiert) | Abhilfe |
+| :--- | :--- | :--- |
+| **„Visualizer läuft“, aber kein Ton** | Der Shortcut „Start“ existiert nicht, heißt anders, oder startet keine Audio-Quelle. | In Kurzbefehle-App prüfen: Name exakt **„Start“**? Funktioniert der Shortcut manuell? |
+| **Klick auf „Alles starten“ tut nichts / Fehler** | Browser blockiert `shortcuts://` (z. B. Nicht-Safari, Sicherheitsrichtlinie). | Safari nutzen. In Safari: „Entwickler“ → „Erlauben: Automatische Wiedergabe“ / Popups prüfen. |
+| **Video startet nicht / bleibt schwarz** | `video.play()` Promise rejected (Autoplay-Policy), obwohl `running=true`. | Status zeigt „Video konnte nicht automatisch starten.“ → Toolbar „▶ Start“ klicken (ruft `video.play()` erneut auf). |
+| **Lyrics werden nicht angezeigt / „Keine zeitgestempelten Lyrics gefunden.“** | LRC-Datei hat keine passenden Zeitstempel (Regex matcht nicht) oder falsche Kodierung. | Datei prüfen: Zeilen wie `[00:12.34]Text`. Keine exotischen Tags (`[ti:...]`, `[ar:...]` werden ignoriert, aber Text danach genutzt). |
+| **Queue-Reihenfolge falsch (1, 10
