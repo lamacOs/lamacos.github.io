@@ -2,178 +2,336 @@
 <!-- source-path: LaunchKit -->
 <!-- source-files: ["LaunchKit/index.html"] -->
 
-# Support-Dokumentation: LaunchKit
+# LaunchKit – Support-Dokumentation
 
-**Website-Name:** LaunchKit  
-**Vermuteter Zweck:** Professionelle Präsentations- und Vertriebsplattform für digitale Produkte (Software, Spiele, Apps, Plugins, Open-Source-Projekte) mit Produktseiten, Downloads, Versionen, Changelogs und Analytics – alles an einem Ort.  
-**Quellcode-Pfad:** `LaunchKit/index.html` (Single-Page-Application-Struktur mit Hash-Routing)  
-**Datum der Erstellung:** 2025-08-14 (basierend auf dem bereitgestellten Quellcode-Stand)
+**Vermuteter Zweck:** LaunchKit ist eine zentrale Website für digitale Produkte wie Software, Spiele, Apps, Plugins und Open-Source-Projekte. Die Website soll Produktinformationen, Downloads, Versionen, Changelogs und Analysedaten an einem Ort zusammenführen.
 
----
+**Quellcode-Pfad:** `LaunchKit/index.html`  
+**Datum der Erstellung:** 15. März 2025  
+**Quellcode-Stand:** Die bereitgestellte Datei ist gekürzt. Aussagen zu Funktionen, die im Ausschnitt nicht sichtbar sind, sind entsprechend gekennzeichnet.
 
-## 1. Überblick & Zielgruppe
-
-LaunchKit ist eine **statische, clientseitige Webanwendung** (kein Backend im Quellcode erkennbar), die als „Landingpage + Produktkatalog + Produktdetailseiten“ fungiert. Sie richtet sich an:
-
-- **Produktbesitzer/Entwickler**, die eine professionelle Produktseite ohne Server-Setup hosten möchten (z. B. auf GitHub Pages, Netlify, Vercel).
-- **Besucher/Nutzer**, die Produkte entdecken, Details lesen, Versionen/Changelogs einsehen und Downloads starten wollen.
-- **Analytics-Interessierte**, die eingebaute Zähler (Views, Downloads, Revenue) sehen – **Hinweis:** Im Quellcode sind dies **Mock-Daten / Demowerte**, keine echten Server-seitigen Analytics.
-
-**Technische Basis:**  
-- Einzelne `index.html` mit Inline-CSS (Design-System, Dark/Light Mode, Responsive) und Inline-JavaScript (Routing, State, Rendering, Mock-Daten, Theme, Mobile Menu, Smooth Scroll).  
-- Keine externen Frameworks (React, Vue etc.) – Vanilla JS.  
-- Schriftarten: Google Fonts (Poppins, Inter).  
-- Icons: Inline SVGs.  
-- Hosting-tauglich als statische Datei.
+> **Hinweis zur Aktualität:** Die Dokumentation beschreibt den bereitgestellten Quellcode-Auszug. Da dieser nur den Anfang der HTML-Datei enthält, sind einige sichtbare Bereiche und Bedienelemente nicht vollständig nachvollziehbar.
 
 ---
 
-## 2. Voraussetzungen & Zugriff
+## 1. Überblick
 
-| Voraussetzung | Details |
-|---------------|---------|
-| **Browser** | Moderne Browser (Chrome, Firefox, Safari, Edge – ES6+ Support). |
-| **JavaScript** | Muss aktiviert sein (Routing, Rendering, Theme-Toggle, Mobile Menu). |
-| **Netzwerk** | Für Google Fonts & Favicon (GitHub Raw) Internetzugang nötig. Offline: Fonts fallen auf System-Fallbacks zurück. |
-| **Installation** | Keine. Datei `index.html` direkt öffnen oder auf statischem Hosting deployen. |
-| **Konto/Anmeldung** | **Nicht vorhanden** – keine Login/Registrierung im Code. |
-| **API-Keys/Secrets** | Keine im Quellcode. Ein möglicher Geheimniswert wurde aus Sicherheitsgründen ausgelassen (nicht gefunden). |
+LaunchKit ist eine öffentlich erreichbare Produkt- und Informationswebsite. Im bestätigten Quellcode-Auszug stehen folgende Schwerpunkte im Vordergrund:
 
----
+- eine Startseite mit Produktvorstellung und Aufrufen zu zentralen Bereichen,
+- eine Navigationsleiste,
+- eine Schaltfläche zum Wechseln zwischen hellem und dunklem Erscheinungsbild,
+- eine mobile Navigation,
+- eine Übersicht über Produkte beziehungsweise Projekte,
+- Filter- und Suchfunktionen für diese Übersicht,
+- eine Showcase-Fläche mit Vorschaubildern,
+- eine Fußzeile mit weiteren Navigationsbereichen.
 
-## 3. Sichtbare Bereiche & Navigation
-
-### 3.1 Header / Navigation (`.site-header`, sticky)
-- **Logo/Markenname:** „LaunchKit“ mit Subtitle „Professional Product Platform“.
-- **Desktop-Nav (`.nav-links`):**  
-  - **Produkte** → `/products` (Katalog)  
-  - **Features** → `#features` (Scroll-Anker auf Startseite)  
-  - **Preise** → `#pricing` (Scroll-Anker, **Im Quellcode nicht eindeutig erkennbar**, ob eigener Inhalt existiert)  
-  - **Changelog** → `/changelog` (globale Changelog-Seite)  
-  - **Analytics** → `/analytics` (Demo-Dashboard)  
-- **Rechts (`.nav-right`):**  
-  - **Theme-Toggle** (☀/🌙) – speichert Präferenz in `localStorage` (`lk-theme`).  
-  - **Mobile Menu Button** (Hamburger) – nur < 880 px sichtbar.
-- **Mobile Menu (`.mobile-menu`):** Vollbild-Overlay ab 64 px Top, gleiche Links + CTA-Buttons („Jetzt starten“, „GitHub“).
-
-### 3.2 Startseite (Route `/` / `home`)
-1. **Hero (`.hero`)**  
-   - Headline: „Die professionelle Plattform für dein digitales Produkt“ (Brand-Akzent farbig).  
-   - Lead-Text, CTA-Buttons: „Jetzt starten“ (scrollt zu `#products`), „GitHub ansehen“ (Link `https://github.com/lamacOs/LaunchKit`).  
-   - Meta-Zeile: „Open Source“, „Kein Backend nötig“, „In Minuten live“.  
-   - **Hero-Card (`.hero-card`)** – visuelle Demo eines Produkt-Dashboards:  
-     - Produkt-Header (Logo, Name, Version, Status „Live“).  
-     - KPI-Kacheln: **Views 12.4k**, **Downloads 3.2k**, **Revenue $4.8k** (Mock-Daten).  
-     - Mini-Charts (Sparkbars, CSS-Animation).  
-     - Footer mit „Letzte Aktualisierung: vor 2 Std.“.
-2. **Features (`.features-grid`, 4 Karten)**  
-   - **Produktseiten** – schöne Landingpages je Produkt.  
-   - **Versionen & Changelog** – Historie pro Produkt.  
-   - **Analytics & Insights** – Views, Downloads, Revenue (Demo).  
-   - **Einfaches Deployment** – statisch, GitHub Pages, Netlify, Vercel.
-3. **Showcase (`.showcase`)** – Split-Layout: Text + 4 Screenshot-Platzhalter (CSS-Gradienten, keine echten Bilder).
-4. **Footer (`.site-footer`)** – 4 Spalten: Produkt, Ressourcen, Rechtliches, Social + Copyright-Zeile.
-
-### 3.3 Produktkatalog (Route `/products`)
-- **Toolbar (`.toolbar`)**  
-  - Suche (Input mit Lupe-SVG) – filtert clientseitig nach Name, Beschreibung, Kategorie, Tags.  
-  - Filter: **Kategorie** (Alle, Software, Spiel, App, Plugin, Open Source), **Sortierung** (Neueste, Beliebteste, Name A-Z, Version), **Status** (Alle, Live, Beta, Alpha, Privat).  
-- **Produkt-Grid (`.products-grid`, 3 Spalten)** – Karten (`.product-card`) mit:  
-  - Logo (Buchstabe + Gradient), Name, Kategorie/Status-Pills, Beschreibung, Tags, Footer: Version + „Details“-Link (navigiert zu `/product/<id>`).
-- **Leerzustand (`.empty`)** – falls Filter nichts ergibt.
-
-### 3.4 Produktdetail (Route `/product/:id`)
-- **Header-Card** – großes Logo, Name, Kategorie/Status-Pills, Beschreibung, Meta (Version, Updated, Lizenz, Sprache, Größe), Buttons: **Download** (löst `handleDownload` aus), **Changelog** (scrollt zu Changelog-Sektion), **Website** (externer Link, falls `product.website` gesetzt).
-- **Tabs (`.detail-tabs`)** – 3 Reiter:  
-  1. **Übersicht** – Features (Checkliste), Systemanforderungen (Key-Value), Statistik-Kacheln (Views, Downloads, Rating, Update).  
-  2. **Versionen** – Tabelle: Version, Datum, Typ, Größe, Changelog (gekürzt), Download-Button pro Zeile.  
-  3. **Changelog** – Timeline pro Version (Datum, Typ-Badge, Titel, Liste Änderungen).
-- **Nicht gefunden** – falls `id` nicht in `PRODUCTS` existiert: 404-Card mit Link zurück zu Produkten.
-
-### 3.5 Globaler Changelog (Route `/changelog`)
-- **Toolbar** – Suche, Produkt-Filter (Alle + alle Produkte), Typ-Filter (Alle, Feature, Fix, Improvement, Breaking, Security), Sortierung.
-- **Liste** – Karten pro Eintrag: Produkt-Logo/Name, Version, Typ-Badge, Titel, Beschreibung, Datum, „Details“-Link → `/product/<id>#changelog`.
-- **Leerzustand** bei keinem Treffer.
-
-### 3.6 Analytics-Dashboard (Route `/analytics`)
-- **Hinweis-Banner** – „Demo-Daten – Keine echten Analytics“.
-- **KPI-Kacheln** – Total Views, Total Downloads, Total Revenue, Active Products (Summen über `PRODUCTS`).
-- **Charts (Platzhalter)** – „Views (30 Tage)“, „Downloads (30 Tage)“, „Revenue (30 Tage)“ – nur SVG-Rahmen, **keine echte Chart-Bibliothek**.
-- **Top-Produkte-Tabelle** – Sortierbar (Views, Downloads, Revenue, Rating) – Client-seitiges Sortieren via `th` Click.
-- **Letzte Aktivität** – Mock-Liste (Download, View, Purchase) mit Zeitstempeln.
+Die sichtbaren Gestaltungselemente deuten zusätzlich auf Changelog-, Versions- und Analytics-Bereiche hin. Der zugehörige Quellcode und die konkreten Bedienabläufe sind im gekürzten Ausschnitt **nicht eindeutig erkennbar**.
 
 ---
 
-## 4. Bedienung Schritt für Schritt
+## 2. Voraussetzungen und technische Grundlagen
 
-### 4.1 Theme wechseln (Light/Dark)
-1. Klicke auf den **Theme-Button** (Sonnen-/Mond-Icon) rechts im Header.  
-2. Seite wechselt sofort; Präferenz wird in `localStorage` (`lk-theme`) gespeichert und beim nächsten Laden wiederhergestellt.
+### 2.1 Für Besucher
 
-### 4.2 Mobile Navigation öffnen
-1. Bei Bildschirmbreite < 880 px: **Hamburger-Button** (drei Striche) oben rechts antippen.  
-2. Menü fährt von oben ein.  
-3. Gewünschten Eintrag antippen → Menü schließt sich, Navigation wird ausgeführt (Hash-Change oder Scroll).
+Bestätigt im Quellcode:
 
-### 4.3 Produkte durchsuchen & filtern
-1. Navigiere zu **Produkte** (Header) oder scrolle zum Bereich „Produkte“ auf Startseite.  
-2. **Suche:** Text in „Produkte suchen…“ eingeben → Liste filtert live.  
-3. **Kategorie:** Dropdown wählen (Software, Spiel, App, Plugin, Open Source).  
-4. **Sortierung:** Dropdown wählen (Neueste, Beliebteste, Name A-Z, Version).  
-5. **Status:** Dropdown wählen (Live, Beta, Alpha, Privat).  
-6. **Karte anklicken** → Produktdetailseite.
+- Ein aktueller Browser mit Unterstützung für moderne HTML- und CSS-Funktionen.
+- Für die vollständige Darstellung der Schriftarten eine Internetverbindung zu Google Fonts.
+- Für das Seitenlogo eine Internetverbindung zu dem in der HTML-Datei angegebenen externen Bildhost.
 
-### 4.4 Produktdetail ansehen
-1. Auf Produktkarte **„Details“** klicken (oder direkt URL `#/product/<id>` aufrufen).  
-2. **Tabs** oben wählen: Übersicht / Versionen / Changelog.  
-3. **Download-Button** (Header oder Versionen-Tabelle) → löst `handleDownload(product, version)` aus:  
-   - Zeigt `alert("Download gestartet: …")` (Demo).  
-   - **Im Quellcode nicht eindeutig erkennbar**, ob echte Datei-Downloads hinterlegt sind – `product.downloadUrl` oder `version.url` werden nicht im Mock-Daten-Array befüllt (leere Strings).  
-4. **Externer Website-Link** – falls im Produkt hinterlegt, öffnet neuen Tab.
+Die Website ist aus dem Quellcode heraus grundsätzlich ohne Anmeldung nutzbar. Ein Anmeldebereich, ein Warenkorb, ein Bezahlvorgang oder eine Kontoverwaltung sind im sichtbaren Ausschnitt nicht vorhanden.
 
-### 4.5 Globalen Changelog nutzen
-1. Header → **Changelog** klicken.  
-2. Filter setzen (Produkt, Typ, Sortierung).  
-3. Eintrag „Details“ → springt zu Produktdetail + Changelog-Tab.
+**Im Quellcode nicht eindeutig erkennbar:**
 
-### 4.6 Analytics-Dashboard ansehen
-1. Header → **Analytics** klicken.  
-2. KPI-Kacheln, Platzhalter-Charts, Top-Produkte-Tabelle (Spaltenköpfe klickbar zum Sortieren), Letzte Aktivität betrachten.  
-3. **Hinweis:** Alles **Mock-Daten** – keine echte Messung.
+- ob eine bestimmte Browser- oder Betriebssystemversion unterstützt wird,
+- ob die Website zusätzlich ein serverseitiges Backend benötigt,
+- ob alle extern geladenen Ressourcen für die Kernfunktionen zwingend erforderlich sind.
 
-### 4.7 Smooth Scroll zu Anker (`#features`, `#pricing`)
-- Klick auf Nav-Links „Features“ / „Preise“ → `e.preventDefault()`, `scrollIntoView({behavior: 'smooth'})`.  
-- **Preise-Bereich** – **Im Quellcode nicht eindeutig erkennbar**, ob ein `#pricing`-Element existiert (nicht im gelieferten HTML-Ausschnitt).
+### 2.2 Darstellung auf verschiedenen Geräten
+
+Die Website enthält eine responsive Layoutdefinition:
+
+- Auf breiten Bildschirmen werden Navigation und mehrere Produktkarten nebeneinander dargestellt.
+- Eine eigene mobile Navigation ist im Quellcode vorhanden.
+- Die Inhalte passen sich grundsätzlich an die verfügbare Breite an.
 
 ---
 
-## 5. Eingaben & Ausgaben
+## 3. Aufbau der Website
 
-| Bereich | Eingabe (User) | Ausgabe / Reaktion |
-|---------|----------------|---------------------|
-| Theme-Toggle | Klick | Umschaltung CSS-Variablen, `localStorage` Update, Icon-Drehung. |
-| Mobile Menu | Klick Hamburger | Menü slide-down/up, Body-Scroll-Lock. |
-| Suche (Produkte/Changelog) | Text eingeben | Clientseitiges Filtern der Arrays `PRODUCTS` / `CHANGELOG`. |
-| Filter-Dropdowns | Auswahl | Neu-Render der Grid/Liste. |
-| Sortier-Dropdowns | Auswahl | Neu-Render mit sortiertem Array. |
-| Produktkarte / Details-Link | Klick | Hash-Route `#/product/<id>` → `renderProductDetail(id)`. |
-| Download-Button | Klick | `alert("Download gestartet: …")` – **kein echter Download** (URLs leer). |
-| Changelog-Details | Klick | Hash-Route `#/product/<id>#changelog` + Tab-Wechsel. |
-| Analytics Tabellen-Header | Klick | Clientseitiges Sortieren der `PRODUCTS`-Kopie. |
-| Nav-Links (Features/Preise) | Klick | Smooth Scroll zu `#features` / `#pricing`. |
-| Externe Links (GitHub, Website) | Klick | `window.open(..., '_blank', 'noopener')`. |
+### 3.1 Kopf- und Navigationsleiste
+
+Am oberen Seitenrand befindet sich eine dauerhaft sichtbare Kopfzeile. Sie enthält:
+
+- das LaunchKit-Logo mit der Bezeichnung **„LaunchKit“**,
+- eine zentrale Navigationsleiste,
+- eine Schaltfläche für das helle oder dunkle Erscheinungsbild,
+- eine mobile Menüschaltfläche.
+
+#### Desktop-Navigation
+
+Die sichtbaren Einträge der Navigationsleiste sind:
+
+- **„Start“**
+- **„Produkte“**
+- **„Changelog“**
+- **„Analytics“**
+- **„Docs“**
+
+**„Produkte“** ist im Quellcode als aktiver Navigationspunkt markiert. Das bedeutet: Beim Laden dieser HTML-Datei wird dieser Eintrag optisch hervorgehoben.
+
+**Im Quellcode nicht eindeutig erkennbar:**
+
+- Wohin die einzelnen Navigationspunkte verlinken.
+- Ob „Changelog“, „Analytics“ und „Docs“ auf derselben Seite, auf getrennten Seiten oder über Inhalte innerhalb derselben Datei dargestellt werden.
+- Ob es eine Seite für „Start“ gibt oder dieser Eintrag lediglich einen Seitenanfang beziehungsweise eine andere Route referenziert.
+
+#### Mobile Navigation
+
+Auf schmaleren Bildschirmen wird ein Menüschaltfläche angezeigt.
+
+1. Tippen Sie auf die Menüschaltfläche rechts in der Kopfzeile.
+2. Das mobile Menü öffnet sich über dem Seiteninhalt.
+3. Wählen Sie einen Eintrag aus dem geöffneten Menü.
+4. Die Navigation führt – abhängig vom hinterlegten Link – zum jeweiligen Ziel.
+
+**Hinweis:** In den bereitgestellten CSS-Auszügen ist die Öffnungslogik des mobilen Menüs nicht enthalten. Das Menü wird jedoch durch die Klasse `.open` sichtbar geschaltet. Ob ein Klick auf einen Menüeintrag das Menü automatisch schließt, ist **im Quellcode nicht eindeutig erkennbar**.
 
 ---
 
-## 6. Typische Probleme & Fehlerbehebung
+### 3.2 Startseite
 
-| Symptom | Mögliche Ursache (Code-basiert) | Abhilfe |
-|---------|----------------------------------|---------|
-| **Seite bleibt weiß / JS-Fehler** | Browser blockiert Inline-Scripts (CSP) oder JS deaktiviert. | CSP anpassen (`'unsafe-inline'` für Scripts/Styles), JS aktivieren. |
-| **Fonts / Favicon laden nicht** | Kein Internet / GitHub Raw blockiert. | Lokal hosten oder Offline-Fallbacks nutzen (System-Fonts greifen automatisch). |
-| **Download tut nichts / Alert nur** | `product.downloadUrl` & `version.url` sind leere Strings im Mock-Array. | Echte URLs in `PRODUCTS`-Daten pflegen (im Code: `const PRODUCTS = [...]`). |
-| **Preise-Link scrollt nicht** | Kein Element mit `id="pricing"` im DOM. | Entweder Section `id="pricing"` hinzufügen oder Nav-Link entfernen/ändern. |
-| **Mobile Menu schließt nicht** | Klick außerhalb nicht implementiert (nur Link-Klick schließt). | Außerhalb klicken → Menü bleibt offen (bekanntes Limit). Workaround: Link klicken oder Hamburger erneut drücken. |
-| **Theme nicht gespeichert** | `localStorage` deaktiviert / Privatmodus blockiert. | Browser-Einstellungen prüfen; Fallback: System-Preference (`prefers-color-scheme`). |
-| **Analytics zeigen 0 / Demo-Werte** | Kein Backend – Daten sind hardcoded in `PRODUCTS`. | Für echte Analytics: Backend/API anbinden (nicht im Code vorhanden). |
-| **Changelog leer trotz Einträ
+#### Hero-Bereich
+
+Der obere Inhaltsbereich enthält:
+
+- eine einleitende Kennzeichnung,
+- eine große Überschrift mit farblich hervorgehobenem Text,
+- einen erläuternden Absatz,
+- eine Reihe von Schaltflächen,
+- ergänzende Metadaten.
+
+Die sichtbaren Handlungsaufforderungen heißen:
+
+- **„Produkte entdecken“**
+- **„Changelog ansehen“**
+
+Darunter befinden sich mehrere kurze Statusangaben mit orangefarbenen Punkten.
+
+**Im Quellcode nicht eindeutig erkennbar:**
+
+- die vollständigen Texte der Statusangaben,
+- die genauen Zielseiten der beiden Schaltflächen,
+- ob die Statusangaben auf echte, aktuell abgerufene Systemdaten beruhen oder statisch im HTML hinterlegt sind.
+
+#### Vorschaukarte rechts
+
+Rechts befindet sich eine Karte, die ein Dashboard oder Produkt-Dashboard darstellen soll. Sichtbar sind:
+
+- ein animierter orangefarbener Punkt,
+- eine Produktzeile mit einer quadratischen Logofläche,
+- drei Kennzahlenfelder,
+- ein kleines Balkendiagramm,
+- eine Fußzeile mit weiterem Status.
+
+Die Karte ist ein gestaltetes Vorschauelement. Ob die dort angezeigten Werte aus realen Daten stammen, ist **im Quellcode nicht eindeutig erkennbar**.
+
+#### „Was LaunchKit auszeichnet“
+
+Darunter folgt eine Reihe von Feature-Karten. Im sichtbaren Code sind vier Karten angelegt. Sichtbare Überschriften beziehungsweise Themen sind:
+
+1. **„Releases“**
+2. **„Changelogs“**
+3. **„Analytics“**
+4. **„Open Source ready“**
+
+Jede Karte enthält ein orangefarbenes Symbol, eine Überschrift und einen erläuternden Text.
+
+**Im Quellcode nicht eindeutig erkennbar:**
+
+- ob die Karten als Ganzes oder einzeln anklickbar sind,
+- ob einzelne Karten lediglich auf die Navigation zu den jeweiligen Bereichen verweisen,
+- ob hinter den Analytics-, Release- oder Changelog-Angaben tatsächlich Daten aus einem Backend geladen werden.
+
+#### „Bereit für deinen Launch?“
+
+Dieser Bereich stellt einen Produktnamen und eine zugehörige Beschreibung vor. Außerdem sind mehrere Schlagwörter beziehungsweise Statusplaketten sichtbar. Im Ausschnitt ist unter anderem die Plakette **„Version 2.4.0“** zu erkennen.
+
+Rechts zeigt eine Rasterfläche vier gestaltete Vorschaufenster. Diese sind dekorative Platzhalter mit unterschiedlichen Farbverläufen.
+
+**Im Quellcode nicht eindeutig erkennbar:**
+
+- ob es sich bei den Vorschaufenstern um echte Screenshots oder ausgestaltete Platzhalter handelt,
+- ob die Versionsangabe automatisch aus einem Release-Datensatz stammt,
+- welche Aktion die Produktdarstellung auslöst.
+
+#### „Produkte“
+
+Weiter unten ist ein Produktbereich mit einer Filterleiste vorgesehen.
+
+Die Filterleiste enthält:
+
+1. ein Suchfeld mit Lupensymbol,
+2. eine Kategorieauswahl,
+3. eine weitere Auswahl,
+4. eine weitere Auswahl,
+5. eine weitere Auswahl,
+6. eine Schaltfläche zum Zurücksetzen.
+
+Die sichtbaren Platzhalter der Auswahlfelder lauten:
+
+- **„Alle Kategorien“**
+- **„Alle Lizenzen“**
+- **„Alle Sortierungen“**
+- **„Alle Preise“**
+
+Die Produktkarten werden in einem Raster mit bis zu drei Spalten dargestellt. Jede Karte zeigt:
+
+- ein Logofeld mit der Anfangsbuchstabe des Produktnamens,
+- den Produktnamen,
+- eine kurze Unterzeile,
+- eine Beschreibung,
+- mehrere Schlagwörter,
+- eine Versionsangabe am unteren Rand.
+
+Die im Ausschnitt sichtbaren Produktnamen sind unter anderem:
+
+- **„Nova Studio“**
+- **„PixelForge“**
+- **„Echo API“**
+- **„Vortex CLI“**
+- **„Lumina UI“**
+- **„Nimbus Sync“**
+
+**Im Quellcode nicht eindeutig erkennbar:**
+
+- die vollständigen Namen der Auswahlfelder jenseits der Platzhalter,
+- die Sortier- und Filterregeln,
+- ob die Preise tatsächlich ausgewertet werden,
+- ob die Karten auf Detailseiten verweisen,
+- ob Produktdaten statisch im HTML stehen oder dynamisch geladen werden.
+
+#### „So funktioniert’s“
+
+Ein weiterer Abschnitt zeigt drei Schritte. Sichtbare Schrittbezeichnungen sind:
+
+1. **„Veröffentlichen“**
+2. **„Verteilen“**
+3. **„Verfolgen“**
+
+Jeder Schritt enthält einen nummerierten Kreis und einen erläuternden Text.
+
+#### „Finale Fragen?“ beziehungsweise FAQ-Bereich
+
+Im Quellcode ist ein Abschnitt mit Frage-Antwort-Einträgen erkennbar. Im Ausschnitt ist unter anderem die Frage **„Brauche ich einen Account?“** sichtbar.
+
+Die technische Umsetzung der Fragenaufklappung ist im gekürzten Quellcode **nicht eindeutig erkennbar**. Insbesondere lässt sich aus dem vorliegenden Ausschnitt nicht bestätigen, ob die Einträge standardmäßig geöffnet, geschlossen oder per JavaScript ein- und ausgeklappt werden.
+
+#### Aufruf zur Kontaktaufnahme
+
+Weiter unten befindet sich ein orangefarbener CTA-Bereich mit der Überschrift **„Bereit, dein Produkt zu launchen?“** sowie erläuterndem Text und einer Schaltfläche **„Launch starten“**.
+
+**Im Quellcode nicht eindeutig erkennbar:** das Ziel oder der weitere Ablauf hinter „Launch starten“.
+
+---
+
+### 3.3 Footer
+
+Der untere Seitenbereich enthält vier Spalten:
+
+1. **LaunchKit** mit Beschreibungstext,
+2. **„Produkt“** mit mehreren Links,
+3. **„Ressourcen“** mit mehreren Links,
+4. **„Unternehmen“** mit mehreren Links.
+
+Unten befindet sich eine schmalere Zeile mit Copyright-Information und weiteren Links.
+
+Die konkreten Linktexte und Zieladressen sind im Ausschnitt nicht vollständig sichtbar. **Im Quellcode nicht eindeutig erkennbar** sind daher:
+
+- ob die Footer-Links tatsächlich funktionieren,
+- ob externe Dienste oder Kontaktformulare erreicht werden,
+- ob ein Link zu Datenschutz, Impressum oder Cookie-Einstellungen vorhanden ist.
+
+---
+
+## 4. Bedienung: Suche, Filter und Navigation
+
+### 4.1 Produkte durchsuchen
+
+1. Scrollen Sie zum Bereich **„Produkte“**.
+2. Setzen Sie den Cursor in das Suchfeld mit dem Lupensymbol.
+3. Geben Sie einen Suchbegriff ein.
+4. Drücken Sie die Eingabetaste.
+
+Die Website ist für Eingabe in diesem Feld vorgesehen. **Ob eine sofortige Live-Filterung ohne Eingabetaste stattfindet, ist im Quellcode nicht eindeutig erkennbar.**
+
+### 4.2 Produkte filtern
+
+1. Öffnen Sie eine der Auswahllisten in der Filterleiste.
+2. Wählen Sie einen der angebotenen Einträge.
+3. Beobachten Sie die Produktliste unterhalb der Leiste.
+
+Die Filterleiste ist eindeutig für Suche und Kategorisierung vorgesehen. Die genaue Zuordnung der vier Auswahlfelder zu Filtern sowie die konkrete Wirkung auf die Liste sind im gekürzten Quellcode **nicht eindeutig erkennbar**.
+
+### 4.3 Filter zurücksetzen
+
+Klicken Sie rechts in der Filterleiste auf **„Zurücksetzen“**.
+
+**Im Quellcode nicht eindeutig erkennbar:** ob dabei alle Felder gleichzeitig geleert werden oder nur ein bestimmter Filter.
+
+---
+
+## 5. Eingaben, Ausgaben und Datenflüsse
+
+### 5.1 Vom Besucher eingegebene Daten
+
+Im bestätigten Ausschnitt sind nur zwei Eingabearten erkennbar:
+
+| Eingabe | Ort | Zweck |
+|---|---|---|
+| Freitext | Suchfeld im Produktbereich | Suche nach Produkten |
+| Auswahl | vier Auswahlfelder der Filterleiste | Eingrenzung der Produktliste |
+
+Weitere Formularfelder, etwa für Kontoerstellung, Kontakt oder Newsletter, sind im Ausschnitt **nicht eindeutig erkennbar**.
+
+### 5.2 Angezeigte Ergebnisse
+
+Die Website stellt folgende Ausgabearten bereit:
+
+- Produktkarten mit Name, Beschreibung, Schlagwörtern und Version,
+- mehrere Kennzahlen in der Dashboard-Vorschau,
+- ein stilisches Balkendiagramm,
+- Versions- und Statusplaketten,
+- eine Changelog-Hinweisfläche im Hero-Bereich.
+
+**Im Quellcode nicht eindeutig erkennbar:** Ob sämtliche angezeigten Werte live aus einem Datenspeicher stammen oder als statische Vorschau im HTML hinterlegt sind.
+
+---
+
+## 6. Darstellung hell/dunkel
+
+1. Klicken Sie auf die kleine Schaltfläche mit dem Sonnen- oder Mondsymbol rechts oben.
+2. Die Seite wechselt zwischen dem hellen und dem dunklen Farbschema.
+3. Die Auswahl wird im Browser für diese Website gespeichert, sodass sie beim nächsten Besuch erhalten bleiben kann.
+
+Der Wechsel wird im Quellcode durch das Attribut `data-theme` gesteuert. **Im Quellcode nicht eindeutig erkennbar** ist, ob es zusätzlich eine automatische Einstellung nach Systemvorgabe oder eine manuelle Auswahl über ein Menü gibt.
+
+---
+
+## 7. Typische Probleme und Fehlerbehebung
+
+### 7.1 Die Produktliste bleibt leer
+
+**Mögliche Ursache:** Eine Filtereinstellung schließt alle sichtbaren Produkte aus.
+
+**Lösung:**
+
+1. Klicken Sie auf **„Zurücksetzen“**.
+2. Entfernen Sie gegebenenfalls anschließend weitere Bedingungen aus den Auswahlfeldern.
+3. Geben Sie im Suchfeld einen kürzeren oder allgemeineren Begriff ein.
+
+### 7.2 Ein gesuchtes Produkt wird nicht gefunden
+
+**
