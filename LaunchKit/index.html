@@ -1224,97 +1224,314 @@ input, textarea, select { font: inherit; color: inherit; }
     }
   }
 
-  // -------------------- File Storage (anonyme Browser-Uploads) --------------------
-  // Nur Anbieter mit dokumentierter Browser-Kompatibilität.
-  // Ein Browser-Test vom 23.08.2026 hat u.a. Litterbox, tmpfiles.org und
-  // weitere Hosts direkt aus einer Webseite erfolgreich getestet.
-  //
-  // Catbox, 0x0.st und file.io wurden bewusst entfernt: deren APIs sind
-  // nicht zuverlässig direkt aus einer normalen GitHub-Pages-Seite nutzbar,
-  // insbesondere wegen fehlender CORS-Freigaben.
+  /* ======================================================================
+     LaunchKit – Datei-Hosting
+     Ersetzt den bisherigen File-Storage-Block.
+     ====================================================================== */
+
+   /* ======================================================================
+     LaunchKit – Datei-Hosting
+     Ausschließlich dauerhafte Anbieter.
+     ====================================================================== */
+
+  const MB = 1024 * 1024;
+  const PROBE_FROM_SIZE = 20 * MB;
+  const PROBE_TTL = 6 * 60 * 60 * 1000;
+
+  function timeoutFor(file) {
+    return Math.min(
+      30 * 60 * 1000,
+      Math.max(120000, (file.size / (100 * 1024)) * 1000)
+    );
+  }
 
   async function fetchWithTimeout(url, opts, timeoutMs) {
-    return Promise.race([
-      fetch(url, opts),
-      new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout (' + timeoutMs + 'ms)')), timeoutMs))
-    ]);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+
+    try {
+      return await fetch(
+        url,
+        Object.assign({}, opts, { signal: ctrl.signal })
+      );
+    } catch (e) {
+      if (e && e.name === 'AbortError') {
+        throw new Error(
+          'Timeout (' + Math.round(timeoutMs / 1000) + ' s)'
+        );
+      }
+      throw e;
+    } finally {
+      clearTimeout(timer);
+    }
   }
+
+  // Cloudflare Worker: bewusst ohne abschließenden Slash.
+  const UPLOAD_WORKER_URL =
+    'https://launchkit-upload.oslamuoslamu.workers.dev';
 
   const FILE_HOSTS = [
     {
-      name: 'GoFile',
-      maxSize: Infinity,
-      async upload(file, onProgress) {
-        const fd = new FormData();
-        fd.append('file', file, file.name);
-        const resp = await fetchWithTimeout('https://upload.gofile.io/uploadfile', {
-          method: 'POST',
-          body: fd
-        }, 120000);
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      name: 'GitHub',
+      permanent: true,
+      noProbe: true,
+      maxSize: 90 * MB,
+
+      enabled() {
+        return !!UPLOAD_WORKER_URL;
+      },
+
+      async upload(file) {
+        const user = LK && LK.auth && LK.auth.currentUser;
+
+        if (!user || typeof user.getIdToken !== 'function') {
+          throw new Error('nicht bei Firebase angemeldet');
+        }
+
+        const idToken = await user.getIdToken();
+
+        const resp = await fetchWithTimeout(
+          UPLOAD_WORKER_URL + '/?name=' +
+            encodeURIComponent(file.name),
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + idToken,
+              'Content-Type': 'application/octet-stream'
+            },
+            body: file
+          },
+          timeoutFor(file)
+        );
+
         const j = await resp.json().catch(() => null);
-        const url = j && j.status === 'ok' && j.data && j.data.downloadPage;
-        if (!url) throw new Error('GoFile Antwort unvollständig');
+
+        if (!resp.ok) {
+          throw new Error((j && j.error) || ('HTTP ' + resp.status));
+        }
+
+        if (!j || !j.url) {
+          throw new Error('Antwort unvollständig');
+        }
+
+        return j.url;
+      }
+    },
+
+    {
+      name: 'Catbox',
+      permanent: true,
+      maxSize: 200 * MB,
+
+      async upload(file) {
+        const fd = new FormData();
+        fd.append('reqtype', 'fileupload');
+        fd.append('fileToUpload', file, file.name);
+
+        const resp = await fetchWithTimeout(
+          'https://catbox.moe/user/api.php',
+          {
+            method: 'POST',
+            body: fd
+          },
+          timeoutFor(file)
+        );
+
+        if (!resp.ok) {
+          throw new Error('HTTP ' + resp.status);
+        }
+
+        const url = (await resp.text()).trim();
+
+        if (!/^https:\/\/(files\.)?catbox\.moe\//.test(url)) {
+          throw new Error(
+            'unerwartete Antwort: ' + url.slice(0, 80)
+          );
+        }
+
         return url;
       }
     },
+
     {
-      name: 'tmpfiles.org',
-      maxSize: 100 * 1024 * 1024,
-      async upload(file, onProgress) {
+      name: 'pomf.lain.la',
+      permanent: true,
+      maxSize: 1024 * MB,
+
+      async upload(file) {
         const fd = new FormData();
-        fd.append('file', file, file.name);
-        const resp = await fetchWithTimeout('https://tmpfiles.org/api/v1/upload', {
-          method: 'POST',
-          body: fd
-        }, 120000);
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        fd.append('files[]', file, file.name);
+
+        const resp = await fetchWithTimeout(
+          'https://pomf.lain.la/upload.php',
+          {
+            method: 'POST',
+            body: fd
+          },
+          timeoutFor(file)
+        );
+
+        if (!resp.ok) {
+          throw new Error('HTTP ' + resp.status);
+        }
+
         const j = await resp.json().catch(() => null);
-        const raw = j && j.data && j.data.url;
-        if (!raw) throw new Error('tmpfiles.org Antwort unvollständig');
-        return raw.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/')
-                  .replace('http://tmpfiles.org/', 'https://tmpfiles.org/dl/');
+        const url =
+          j && j.success && j.files && j.files[0] &&
+          j.files[0].url;
+
+        if (!url) {
+          throw new Error('Antwort unvollständig');
+        }
+
+        return url;
       }
     },
+
     {
-      name: 'Litterbox',
-      maxSize: 1024 * 1024 * 1024,
-      async upload(file, onProgress) {
+      name: 'Yukisbox',
+      permanent: true,
+      experimental: true,
+      maxSize: 2048 * MB,
+
+      async upload(file) {
         const fd = new FormData();
-        fd.append('reqtype', 'fileupload');
-        fd.append('time', '72h');
-        fd.append('fileToUpload', file, file.name);
-        const resp = await fetchWithTimeout('https://litterbox.catbox.moe/resources/internals/api.php', {
-          method: 'POST',
-          body: fd
-        }, 120000);
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        const url = (await resp.text()).trim();
-        if (!/^https?:\/\//.test(url)) throw new Error('unerwartete Antwort: ' + url.slice(0, 100));
+        fd.append('file', file, file.name);
+
+        const resp = await fetchWithTimeout(
+          'https://yukiapi.site/upload',
+          {
+            method: 'POST',
+            body: fd
+          },
+          timeoutFor(file)
+        );
+
+        if (!resp.ok) {
+          throw new Error('HTTP ' + resp.status);
+        }
+
+        const j = await resp.json().catch(() => null);
+        const url = j && j.success && j.url;
+
+        if (!url) {
+          throw new Error('Antwort unvollständig');
+        }
+
         return url;
       }
     }
   ];
 
-  async function uploadToFileHost(file, onProgress) {
-    const errors = [];
-    for (const host of FILE_HOSTS) {
-      if (file.size > host.maxSize) {
-        errors.push(host.name + ': Datei zu groß für diesen Anbieter (max ' + Math.round(host.maxSize / 1024 / 1024) + ' MB)');
-        continue;
+  // Erreichbarkeitstest für größere Dateien.
+  // Das Ergebnis wird lokal sechs Stunden zwischengespeichert.
+  function probeGet(name) {
+    try {
+      const v = JSON.parse(
+        localStorage.getItem('lk-host-' + name) || 'null'
+      );
+
+      if (v && Date.now() - v.t < PROBE_TTL) {
+        return v.ok;
       }
-      try {
-        if (onProgress) onProgress('⏳ Versuche ' + host.name + ' ...');
-        const url = await host.upload(file, onProgress);
-        if (onProgress) onProgress('✓ Hochgeladen via ' + host.name);
-        return { host: host.name, url };
-      } catch (e) {
-        errors.push(host.name + ': ' + e.message);
-      }
-    }
-    throw new Error('Upload fehlgeschlagen: ' + errors.join(' · '));
+    } catch (e) {}
+
+    return null;
   }
 
+  function probeSet(name, ok) {
+    try {
+      localStorage.setItem(
+        'lk-host-' + name,
+        JSON.stringify({ ok, t: Date.now() })
+      );
+    } catch (e) {}
+  }
+
+  async function probeHost(host) {
+    const cached = probeGet(host.name);
+
+    if (cached !== null) {
+      return cached;
+    }
+
+    try {
+      const tiny = new File(
+        ['lk'],
+        'probe.txt',
+        { type: 'text/plain' }
+      );
+
+      const url = await host.upload(tiny);
+      const ok = /^https?:\/\//.test(url);
+
+      probeSet(host.name, ok);
+      return ok;
+    } catch (e) {
+      probeSet(host.name, false);
+      return false;
+    }
+  }
+
+  // Rückgabe: { host, url, permanent, retention }
+  async function uploadToFileHost(file, onProgress) {
+    const say = (message) => {
+      if (typeof onProgress === 'function') {
+        onProgress(message);
+      }
+    };
+
+    const errors = [];
+
+    const activeHosts = FILE_HOSTS.filter(
+      host => !host.enabled || host.enabled()
+    );
+
+    for (const host of activeHosts) {
+      if (file.size > host.maxSize) {
+        errors.push(
+          host.name + ': Datei zu groß (max ' +
+          Math.round(host.maxSize / MB) + ' MB)'
+        );
+        continue;
+      }
+
+      if (file.size > PROBE_FROM_SIZE && !host.noProbe) {
+        say('🔎 Prüfe ' + host.name + ' …');
+
+        if (!(await probeHost(host))) {
+          errors.push(
+            host.name + ': aus dem Browser nicht erreichbar'
+          );
+          continue;
+        }
+      }
+
+      try {
+        say('⏳ Lade zu ' + host.name + ' hoch …');
+
+        const url = await host.upload(file);
+
+        say('✓ Hochgeladen via ' + host.name);
+
+        return {
+          host: host.name,
+          url: url,
+          permanent: true,
+          retention: ''
+        };
+      } catch (e) {
+        errors.push(
+          host.name + ': ' +
+          (e && e.message ? e.message : String(e))
+        );
+      }
+    }
+
+    throw new Error(
+      'Upload fehlgeschlagen: ' + errors.join(' · ')
+    );
+  }
   // Hilfsfunktion: Lesen aller öffentlichen Produkte aus Firebase RTDB
   async function loadAllProducts() {
     if (!window.LK?.db || window.LK?.firebaseError) { PRODUCTS = []; return; }
