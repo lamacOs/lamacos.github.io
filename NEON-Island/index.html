@@ -1,0 +1,992 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NEON ISLAND – 3D Open World</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#07121c;font-family:Inter,Arial,sans-serif;color:white;touch-action:none}
+canvas{display:block}
+#game{position:fixed;inset:0}
+#hud{position:fixed;inset:0;pointer-events:none}
+.topbar{position:absolute;top:18px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:flex-start}
+.brand{background:rgba(8,20,32,.7);border:1px solid #ffffff25;padding:12px 17px;border-radius:15px;backdrop-filter:blur(12px)}
+.brand strong{font-size:16px;letter-spacing:2px;color:#63f5dc}
+.brand small{display:block;color:#a8c3d2;font-size:10px;margin-top:4px}
+.stats{display:flex;gap:8px}
+.stat{background:rgba(8,20,32,.75);border:1px solid #ffffff25;padding:10px 14px;border-radius:13px;backdrop-filter:blur(12px);text-align:center;min-width:78px}
+.stat small{display:block;color:#9bb6c5;font-size:9px;letter-spacing:1px}
+.stat b{font-size:17px}
+#mission{position:absolute;top:105px;left:18px;background:rgba(8,20,32,.7);padding:12px 15px;border:1px solid #ffffff22;border-radius:13px;max-width:230px;font-size:12px;line-height:1.5}
+#mission strong{color:#65f4d9}
+#centerMessage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;background:rgba(5,15,25,.88);border:1px solid #65f4d955;padding:32px;border-radius:22px;width:min(90%,420px);backdrop-filter:blur(15px);pointer-events:auto}
+#centerMessage h1{font-size:34px;letter-spacing:2px;color:#63f5dc;margin-bottom:10px}
+#centerMessage p{font-size:13px;color:#b3c9d5;line-height:1.6;margin-bottom:20px}
+.mainbtn{border:0;background:linear-gradient(120deg,#13b99b,#48e5d3);color:#03221e;padding:14px 27px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer}
+#controls{position:absolute;bottom:22px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:end}
+#joystick{width:132px;height:132px;border-radius:50%;background:#ffffff16;border:2px solid #ffffff45;position:relative;pointer-events:auto;touch-action:none;backdrop-filter:blur(8px)}
+#stick{width:55px;height:55px;border-radius:50%;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#76ffe6,#12a88d);box-shadow:0 0 20px #24d6b0aa;border:2px solid #ffffff80}
+.actionbuttons{display:flex;gap:12px;align-items:end;pointer-events:auto}
+.actionbtn{width:69px;height:69px;border-radius:50%;border:1px solid #ffffff65;background:#112c40cc;color:white;font-size:11px;font-weight:bold;backdrop-filter:blur(8px);touch-action:none}
+.actionbtn:active,.actionbtn.active{background:#13a98f;color:#001e19}
+#hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:10px;color:#d1e5edaa;white-space:nowrap}
+#pause{position:absolute;top:90px;right:18px;pointer-events:auto;background:#10283bbb;color:white;border:1px solid #ffffff44;border-radius:10px;padding:9px 14px}
+#crosshair{position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:#ffffff99;display:none}
+#loading{position:fixed;inset:0;background:#07121c;display:grid;place-items:center;z-index:10;text-align:center}
+#loading h1{color:#63f5dc;letter-spacing:4px;font-size:28px}
+#loading p{color:#9bb6c5;margin-top:12px;font-size:12px}
+@media(min-width:800px){
+ #controls{left:28px;right:28px}
+ #joystick{width:110px;height:110px}
+ #stick{width:48px;height:48px}
+ #hint{bottom:20px}
+}
+@media(max-width:480px){
+ .topbar{top:10px;left:10px;right:10px}
+ .brand{padding:9px 11px}
+ .brand strong{font-size:12px}
+ .stat{min-width:58px;padding:8px}
+ .stat b{font-size:14px}
+ #mission{top:76px;left:10px;font-size:10px;max-width:175px}
+ #pause{top:80px;right:10px}
+ #controls{bottom:17px;left:12px;right:12px}
+ #joystick{width:112px;height:112px}
+ .actionbtn{width:59px;height:59px}
+ #hint{display:none}
+}
+</style>
+
+<script type="importmap">
+{
+ "imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+ }
+}
+</script>
+</head>
+
+<body>
+
+<div id="loading">
+ <div>
+  <h1>NEON ISLAND</h1>
+  <p>Die 3D-Welt wird geladen ...</p>
+ </div>
+</div>
+
+<div id="game"></div>
+
+<div id="hud">
+ <div class="topbar">
+  <div class="brand">
+   <strong>NEON ISLAND</strong>
+   <small>OPEN WORLD EXPERIENCE</small>
+  </div>
+  <div class="stats">
+   <div class="stat"><small>KRISTALLE</small><b id="score">0 / 12</b></div>
+   <div class="stat"><small>STATUS</small><b id="status">START</b></div>
+  </div>
+ </div>
+
+ <div id="mission">
+  <strong>DEINE MISSION</strong><br>
+  Erkunde die Insel und sammle alle 12 Energie-Kristalle!
+ </div>
+
+ <button id="pause">Ⅱ Pause</button>
+ <div id="crosshair"></div>
+
+ <div id="centerMessage">
+  <h1>NEON ISLAND</h1>
+  <p>Eine geheimnisvolle Insel wartet auf dich.<br>
+  Erkunde die Welt, entdecke Gebäude und sammle die Energie-Kristalle.</p>
+  <button class="mainbtn" id="start">SPIEL STARTEN</button>
+ </div>
+
+ <div id="controls">
+  <div id="joystick"><div id="stick"></div></div>
+  <div class="actionbuttons">
+   <button class="actionbtn" id="jump">▲<br>SPRINGEN</button>
+   <button class="actionbtn" id="sprint">⚡<br>SPRINT</button>
+  </div>
+ </div>
+
+ <div id="hint">WASD bewegen · Maus ziehen zum Umsehen · Leertaste springen</div>
+</div>
+
+<script type="module">
+import * as THREE from "three";
+
+// ==========================================
+// GRUNDEINSTELLUNGEN
+// ==========================================
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x8ad7ee);
+scene.fog = new THREE.Fog(0x8ad7ee,90,240);
+
+const camera = new THREE.PerspectiveCamera(
+ 65,window.innerWidth/window.innerHeight,0.1,400
+);
+
+const renderer = new THREE.WebGLRenderer({
+ antialias:true,
+ powerPreference:"high-performance"
+});
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.7));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+document.getElementById("game").appendChild(renderer.domElement);
+
+// ==========================================
+// LICHT
+// ==========================================
+
+scene.add(new THREE.HemisphereLight(0xc5f3ff,0x526b42,2));
+
+const sun = new THREE.DirectionalLight(0xfff0d0,3);
+sun.position.set(-60,100,50);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left = -110;
+sun.shadow.camera.right = 110;
+sun.shadow.camera.top = 110;
+sun.shadow.camera.bottom = -110;
+scene.add(sun);
+
+// ==========================================
+// MATERIALIEN
+// ==========================================
+
+const mat = (color,roughness=0.8,metalness=0) =>
+ new THREE.MeshStandardMaterial({color,roughness,metalness});
+
+const grassMat = mat(0x4b9b65);
+const sandMat = mat(0xe8d39a);
+const waterMat = new THREE.MeshStandardMaterial({
+ color:0x087fba,
+ roughness:0.25,
+ metalness:0.25,
+ transparent:true,
+ opacity:0.92
+});
+
+const trunkMat = mat(0x82502d);
+const leafMat = mat(0x21885a);
+const leafMat2 = mat(0x3aa36c);
+const stoneMat = mat(0x687b80);
+const whiteMat = mat(0xe9f4ef);
+const glassMat = new THREE.MeshStandardMaterial({
+ color:0x65ddeb,metalness:0.5,roughness:0.15,
+ transparent:true,opacity:0.65
+});
+
+// ==========================================
+// INSEL-TERRAIN
+// ==========================================
+
+const ISLAND_RADIUS = 82;
+
+function terrainHeight(x,z){
+ const r = Math.sqrt(x*x+z*z);
+ const edge = Math.max(0,1-r/ISLAND_RADIUS);
+
+ let h = -2 + Math.pow(edge,0.6)*13;
+
+ h += Math.sin(x*0.075)*Math.cos(z*0.06)*2.0;
+ h += Math.sin(z*0.13+x*0.04)*1.2;
+
+ // Zentraler Berg
+ const mountain = Math.exp(-((x-12)**2+(z+12)**2)/550);
+ h += mountain*20;
+
+ // Flachere Küstenregion
+ h -= Math.exp(-((x+20)**2+(z-20)**2)/500)*3;
+
+ return h;
+}
+
+function createTerrain(){
+ const segments = 160;
+ const geometry = new THREE.PlaneGeometry(
+  ISLAND_RADIUS*2,ISLAND_RADIUS*2,segments,segments
+ );
+
+ geometry.rotateX(-Math.PI/2);
+
+ const positions = geometry.attributes.position;
+
+ for(let i=0;i<positions.count;i++){
+  const x=positions.getX(i);
+  const z=positions.getZ(i);
+  positions.setY(i,terrainHeight(x,z));
+ }
+
+ geometry.computeVertexNormals();
+
+ const terrain = new THREE.Mesh(geometry,grassMat);
+ terrain.receiveShadow=true;
+ terrain.castShadow=true;
+ scene.add(terrain);
+
+ // Sandküste
+ const sandGeometry = geometry.clone();
+ const sandPositions=sandGeometry.attributes.position;
+
+ for(let i=0;i<sandPositions.count;i++){
+  const x=sandPositions.getX(i);
+  const z=sandPositions.getZ(i);
+  sandPositions.setY(i,terrainHeight(x,z)-0.22);
+ }
+
+ sandGeometry.computeVertexNormals();
+
+ const sand = new THREE.Mesh(sandGeometry,sandMat);
+ sand.scale.set(1,1,1);
+ sand.receiveShadow=true;
+ scene.add(sand);
+}
+
+createTerrain();
+
+// ==========================================
+// OZEAN
+// ==========================================
+
+const ocean = new THREE.Mesh(
+ new THREE.PlaneGeometry(1000,1000),
+ waterMat
+);
+
+ocean.rotation.x=-Math.PI/2;
+ocean.position.y=-3;
+scene.add(ocean);
+
+// ==========================================
+// 3D-OBJEKTE
+// ==========================================
+
+function addMesh(geometry,material,x,y,z,scale=1){
+ const mesh=new THREE.Mesh(geometry,material);
+ mesh.position.set(x,y,z);
+ if(typeof scale==="number") mesh.scale.setScalar(scale);
+ else mesh.scale.set(...scale);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ scene.add(mesh);
+ return mesh;
+}
+
+// Palmen mit gebogenen Stämmen und Blättern
+
+function createPalm(x,z){
+ const base=terrainHeight(x,z);
+ const height=5+Math.random()*3;
+
+ const group=new THREE.Group();
+ group.position.set(x,base,z);
+
+ const trunkGeo=new THREE.CylinderGeometry(
+  0.22,0.38,height,12,8
+ );
+
+ for(let i=0;i<trunkGeo.attributes.position.count;i++){
+  const py=trunkGeo.attributes.position.getY(i);
+  trunkGeo.attributes.position.setX(
+   i,trunkGeo.attributes.position.getX(i)+py*0.06
+  );
+ }
+
+ trunkGeo.computeVertexNormals();
+
+ const trunk=new THREE.Mesh(trunkGeo,trunkMat);
+ trunk.position.y=height/2;
+ trunk.castShadow=true;
+ group.add(trunk);
+
+ const leafCount=8;
+
+ for(let i=0;i<leafCount;i++){
+  const angle=i/leafCount*Math.PI*2;
+  const leaf=new THREE.Mesh(
+   new THREE.SphereGeometry(1,12,8),
+   i%2?leafMat:leafMat2
+  );
+
+  leaf.position.set(
+   Math.cos(angle)*1.5,
+   height+0.2,
+   Math.sin(angle)*1.5
+  );
+
+  leaf.scale.set(1.7,0.15,0.48);
+  leaf.rotation.y=-angle;
+  leaf.rotation.z=-Math.cos(angle)*0.35;
+  leaf.castShadow=true;
+  group.add(leaf);
+ }
+
+ scene.add(group);
+}
+
+// Runde Laubbäume
+
+function createTree(x,z){
+ const base=terrainHeight(x,z);
+ const height=3+Math.random()*2;
+
+ const group=new THREE.Group();
+ group.position.set(x,base,z);
+
+ const trunk=new THREE.Mesh(
+  new THREE.CylinderGeometry(0.22,0.35,height,12),
+  trunkMat
+ );
+ trunk.position.y=height/2;
+ trunk.castShadow=true;
+ group.add(trunk);
+
+ const crown=new THREE.Mesh(
+  new THREE.IcosahedronGeometry(1.6,2),
+  leafMat
+ );
+ crown.position.y=height+1;
+ crown.scale.set(1.1,1.1,1.1);
+ crown.castShadow=true;
+ group.add(crown);
+
+ const second=new THREE.Mesh(
+  new THREE.IcosahedronGeometry(1.1,2),
+  leafMat2
+ );
+ second.position.set(0.8,height+1.7,0.3);
+ second.castShadow=true;
+ group.add(second);
+
+ scene.add(group);
+}
+
+// Felsen
+
+function createRock(x,z){
+ const y=terrainHeight(x,z);
+ const rock=addMesh(
+  new THREE.DodecahedronGeometry(1,1),
+  stoneMat,x,y+0.5,z,
+  [0.7+Math.random(),0.5+Math.random(),0.7+Math.random()]
+ );
+ rock.rotation.set(Math.random(),Math.random(),Math.random());
+}
+
+// Gebäude
+
+function createHouse(x,z,color=0xf1e6ce){
+ const y=terrainHeight(x,z);
+ const group=new THREE.Group();
+ group.position.set(x,y,z);
+
+ const walls=new THREE.Mesh(
+  new THREE.BoxGeometry(8,5,7),
+  mat(color)
+ );
+ walls.position.y=2.5;
+ walls.castShadow=true;
+ walls.receiveShadow=true;
+ group.add(walls);
+
+ const roof=new THREE.Mesh(
+  new THREE.ConeGeometry(5.7,3.5,4),
+  mat(0x934c39)
+ );
+ roof.position.y=6.5;
+ roof.rotation.y=Math.PI/4;
+ roof.castShadow=true;
+ group.add(roof);
+
+ const door=new THREE.Mesh(
+  new THREE.BoxGeometry(1.3,2.6,0.15),
+  mat(0x553526)
+ );
+ door.position.set(0,1.3,3.57);
+ group.add(door);
+
+ for(let side of [-1,1]){
+  const window=new THREE.Mesh(
+   new THREE.BoxGeometry(1.5,1.3,0.15),
+   glassMat
+  );
+  window.position.set(side*2.2,3,3.58);
+  group.add(window);
+ }
+
+ scene.add(group);
+}
+
+// Straßen / Wege
+
+function createPath(points,width=3){
+ const curve=new THREE.CatmullRomCurve3(
+  points.map(p=>new THREE.Vector3(p[0],terrainHeight(p[0],p[1])+0.08,p[1]))
+ );
+
+ const geometry=new THREE.TubeGeometry(curve,100,width/2,6,false);
+ const path=new THREE.Mesh(geometry,mat(0xc4b38b));
+ path.receiveShadow=true;
+ scene.add(path);
+}
+
+// ==========================================
+// WELT AUFBAUEN
+// ==========================================
+
+for(let i=0;i<36;i++){
+ const angle=Math.random()*Math.PI*2;
+ const radius=27+Math.random()*43;
+ const x=Math.cos(angle)*radius;
+ const z=Math.sin(angle)*radius;
+
+ if(Math.sqrt((x-12)**2+(z+12)**2)<25) continue;
+
+ if(i%3===0) createPalm(x,z);
+ else createTree(x,z);
+}
+
+for(let i=0;i<24;i++){
+ const angle=Math.random()*Math.PI*2;
+ const radius=12+Math.random()*62;
+ const x=Math.cos(angle)*radius;
+ const z=Math.sin(angle)*radius;
+ createRock(x,z);
+}
+
+createHouse(-18,10);
+createHouse(-29,17,0xd9e7d9);
+createHouse(-12,22,0xe9d9c0);
+
+// Kleine Forschungsstation
+const station=addMesh(
+ new THREE.CylinderGeometry(5,5,6,24),
+ mat(0x607f91),25,terrainHeight(25,-24)+3,-24
+);
+
+const stationTop=addMesh(
+ new THREE.SphereGeometry(5,24,16,0,Math.PI*2,0,Math.PI/2),
+ glassMat,25,terrainHeight(25,-24)+6,-24
+);
+
+createPath([
+ [-18,10],[-10,4],[0,0],[12,-4],[25,-10]
+],2.5);
+
+// ==========================================
+// SPIELCHARAKTER
+// ==========================================
+
+const player=new THREE.Group();
+scene.add(player);
+
+const character=new THREE.Group();
+player.add(character);
+
+const skinMat=mat(0xf1b98d);
+const shirtMat=mat(0x16a8a1);
+const pantsMat=mat(0x263c59);
+const shoeMat=mat(0x17212d);
+const hairMat=mat(0x493125);
+
+function makePart(geometry,material,parent,x,y,z){
+ const mesh=new THREE.Mesh(geometry,material);
+ mesh.position.set(x,y,z);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ parent.add(mesh);
+ return mesh;
+}
+
+// Körper
+const body=makePart(
+ new THREE.CapsuleGeometry(0.48,0.9,6,12),
+ shirtMat,character,0,1.65,0
+);
+
+// Kopf
+const head=makePart(
+ new THREE.SphereGeometry(0.43,24,20),
+ skinMat,character,0,2.8,0
+);
+
+// Haare
+const hair=makePart(
+ new THREE.SphereGeometry(0.44,20,12,0,Math.PI*2,0,Math.PI/2),
+ hairMat,character,0,3.0,0
+);
+
+// Augen
+const eyeMat=mat(0x15202a);
+for(const side of [-1,1]){
+ makePart(
+  new THREE.SphereGeometry(0.045,10,10),
+  eyeMat,character,side*0.15,2.83,0.37
+ );
+}
+
+// Arme
+const arms=[];
+
+for(const side of [-1,1]){
+ const pivot=new THREE.Group();
+ pivot.position.set(side*0.58,2.05,0);
+ character.add(pivot);
+
+ makePart(
+  new THREE.CapsuleGeometry(0.17,0.68,5,10),
+  shirtMat,pivot,0,-0.42,0
+ );
+
+ arms.push(pivot);
+}
+
+// Beine
+const legs=[];
+
+for(const side of [-1,1]){
+ const pivot=new THREE.Group();
+ pivot.position.set(side*0.27,1.1,0);
+ character.add(pivot);
+
+ makePart(
+  new THREE.CapsuleGeometry(0.19,0.65,5,10),
+  pantsMat,pivot,0,-0.43,0
+ );
+
+ makePart(
+  new THREE.SphereGeometry(0.23,12,10),
+  shoeMat,pivot,0,-0.91,0.13
+ );
+
+ legs.push(pivot);
+}
+
+player.position.set(0,terrainHeight(0,0),0);
+
+// ==========================================
+// KRISTALLE
+// ==========================================
+
+const crystals=[];
+const crystalMaterial=new THREE.MeshStandardMaterial({
+ color:0x48fff0,
+ emissive:0x00cbb5,
+ emissiveIntensity:2,
+ metalness:0.35,
+ roughness:0.15
+});
+
+for(let i=0;i<12;i++){
+ const angle=i/12*Math.PI*2;
+ const radius=15+(i%3)*12;
+ const x=Math.cos(angle)*radius;
+ const z=Math.sin(angle)*radius;
+
+ const group=new THREE.Group();
+ group.position.set(x,terrainHeight(x,z)+1.5,z);
+
+ const crystal=new THREE.Mesh(
+  new THREE.OctahedronGeometry(0.75,1),
+  crystalMaterial
+ );
+ crystal.scale.set(0.7,1.5,0.7);
+ crystal.castShadow=true;
+ group.add(crystal);
+
+ const glow=new THREE.PointLight(0x23ffe0,1.7,8);
+ glow.position.y=0.3;
+ group.add(glow);
+
+ scene.add(group);
+ crystals.push(group);
+}
+
+// ==========================================
+// STEUERUNG
+// ==========================================
+
+let started=false;
+let paused=false;
+let score=0;
+
+let moveX=0;
+let moveY=0;
+
+let sprinting=false;
+let velocityY=0;
+let grounded=true;
+
+let yaw=0;
+let cameraPitch=0.15;
+
+const joystick=document.getElementById("joystick");
+const stick=document.getElementById("stick");
+
+let joyPointer=null;
+
+function updateJoystick(e){
+ const rect=joystick.getBoundingClientRect();
+ const cx=rect.left+rect.width/2;
+ const cy=rect.top+rect.height/2;
+
+ let dx=e.clientX-cx;
+ let dy=e.clientY-cy;
+
+ const max=rect.width*0.34;
+ const distance=Math.sqrt(dx*dx+dy*dy);
+
+ if(distance>max){
+  dx=dx/distance*max;
+  dy=dy/distance*max;
+ }
+
+ stick.style.left=`calc(50% + ${dx}px)`;
+ stick.style.top=`calc(50% + ${dy}px)`;
+
+ moveX=dx/max;
+ moveY=-dy/max;
+}
+
+joystick.addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ joyPointer=e.pointerId;
+ joystick.setPointerCapture(e.pointerId);
+ updateJoystick(e);
+});
+
+joystick.addEventListener("pointermove",e=>{
+ if(e.pointerId===joyPointer) updateJoystick(e);
+});
+
+function releaseJoystick(e){
+ if(e.pointerId!==joyPointer)return;
+ joyPointer=null;
+ moveX=0;
+ moveY=0;
+ stick.style.left="50%";
+ stick.style.top="50%";
+}
+
+joystick.addEventListener("pointerup",releaseJoystick);
+joystick.addEventListener("pointercancel",releaseJoystick);
+
+document.getElementById("sprint").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ sprinting=true;
+ document.getElementById("sprint").classList.add("active");
+});
+
+function stopSprint(){
+ sprinting=false;
+ document.getElementById("sprint").classList.remove("active");
+}
+
+document.getElementById("sprint").addEventListener("pointerup",stopSprint);
+document.getElementById("sprint").addEventListener("pointercancel",stopSprint);
+document.getElementById("sprint").addEventListener("lostpointercapture",stopSprint);
+
+function jump(){
+ if(!started||paused||!grounded)return;
+ velocityY=8.5;
+ grounded=false;
+}
+
+document.getElementById("jump").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ jump();
+});
+
+document.addEventListener("keydown",e=>{
+ if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)){
+  e.preventDefault();
+ }
+
+ if(e.key.toLowerCase()==="w"||e.key==="ArrowUp")moveY=1;
+ if(e.key.toLowerCase()==="s"||e.key==="ArrowDown")moveY=-1;
+ if(e.key.toLowerCase()==="a"||e.key==="ArrowLeft")moveX=-1;
+ if(e.key.toLowerCase()==="d"||e.key==="ArrowRight")moveX=1;
+
+ if(e.code==="Space")jump();
+ if(e.code==="ShiftLeft"||e.code==="ShiftRight")sprinting=true;
+});
+
+document.addEventListener("keyup",e=>{
+ if(["w","s","a","d","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){
+  moveX=0;
+  moveY=0;
+ }
+
+ if(e.code==="ShiftLeft"||e.code==="ShiftRight")stopSprint();
+});
+
+// ==========================================
+// KAMERA
+// ==========================================
+
+let dragging=false;
+let lastX=0;
+let lastY=0;
+
+renderer.domElement.addEventListener("pointerdown",e=>{
+ if(e.pointerType==="touch"){
+  dragging=true;
+  lastX=e.clientX;
+  lastY=e.clientY;
+ }
+});
+
+renderer.domElement.addEventListener("pointermove",e=>{
+ if(!dragging)return;
+
+ const dx=e.clientX-lastX;
+ const dy=e.clientY-lastY;
+
+ yaw-=dx*0.006;
+ cameraPitch+=dy*0.003;
+
+ cameraPitch=THREE.MathUtils.clamp(cameraPitch,-0.25,0.7);
+
+ lastX=e.clientX;
+ lastY=e.clientY;
+});
+
+renderer.domElement.addEventListener("pointerup",()=>dragging=false);
+renderer.domElement.addEventListener("pointercancel",()=>dragging=false);
+
+renderer.domElement.addEventListener("mousedown",e=>{
+ if(e.pointerType==="touch")return;
+ dragging=true;
+ lastX=e.clientX;
+ lastY=e.clientY;
+});
+
+window.addEventListener("mousemove",e=>{
+ if(!dragging)return;
+
+ yaw-=(e.clientX-lastX)*0.006;
+ cameraPitch+=(e.clientY-lastY)*0.003;
+ cameraPitch=THREE.MathUtils.clamp(cameraPitch,-0.25,0.7);
+
+ lastX=e.clientX;
+ lastY=e.clientY;
+});
+
+window.addEventListener("mouseup",()=>dragging=false);
+
+function updateCamera(dt){
+ const distance=7;
+ const height=3.5+cameraPitch*5;
+
+ const targetX=player.position.x-Math.sin(yaw)*distance;
+ const targetZ=player.position.z-Math.cos(yaw)*distance;
+
+ const desired=new THREE.Vector3(
+  targetX,
+  player.position.y+height,
+  targetZ
+ );
+
+ camera.position.lerp(desired,1-Math.exp(-5*dt));
+
+ camera.lookAt(
+  player.position.x,
+  player.position.y+2.1,
+  player.position.z
+ );
+}
+
+// ==========================================
+// PAUSE UND START
+// ==========================================
+
+function start(){
+ started=true;
+ paused=false;
+ document.getElementById("centerMessage").style.display="none";
+ document.getElementById("status").textContent="AKTIV";
+ document.getElementById("pause").textContent="Ⅱ Pause";
+}
+
+document.getElementById("start").onclick=start;
+
+document.getElementById("pause").onclick=()=>{
+ if(!started)return;
+
+ paused=!paused;
+
+ document.getElementById("pause").textContent=
+  paused?"▶ Weiter":"Ⅱ Pause";
+
+ document.getElementById("status").textContent=
+  paused?"PAUSE":"AKTIV";
+};
+
+// ==========================================
+// SPIELLOGIK
+// ==========================================
+
+const clock=new THREE.Clock();
+
+function updatePlayer(dt){
+ if(!started||paused)return;
+
+ const inputLength=Math.sqrt(moveX*moveX+moveY*moveY);
+ const inputX=moveX;
+ const inputY=moveY;
+
+ let vx=0;
+ let vz=0;
+
+ if(inputLength>0.05){
+  const forwardX=-Math.sin(yaw);
+  const forwardZ=-Math.cos(yaw);
+
+  const rightX=Math.cos(yaw);
+  const rightZ=-Math.sin(yaw);
+
+  vx=rightX*inputX+forwardX*inputY;
+  vz=rightZ*inputX+forwardZ*inputY;
+
+  const len=Math.sqrt(vx*vx+vz*vz);
+  vx/=len;
+  vz/=len;
+
+  const targetRotation=Math.atan2(-vx,-vz);
+
+  let diff=targetRotation-character.rotation.y;
+  diff=Math.atan2(Math.sin(diff),Math.cos(diff));
+
+  character.rotation.y+=diff*Math.min(1,dt*12);
+ }
+
+ const speed=sprinting?12:6.5;
+
+ player.position.x+=vx*speed*dt;
+ player.position.z+=vz*speed*dt;
+
+ // Inselgrenze
+ const radius=Math.sqrt(
+  player.position.x**2+player.position.z**2
+ );
+
+ if(radius>75){
+  player.position.x*=75/radius;
+  player.position.z*=75/radius;
+ }
+
+ const ground=terrainHeight(player.position.x,player.position.z);
+
+ velocityY-=20*dt;
+ player.position.y+=velocityY*dt;
+
+ if(player.position.y<=ground){
+  player.position.y=ground;
+  velocityY=0;
+  grounded=true;
+ }
+
+ // Laufanimation
+ const moving=inputLength>0.1;
+
+ if(moving){
+  const anim=performance.now()*0.012*(sprinting?1.5:1);
+  legs[0].rotation.x=Math.sin(anim)*0.8;
+  legs[1].rotation.x=-Math.sin(anim)*0.8;
+  arms[0].rotation.x=-Math.sin(anim)*0.7;
+  arms[1].rotation.x=Math.sin(anim)*0.7;
+ }else{
+  legs.forEach(l=>l.rotation.x=THREE.MathUtils.damp(l.rotation.x,0,10,dt));
+  arms.forEach(a=>a.rotation.x=THREE.MathUtils.damp(a.rotation.x,0,10,dt));
+ }
+
+ // Kristalle einsammeln
+ for(let i=crystals.length-1;i>=0;i--){
+  const c=crystals[i];
+  c.rotation.y+=dt*1.4;
+  c.position.y=terrainHeight(c.position.x,c.position.z)+1.5+
+   Math.sin(performance.now()*0.002+i)*0.2;
+
+  const dx=player.position.x-c.position.x;
+  const dz=player.position.z-c.position.z;
+
+  if(Math.sqrt(dx*dx+dz*dz)<1.7){
+   scene.remove(c);
+   crystals.splice(i,1);
+   score++;
+   document.getElementById("score").textContent=score+" / 12";
+
+   if(score===12){
+    document.getElementById("mission").innerHTML=
+     "<strong>MISSION ERFÜLLT!</strong><br>Du hast alle Kristalle gesammelt! 🎉";
+    document.getElementById("status").textContent="GEWONNEN";
+   }
+  }
+ }
+}
+
+// ==========================================
+// WASSER UND ATMOSPHÄRE
+// ==========================================
+
+function updateEnvironment(dt){
+ ocean.position.y=-3+Math.sin(performance.now()*0.0005)*0.08;
+
+ // Dezente Tageslichtbewegung
+ sun.position.x=Math.sin(performance.now()*0.00002)*60-30;
+}
+
+// ==========================================
+// HAUPTSCHLEIFE
+// ==========================================
+
+function animate(){
+ requestAnimationFrame(animate);
+
+ const dt=Math.min(clock.getDelta(),0.04);
+
+ if(started&&!paused){
+  updatePlayer(dt);
+  updateEnvironment(dt);
+ }
+
+ for(const c of crystals){
+  c.rotation.y+=dt*0.6;
+ }
+
+ updateCamera(dt);
+ renderer.render(scene,camera);
+}
+
+animate();
+
+// ==========================================
+// FENSTERGRÖSSE
+// ==========================================
+
+window.addEventListener("resize",()=>{
+ camera.aspect=window.innerWidth/window.innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(window.innerWidth,window.innerHeight);
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.7));
+});
+
+document.getElementById("loading").style.display="none";
+
+</script>
+</body>
+</html>
