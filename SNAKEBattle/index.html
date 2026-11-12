@@ -224,6 +224,14 @@ const FOOD_COUNT=180;
 const BOT_COUNT=10;
 const WORLD_BASE=3600;
 
+/* Online-Bots: Lebensdauer, maximale Länge und maximale Futter-Drops */
+const BOT_LIFETIME_MIN=45000;   // ms
+const BOT_LIFETIME_MAX=100000;  // ms
+const BOT_MAXLEN_MIN=55;
+const BOT_MAXLEN_MAX=100;
+const BOT_MAX_DROPS=30;         // so viel Futter lässt ein toter Bot maximal fallen
+const START_LENGTH=22;
+
 let WORLD=WORLD_BASE;
 let snakes=[];
 let foods=[];
@@ -766,7 +774,7 @@ function createSnake(name,color,x,y,angle,isPlayer=false,uid=null){
  const s={
   uid,name,color,x,y,angle,targetAngle:angle,
   speed:isPlayer?185:rand(145,175),
-  radius:15,length:22,score:0,alive:true,isPlayer,
+  radius:15,length:START_LENGTH,score:0,alive:true,isPlayer,
   trail:[],trailDistance:0,think:0,targetFood:null,
   wanderAngle:angle,stuckTimer:0,lastCheckX:x,lastCheckY:y,
   progressTimer:0
@@ -823,12 +831,18 @@ function spawnFood(){
  return null;
 }
 
-/* Futter toter Schlangen: Solo lokal, Online in die Datenbank */
+/* Futter toter Schlangen: Solo lokal, Online in die Datenbank.
+   Bots lassen maximal BOT_MAX_DROPS Futterstücke fallen (gleichmäßig über den Körper verteilt),
+   damit keine riesigen Futterhaufen entstehen. */
 function dropSnakeFood(s){
  const drops=[];
+ const total=Math.max(1,Math.floor(s.length));
+ const count=s.bot?Math.min(total,BOT_MAX_DROPS):total;
+ const step=total/count;
 
- for(let i=0;i<Math.max(1,Math.floor(s.length));i++){
-  const p=s.trail[i]||{x:s.x,y:s.y};
+ for(let i=0;i<count;i++){
+  const idx=Math.min(total-1,Math.floor(i*step));
+  const p=s.trail[idx]||s.trail[s.trail.length-1]||{x:s.x,y:s.y};
 
   drops.push({
    x:clamp(p.x+rand(-4,4),5,WORLD-5),
@@ -892,6 +906,21 @@ function evaluateDirection(s,angle){
 function botAI(s,dt){
  s.think-=dt;
 
+ /* Anti-Stillstand: Wenn der Bot sich über längere Zeit kaum bewegt hat, zwingend umlenken */
+ s.progressTimer+=dt;
+ if(s.progressTimer>=1.5){
+  const moved=Math.hypot(s.x-s.lastCheckX,s.y-s.lastCheckY);
+  s.lastCheckX=s.x;
+  s.lastCheckY=s.y;
+  s.progressTimer=0;
+
+  if(moved<40){
+   s.targetAngle=wrapAngle(s.angle+(Math.random()<.5?-1:1)*rand(Math.PI/2,Math.PI));
+   s.targetFood=null;
+   s.think=.6; // neue Richtung kurz beibehalten
+  }
+ }
+
  if(s.think<=0){
   s.think=rand(.2,.4);
 
@@ -951,7 +980,12 @@ function eliminate(s,reason){
   boostActive=false;
   updateBoostButton();
 
-  if(onlineMode)updateOwnPlayer({alive:false,online:false});
+  if(onlineMode){
+   updateOwnPlayer({alive:false,online:false});
+   // Wichtig: Ein toter Spieler darf nicht Leader bleiben, sonst frieren die Bots ein
+   clearRuntimeIntervals();
+   releaseLeader();
+  }
   showEnd(false);
  }
 }
@@ -1177,7 +1211,7 @@ function updateRemoteSnakes(){
   s.targetY=Number(data.y)||s.y;
   s.targetAngle=Number(data.angle)||0;
   s.score=data.score||0;
-  s.length=data.length||22;
+  s.length=data.length||START_LENGTH;
   s.alive=true;
 
   if(Array.isArray(data.trail))s.remoteTrail=data.trail;
@@ -1192,9 +1226,18 @@ function updateRemoteSnakes(){
  updateUI();
 }
 
-/* Bots aus der Datenbank übernehmen. Der Leader simuliert seine Bots selbst. */
+/* Bots aus der Datenbank übernehmen.
+   WICHTIG: Der Leader simuliert seine Bots selbst und erzeugt sie NICHT aus der Datenbank neu.
+   (Vorher wurden eliminierte Bots aus veralteten DB-Daten wiederbelebt.) */
 function updateArenaObjects(){
  if(!onlineMode)return;
+
+ foods=Object.entries(onlineFoods).map(([id,f])=>({...f,id}));
+
+ if(arenaLeader){
+  updateUI();
+  return;
+ }
 
  const seen=new Set();
 
@@ -1212,13 +1255,8 @@ function updateArenaObjects(){
     b.x||WORLD/2,b.y||WORLD/2,b.angle||0,false,uid
    );
    s.bot=true;
-   s.targetX=b.x;
-   s.targetY=b.y;
-   s.targetAngle=b.angle||0;
    snakes.push(s);
   }
-
-  if(arenaLeader)continue; // Leader simuliert selbst, DB-Werte sind veraltet
 
   s.name=b.name||"Bot";
   s.color=b.color||"#ff5757";
@@ -1226,15 +1264,13 @@ function updateArenaObjects(){
   s.targetY=b.y;
   s.targetAngle=b.angle||0;
   s.score=b.score||0;
-  s.length=b.length||22;
+  s.length=b.length||START_LENGTH;
   s.alive=true;
 
   if(Array.isArray(b.trail)&&b.trail.length)s.remoteTrail=b.trail;
  }
 
- if(!arenaLeader)snakes=snakes.filter(s=>!s.bot||seen.has(s.uid));
-
- foods=Object.entries(onlineFoods).map(([id,f])=>({...f,id}));
+ snakes=snakes.filter(s=>!s.bot||seen.has(s.uid));
  updateUI();
 }
 
@@ -1255,6 +1291,7 @@ function updateArenaSize(){
 
 async function claimLeader(){
  if(!onlineMode||!currentUser)return;
+ if(!running||paused||document.hidden)return; // nur aktive Clients dürfen Leader werden
 
  const ref=arenaRef.child("leader");
 
@@ -1267,10 +1304,39 @@ async function claimLeader(){
    return;
   });
 
+  const wasLeader=arenaLeader;
   arenaLeader=result.committed&&result.snapshot.val()?.uid===currentUser.uid;
+
+  if(arenaLeader&&!wasLeader){
+   // Neuer Leader: übernommene Bots lokal weitersimulieren
+   for(const s of snakes){
+    if(!s.bot)continue;
+    if(s.remoteTrail&&s.remoteTrail.length)s.trail=s.remoteTrail.slice();
+    s.remoteTrail=null;
+    s.targetX=undefined;
+    s.targetY=undefined;
+    s.think=0;
+    s.progressTimer=0;
+    s.lastCheckX=s.x;
+    s.lastCheckY=s.y;
+   }
+  }
 
   if(arenaLeader)await initializeArenaIfNeeded();
  }catch(e){console.error("Leader:",e)}
+}
+
+/* Leader-Rolle abgeben (Tod, Pause, Tab im Hintergrund, Verlassen) */
+async function releaseLeader(){
+ if(!arenaLeader||!currentUser)return;
+ arenaLeader=false;
+
+ try{
+  await arenaRef.child("leader").transaction(current=>{
+   if(current&&current.uid===currentUser.uid)return null;
+   return current;
+  });
+ }catch(e){console.error("Leader abgeben:",e)}
 }
 
 /* Nur noch das Futter wird initial angelegt. Bots erzeugt der Leader lokal (maintainBots). */
@@ -1388,6 +1454,8 @@ async function leaveOnline(){
  clearRuntimeIntervals();
  removeOnlineListeners();
 
+ await releaseLeader();
+
  if(currentUser){
   try{
    await db.ref("players/"+currentUser.uid).update({
@@ -1433,13 +1501,22 @@ function startRuntime(){
    await updateOwnPlayer();
 
    if(arenaLeader){
+    // Nur wer wirklich aktiv spielt (nicht pausiert / im Hintergrund / tot), hält die Leader-Rolle
+    if(!running||paused||document.hidden){
+     releaseLeader();
+     return;
+    }
+
     const ref=arenaRef.child("leader");
 
     try{
-     await ref.transaction(current=>{
+     const res=await ref.transaction(current=>{
       if(!current||current.uid!==currentUser.uid)return;
       return {uid:currentUser.uid,heartbeat:Date.now()};
      });
+
+     // Wurde uns die Leader-Rolle weggenommen, nicht weiter simulieren
+     if(!(res.snapshot.val()&&res.snapshot.val().uid===currentUser.uid))arenaLeader=false;
     }catch(e){console.error(e)}
    }else{
     claimLeader();
@@ -1501,6 +1578,18 @@ document.addEventListener("keyup",e=>{
  const k=e.key.toLowerCase();
  if(k==="arrowleft"||k==="a")keys.left=false;
  if(k==="arrowright"||k==="d")keys.right=false;
+});
+
+/* Tab im Hintergrund: Leader-Rolle abgeben, sonst frieren alle Bots ein */
+document.addEventListener("visibilitychange",()=>{
+ if(!onlineMode)return;
+
+ if(document.hidden){
+  releaseLeader();
+ }else{
+  lastTime=0;
+  claimLeader();
+ }
 });
 
 /* CAMERA / DRAW */
@@ -1744,6 +1833,12 @@ function togglePause(){
  paused=!paused;
  lastTime=0;
  document.getElementById("pause").textContent=paused?"▶":"Ⅱ";
+
+ // Pausierender Leader gibt die Rolle ab, damit die Bots für andere weiterlaufen
+ if(onlineMode){
+  if(paused)releaseLeader();
+  else claimLeader();
+ }
 }
 
 document.getElementById("pause").onclick=togglePause;
@@ -1780,8 +1875,21 @@ function loop(time){
    leaderTimer+=dt;
 
    if(leaderTimer>=.04){
+    const now=Date.now();
+
     for(const s of snakes.slice()){
-     if(s.bot)moveSnake(s,leaderTimer);
+     if(!s.bot||!s.alive)continue;
+
+     // Lebensdauer / maximale Länge pro Bot (zufällig), danach "stirbt" der Bot
+     if(!s.dieAt)s.dieAt=now+rand(BOT_LIFETIME_MIN,BOT_LIFETIME_MAX);
+     if(!s.maxLen)s.maxLen=rand(BOT_MAXLEN_MIN,BOT_MAXLEN_MAX);
+
+     if(now>s.dieAt||s.length>s.maxLen){
+      eliminate(s,"retire");
+      continue;
+     }
+
+     moveSnake(s,leaderTimer);
     }
     leaderTimer=0;
    }
@@ -1833,12 +1941,13 @@ function loop(time){
  draw();
 }
 
-/* Der Leader hält die Bot-Anzahl lokal aufrecht */
+/* Der Leader hält die Bot-Anzahl lokal aufrecht.
+   Neue Bots starten immer mit Startlänge (wie ein Spieler am Anfang). */
 function maintainBots(){
  if(!onlineMode||!arenaLeader)return;
 
  const now=Date.now();
- if(now-lastBotCheck<2000)return;
+ if(now-lastBotCheck<1000)return;
  lastBotCheck=now;
 
  const real=Object.values(onlinePlayers).filter(p=>
@@ -1862,6 +1971,8 @@ function maintainBots(){
   );
   s.bot=true;
   s.protectUntil=now+2500;
+  s.dieAt=now+rand(BOT_LIFETIME_MIN,BOT_LIFETIME_MAX);
+  s.maxLen=rand(BOT_MAXLEN_MIN,BOT_MAXLEN_MAX);
   snakes.push(s);
  }
 }
@@ -1878,6 +1989,10 @@ addEventListener("beforeunload",()=>{
  clearFriendListeners();
 
  if(onlineMode&&currentUser){
+  if(arenaLeader){
+   arenaRef.child("leader").remove();
+  }
+
   db.ref("players/"+currentUser.uid).update({
    online:false,alive:false,
    lastSeen:firebase.database.ServerValue.TIMESTAMP
