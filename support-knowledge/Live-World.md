@@ -6,79 +6,71 @@
 
 **Website-Name:** Live Welt  
 **Vermuteter Zweck:** Dashboard-ähnliche Startseite mit KI-gestütztem Kundensupport-Widget (lamacHub)  
-**Quellcode-Pfad:** Live-World/index.html  
+**Quellcode-Pfad:** `Live-World/index.html`  
 **Datum der Erstellung:** 2025-08-17  
 
 ---
 
 ## 1. Überblick
 
-**Live Welt** ist eine einzelne HTML-Seite, die ein responsives Dashboard-Layout mit Karten (Cards) und einer festen Navigationsleiste darstellt. Zusätzlich ist ein **KI-Kundenservice-Widget (lamacHub)** fest in die Seite eingebettet, das über einen schwebenden Button unten rechts geöffnet wird. Die Seite unterstützt Light- und Dark-Mode über CSS-Variablen.
-
-> **Hinweis:** Der übermittelte Quellcode ist gekürzt (`[Datei gekürzt; nur Anfang analysiert]`). Die Dokumentation beschreibt nur die im Auszug erkennbaren Funktionen. Fehlende Bereiche (z. B. weitere Dashboard-Karten, Skript-Ende, Worker-Kommunikation) sind als „Im Quellcode nicht eindeutig erkennbar“ gekennzeichnet.
+**Live Welt** ist eine einzelne HTML-Seite, die ein responsives Dashboard-Layout mit Karten (Kacheln) darstellt. In der Seite ist fest das **lamacHub KI-Kundenservice-Widget** eingebettet, das als schwebender Chat-Button (rechts unten) permanent verfügbar ist. Die Seite nutzt CSS-Variablen für Light/Dark-Mode (`.dark`-Klasse), bietet aber im vorliegenden Code **keinen sichtbaren Umschalter** für den Besucher.
 
 ---
 
-## 2. Voraussetzungen & Technische Basis
+## 2. Voraussetzungen für Besucher
 
 | Anforderung | Details |
 |-------------|---------|
-| **Browser** | Moderner Browser mit Unterstützung für CSS Custom Properties, `fetch`/`Web Workers`, `IntersectionObserver` (nicht direkt genutzt, aber typisch), `localStorage` (nicht im Auszug genutzt). |
-| **Netzwerk** | Zugriff auf `https://fonts.googleapis.com` (Schriftart Inter) und `https://carescape-ai.oslamuoslamu.workers.dev/` (KI-Worker-Endpunkt). |
-| **JavaScript** | Muss aktiviert sein für das Support-Widget (Öffnen/Schließen, Senden, Markdown-Rendering, Typing-Animation). |
-| **Cookies/Storage** | Im Auszug nicht verwendet. Der Worker könnte serverseitig Sitzungen führen. |
-| **CSP-Hinweis** | Inline-`<style>` und `<script>` sowie externe Fonts/Worker erfordern ggf. `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com` und `script-src 'self' 'unsafe-inline' https://carescape-ai.oslamuoslamu.workers.dev`. |
+| **Browser** | Moderner Browser mit Unterstützung für CSS Grid, CSS Custom Properties, `fetch` API, `URL` Constructor, `IntersectionObserver` (nicht direkt genutzt, aber Standard) |
+| **JavaScript** | Muss aktiviert sein (Dashboard ist statisch nutzbar, aber Chat-Widget funktioniert nur mit JS) |
+| **Netzwerk** | Zugriff auf `https://fonts.googleapis.com` (Schriftart Inter) und `https://carescape-ai.oslamuoslamu.workers.dev` (KI-Worker-Endpunkt) |
+| **Gerät** | Desktop & Mobile (responsive bis < 480 px) |
+| **Berechtigungen** | Keine Kamera, Mikrofon, Standort oder Benachrichtigungen erforderlich |
 
 ---
 
-## 3. Sichtbare Bereiche & UI-Elemente
+## 3. Sichtbare Bereiche & Elemente
 
 ### 3.1 Navigationsleiste (`.navbar`)
-- **Position:** Oben, `position: sticky; top: 0`.
+- **Position:** Oben, `position: sticky; top: 0`
 - **Inhalt:**
-  - **Logo (`.logo`):** 32×32 px Bild (`<img>`) + Text „Live Welt“ (schwarz, fett, per Kommentar „Design1 Regel“).
-  - **Toggle-Button (`.toggle`):** Beschriftungsloser Button (`padding: 10px 14px`, abgerundet), vermutlich für Theme-Umschaltung (Light/Dark). **Im Quellcode nicht eindeutig erkennbar:** Kein `aria-label`, keine JS-Logik im Auszug.
+  - **Logo** (`.logo`): 32×32 px Bild (`<img>` ohne `src` im Code → **Im Quellcode nicht eindeutig erkennbar**, ob ein Logo geladen wird) + Text „Live Welt“ (fett, schwarz per Inline-Style `color:black`).
+  - **Toggle-Button** (`.toggle`): Beschriftung im Code nicht vorhanden (nur `<button class="toggle"></button>`). **Vermutung:** Dark-Mode-Umschalter, aber **keine JS-Logik dafür im Code vorhanden**.
 
-### 3.2 Dashboard-Grid (`.dashboard`)
-- **Layout:** CSS Grid, `repeat(auto-fit, minmax(220px, 1fr))`, Gap 22 px, max. 1100 px Breite, zentriert.
-- **Karten (`.card`):** Weiße Karten mit Rand, Radius 18 px, Padding 22 px, zentrierter Text, Hover-Heave (`transform: translateY(-3px)`).
-  - **Label (`.label`):** Grau, 14 px.
-  - **Zahl (`.number`):** 1.6 rem, fett, Akzentfarbe `#ff7a00` (Orange).
-- **Im Quellcode nicht eindeutig erkennbar:** Anzahl und konkreter Inhalt der Karten (Daten, Icons, Links).
+### 3.2 Dashboard-Gitter (`.dashboard`)
+- **Layout:** CSS Grid, `repeat(auto-fit, minmax(220px, 1fr))`, Gap 22 px, max. 1100 px Breite, zentriert.
+- **Karten (`.card`):** Mehrere Kacheln mit:
+  - Beschriftung (`.label`, grau, 14 px)
+  - Zahlwert (`.number`, 1.6 rem, fett, Akzentfarbe `#ff7a00`)
+- **Inhalt der Karten:** **Im Quellcode nicht eindeutig erkennbar** (HTML für Karten fehlt im Ausschnitt / wurde gekürzt). Die CSS-Regeln zeigen nur das Styling.
 
 ### 3.3 lamacHub KI-Kundenservice (`#lamac-ai`)
-- **Öffnen-Button (`#lamac-ai-open`):** Fester runder Button (60 px) unten rechts (24 px Abstand), Emoji „💬“, grün (`#007e62`), Schatten, Hover-Skalierung.
-- **Chat-Fenster (`#lamac-ai-window`):** Initial `display: none`, bei Klasse `.open` `display: flex` mit Animation. Größe: max. 390 px × 570 px (Desktop), responsiv bis 100 vw−32 px. Hintergrund `#efeae2`, Rand, Radius 18 px, Schatten.
-  - **Header:** Dunkelgrün (`#11211d`), Titel „lamacHub Kundenservice“, Untertitel „KI-gestützter Support“, Schließen-Button (×).
-  - **Nachrichtenbereich (`#lamac-ai-messages`):** Scrollbar, `aria-live="polite"`, Blasen für Bot (weiß, links) und User (hellgrün, rechts). Markdown-Rendering (Überschriften, Listen, Tabellen, Code, Links, Zitate, HR).
-  - **Typing-Indikator:** Drei pulsierende Punkte (`.lamac-typing-dot`), `role="status"`.
-  - **Eingabeformular (`#lamac-ai-form`):** Textfeld (max. 1800 Zeichen, `autocomplete="off"`), Sende-Button (Pfeil ➤), deaktiviert während `busy`.
+- **Öffnen-Button** (`#lamac-ai-open`): Fest positioniert (rechts unten, 24 px Abstand), 60×60 px, grün (`#007e62`), Emoji „💬“, `aria-label="Kundensupport öffnen"`.
+- **Chat-Fenster** (`#lamac-ai-window`): Initial `display: none`, bei Klasse `.open` → `display: flex`, feste Größe (max. 390×570 px), Animation `lamac-ai-appear`.
+  - **Header:** Titel „lamacHub Kundenservice“, Untertitel „KI-gestützter Support“, Schließen-Button (×).
+  - **Nachrichtenbereich** (`#lamac-ai-messages`): Scrollbar, `aria-live="polite"`, zeigt Bot- und User-Nachrichten.
+  - **Eingabeformular** (`#lamac-ai-form`): Textfeld (max. 1800 Zeichen, `required`), Senden-Button (➤).
 
 ---
 
-## 4. Bedienung – Schritt für Schritt
+## 4. Bedienung Schritt für Schritt
 
 ### 4.1 Dashboard betrachten
-1. Seite laden → Navigationsleiste oben, Karten-Grid darunter.
-2. Bei Bedarf **Toggle-Button** in der Navbar klicken → **Vermutung:** Umschaltung Light/Dark (CSS-Klasse `.dark` auf `<html>` oder `<body>`). **Im Quellcode nicht eindeutig erkennbar:** Kein Event-Listener im Auszug.
+1. Seite laden → Navigationsleiste oben, Karten-Gitter darunter.
+2. Bei schmalem Viewport (< 220 px pro Karte) stapeln sich Karten vertikal.
+3. Hover-Effekt: Karte hebt sich leicht an (`transform: translateY(-3px)`).
 
-### 4.2 KI-Kundenservice nutzen
-1. **Öffnen:** Klick auf den grünen 💬-Button unten rechts.
-2. **Erste Nachricht:** Im Chat erscheint Bot-Begrüßung: „Hallo! Wie kann ich dir weiterhelfen?“.
-3. **Eingabe:** Text in das Feld „Nachricht schreiben …“ tippen (max. 1800 Zeichen).
-4. **Senden:** Enter oder Klick auf ➤-Button.
-   - User-Nachricht erscheint rechts (grüne Blase).
-   - Eingabefeld wird geleert, Button deaktiviert (`busy = true`).
-   - Typing-Indikator (drei Punkte) erscheint links.
-5. **Antwort warten:** Bot-Antwort wird per Markdown gerendert (Links, Code, Tabellen etc.). Nach Erhalt: `busy = false`, Button wieder aktiv.
-6. **Schließen:** Klick auf × im Header oder erneut auf 💬-Button (Toggle-Logik im Skript). Fenster wird per `display: none` ausgeblendet.
-
-### 4.3 Barrierefreiheit
-- `aria-label` auf Buttons (Öffnen, Schließen, Senden, Eingabe).
-- `aria-live="polite"` im Nachrichtenbereich.
-- `role="status"` beim Typing-Indikator.
-- Fokus-Styles auf Input (`border-color: #007e62`, Box-Shadow).
-- `prefers-reduced-motion`: Animationen deaktiviert.
+### 4.2 KI-Kundensupport nutzen
+1. **Chat öffnen:** Klick auf den grünen 💬-Button rechts unten.
+2. **Erste Nachricht:** Im Nachrichtenbereich erscheint automatisch: „Hallo! Wie kann ich dir weiterhelfen?“ (Bot).
+3. **Eigene Nachricht senden:**
+   - Text in das Feld „Nachricht schreiben …“ eingeben (max. 1800 Zeichen).
+   - Enter drücken oder ➤-Button klicken.
+   - Nachricht erscheint rechtsbündig grünlich (`lamac-user`).
+   - Während der Antwort zeigt der Bot drei animierte Punkte („Kundenservice antwortet“).
+4. **Antwort lesen:** Bot-Nachrichten linksbündig weiß mit Rand, unterstützen **Markdown** (Überschriften, Listen, Tabellen, Codeblöcke, Links, Fett/Kursiv/Strikethrough).
+5. **Chat schließen:** Klick auf × im Header oder erneut auf 💬-Button (Toggle-Verhalten per JS).
+6. **Verlauf:** Der Chat-Verlauf bleibt im `history`-Array erhalten, solange die Seite nicht neu geladen wird.
 
 ---
 
@@ -86,31 +78,29 @@
 
 | Komponente | Eingabe | Ausgabe / Wirkung |
 |------------|---------|-------------------|
-| **Toggle-Button (Navbar)** | Klick | **Unbekannt** – keine JS-Logik im Auszug. |
-| **Chat-Eingabe** | Text (≤1800 Zeichen) | User-Blase, Versand an Worker (siehe 6). |
-| **Sende-Button** | Klick / Enter | Submit des Formulars → `sendMessage()` (im gekürzten Teil). |
-| **Schließen-Button** | Klick | Chat-Fenster `display: none`, Klasse `.open` entfernt. |
-| **Worker-Antwort** | JSON/Stream (vermutlich) | Bot-Blase mit gerendertem Markdown, Typing-Indikator entfernt. |
+| **Toggle-Button (Navbar)** | Klick | **Keine Funktion im Code** (kein Event-Listener) |
+| **Chat-Öffnen-Button** | Klick | Toggle `display: none/flex` auf `#lamac-ai-window`, Klasse `.open` für Animation |
+| **Chat-Schließen-Button** | Klick | Schließt Fenster |
+| **Eingabefeld** | Text (≤ 1800 Zeichen) | Validierung `required`, Enter/Submit sendet |
+| **Senden-Button** | Klick / Form-Submit | Sendet Nachricht an Worker, deaktiviert Button während `busy=true` |
+| **Worker-Antwort** | JSON-Stream (vermutet) | Rendert Markdown in HTML, zeigt in `#lamac-ai-messages` |
+
+> **Hinweis:** Die tatsächliche Worker-Kommunikation (`fetch` an `WORKER_URL`) ist im gekürzten Script-Teil **nicht vollständig sichtbar**, aber die Funktionen `addUserMessage`, `addBotMessage`, `showTyping`, `renderMarkdown` und `safeLink` sind vollständig implementiert.
 
 ---
 
-## 6. Kommunikation mit dem KI-Worker (Bestätigt / Vermutet)
+## 6. Typische Probleme & Fehlerbehebung
 
-**Bestätigt (aus Skript-Kopf):**
-```js
-const WORKER_URL = "https://carescape-ai.oslamuoslamu.workers.dev/";
-```
-- Einziger Endpunkt für alle Websites.
-- `history`-Array wird geführt (Kontext für Folgefragen).
-- `busy`-Flag verhindert Doppelanfragen.
-
-**Im Quellcode nicht eindeutig erkennbar (gekürzter Teil):**
-- Request-Format (POST? JSON? `history` mitgesendet?).
-- Response-Handling (Streaming? Einmalig? Fehlerbehandlung?).
-- Authentifizierung/Api-Key (kein Header im Auszug).
-- Serverseitige Speicherung von Gesprächen.
-
-**Sicherheitshinweis:** Der Worker-URL ist im Frontend sichtbar. Keine Geheimnisse im Client-Code erkannt. Falls der Worker Auth-Tokens erwartet, werden diese **nicht** im Quellcode offengelegt.
+| Symptom | Mögliche Ursache | Prüfung / Lösung |
+|---------|------------------|------------------|
+| **Chat-Button fehlt / Chat öffnet nicht** | JS-Fehler, `#lamac-ai` nicht initialisiert | Console prüfen: `root.dataset.initialized` verhindert Doppel-Init. AdBlocker? `carescape-ai.oslamuoslamu.workers.dev` geblockt? |
+| **Nachricht wird nicht gesendet** | `busy === true` (vorherige Anfrage läuft noch) | Warten bis Antwort da ist; Button ist währenddessen `disabled` (`opacity: .5`). |
+| **Worker antwortet nicht / Netzwerkfehler** | CORS, Worker down, falsche URL | Network-Tab: POST an `WORKER_URL` prüfen. Im Code: `const WORKER_URL = "https://carescape-ai.oslamuoslamu.workers.dev/";` |
+| **Markdown wird nicht gerendert** | Bot sendet rohen Text ohne Markdown | `renderMarkdown()` escapet HTML zuerst, dann wandelt es MD → HTML. Prüfen, ob Worker Markdown liefert. |
+| **Links nicht klickbar** | `safeLink()` blockiert Nicht-HTTP(S) | Nur `http:` / `https:` erlaubt. `mailto:`, `tel:` etc. werden als Text belassen. |
+| **Dark Mode funktioniert nicht** | `.dark`-Klasse nie auf `<body>` gesetzt | **Im Code keine Logik dafür.** Manuell in DevTools `<body class="dark">` testen. |
+| **Logo nicht sichtbar** | `<img>` ohne `src`-Attribut | HTML ergänzen: `<img src="pfad/zum/logo.svg" alt="">` |
+| **Toggle-Button ohne Beschriftung** | `<button class="toggle"></button>` leer | Barrierefreiheit: `aria-label="Dark Mode umschalten"` + JS für Theme-Wechsel ergänzen. |
 
 ---
 
@@ -118,64 +108,67 @@ const WORKER_URL = "https://carescape-ai.oslamuoslamu.workers.dev/";
 
 | Aspekt | Status |
 |--------|--------|
-| **Personenbezogene Daten** | Nur Chat-Inhalte (freiwillig eingegeben). Keine automatischen Tracking-Skripte (GA, Matomo, FB Pixel) im Auszug. |
-| **Externe Requests** | Fonts (Google Fonts → IP an Google), Worker (Cloudflare Workers Subdomain → IP an Worker-Betreiber). |
-| **Speicherung** | `localStorage`/`sessionStorage` nicht im Auszug genutzt. `history` nur im JS-Speicher (verflüchtigt bei Reload). |
-| **Einwilligung** | Kein Cookie-Banner / Consent-Layer im Code. Bei DSGVO-Relevanz: Prüfen, ob Worker-Aufruf als „berechtigtes Interesse“ oder „Vertragserfüllung“ gilt. |
-| **Inhaltssicherheit** | Markdown-Rendering escaped HTML (`escapeHTML`), erlaubt nur `https?` Links (`safeLink`), `target="_blank" rel="noopener noreferrer"`. XSS-Risiko gering. |
+| **Cookies / LocalStorage** | Nicht im Code verwendet (Chat-Verlauf nur im RAM `history`-Array). |
+| **Externe Requests** | 1. Google Fonts (`fonts.googleapis.com`) beim Laden.<br>2. KI-Worker (`carescape-ai.oslamuoslamu.workers.dev`) bei jeder Chat-Nachricht. |
+| **IP / Metadaten** | Werden an Worker-Endpunkt gesendet (Standard-HTTP). Keine zusätzlichen Tracker im Code. |
+| **Eingabedaten** | Chat-Nachrichten verlassen den Browser Richtung Worker. **Keine clientseitige Verschlüsselung.** |
+| **Berechtigungs-APIs** | Keine (kein `navigator.permissions`, `getUserMedia`, `Notification` etc.). |
+| **CSP-Hinweis** | Inline-`<style>` und `<script>` sowie `unsafe-eval` (nicht genutzt) wären für strikte CSP problematisch. |
 
 ---
 
-## 8. Typische Probleme & Fehlerbehebung
+## 8. FAQ
 
-| Symptom | Mögliche Ursache | Prüfschritte / Lösung |
-|---------|------------------|------------------------|
-| **Chat-Button fehlt / Widget öffnet nicht** | JS-Fehler, CSP blockiert Inline-Script, `root.dataset.initialized` schon `true` (Doppelteinbindung). | DevTools Console prüfen → „lamac-ai“ Element vorhanden? CSP `script-src 'unsafe-inline'` erlaubt? |
-| **Nachricht wird nicht gesendet** | `busy = true` hängt, Worker nicht erreichbar (CORS, Netzwerk), `fetch` fehlt im gekürzten Code. | Network-Tab: Request an `carescape-ai.oslamuoslamu.workers.dev`? Status 200? CORS-Header? |
-| **Antwort erscheint nicht / Typing-Indikator bleibt** | Worker liefert Fehler/leere Antwort, `addBotMessage` nicht aufgerufen, Markdown-Renderer wirft Exception. | Console auf Fehler prüfen (z. B. `renderMarkdown` undefined). |
-| **Dark-Mode funktioniert nicht** | Kein JS für `.toggle`, CSS-Klasse `.dark` nicht auf `<html>`/`<body>` gesetzt. | Manuell `<html class="dark">` testen → Farben wechseln? Dann Toggle-Logik nachrüsten. |
-| **Layout bricht auf Mobil** | Viewport-Meta vorhanden, Grid `auto-fit` sollte greifen. Chat-Fenster hat Media-Queries ≤480 px. | Chrome DevTools Device Toolbar testen. |
-| **Fonts laden nicht** | `fonts.googleapis.com` blockiert (Firewall, Privacy-Tools). | Lokal `Inter` hosten oder `font-display: swap` prüfen (nicht im Code). |
+**F: Wie schalte ich den Dark Mode ein?**  
+A: **Im Quellcode nicht eindeutig erkennbar.** Die CSS-Variablen für `.dark` existieren, aber es gibt keinen Button/Listener, der die Klasse auf `<body>` setzt. Der `.toggle`-Button in der Navbar ist funktionslos.
 
----
+**F: Warum steht im Logo „Live Welt“, aber der Tab-Titel ist „Live Welt“?**  
+A: `<title>Live Welt</title>` und Logo-Text stimmen überein. Konsistent.
 
-## 9. Häufige Fragen (FAQ)
+**F: Kann ich den Chat-Verlauf exportieren?**  
+A: Nicht im Code vorgesehen. `history`-Array ist privat im IIFE. Kein Export-Button.
 
-**F: Wie wechsle ich zwischen Light- und Dark-Mode?**  
-A: Im Quellcode ist ein `.toggle`-Button in der Navbar vorhanden, aber **keine JavaScript-Logik** dafür im Auszug erkennbar. Vermutlich muss ein Klick-Handler die Klasse `.dark` auf `<html>` oder `<body>` togglen.
+**F: Funktioniert der Chat offline?**  
+A: Nein. Der `fetch` an den Worker schlägt fehl. Kein Service Worker / Offline-Cache im Code.
 
-**F: Werden meine Chat-Verläufe gespeichert?**  
-A: Clientseitig **nicht** (kein `localStorage`). Serverseitig **im Quellcode nicht eindeutig erkennbar** – der Worker könnte Gespräche protokollieren. Datenschutzhinweis des Anbieters beachten.
+**F: Sind meine Nachrichten verschlüsselt?**  
+A: Nur per HTTPS (TLS) auf Transportweg. Inhaltlich liegt der Text im Worker-Request im Klartext vor.
 
-**F: Kann ich Dateien/Bilder an den Bot senden?**  
-A: **Nein.** Das Eingabeformular akzeptiert nur Text (`<input type="text">`, `maxlength="1800"`). Kein Datei-Upload im Code.
+**F: Warum ist der Senden-Button manchmal grau/deaktiviert?**  
+A: Während `busy = true` (Warten auf Worker-Antwort) wird `button.disabled = true` gesetzt (CSS: `opacity: .5; cursor: not-allowed`).
 
-**F: Warum antwortet der Bot auf Englisch / nicht auf Deutsch?**  
-A: Die Begrüßung ist fest auf Deutsch („Hallo! Wie kann ich dir weiterhelfen?“). Die Antwortsprache hängt vom **Worker-Modell/Prompt** ab – **im Quellcode nicht steuerbar**.
+**F: Kann ich Code-Blöcke im Chat senden?**  
+A: Ja, der Bot rendert Markdown-Codeblöcke (``` ... ```) als `<pre><code>`. Eigene Eingabe wird als Plaintext gesendet (kein MD-Parsing clientseitig für User-Nachrichten).
 
-**F: Funktioniert der Chat ohne Internet?**  
-A: **Nein.** Der Worker-Endpunkt (`https://carescape-ai.oslamuoslamu.workers.dev/`) muss erreichbar sein. Offline wird `fetch` fehlschlagen.
-
-**F: Ist der Chat DSGVO-konform?**  
-A: **Im Quellcode nicht eindeutig erkennbar.** Kein Consent-Banner, keine AVV-Infos, Worker auf Cloudflare-Subdomain. Rechtliche Prüfung durch Betreiber nötig.
-
-**F: Kann ich das Widget farblich anpassen?**  
-A: Die Widget-Farben sind im `<style>`-Block **hardcodiert** (z. B. `#007e62`, `#efeae2`). Anpassung nur durch Überschreiben der CSS-Regeln oder Einbindung einer modifizierten Version möglich.
+**F: Woher kommt die Akzentfarbe `#ff7a00` (Orange) im Dashboard, aber `#007e62` (Grün) im Chat?**  
+A: Zwei getrennte Design-Systeme: Dashboard nutzt CSS-Variablen (`--accent`), Chat-Widget hat **eigene, fest codierte Farben** (keine CSS-Variablen), um Isolation zu garantieren.
 
 ---
 
-## 10. Bekannte Limitationen (aus Quellcode-Sicht)
+## 9. Bekannte Limitationen (aus Code ersichtlich)
 
-1. **Unvollständiger Code** – Das Skript endet mitten in `renderMarkdown` (Heading-Level-Array). Funktionen wie `sendMessage`, `fetch`-Logik, Fehlerbehandlung, History-Management fehlen im Auszug.
-2. **Toggle-Button ohne Funktion** – Dark-Mode-Umschaltung vorbereitet (CSS), aber nicht verdrahtet.
-3. **Keine Server-seitige Validierung** – Client-seitig `maxlength="1800"`, aber Worker könnte längere Texte ablehnen.
-4. **Keine i18n** – UI-Texte fest auf Deutsch.
-5. **Keine automatischen Tests / Error Boundaries** – JS-Fehler brechen das Widget komplett ab (kein Try-Catch im Auszug).
+1. **Keine Dark-Mode-Umschaltung** trotz vorbereiteter Variablen.
+2. **Logo-Bild fehlt** (`<img>` ohne `src`).
+3. **Toggle-Button unbeschriftet & funktionslos** (Barrierefreiheits-Mangel).
+4. **Karten-Inhalt fehlt** im HTML-Ausschnitt (nur CSS vorhanden).
+5. **Worker-URL hardcoded** → bei Änderung muss HTML angepasst werden.
+6. **Keine Persistenz** des Chat-Verlaufs (Seite neu laden = Verlauf weg).
+7. **Keine Fehlermeldung im UI** bei Worker-Fehler (nur Console/Network).
+8. **Maximale Nachrichtenlänge 1800 Zeichen** (HTML `maxlength`), längere Texte werden abgeschnitten.
 
 ---
 
-## 11. Empfehlungen für Betrieb & Weiterentwicklung
+## 10. Empfehlungen für Weiterentwicklung
 
-- **Vervollständigen:** Fehlenden JS-Teil (`sendMessage`, Worker-Kommunikation, Error-Handling) einpflegen.
-- **Dark-Mode verbinden:** `document.querySelector('.toggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'))`.
-- **CSP härten:** Nonces/Hashes
+- Dark-Mode-Toggle implementieren (LocalStorage + `body.classList.toggle('dark')`).
+- `src` für Logo-Bild setzen, `alt`-Text prüfen.
+- `.toggle` mit `aria-label` und Click-Handler versehen.
+- Karten-HTML im `.dashboard` ergänzen (Datenquelle klären).
+- Worker-URL per `data-Attribut` oder Config-Variable auslagern.
+- Fehlerbehandlung im Chat-UI (Toast/Banner bei Network-Error).
+- Chat-Verlauf optional in `localStorage` speichern/wiederherstellen.
+- CSP-kompatibel machen: Inline-Styles/Script nonces oder externe Dateien.
+
+---
+
+*Ende der Dokumentation. Basierend ausschließlich auf dem bereitgestellten Quellcode-Ausschnitt.*
