@@ -1,1 +1,1910 @@
 
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Snake Battle</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08111d;color:white;font-family:Inter,Arial,sans-serif;touch-action:none}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+button,input{font:inherit}
+button{background:#14243a;color:white;border:1px solid #354d68;padding:10px 14px;border-radius:10px;cursor:pointer}
+button:active{background:#087eaa}
+button:disabled{opacity:.5;cursor:not-allowed}
+input{background:#091522;border:1px solid #354d68;color:white;border-radius:9px;padding:12px;width:100%;outline:none}
+input:focus{border-color:#01c7fc}
+.hidden{display:none!important}
+#hud{position:fixed;inset:0;pointer-events:none}
+.top{position:absolute;top:14px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.logo{font-size:21px;font-weight:900;text-shadow:0 2px 8px #000}
+.logo span{color:#01c7fc}
+.stats{display:flex;gap:8px;margin-top:9px}
+.stat{background:#101d2dcc;border:1px solid #34465c;border-radius:11px;padding:8px 13px;min-width:70px;backdrop-filter:blur(8px)}
+.stat small{display:block;color:#9aafc7;font-size:10px}
+.stat strong{font-size:18px}
+.controls{display:flex;gap:7px;pointer-events:auto}
+#leaderboard{position:absolute;right:15px;top:78px;width:160px;max-height:45vh;overflow:auto;background:#101d2dcc;border:1px solid #34465c;border-radius:12px;padding:12px;backdrop-filter:blur(8px)}
+#leaderboard h3{font-size:12px;margin:0 0 9px}
+.rank{display:flex;justify-content:space-between;padding:5px 0;font-size:11px}
+.rank b{color:#01c7fc}
+#bottom{position:absolute;bottom:16px;left:16px;color:#d0dceb;font-size:11px;text-shadow:0 1px 5px #000}
+#boostButton{
+ position:absolute;bottom:48px;left:50%;transform:translateX(-50%);
+ pointer-events:auto;background:#087eaa;border:1px solid #4ddcff;
+ border-radius:14px;padding:13px 24px;font-weight:900;
+ box-shadow:0 0 20px #01c7fc55;min-width:175px
+}
+#boostButton.ready{background:#087eaa}
+#boostButton.active{background:#168044;border-color:#4ade80}
+#boostButton.cooldown{background:#303d50;border-color:#64748b}
+#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#050b15eF;backdrop-filter:blur(10px);padding:18px;z-index:5;overflow:auto}
+.panel{width:min(430px,100%);padding:25px;border:1px solid #354b67;background:#101d30;border-radius:20px;text-align:center;max-height:95vh;overflow:auto}
+.panel h1{font-size:30px;margin:0 0 8px}
+.panel p{color:#a8b9cc;line-height:1.6;font-size:13px}
+.primary{background:#01a9dd;border:0;padding:14px 20px;font-size:15px;font-weight:900;width:100%;margin-top:10px}
+.secondary{width:100%;margin-top:8px}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}
+.menu-button{padding:18px 8px;font-weight:bold}
+.menu-button span{display:block;font-size:26px;margin-bottom:7px}
+.field{text-align:left;margin-top:12px}
+.field label{display:block;font-size:12px;color:#9aafc7;margin-bottom:6px}
+.error{color:#ff7373;font-size:12px;margin-top:10px}
+.success{color:#4ade80;font-size:12px;margin-top:10px}
+.tabs{display:flex;gap:6px;margin:14px 0}
+.tabs button{flex:1;font-size:11px;padding:9px 4px}
+.list-item{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#172940;padding:10px;border-radius:10px;margin-top:7px;text-align:left;font-size:12px}
+.list-item button{font-size:10px;padding:7px}
+#joystickHint{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);color:#ffffff55;font-size:12px;pointer-events:none;text-align:center}
+@media(max-width:600px){
+ .logo{font-size:16px}
+ .stat{min-width:50px;padding:6px}
+ .stat strong{font-size:14px}
+ .stat small{font-size:9px}
+ #leaderboard{width:120px;top:70px;padding:8px}
+ .rank{font-size:10px}
+ button{padding:8px;font-size:11px}
+ #boostButton{bottom:52px;padding:12px 18px;min-width:155px}
+}
+</style>
+</head>
+
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud">
+ <div class="top">
+  <div>
+   <div class="logo">🐍 SNAKE<span> BATTLE</span></div>
+   <div class="stats">
+    <div class="stat"><small>SCORE</small><strong id="score">0</strong></div>
+    <div class="stat"><small>RANG</small><strong id="rank">#1</strong></div>
+    <div class="stat"><small>SPIELER</small><strong id="bots">0</strong></div>
+   </div>
+  </div>
+  <div class="controls">
+   <button id="pause">Ⅱ</button>
+   <button id="fullscreen">⛶</button>
+  </div>
+ </div>
+ <div id="leaderboard">
+  <h3>🏆 RANGLISTE</h3>
+  <div id="ranking"></div>
+ </div>
+ <button id="boostButton" class="ready" onclick="activateBoost()">⚡ BOOST BEREIT</button>
+ <div id="joystickHint">Wische um deinen Schlangenkopf, um die Richtung zu ändern</div>
+ <div id="bottom">Touch: Richtung steuern · PC: Maus oder WASD</div>
+</div>
+
+<div id="overlay">
+ <div class="panel">
+  <h1 id="title">🐍 SNAKE BATTLE</h1>
+  <p id="description">Wähle deinen Spielmodus!</p>
+
+  <div id="mainMenu">
+   <div class="menu-grid">
+    <button class="menu-button" onclick="startSolo()"><span>🎮</span>SOLO</button>
+    <button class="menu-button" onclick="openOnline()"><span>🌍</span>ONLINE</button>
+    <button class="menu-button" onclick="openFriends()"><span>👥</span>FREUNDE</button>
+    <button class="menu-button" onclick="openProfile()"><span>👤</span>PROFIL</button>
+   </div>
+   <button class="secondary" onclick="openAuth()">ANMELDEN / REGISTRIEREN</button>
+   <div id="menuStatus" class="success"></div>
+  </div>
+
+  <div id="authMenu" class="hidden">
+   <h2>Dein Konto</h2>
+   <div class="field">
+    <label>E-Mail-Adresse</label>
+    <input id="email" type="email" placeholder="name@example.com">
+   </div>
+   <div class="field">
+    <label>Passwort</label>
+    <input id="password" type="password" placeholder="Mindestens 6 Zeichen">
+   </div>
+   <button class="primary" onclick="registerEmail()">KONTO ERSTELLEN</button>
+   <button class="secondary" onclick="loginEmail()">ANMELDEN</button>
+   <button class="secondary" onclick="loginGoogle()">MIT GOOGLE ANMELDEN</button>
+   <button class="secondary" onclick="resetPassword()">PASSWORT VERGESSEN</button>
+   <button class="secondary" onclick="showMain()">ZURÜCK</button>
+   <div id="authMessage" class="error"></div>
+  </div>
+
+  <div id="profileMenu" class="hidden">
+   <h2>Dein Profil</h2>
+   <p id="profileEmail">Nicht angemeldet</p>
+   <div class="field">
+    <label>Spielername</label>
+    <input id="playerNameInput" maxlength="16" placeholder="Dein Spielername">
+   </div>
+   <button class="primary" onclick="saveProfile()">NAMEN SPEICHERN</button>
+   <button class="secondary" onclick="logout()">ABMELDEN</button>
+   <button class="secondary" onclick="showMain()">ZURÜCK</button>
+   <div id="profileMessage"></div>
+  </div>
+
+  <div id="friendsMenu" class="hidden">
+   <h2>👥 Freunde</h2>
+   <div class="field">
+    <label>Spielername suchen</label>
+    <input id="friendSearch" maxlength="16" placeholder="Spielername">
+   </div>
+   <button class="primary" onclick="searchFriend()">SPIELER SUCHEN</button>
+   <div id="friendResults"></div>
+   <h3>Deine Freunde</h3>
+   <div id="friendsList"></div>
+   <h3>Anfragen</h3>
+   <div id="friendRequests"></div>
+   <button class="secondary" onclick="showMain()">ZURÜCK</button>
+  </div>
+
+  <div id="onlineMenu" class="hidden">
+   <h2>🌍 Online-Arena</h2>
+   <p>Betritt die gemeinsame Arena und spiele gegen andere Spieler.</p>
+   <div class="stat" style="display:inline-block">
+    <small>SPIELER ONLINE</small>
+    <strong id="onlineCount">0</strong>
+   </div>
+   <div class="stat" style="display:inline-block">
+    <small>ARENA-GRÖSSE</small>
+    <strong id="arenaSize">3600</strong>
+   </div>
+   <button class="primary" onclick="joinOnline()">ARENA BETRETEN</button>
+   <button class="secondary" onclick="showMain()">ZURÜCK</button>
+   <div id="onlineMessage"></div>
+  </div>
+
+  <div id="endMenu" class="hidden">
+   <h1 id="endTitle">GAME OVER</h1>
+   <p id="endDescription"></p>
+   <button class="primary" onclick="restartCurrent()">NOCHMAL SPIELEN</button>
+   <button class="secondary" onclick="returnMenu()">HAUPTMENÜ</button>
+  </div>
+ </div>
+</div>
+
+<script>
+/* FIREBASE */
+
+const firebaseConfig={
+ apiKey:"AIzaSyCi-gIkBSJfl4AXEN9hm8gzneIA8J8l_Pg",
+ authDomain:"snakebattle-33440.firebaseapp.com",
+ databaseURL:"https://snakebattle-33440-default-rtdb.europe-west1.firebasedatabase.app",
+ projectId:"snakebattle-33440",
+ storageBucket:"snakebattle-33440.firebasestorage.app",
+ messagingSenderId:"728349515774",
+ appId:"1:728349515774:web:1ff7d0962761aa98abeaaf"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+
+let currentUser=null;
+let profile={name:"",color:"#01c7fc"};
+
+const publicRef=db.ref("publicProfiles");
+const playersRef=db.ref("players");
+const arenaRef=db.ref("rooms/public");
+const friendsRef=db.ref("friends");
+
+/* ELEMENTS / STATE */
+
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+let W=innerWidth,H=innerHeight,DPR=1;
+const BODY_SPACING=7;
+const FOOD_COUNT=180;
+const BOT_COUNT=10;
+const WORLD_BASE=3600;
+
+let WORLD=WORLD_BASE;
+let snakes=[];
+let foods=[];
+let player=null;
+let running=false;
+let paused=false;
+let onlineMode=false;
+let lastTime=0;
+let scoreTimer=0;
+let arenaLeader=false;
+let leaderTimer=0;
+let botRespawnTimer={};
+let remoteUnsubs=[];
+let runtimeIntervals=[];
+let lastBotCheck=0;
+let lastArenaPublish=0;
+let lastPlayerPublish=0;
+let friendListeners=[];
+let friendsRenderVersion=0;
+
+const camera={x:0,y:0,zoom:1};
+const pointer={active:false,x:0,y:0};
+const keys={left:false,right:false};
+
+/* BOOSTER: 5 Sekunden aktiv, danach 10 Sekunden Abklingzeit */
+
+const BOOST_DURATION=5000;
+const BOOST_COOLDOWN=10000;
+let boostActive=false;
+let boostAvailable=true;
+let boostEndTime=0;
+let boostCooldownEnd=0;
+
+const boostButton=document.getElementById("boostButton");
+
+function activateBoost(){
+ if(!player||!player.alive||!running||paused)return;
+ if(!boostAvailable||boostActive)return;
+
+ boostAvailable=false;
+ boostActive=true;
+ boostEndTime=Date.now()+BOOST_DURATION;
+ updateBoostButton();
+}
+
+function updateBoost(){
+ const now=Date.now();
+
+ if(boostActive&&now>=boostEndTime){
+  boostActive=false;
+  boostCooldownEnd=now+BOOST_COOLDOWN;
+ }
+
+ if(!boostActive&&!boostAvailable&&now>=boostCooldownEnd){
+  boostAvailable=true;
+ }
+
+ updateBoostButton();
+}
+
+function updateBoostButton(){
+ if(!boostButton)return;
+
+ if(!running||!player||!player.alive){
+  boostButton.textContent="⚡ BOOST";
+  boostButton.disabled=true;
+  boostButton.className="cooldown";
+  return;
+ }
+
+ boostButton.disabled=false;
+
+ if(boostActive){
+  const remaining=Math.max(0,(boostEndTime-Date.now())/1000);
+  boostButton.textContent="⚡ BOOST AKTIV · "+remaining.toFixed(1)+"s";
+  boostButton.className="active";
+ }else if(!boostAvailable){
+  const remaining=Math.max(0,(boostCooldownEnd-Date.now())/1000);
+  boostButton.textContent="⏳ AUFLADEN · "+Math.ceil(remaining)+"s";
+  boostButton.className="cooldown";
+ }else{
+  boostButton.textContent="⚡ BOOST BEREIT";
+  boostButton.className="ready";
+ }
+}
+
+const colors=[
+ "#01c7fc","#ff5757","#a78bfa","#fbbf24",
+ "#4ade80","#f472b6","#fb923c","#38bdf8","#e879f9"
+];
+
+function resize(){
+ W=innerWidth;
+ H=innerHeight;
+ DPR=Math.min(devicePixelRatio||1,2);
+ canvas.width=W*DPR;
+ canvas.height=H*DPR;
+ ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+addEventListener("resize",resize);
+resize();
+
+function rand(a,b){return Math.random()*(b-a)+a}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function wrapAngle(a){return Math.atan2(Math.sin(a),Math.cos(a))}
+function angleDifference(a,b){return wrapAngle(b-a)}
+
+function randomName(){
+ const a=["Pixel","Nova","Shadow","Turbo","Luna","Blaze","Storm","Ninja","Frost","Rocket","Neo","Ghost","Cyber","Mango","Dragon"];
+ const b=["Fox","Wolf","Snake","King","Pro","X","Master","Star","Fire","Runner","Player"];
+ return a[Math.floor(Math.random()*a.length)]+b[Math.floor(Math.random()*b.length)];
+}
+
+/* AUTHENTICATION */
+
+auth.onAuthStateChanged(async user=>{
+ currentUser=user;
+
+ if(user){
+  try{
+   const snap=await db.ref("players/"+user.uid).once("value");
+   const data=snap.val()||{};
+
+   profile.name=data.name||user.displayName||"";
+   profile.color=data.color||colors[0];
+
+   await db.ref("players/"+user.uid).update({
+    uid:user.uid,
+    email:user.email||"",
+    online:false,
+    lastSeen:firebase.database.ServerValue.TIMESTAMP
+   });
+
+   await publicRef.child(user.uid).update({
+    uid:user.uid,
+    name:profile.name,
+    color:profile.color
+   });
+
+   document.getElementById("menuStatus").textContent=
+    "Angemeldet als "+(profile.name||user.email);
+  }catch(e){
+   document.getElementById("menuStatus").textContent="Firebase-Fehler: "+e.message;
+  }
+ }else{
+  profile.name="";
+  document.getElementById("menuStatus").textContent="Nicht angemeldet";
+ }
+});
+
+async function registerEmail(){
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+
+ try{
+  if(!email)throw new Error("Bitte E-Mail eingeben.");
+  if(password.length<6)throw new Error("Passwort muss mindestens 6 Zeichen haben.");
+  await auth.createUserWithEmailAndPassword(email,password);
+  document.getElementById("authMessage").textContent="Konto erstellt!";
+ }catch(e){showAuthError(e)}
+}
+
+async function loginEmail(){
+ try{
+  await auth.signInWithEmailAndPassword(
+   document.getElementById("email").value.trim(),
+   document.getElementById("password").value
+  );
+  showMain();
+ }catch(e){showAuthError(e)}
+}
+
+async function loginGoogle(){
+ try{
+  const provider=new firebase.auth.GoogleAuthProvider();
+  await auth.signInWithPopup(provider);
+  showMain();
+ }catch(e){
+  if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment"){
+   try{
+    const provider=new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithRedirect(provider);
+   }catch(err){showAuthError(err)}
+  }else showAuthError(e);
+ }
+}
+
+async function resetPassword(){
+ try{
+  const email=document.getElementById("email").value.trim();
+  if(!email)throw new Error("Bitte zuerst deine E-Mail eingeben.");
+  await auth.sendPasswordResetEmail(email);
+  document.getElementById("authMessage").textContent="E-Mail zum Zurücksetzen wurde gesendet.";
+ }catch(e){showAuthError(e)}
+}
+
+async function logout(){
+ if(running&&onlineMode)await leaveOnline();
+ await auth.signOut();
+ showMain();
+}
+
+function showAuthError(e){
+ document.getElementById("authMessage").textContent=e.message||"Ein Fehler ist aufgetreten.";
+}
+
+async function saveProfile(){
+ if(!currentUser){
+  document.getElementById("profileMessage").textContent="Bitte anmelden!";
+  return;
+ }
+
+ const name=document.getElementById("playerNameInput").value.trim();
+
+ if(name.length<3||name.length>16){
+  document.getElementById("profileMessage").textContent="Name muss 3–16 Zeichen haben.";
+  return;
+ }
+
+ if(!/^[a-zA-Z0-9_ -]+$/.test(name)){
+  document.getElementById("profileMessage").textContent="Nur Buchstaben, Zahlen, _ und - erlaubt.";
+  return;
+ }
+
+ try{
+  const existing=await publicRef.once("value");
+  let duplicate=false;
+
+  existing.forEach(child=>{
+   const data=child.val()||{};
+   if(child.key!==currentUser.uid&&
+      String(data.name||"").toLowerCase()===name.toLowerCase()){
+    duplicate=true;
+   }
+  });
+
+  if(duplicate)throw new Error("Dieser Spielername ist bereits vergeben.");
+
+  profile.name=name;
+
+  await db.ref("players/"+currentUser.uid).update({name});
+  await publicRef.child(currentUser.uid).update({
+   name,uid:currentUser.uid,color:profile.color
+  });
+
+  document.getElementById("profileMessage").textContent="Name gespeichert!";
+ }catch(e){
+  document.getElementById("profileMessage").textContent=e.message;
+ }
+}
+
+/* FREUNDE */
+
+function clearFriendListeners(){
+ friendListeners.forEach(({ref,event,callback})=>ref.off(event,callback));
+ friendListeners=[];
+}
+
+function openFriends(){
+ hideMenus();
+ document.getElementById("friendsMenu").classList.remove("hidden");
+
+ if(!currentUser){
+  document.getElementById("friendResults").textContent="Bitte zuerst anmelden.";
+  return;
+ }
+
+ loadFriends();
+}
+
+async function searchFriend(){
+ const result=document.getElementById("friendResults");
+ result.innerHTML="";
+
+ if(!currentUser){
+  result.textContent="Bitte anmelden.";
+  return;
+ }
+
+ const name=document.getElementById("friendSearch").value.trim();
+
+ if(name.length<2){
+  result.textContent="Bitte mindestens 2 Zeichen eingeben.";
+  return;
+ }
+
+ result.textContent="Suche läuft …";
+
+ try{
+  const snap=await publicRef.once("value");
+  const matches=[];
+
+  snap.forEach(child=>{
+   const p=child.val()||{};
+   if(p.uid===currentUser.uid)return;
+
+   if(String(p.name||"").toLowerCase().includes(name.toLowerCase())){
+    matches.push(p);
+   }
+  });
+
+  result.innerHTML="";
+
+  if(!matches.length){
+   result.textContent="Kein Spieler gefunden.";
+   return;
+  }
+
+  matches.slice(0,20).forEach(p=>{
+   const item=document.createElement("div");
+   item.className="list-item";
+
+   const label=document.createElement("span");
+   label.textContent=p.name||"Spieler";
+
+   const button=document.createElement("button");
+   button.textContent="HINZUFÜGEN";
+   button.onclick=()=>sendFriendRequest(p.uid,button);
+
+   item.append(label,button);
+   result.appendChild(item);
+  });
+ }catch(e){
+  result.textContent="Suchfehler: "+e.message;
+ }
+}
+
+async function sendFriendRequest(uid,button){
+ if(!currentUser)return;
+ if(!uid||uid===currentUser.uid)return;
+
+ try{
+  if(button)button.disabled=true;
+
+  const existing=await friendsRef.child(currentUser.uid+"/"+uid).once("value");
+
+  if(existing.exists()){
+   document.getElementById("friendResults").textContent="Ihr seid bereits befreundet.";
+   return;
+  }
+
+  const requestRef=db.ref("friendRequests/"+uid+"/"+currentUser.uid);
+  const requestSnap=await requestRef.once("value");
+
+  if(requestSnap.exists()){
+   document.getElementById("friendResults").textContent="Du hast bereits eine Anfrage gesendet.";
+   return;
+  }
+
+  await requestRef.set({
+   uid:currentUser.uid,
+   name:profile.name||currentUser.displayName||"Spieler",
+   createdAt:firebase.database.ServerValue.TIMESTAMP
+  });
+
+  document.getElementById("friendResults").textContent="Freundschaftsanfrage gesendet!";
+ }catch(e){
+  document.getElementById("friendResults").textContent="Fehler: "+e.message;
+ }finally{
+  if(button)button.disabled=false;
+ }
+}
+
+function loadFriends(){
+ if(!currentUser)return;
+
+ clearFriendListeners();
+
+ const list=document.getElementById("friendsList");
+ const requests=document.getElementById("friendRequests");
+
+ list.innerHTML="Lade Freunde …";
+ requests.innerHTML="Lade Anfragen …";
+
+ const friendRef=friendsRef.child(currentUser.uid);
+ const requestRef=db.ref("friendRequests/"+currentUser.uid);
+
+ const friendCallback=snap=>{
+  list.innerHTML="";
+  let count=0;
+
+  snap.forEach(child=>{
+   count++;
+   const f=child.val()||{};
+   const item=document.createElement("div");
+   item.className="list-item";
+
+   const name=document.createElement("span");
+   name.textContent=f.name||"Freund";
+
+   const status=document.createElement("span");
+   status.textContent=f.online?"🟢 Online":"⚫ Offline";
+
+   item.append(name,status);
+   list.appendChild(item);
+  });
+
+  if(!count)list.textContent="Noch keine Freunde.";
+ };
+
+ const requestCallback=snap=>{
+  requests.innerHTML="";
+  let count=0;
+
+  snap.forEach(child=>{
+   count++;
+   const r=child.val()||{};
+   const item=document.createElement("div");
+   item.className="list-item";
+
+   const name=document.createElement("span");
+   name.textContent=(r.name||"Ein Spieler")+" möchte dein Freund sein.";
+
+   const accept=document.createElement("button");
+   accept.textContent="ANNEHMEN";
+
+   accept.onclick=async()=>{
+    accept.disabled=true;
+    try{
+     const updates={};
+     updates["friends/"+currentUser.uid+"/"+r.uid]={
+      uid:r.uid,name:r.name||"Freund",online:false
+     };
+     updates["friends/"+r.uid+"/"+currentUser.uid]={
+      uid:currentUser.uid,name:profile.name||"Freund",online:false
+     };
+     updates["friendRequests/"+currentUser.uid+"/"+r.uid]=null;
+
+     await db.ref().update(updates);
+    }catch(e){
+     alert("Anfrage konnte nicht angenommen werden: "+e.message);
+     accept.disabled=false;
+    }
+   };
+
+   const reject=document.createElement("button");
+   reject.textContent="ABLEHNEN";
+   reject.onclick=async()=>{
+    try{
+     await db.ref("friendRequests/"+currentUser.uid+"/"+r.uid).remove();
+    }catch(e){alert(e.message)}
+   };
+
+   const buttons=document.createElement("div");
+   buttons.style.display="flex";
+   buttons.style.gap="5px";
+   buttons.append(accept,reject);
+
+   item.append(name,buttons);
+   requests.appendChild(item);
+  });
+
+  if(!count)requests.textContent="Keine Anfragen.";
+ };
+
+ friendRef.on("value",friendCallback);
+ requestRef.on("value",requestCallback);
+
+ friendListeners.push(
+  {ref:friendRef,event:"value",callback:friendCallback},
+  {ref:requestRef,event:"value",callback:requestCallback}
+ );
+}
+
+/* MENÜ */
+
+function hideMenus(){
+ clearFriendListeners();
+ document.querySelectorAll(
+  "#mainMenu,#authMenu,#profileMenu,#friendsMenu,#onlineMenu,#endMenu"
+ ).forEach(e=>e.classList.add("hidden"));
+}
+
+function showMain(){
+ hideMenus();
+ document.getElementById("mainMenu").classList.remove("hidden");
+ document.getElementById("overlay").classList.remove("hidden");
+}
+
+function openAuth(){
+ hideMenus();
+ document.getElementById("authMenu").classList.remove("hidden");
+}
+
+function openProfile(){
+ hideMenus();
+ document.getElementById("profileMenu").classList.remove("hidden");
+ document.getElementById("profileEmail").textContent=
+  currentUser?currentUser.email||"Google-Konto":"Nicht angemeldet";
+ document.getElementById("playerNameInput").value=profile.name||"";
+}
+
+function openOnline(){
+ hideMenus();
+ document.getElementById("onlineMenu").classList.remove("hidden");
+ updateOnlineCount();
+}
+
+async function updateOnlineCount(){
+ try{
+  const snap=await playersRef.once("value");
+  let count=0;
+
+  snap.forEach(c=>{
+   const p=c.val()||{};
+   if(p.online&&Date.now()-(p.lastSeen||0)<30000)count++;
+  });
+
+  const participants=Math.max(10,count);
+  const size=WORLD_BASE*(1+Math.floor(participants/10)*.1);
+
+  document.getElementById("onlineCount").textContent=count;
+  document.getElementById("arenaSize").textContent=Math.round(size);
+ }catch(e){
+  document.getElementById("onlineMessage").textContent=e.message;
+ }
+}
+
+async function returnMenu(){
+ if(onlineMode)await leaveOnline();
+ running=false;
+ paused=false;
+ onlineMode=false;
+ showMain();
+ draw();
+}
+
+async function restartCurrent(){
+ if(onlineMode){
+  await leaveOnline();
+  openOnline();
+ }else{
+  startSolo();
+ }
+}
+
+/* SNAKE ENGINE */
+
+function createSnake(name,color,x,y,angle,isPlayer=false,uid=null){
+ const s={
+  uid,name,color,x,y,angle,targetAngle:angle,
+  speed:isPlayer?185:rand(145,175),
+  radius:15,length:22,score:0,alive:true,isPlayer,
+  trail:[],trailDistance:0,think:0,targetFood:null,
+  wanderAngle:angle,stuckTimer:0,lastCheckX:x,lastCheckY:y,
+  progressTimer:0
+ };
+
+ for(let i=1;i<=s.length;i++){
+  s.trail.push({
+   x:x-Math.cos(angle)*BODY_SPACING*i,
+   y:y-Math.sin(angle)*BODY_SPACING*i
+  });
+ }
+
+ return s;
+}
+
+function extendSnakeTail(s,amount){
+ for(let i=0;i<amount;i++){
+  const last=s.trail[s.trail.length-1]||{
+   x:s.x-Math.cos(s.angle)*BODY_SPACING,
+   y:s.y-Math.sin(s.angle)*BODY_SPACING
+  };
+
+  const previous=s.trail[s.trail.length-2]||{
+   x:last.x-Math.cos(s.angle),
+   y:last.y-Math.sin(s.angle)
+  };
+
+  let dx=last.x-previous.x;
+  let dy=last.y-previous.y;
+  const len=Math.hypot(dx,dy)||1;
+
+  s.trail.push({
+   x:last.x+dx/len*BODY_SPACING,
+   y:last.y+dy/len*BODY_SPACING
+  });
+ }
+}
+
+function spawnFood(){
+ for(let i=0;i<100;i++){
+  const f={
+   x:rand(70,WORLD-70),
+   y:rand(70,WORLD-70),
+   radius:rand(3,6),
+   value:10,
+   color:Math.random()<.2?"#ffca67":"#01c7fc"
+  };
+
+  if(!snakes.some(s=>s.alive&&distance(s,f)<100)){
+   foods.push(f);
+   return f;
+  }
+ }
+ return null;
+}
+
+function dropSnakeFood(s){
+ for(let i=0;i<Math.max(1,Math.floor(s.length));i++){
+  const p=s.trail[i]||{
+   x:s.x-Math.cos(s.angle)*(i+1)*BODY_SPACING,
+   y:s.y-Math.sin(s.angle)*(i+1)*BODY_SPACING
+  };
+
+  foods.push({
+   x:clamp(p.x+rand(-4,4),5,WORLD-5),
+   y:clamp(p.y+rand(-4,4),5,WORLD-5),
+   radius:5,value:10,color:s.color,dropped:true
+  });
+ }
+}
+
+function nearestFood(s){
+ let best=null,bestScore=Infinity;
+
+ for(const f of foods){
+  const dx=f.x-s.x,dy=f.y-s.y;
+  const d=Math.hypot(dx,dy);
+  const angle=Math.atan2(dy,dx);
+  const turn=Math.abs(angleDifference(s.angle,angle));
+  const score=d+turn*95;
+
+  if(score<bestScore){bestScore=score;best=f}
+ }
+ return best;
+}
+
+function evaluateDirection(s,angle){
+ let danger=0;
+
+ for(const ahead of [90,170,260,350]){
+  const x=s.x+Math.cos(angle)*ahead;
+  const y=s.y+Math.sin(angle)*ahead;
+  const wall=Math.min(x,y,WORLD-x,WORLD-y);
+
+  if(wall<125)danger+=(125-wall)*2.8;
+
+  for(const other of snakes){
+   if(!other.alive||other===s)continue;
+   if(Math.hypot(other.x-x,other.y-y)<115)danger+=150;
+
+   for(let i=5;i<other.trail.length;i+=4){
+    const p=other.trail[i];
+    const d=Math.hypot(p.x-x,p.y-y);
+    if(d<65)danger+=(65-d)*1.8;
+   }
+  }
+ }
+ return danger;
+}
+
+function botAI(s,dt){
+ s.think-=dt;
+
+ if(s.think<=0){
+  s.think=rand(.2,.4);
+
+  if(!s.targetFood||!foods.includes(s.targetFood)||distance(s,s.targetFood)<35){
+   s.targetFood=nearestFood(s);
+  }
+
+  let desired=s.targetFood
+   ?Math.atan2(s.targetFood.y-s.y,s.targetFood.x-s.x)
+   :s.wanderAngle;
+
+  const offsets=[0,-.3,.3,-.65,.65,-1.05,1.05,-1.5,1.5,-2.1,2.1,Math.PI];
+  let best=desired,bestScore=Infinity;
+
+  for(const offset of offsets){
+   const candidate=wrapAngle(desired+offset);
+   const danger=evaluateDirection(s,candidate);
+   const turn=Math.abs(angleDifference(s.angle,candidate))*17;
+   const score=danger*2+turn+Math.abs(offset)*13;
+
+   if(score<bestScore){bestScore=score;best=candidate}
+  }
+
+  s.targetAngle=best;
+
+  if(bestScore>250){
+   const left=wrapAngle(s.angle-Math.PI/2);
+   const right=wrapAngle(s.angle+Math.PI/2);
+   s.targetAngle=evaluateDirection(s,left)<evaluateDirection(s,right)?left:right;
+  }
+ }
+
+ const diff=angleDifference(s.angle,s.targetAngle);
+ s.angle=wrapAngle(s.angle+clamp(diff,-2.8*dt,2.8*dt));
+}
+
+function hitBody(s,x,y){
+ for(let i=4;i<s.trail.length;i+=2){
+  if(Math.hypot(s.trail[i].x-x,s.trail[i].y-y)<s.radius*1.35)return true;
+ }
+ return false;
+}
+
+function eliminate(s){
+ if(!s.alive)return;
+
+ s.alive=false;
+ dropSnakeFood(s);
+
+ if(s.isPlayer){
+  running=false;
+  boostActive=false;
+  updateBoostButton();
+
+  if(onlineMode)updateOwnPlayer({alive:false,online:false});
+  showEnd(false);
+ }
+
+ if(onlineMode&&s.bot&&arenaLeader)scheduleBotRespawn(s);
+}
+
+function moveSnake(s,dt){
+ if(!s.alive)return;
+
+ if(!s.isPlayer){
+  botAI(s,dt);
+ }else{
+  if(keys.left)s.targetAngle=wrapAngle(s.targetAngle-2.8*dt);
+  if(keys.right)s.targetAngle=wrapAngle(s.targetAngle+2.8*dt);
+
+  const diff=angleDifference(s.angle,s.targetAngle);
+  s.angle=wrapAngle(s.angle+clamp(diff,-3.8*dt,3.8*dt));
+ }
+
+ const speed=s.speed*(s.isPlayer&&boostActive?2:1);
+ const oldX=s.x,oldY=s.y;
+
+ s.x+=Math.cos(s.angle)*speed*dt;
+ s.y+=Math.sin(s.angle)*speed*dt;
+
+ if(s.x<35||s.y<35||s.x>WORLD-35||s.y>WORLD-35){
+  eliminate(s);
+  return;
+ }
+
+ s.trailDistance+=Math.hypot(s.x-oldX,s.y-oldY);
+
+ while(s.trailDistance>=BODY_SPACING){
+  s.trail.unshift({x:oldX,y:oldY});
+  s.trailDistance-=BODY_SPACING;
+ }
+
+ while(s.trail.length>s.length)s.trail.pop();
+
+ for(let i=foods.length-1;i>=0;i--){
+  const f=foods[i];
+
+  if(Math.hypot(s.x-f.x,s.y-f.y)<s.radius+f.radius+3){
+   if(onlineMode&&s.isPlayer){
+    collectOnlineFood(f);
+    continue;
+   }
+
+   foods.splice(i,1);
+   s.score+=f.value;
+   s.length++;
+   extendSnakeTail(s,1);
+   s.radius=Math.min(20,15+s.length*.004);
+
+   if(!onlineMode)spawnFood();
+  }
+ }
+
+ for(const other of snakes){
+  if(!other.alive)continue;
+
+  if(other!==s&&distance(s,other)<s.radius+other.radius*.8){
+   eliminate(s);
+   return;
+  }
+
+  if(other===s&&hitBody(s,s.x,s.y)){
+   eliminate(s);
+   return;
+  }
+
+  if(other!==s&&hitBody(other,s.x,s.y)){
+   eliminate(s);
+   return;
+  }
+ }
+}
+
+/* SOLO */
+
+function startSolo(){
+ clearRuntimeIntervals();
+ removeOnlineListeners();
+ onlineMode=false;
+ arenaLeader=false;
+ running=false;
+ paused=false;
+ boostActive=false;
+ boostAvailable=true;
+ boostEndTime=0;
+ boostCooldownEnd=0;
+ updateBoostButton();
+
+ WORLD=WORLD_BASE;
+ snakes=[];
+ foods=[];
+
+ player=createSnake("Du",colors[0],WORLD/2,WORLD/2,0,true);
+ snakes.push(player);
+
+ const names=["Nova","Shadow","Pixel","Turbo","Luna","Blaze"];
+
+ for(let i=0;i<6;i++){
+  const a=i*Math.PI*2/6;
+  snakes.push(createSnake(
+   names[i],colors[i+1],
+   WORLD/2+Math.cos(a)*rand(500,1000),
+   WORLD/2+Math.sin(a)*rand(500,1000),
+   rand(-Math.PI,Math.PI)
+  ));
+ }
+
+ for(let i=0;i<FOOD_COUNT;i++)spawnFood();
+ startRuntime();
+}
+
+/* ONLINE */
+
+let playerListener=null;
+let arenaListener=null;
+let onlinePlayers={};
+let onlineBots={};
+let onlineFoods={};
+
+async function joinOnline(){
+ if(!currentUser){
+  document.getElementById("onlineMessage").textContent="Bitte zuerst anmelden!";
+  return;
+ }
+
+ if(!profile.name){
+  document.getElementById("onlineMessage").textContent="Bitte zuerst einen Spielernamen im Profil festlegen!";
+  return;
+ }
+
+ try{
+  await leaveOnline();
+
+  await db.ref("players/"+currentUser.uid).update({
+   uid:currentUser.uid,name:profile.name,color:profile.color,
+   online:true,alive:true,score:0,
+   lastSeen:firebase.database.ServerValue.TIMESTAMP
+  });
+
+  await db.ref("players/"+currentUser.uid+"/lastSeen").onDisconnect().set(
+   firebase.database.ServerValue.TIMESTAMP
+  );
+  await db.ref("players/"+currentUser.uid+"/online").onDisconnect().set(false);
+
+  onlineMode=true;
+  WORLD=WORLD_BASE;
+  snakes=[];
+  foods=[];
+
+  const x=rand(300,WORLD-300);
+  const y=rand(300,WORLD-300);
+
+  player=createSnake(profile.name,profile.color,x,y,rand(-Math.PI,Math.PI),true,currentUser.uid);
+  snakes.push(player);
+
+  await db.ref("players/"+currentUser.uid).update({
+   x,y,angle:player.angle,score:0,length:player.length,
+   alive:true,online:true,trail:player.trail
+  });
+
+  await arenaRef.child("created").transaction(v=>v||Date.now());
+
+  setupOnlineListeners();
+  startRuntime();
+
+  document.getElementById("onlineMessage").textContent="Verbunden!";
+ }catch(e){
+  onlineMode=false;
+  document.getElementById("onlineMessage").textContent=e.message;
+ }
+}
+
+function setupOnlineListeners(){
+ removeOnlineListeners();
+
+ playerListener=playersRef.on("value",snap=>{
+  onlinePlayers=snap.val()||{};
+  updateRemoteSnakes();
+  updateArenaSize();
+ });
+
+ arenaListener=arenaRef.on("value",snap=>{
+  const data=snap.val()||{};
+  onlineBots=data.bots||{};
+  onlineFoods=data.foods||{};
+  updateArenaObjects();
+ });
+}
+
+function removeOnlineListeners(){
+ if(playerListener)playersRef.off("value",playerListener);
+ if(arenaListener)arenaRef.off("value",arenaListener);
+ playerListener=null;
+ arenaListener=null;
+ remoteUnsubs=[];
+}
+
+function updateRemoteSnakes(){
+ if(!onlineMode||!currentUser)return;
+
+ for(const [uid,data] of Object.entries(onlinePlayers)){
+  if(uid===currentUser.uid)continue;
+  if(!data.online||!data.alive)continue;
+
+  let s=snakes.find(x=>x.uid===uid);
+
+  if(!s){
+   s=createSnake(
+    data.name||"Spieler",data.color||"#ff5757",
+    Number(data.x)||WORLD/2,Number(data.y)||WORLD/2,
+    Number(data.angle)||0,false,uid
+   );
+   s.remote=true;
+   snakes.push(s);
+  }
+
+  s.name=data.name||"Spieler";
+  s.color=data.color||"#ff5757";
+  s.targetX=Number(data.x)||s.x;
+  s.targetY=Number(data.y)||s.y;
+  s.targetAngle=Number(data.angle)||0;
+  s.score=data.score||0;
+  s.length=data.length||22;
+  s.alive=true;
+
+  if(Array.isArray(data.trail))s.remoteTrail=data.trail;
+ }
+
+ snakes=snakes.filter(s=>{
+  if(!s.remote)return true;
+  const data=onlinePlayers[s.uid];
+  return data&&data.online&&data.alive;
+ });
+
+ updateUI();
+}
+
+function updateArenaObjects(){
+ if(!onlineMode)return;
+
+ const bots=Object.entries(onlineBots).map(([id,b])=>{
+  const uid=id.startsWith("bot_")?id:"bot_"+id;
+  const old=snakes.find(s=>s.uid===uid);
+
+  const s=old||createSnake(
+   b.name||"Bot",b.color||"#ff5757",
+   b.x||WORLD/2,b.y||WORLD/2,b.angle||0,false,uid
+  );
+
+  s.bot=true;
+  s.name=b.name||"Bot";
+  s.color=b.color||"#ff5757";
+  s.targetX=b.x;
+  s.targetY=b.y;
+  s.targetAngle=b.angle;
+  s.score=b.score||0;
+  s.length=b.length||22;
+  s.alive=b.alive!==false;
+
+  if(Array.isArray(b.trail))s.remoteTrail=b.trail;
+
+  return s;
+ });
+
+ snakes=snakes.filter(s=>!s.bot).concat(bots);
+
+ foods=Object.entries(onlineFoods).map(([id,f])=>({...f,id}));
+ updateUI();
+}
+
+function updateArenaSize(){
+ if(!onlineMode)return;
+
+ const count=Object.values(onlinePlayers).filter(p=>
+  p.online&&p.alive&&Date.now()-(p.lastSeen||0)<30000
+ ).length;
+
+ const total=Math.max(10,count);
+ WORLD=WORLD_BASE*(1+Math.floor(total/10)*.1);
+
+ document.getElementById("bots").textContent=count;
+ document.getElementById("onlineCount").textContent=count;
+ document.getElementById("arenaSize").textContent=Math.round(WORLD);
+}
+
+async function claimLeader(){
+ if(!onlineMode||!currentUser)return;
+
+ const ref=arenaRef.child("leader");
+
+ try{
+  const result=await ref.transaction(current=>{
+   const now=Date.now();
+   if(!current||now-(current.heartbeat||0)>8000){
+    return {uid:currentUser.uid,heartbeat:now};
+   }
+   return;
+  });
+
+  arenaLeader=result.committed&&result.snapshot.val()?.uid===currentUser.uid;
+
+  if(arenaLeader)await initializeArenaIfNeeded();
+ }catch(e){console.error("Leader:",e)}
+}
+
+async function initializeArenaIfNeeded(){
+ const snap=await arenaRef.once("value");
+ const data=snap.val()||{};
+
+ if(!data.foods){
+  const initial={};
+
+  for(let i=0;i<FOOD_COUNT;i++){
+   initial["f"+i]={
+    x:rand(70,WORLD-70),y:rand(70,WORLD-70),
+    radius:rand(3,6),value:10,color:"#01c7fc"
+   };
+  }
+
+  await arenaRef.child("foods").set(initial);
+ }
+
+ if(!data.bots){
+  const bots={};
+  const count=Math.max(0,BOT_COUNT-Object.values(onlinePlayers).filter(p=>p.online&&p.alive).length);
+
+  for(let i=0;i<count;i++){
+   bots["bot"+i]={
+    name:randomName(),color:colors[(i+1)%colors.length],
+    x:rand(300,WORLD-300),y:rand(300,WORLD-300),
+    angle:rand(-Math.PI,Math.PI),score:0,length:22,alive:true
+   };
+  }
+
+  await arenaRef.child("bots").set(bots);
+ }
+}
+
+function scheduleBotRespawn(s){
+ if(!arenaLeader)return;
+
+ const id=s.uid.replace(/^bot_/,"");
+ if(botRespawnTimer[id])return;
+
+ botRespawnTimer[id]=setTimeout(async()=>{
+  delete botRespawnTimer[id];
+
+  if(!onlineMode||!arenaLeader)return;
+
+  try{
+   await arenaRef.child("bots/"+id).update({
+    name:randomName(),
+    color:colors[Math.floor(rand(1,colors.length))],
+    x:rand(300,WORLD-300),y:rand(300,WORLD-300),
+    angle:rand(-Math.PI,Math.PI),
+    score:0,length:22,alive:true
+   });
+  }catch(e){console.error(e)}
+ },rand(5000,10000));
+}
+
+async function collectOnlineFood(f){
+ if(!currentUser||!onlineMode||!player||!f.id)return;
+
+ try{
+  const foodRef=arenaRef.child("foods/"+f.id);
+  const result=await foodRef.transaction(value=>{
+   if(value===null)return;
+   return null;
+  });
+
+  if(!result.committed)return;
+
+  player.score+=f.value;
+  player.length++;
+  extendSnakeTail(player,1);
+
+  updateOwnPlayer({score:player.score,length:player.length});
+
+  const newFood={
+   x:rand(70,WORLD-70),y:rand(70,WORLD-70),
+   radius:rand(3,6),value:10,color:"#01c7fc"
+  };
+
+  await arenaRef.child("foods").push(newFood);
+ }catch(e){console.error("Futter:",e)}
+}
+
+async function updateOwnPlayer(extra={}){
+ if(!currentUser||!onlineMode||!player)return;
+
+ const data={
+  uid:currentUser.uid,name:profile.name,color:profile.color,
+  x:player.x,y:player.y,angle:player.angle,
+  score:player.score,length:player.length,
+  alive:player.alive,online:player.alive,
+  trail:player.trail.slice(0,45),
+  boostActive:boostActive,
+  lastSeen:firebase.database.ServerValue.TIMESTAMP,
+  ...extra
+ };
+
+ try{
+  await db.ref("players/"+currentUser.uid).update(data);
+ }catch(e){console.error("Spieler-Update:",e)}
+}
+
+async function publishArena(){
+ if(!onlineMode||!arenaLeader)return;
+
+ const bots={};
+
+ for(const s of snakes){
+  if(!s.bot)continue;
+
+  const id=s.uid.replace(/^bot_/,"");
+
+  bots[id]={
+   name:s.name,color:s.color,x:s.x,y:s.y,
+   angle:s.angle,score:s.score,length:s.length,
+   alive:s.alive,trail:s.trail.slice(0,45)
+  };
+ }
+
+ const foodData={};
+
+ for(const f of foods){
+  if(!f.id)continue;
+  foodData[f.id]={
+   x:f.x,y:f.y,radius:f.radius,value:f.value,color:f.color
+  };
+ }
+
+ try{
+  await arenaRef.update({bots,foods:foodData});
+ }catch(e){console.error("Arena-Update:",e)}
+}
+
+function updateOnlineRemote(dt){
+ for(const s of snakes){
+  if(!s.remote&&!s.bot)continue;
+  if(s.targetX===undefined||s.targetY===undefined)continue;
+
+  const smoothing=1-Math.exp(-dt*10);
+  s.x+=(s.targetX-s.x)*smoothing;
+  s.y+=(s.targetY-s.y)*smoothing;
+  s.angle=wrapAngle(s.angle+angleDifference(s.angle,s.targetAngle)*smoothing);
+
+  if(s.remoteTrail&&s.remoteTrail.length)s.trail=s.remoteTrail;
+ }
+}
+
+function clearRuntimeIntervals(){
+ runtimeIntervals.forEach(id=>clearInterval(id));
+ runtimeIntervals=[];
+ Object.values(botRespawnTimer).forEach(clearTimeout);
+ botRespawnTimer={};
+}
+
+async function leaveOnline(){
+ running=false;
+ boostActive=false;
+ boostAvailable=true;
+ updateBoostButton();
+
+ clearRuntimeIntervals();
+ removeOnlineListeners();
+
+ if(currentUser){
+  try{
+   await db.ref("players/"+currentUser.uid).update({
+    online:false,alive:false,
+    lastSeen:firebase.database.ServerValue.TIMESTAMP
+   });
+  }catch(e){console.error(e)}
+ }
+
+ arenaLeader=false;
+ onlineMode=false;
+}
+
+/* GAME START / INPUT */
+
+function startRuntime(){
+ clearRuntimeIntervals();
+
+ running=true;
+ paused=false;
+ lastTime=0;
+ scoreTimer=0;
+ leaderTimer=0;
+ lastArenaPublish=0;
+ lastPlayerPublish=0;
+ lastBotCheck=0;
+
+ camera.x=player.x;
+ camera.y=player.y;
+
+ hideMenus();
+ document.getElementById("overlay").classList.add("hidden");
+ document.getElementById("pause").textContent="Ⅱ";
+ document.getElementById("joystickHint").style.opacity="1";
+
+ if(onlineMode){
+  claimLeader();
+  updateOwnPlayer();
+
+  runtimeIntervals.push(setInterval(async()=>{
+   if(!onlineMode||!currentUser)return;
+
+   await updateOwnPlayer();
+
+   if(arenaLeader){
+    const ref=arenaRef.child("leader");
+
+    try{
+     await ref.transaction(current=>{
+      if(!current||current.uid!==currentUser.uid)return;
+      return {uid:currentUser.uid,heartbeat:Date.now()};
+     });
+    }catch(e){console.error(e)}
+   }else{
+    claimLeader();
+   }
+  },2500));
+ }
+
+ updateBoostButton();
+ updateUI();
+ draw();
+}
+
+function setTargetAngle(angle){
+ if(!player||!player.alive||!running||paused)return;
+ player.targetAngle=wrapAngle(angle);
+}
+
+function pointerMove(e){
+ if(!pointer.active)return;
+
+ pointer.x=e.clientX;
+ pointer.y=e.clientY;
+
+ const dx=pointer.x-W/2;
+ const dy=pointer.y-H/2;
+
+ if(Math.hypot(dx,dy)>13)setTargetAngle(Math.atan2(dy,dx));
+}
+
+canvas.addEventListener("pointerdown",e=>{
+ if(!running||paused)return;
+
+ pointer.active=true;
+ pointerMove(e);
+ document.getElementById("joystickHint").style.opacity="0";
+
+ try{canvas.setPointerCapture(e.pointerId)}catch(err){}
+});
+
+canvas.addEventListener("pointermove",pointerMove);
+canvas.addEventListener("pointerup",()=>pointer.active=false);
+canvas.addEventListener("pointercancel",()=>pointer.active=false);
+
+document.addEventListener("keydown",e=>{
+ const k=e.key.toLowerCase();
+
+ if(k==="arrowleft"||k==="a")keys.left=true;
+ if(k==="arrowright"||k==="d")keys.right=true;
+
+ if(k===" "){
+  e.preventDefault();
+  togglePause();
+ }
+
+ if(k==="shift")activateBoost();
+});
+
+document.addEventListener("keyup",e=>{
+ const k=e.key.toLowerCase();
+ if(k==="arrowleft"||k==="a")keys.left=false;
+ if(k==="arrowright"||k==="d")keys.right=false;
+});
+
+/* CAMERA / DRAW */
+
+function updateCamera(dt){
+ if(!player)return;
+
+ const smoothing=1-Math.exp(-dt*7);
+ camera.x+=(player.x-camera.x)*smoothing;
+ camera.y+=(player.y-camera.y)*smoothing;
+ camera.zoom=clamp(Math.min(W,H)/750,.55,1.05);
+}
+
+function drawArenaBoundary(){
+ const z=camera.zoom;
+ const left=W/2-camera.x*z;
+ const top=H/2-camera.y*z;
+ const right=left+WORLD*z;
+ const bottom=top+WORLD*z;
+
+ ctx.save();
+ ctx.beginPath();
+ ctx.rect(0,0,W,H);
+ ctx.rect(left,top,WORLD*z,WORLD*z);
+ ctx.fillStyle="rgba(255,35,55,0.13)";
+ ctx.fill("evenodd");
+
+ const dw=115*z;
+ ctx.fillStyle="rgba(255,45,55,0.13)";
+ ctx.fillRect(left,top,WORLD*z,dw);
+ ctx.fillRect(left,bottom-dw,WORLD*z,dw);
+ ctx.fillRect(left,top,dw,WORLD*z);
+ ctx.fillRect(right-dw,top,dw,WORLD*z);
+
+ ctx.shadowColor="#01c7fc";
+ ctx.shadowBlur=24;
+ ctx.strokeStyle="#01c7fc";
+ ctx.lineWidth=Math.max(3,7*z);
+ ctx.strokeRect(left,top,WORLD*z,WORLD*z);
+ ctx.shadowBlur=0;
+
+ ctx.strokeStyle="rgba(255,255,255,.9)";
+ ctx.lineWidth=Math.max(1.5,2*z);
+ ctx.strokeRect(left+5*z,top+5*z,WORLD*z-10*z,WORLD*z-10*z);
+ ctx.restore();
+}
+
+function drawFood(){
+ for(const f of foods){
+  const sx=W/2+(f.x-camera.x)*camera.zoom;
+  const sy=H/2+(f.y-camera.y)*camera.zoom;
+
+  if(sx< -20||sy< -20||sx>W+20||sy>H+20)continue;
+
+  ctx.fillStyle=f.color;
+  ctx.shadowColor=f.color;
+  ctx.shadowBlur=f.dropped?15:12;
+  ctx.beginPath();
+  ctx.arc(sx,sy,f.radius*camera.zoom,0,Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur=0;
+ }
+}
+
+function drawSnake(s){
+ if(!s.alive)return;
+
+ const z=camera.zoom;
+ const sx=x=>W/2+(x-camera.x)*z;
+ const sy=y=>H/2+(y-camera.y)*z;
+
+ ctx.beginPath();
+ ctx.moveTo(sx(s.x),sy(s.y));
+ for(const p of s.trail)ctx.lineTo(sx(p.x),sy(p.y));
+
+ ctx.strokeStyle=s.color;
+ ctx.lineWidth=s.radius*2*z;
+ ctx.lineCap="round";
+ ctx.lineJoin="round";
+ ctx.shadowColor=s.color;
+ ctx.shadowBlur=12;
+ ctx.stroke();
+ ctx.shadowBlur=0;
+
+ const hx=sx(s.x),hy=sy(s.y);
+ const r=s.radius*z;
+
+ ctx.fillStyle=s.color;
+ ctx.beginPath();
+ ctx.arc(hx,hy,r,0,Math.PI*2);
+ ctx.fill();
+
+ const ex=Math.cos(s.angle),ey=Math.sin(s.angle);
+ const sideX=-ey,sideY=ex;
+
+ for(const side of [-1,1]){
+  const x=hx+ex*r*.35+sideX*r*.48;
+  const y=hy+ey*r*.35+sideY*r*.48;
+
+  ctx.fillStyle="white";
+  ctx.beginPath();
+  ctx.arc(x,y,r*.23,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle="#101827";
+  ctx.beginPath();
+  ctx.arc(x+ex*r*.07,y+ey*r*.07,r*.12,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ ctx.fillStyle="white";
+ ctx.font="bold 12px Arial";
+ ctx.textAlign="center";
+ ctx.shadowColor="#000";
+ ctx.shadowBlur=5;
+ ctx.fillText(s.name,hx,hy-r-9);
+ ctx.shadowBlur=0;
+}
+
+function drawOffscreenIndicators(){
+ if(!player||!player.alive)return;
+
+ for(const s of snakes){
+  if(!s.alive||s===player)continue;
+
+  const dx=(s.x-camera.x)*camera.zoom;
+  const dy=(s.y-camera.y)*camera.zoom;
+  const screenX=W/2+dx;
+  const screenY=H/2+dy;
+
+  if(screenX>=0&&screenX<=W&&screenY>=0&&screenY<=H)continue;
+
+  const edgeX=Math.max(35,W/2-45);
+  const edgeY=Math.max(65,H/2-55);
+  const scale=Math.min(
+   edgeX/Math.max(Math.abs(dx),.001),
+   edgeY/Math.max(Math.abs(dy),.001)
+  );
+
+  const x=W/2+dx*scale;
+  const y=H/2+dy*scale;
+
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(Math.atan2(dy,dx));
+  ctx.fillStyle=s.color;
+  ctx.beginPath();
+  ctx.moveTo(15,0);
+  ctx.lineTo(-9,-10);
+  ctx.lineTo(-5,0);
+  ctx.lineTo(-9,10);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+ }
+}
+
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ ctx.fillStyle="#091421";
+ ctx.fillRect(0,0,W,H);
+
+ const spacing=100*camera.zoom;
+ const startX=((W/2-camera.x*camera.zoom)%spacing+spacing)%spacing;
+ const startY=((H/2-camera.y*camera.zoom)%spacing+spacing)%spacing;
+
+ ctx.fillStyle="#23364b";
+
+ for(let x=startX;x<W;x+=spacing){
+  for(let y=startY;y<H;y+=spacing){
+   ctx.beginPath();
+   ctx.arc(x,y,1,0,Math.PI*2);
+   ctx.fill();
+  }
+ }
+
+ drawArenaBoundary();
+ drawFood();
+ for(const s of snakes)drawSnake(s);
+ drawOffscreenIndicators();
+
+ if(player&&player.alive){
+  ctx.strokeStyle="#ffffff22";
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.arc(W/2,H/2,player.radius*camera.zoom+8,0,Math.PI*2);
+  ctx.stroke();
+ }
+}
+
+/* UI / GAME END */
+
+function updateUI(){
+ if(!player)return;
+
+ document.getElementById("score").textContent=player.score;
+
+ const sorted=snakes.filter(s=>s.alive).sort((a,b)=>b.score-a.score);
+ document.getElementById("rank").textContent=
+  player.alive?"#"+(sorted.indexOf(player)+1):"–";
+
+ document.getElementById("bots").textContent=
+  onlineMode
+   ?Object.values(onlinePlayers).filter(p=>p.online&&p.alive).length
+   :snakes.filter(s=>!s.isPlayer&&s.alive).length;
+
+ const ranking=document.getElementById("ranking");
+ ranking.innerHTML="";
+
+ sorted.slice(0,10).forEach(s=>{
+  const row=document.createElement("div");
+  row.className="rank";
+
+  const name=document.createElement("span");
+  name.style.color=s.color;
+  name.textContent="● "+s.name;
+
+  const score=document.createElement("b");
+  score.textContent=s.score;
+
+  row.append(name,score);
+  ranking.appendChild(row);
+ });
+}
+
+function showEnd(won){
+ document.getElementById("endTitle").textContent=
+  won?"🏆 DU HAST GEWONNEN!":"GAME OVER";
+
+ document.getElementById("endDescription").textContent=
+  "Du hast "+player.score+" Punkte gesammelt.";
+
+ hideMenus();
+ document.getElementById("endMenu").classList.remove("hidden");
+ document.getElementById("overlay").classList.remove("hidden");
+}
+
+function togglePause(){
+ if(!running)return;
+
+ paused=!paused;
+ lastTime=0;
+ document.getElementById("pause").textContent=paused?"▶":"Ⅱ";
+}
+
+document.getElementById("pause").onclick=togglePause;
+
+document.getElementById("fullscreen").onclick=async()=>{
+ try{
+  if(!document.fullscreenElement)await document.documentElement.requestFullscreen();
+  else await document.exitFullscreen();
+ }catch(e){}
+};
+
+/* MAIN LOOP */
+
+function loop(time){
+ requestAnimationFrame(loop);
+
+ if(!running||paused){
+  lastTime=time;
+  updateBoost();
+  return;
+ }
+
+ if(!lastTime)lastTime=time;
+
+ const dt=Math.min((time-lastTime)/1000,.04);
+ lastTime=time;
+
+ updateBoost();
+
+ if(onlineMode){
+  updateOnlineRemote(dt);
+
+  if(arenaLeader){
+   leaderTimer+=dt;
+
+   if(leaderTimer>=.04){
+    for(const s of snakes){
+     if(s.bot)moveSnake(s,leaderTimer);
+    }
+    leaderTimer=0;
+   }
+
+   if(time-lastArenaPublish>450){
+    lastArenaPublish=time;
+    publishArena();
+   }
+
+   maintainBots();
+  }
+
+  if(player&&player.alive&&time-lastPlayerPublish>150){
+   lastPlayerPublish=time;
+   updateOwnPlayer();
+  }
+ }
+
+ for(const s of snakes){
+  if(s.isPlayer||(!onlineMode&&!s.isPlayer)){
+   moveSnake(s,dt);
+  }
+ }
+
+ if(onlineMode&&player&&player.alive){
+  for(const s of snakes){
+   if(s===player||!s.alive)continue;
+
+   if(distance(player,s)<player.radius+s.radius*.8||hitBody(s,player.x,player.y)){
+    eliminate(player);
+    break;
+   }
+  }
+ }
+
+ updateCamera(dt);
+
+ scoreTimer+=dt;
+ if(scoreTimer>.15){
+  updateUI();
+  scoreTimer=0;
+ }
+
+ draw();
+}
+
+async function maintainBots(){
+ if(!onlineMode||!arenaLeader)return;
+
+ const now=Date.now();
+ if(now-lastBotCheck<2000)return;
+ lastBotCheck=now;
+
+ const realPlayers=Object.values(onlinePlayers).filter(p=>
+  p.online&&p.alive&&Date.now()-(p.lastSeen||0)<30000
+ ).length;
+
+ const wanted=Math.max(0,BOT_COUNT-realPlayers);
+
+ try{
+  const snap=await arenaRef.child("bots").once("value");
+  const bots=snap.val()||{};
+  const alive=Object.values(bots).filter(b=>b.alive!==false).length;
+
+  if(alive<wanted){
+   for(let i=0;i<wanted-alive;i++){
+    const id="bot_"+Date.now()+"_"+i;
+
+    bots[id]={
+     name:randomName(),
+     color:colors[Math.floor(rand(1,colors.length))],
+     x:rand(300,WORLD-300),
+     y:rand(300,WORLD-300),
+     angle:rand(-Math.PI,Math.PI),
+     score:0,length:22,alive:true
+    };
+   }
+
+   await arenaRef.child("bots").set(bots);
+  }
+ }catch(e){console.error("Bot-Verwaltung:",e)}
+}
+
+requestAnimationFrame(loop);
+draw();
+showMain();
+updateBoostButton();
+
+/* CLEANUP */
+
+addEventListener("beforeunload",()=>{
+ clearRuntimeIntervals();
+ clearFriendListeners();
+
+ if(onlineMode&&currentUser){
+  db.ref("players/"+currentUser.uid).update({
+   online:false,alive:false,
+   lastSeen:firebase.database.ServerValue.TIMESTAMP
+  });
+ }
+});
+</script>
+</body>
+</html>
