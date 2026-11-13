@@ -1168,7 +1168,11 @@ function humanCount(){
  return c;
 }
 
-/* Fremde Schlange mit einem neuen Netzwerk-Snapshot aktualisieren */
+/* Fremde Schlange mit einem neuen Netzwerk-Snapshot aktualisieren.
+   WICHTIG: Der Körper wird NICHT mehr bei jedem Snapshot durch den (groben)
+   Netzwerk-Körper ersetzt. Er wird lokal vom Kopf nachgezogen (wie bei der
+   eigenen Schlange). Der Snapshot dient nur noch als Kopf-Ziel und zur
+   Neu-Initialisierung bei neuen Schlangen bzw. großen Sprüngen. */
 function applySnapshot(s,d,isNew){
  const nx=Number(d.x),ny=Number(d.y);
  if(!isFinite(nx)||!isFinite(ny))return;
@@ -1190,73 +1194,67 @@ function applySnapshot(s,d,isNew){
  s.targetAngle=Number(d.angle)||0;
  s.alive=true;
 
- const dec=decodeTrail(d.tr);
+ const jump=Math.hypot(px-nx,py-ny)>250;
 
- if(dec){
-  s.baseTrail=dec;
-  s.trail=copyPoints(dec);
- }else if(!s.baseTrail){
-  s.baseTrail=copyPoints(s.trail);
- }
+ if(isNew||jump){
+  const dec=decodeTrail(d.tr);
 
- if(isNew||Math.hypot(px-nx,py-ny)>250){
-  s.offX=0;s.offY=0;
   s.x=nx;s.y=ny;
   s.angle=s.targetAngle;
- }else{
-  // Anzeigeposition bleibt kontinuierlich, der Versatz klingt sanft ab
-  s.offX=px-nx;
-  s.offY=py-ny;
+  s.trailDistance=0;
+
+  if(dec){
+   s.trail=dec;
+  }else{
+   s.trail=[];
+   for(let i=1;i<=Math.floor(s.length);i++){
+    s.trail.push({
+     x:nx-Math.cos(s.targetAngle)*BODY_SPACING*i,
+     y:ny-Math.sin(s.targetAngle)*BODY_SPACING*i
+    });
+   }
+  }
  }
 }
 
-/* Pro Frame: Kopf voraus-berechnen, Körper entlang des echten Pfads nachführen
-   und auf exakt s.length Punkte (Abstand BODY_SPACING) begrenzen */
+/* Pro Frame: Kopf sanft zum vorausberechneten Ziel bewegen und den Körper
+   genau wie bei lokalen Schlangen entlang des Kopfpfads nachziehen. */
 function updateRemote(s,dt){
- if(s.baseX===undefined||!s.baseTrail)return;
+ if(s.baseX===undefined)return;
 
  const now=Date.now();
- const age=Math.min((now-s.snapAt)/1000,.35);
+ const age=Math.min((now-s.snapAt)/1000,.3);
 
- const decay=Math.exp(-dt*7);
- s.offX*=decay;
- s.offY*=decay;
+ const tx=s.baseX+Math.cos(s.targetAngle)*s.sp*age;
+ const ty=s.baseY+Math.sin(s.targetAngle)*s.sp*age;
 
- const k=1-Math.exp(-dt*12);
- s.angle=wrapAngle(s.angle+angleDifference(s.angle,s.targetAngle)*k);
+ const k=1-Math.exp(-dt*14);
+ const ox=s.x,oy=s.y;
+ let nx=ox+(tx-ox)*k;
+ let ny=oy+(ty-oy)*k;
 
- s.x=s.baseX+Math.cos(s.targetAngle)*s.sp*age+s.offX;
- s.y=s.baseY+Math.sin(s.targetAngle)*s.sp*age+s.offY;
+ const d=Math.hypot(nx-ox,ny-oy);
 
- // Pfad: aktueller (vorausberechneter) Kopf -> letzter echter Kopf -> echter Körper
- const path=[{x:s.x,y:s.y},{x:s.baseX+s.offX,y:s.baseY+s.offY}];
- for(const p of s.baseTrail)path.push({x:p.x+s.offX,y:p.y+s.offY});
+ // Blickrichtung: aus tatsächlicher Bewegung, sonst aus Ziel-Winkel
+ const wanted=d>0.4?Math.atan2(ny-oy,nx-ox):s.targetAngle;
+ s.angle=wrapAngle(s.angle+angleDifference(s.angle,wanted)*(1-Math.exp(-dt*12)));
 
- // Gleichmäßig neu abtasten, maximal s.length Punkte
- const maxPts=Math.max(1,Math.min(Math.floor(s.length)||START_LENGTH,400));
- const out=[];
- let seg=0;
- let px=path[0].x,py=path[0].y;
- let need=BODY_SPACING;
+ s.x=nx;
+ s.y=ny;
 
- while(out.length<maxPts&&seg<path.length-1){
-  const b=path[seg+1];
-  const dx=b.x-px,dy=b.y-py;
-  const d=Math.hypot(dx,dy);
+ if(d>0.0001){
+  s.trailDistance=(s.trailDistance||0)+d;
 
-  if(d>=need){
-   const t=need/d;
-   px+=dx*t;py+=dy*t;
-   out.push({x:px,y:py});
-   need=BODY_SPACING;
-  }else{
-   need-=d;
-   px=b.x;py=b.y;
-   seg++;
+  while(s.trailDistance>=BODY_SPACING){
+   const f=clamp((d-(s.trailDistance-BODY_SPACING))/d,0,1);
+   s.trail.unshift({x:ox+(nx-ox)*f,y:oy+(ny-oy)*f});
+   s.trailDistance-=BODY_SPACING;
   }
  }
 
- s.trail=out;
+ const len=Math.max(1,Math.floor(s.length)||START_LENGTH);
+ while(s.trail.length>len)s.trail.pop();
+ if(s.trail.length<len)extendSnakeTail(s,Math.min(len-s.trail.length,3));
 }
 
 function updateOnlineRemote(dt){
@@ -1392,13 +1390,11 @@ function demoteBot(s){
  s.remote=true;
  s.baseX=s.x;
  s.baseY=s.y;
- s.baseTrail=copyPoints(s.trail);
  s.snapAt=Date.now();
  s.lastRemote=Date.now();
  s.sp=0;
- s.offX=0;
- s.offY=0;
  s.targetAngle=s.angle;
+ s.trailDistance=0;
 }
 
 function setLeader(v){
