@@ -206,7 +206,6 @@ const auth=firebase.auth();
 const db=firebase.database();
 const TS=firebase.database.ServerValue.TIMESTAMP;
 
-/* Server-Zeit: alle Clients vergleichen Zeiten auf derselben Basis */
 let serverOffset=0;
 db.ref(".info/serverTimeOffset").on("value",s=>{serverOffset=s.val()||0});
 function serverNow(){return Date.now()+serverOffset}
@@ -237,7 +236,6 @@ const BOT_MAXLEN_MAX=100;
 const BOT_MAX_DROPS=30;
 const START_LENGTH=22;
 
-/* Netzwerk-Takt */
 const PLAYER_PUBLISH_MS=120;
 const BOT_PUBLISH_MS=150;
 const LEADER_TIMEOUT=5000;
@@ -1110,12 +1108,8 @@ function startSolo(){
  startRuntime();
 }
 
-/* ============================================================
-   ONLINE
-   ============================================================ */
+/* ONLINE */
 
-/* Körper komprimiert übertragen: jeder n-te Punkt als "x,y,x,y,…".
-   Der Empfänger füllt die Lücken wieder auf (gleicher Abstand wie lokal). */
 function encodeTrail(trail){
  if(!trail||!trail.length)return"";
  const stride=Math.max(3,Math.ceil(trail.length/110));
@@ -1141,7 +1135,7 @@ function decodeTrail(str){
 
  for(let i=0;i+1<n.length;i+=2){
   const x=n[i],y=n[i+1];
-  if(!isFinite(x)||!isFinite(y))continue;
+  if(!Number.isFinite(x)||!Number.isFinite(y))continue;
 
   if(!pts.length){pts.push({x,y});continue}
 
@@ -1151,7 +1145,10 @@ function decodeTrail(str){
   const steps=Math.max(1,Math.round(d/BODY_SPACING));
 
   for(let k=1;k<=steps;k++){
-   pts.push({x:px+(x-px)*k/steps,y:py+(y-py)*k/steps});
+   pts.push({
+    x:px+(x-px)*k/steps,
+    y:py+(y-py)*k/steps
+   });
   }
  }
 
@@ -1168,46 +1165,57 @@ function humanCount(){
  return c;
 }
 
-/* Fremde Schlange mit einem neuen Netzwerk-Snapshot aktualisieren.
-   WICHTIG: Der Körper wird NICHT mehr bei jedem Snapshot durch den (groben)
-   Netzwerk-Körper ersetzt. Er wird lokal vom Kopf nachgezogen (wie bei der
-   eigenen Schlange). Der Snapshot dient nur noch als Kopf-Ziel und zur
-   Neu-Initialisierung bei neuen Schlangen bzw. großen Sprüngen. */
+/* FIX: Netzwerk-Körper bei jedem Snapshot aktualisieren.
+   Dadurch bleiben auch Kurven und Richtungswechsel synchron. */
 function applySnapshot(s,d,isNew){
- const nx=Number(d.x),ny=Number(d.y);
- if(!isFinite(nx)||!isFinite(ny))return;
+ const nx=Number(d.x);
+ const ny=Number(d.y);
+
+ if(!Number.isFinite(nx)||!Number.isFinite(ny))return;
 
  const now=Date.now();
- const px=s.x,py=s.y;
 
  s.name=d.name||s.name;
  s.color=d.color||s.color;
- s.score=d.score||0;
- s.length=d.length||START_LENGTH;
+ s.score=Number(d.score)||0;
+ s.length=Math.max(1,Number(d.length)||START_LENGTH);
  s.radius=Math.min(20,15+s.length*.004);
 
  s.baseX=nx;
  s.baseY=ny;
  s.snapAt=now;
  s.lastRemote=now;
- s.sp=Number(d.sp)||0;
+ s.sp=Math.max(0,Number(d.sp)||0);
  s.targetAngle=Number(d.angle)||0;
  s.alive=true;
 
- const jump=Math.hypot(px-nx,py-ny)>250;
+ const jump=Math.hypot(s.x-nx,s.y-ny)>250;
+
+ const decoded=decodeTrail(d.tr);
+
+ if(decoded&&decoded.length){
+  s.trail=decoded;
+  s.trailDistance=0;
+
+  while(s.trail.length>s.length){
+   s.trail.pop();
+  }
+
+  if(s.trail.length<s.length){
+   extendSnakeTail(s,s.length-s.trail.length);
+  }
+ }
 
  if(isNew||jump){
-  const dec=decodeTrail(d.tr);
-
-  s.x=nx;s.y=ny;
+  s.x=nx;
+  s.y=ny;
   s.angle=s.targetAngle;
   s.trailDistance=0;
 
-  if(dec){
-   s.trail=dec;
-  }else{
+  if(!decoded||!decoded.length){
    s.trail=[];
-   for(let i=1;i<=Math.floor(s.length);i++){
+
+   for(let i=1;i<=s.length;i++){
     s.trail.push({
      x:nx-Math.cos(s.targetAngle)*BODY_SPACING*i,
      y:ny-Math.sin(s.targetAngle)*BODY_SPACING*i
@@ -1217,8 +1225,8 @@ function applySnapshot(s,d,isNew){
  }
 }
 
-/* Pro Frame: Kopf sanft zum vorausberechneten Ziel bewegen und den Körper
-   genau wie bei lokalen Schlangen entlang des Kopfpfads nachziehen. */
+/* FIX: Der Körper folgt der tatsächlich interpolierten Kopfbewegung.
+   Die empfangenen Körper-Snapshots werden zusätzlich regelmäßig synchronisiert. */
 function updateRemote(s,dt){
  if(s.baseX===undefined)return;
 
@@ -1229,32 +1237,63 @@ function updateRemote(s,dt){
  const ty=s.baseY+Math.sin(s.targetAngle)*s.sp*age;
 
  const k=1-Math.exp(-dt*14);
- const ox=s.x,oy=s.y;
- let nx=ox+(tx-ox)*k;
- let ny=oy+(ty-oy)*k;
 
- const d=Math.hypot(nx-ox,ny-oy);
+ const ox=s.x;
+ const oy=s.y;
 
- // Blickrichtung: aus tatsächlicher Bewegung, sonst aus Ziel-Winkel
- const wanted=d>0.4?Math.atan2(ny-oy,nx-ox):s.targetAngle;
- s.angle=wrapAngle(s.angle+angleDifference(s.angle,wanted)*(1-Math.exp(-dt*12)));
+ const nx=ox+(tx-ox)*k;
+ const ny=oy+(ty-oy)*k;
+
+ const dx=nx-ox;
+ const dy=ny-oy;
+ const distanceMoved=Math.hypot(dx,dy);
+
+ if(distanceMoved>.001){
+  const wanted=Math.atan2(dy,dx);
+
+  s.angle=wrapAngle(
+   s.angle+
+   angleDifference(s.angle,wanted)*
+   (1-Math.exp(-dt*12))
+  );
+ }else{
+  s.angle=wrapAngle(
+   s.angle+
+   angleDifference(s.angle,s.targetAngle)*
+   (1-Math.exp(-dt*5))
+  );
+ }
 
  s.x=nx;
  s.y=ny;
 
- if(d>0.0001){
-  s.trailDistance=(s.trailDistance||0)+d;
+ if(distanceMoved>.0001){
+  s.trailDistance=(s.trailDistance||0)+distanceMoved;
 
   while(s.trailDistance>=BODY_SPACING){
-   const f=clamp((d-(s.trailDistance-BODY_SPACING))/d,0,1);
-   s.trail.unshift({x:ox+(nx-ox)*f,y:oy+(ny-oy)*f});
+   const required=BODY_SPACING-
+    (s.trailDistance-BODY_SPACING);
+
+   const f=clamp(required/distanceMoved,0,1);
+
+   s.trail.unshift({
+    x:ox+dx*f,
+    y:oy+dy*f
+   });
+
    s.trailDistance-=BODY_SPACING;
   }
  }
 
  const len=Math.max(1,Math.floor(s.length)||START_LENGTH);
- while(s.trail.length>len)s.trail.pop();
- if(s.trail.length<len)extendSnakeTail(s,Math.min(len-s.trail.length,3));
+
+ while(s.trail.length>len){
+  s.trail.pop();
+ }
+
+ if(s.trail.length<len){
+  extendSnakeTail(s,len-s.trail.length);
+ }
 }
 
 function updateOnlineRemote(dt){
@@ -1268,7 +1307,7 @@ function onRemoteData(uid,d,isBot){
  if(isBot&&retiredBots.has(uid))return;
 
  let s=snakes.find(x=>x.uid===uid);
- if(s&&!s.remote)return; // wird lokal simuliert
+ if(s&&!s.remote)return;
 
  let isNew=false;
 
@@ -1286,7 +1325,6 @@ function onRemoteData(uid,d,isBot){
 
  applySnapshot(s,d,isNew);
 
- // Ist man selbst Leader, werden neu entdeckte Bots sofort übernommen
  if(isNew&&isBot&&arenaLeader)promoteBot(s);
 }
 
@@ -1368,7 +1406,7 @@ function removeOnlineListeners(){
  onlineListeners=[];
 }
 
-/* Leader-Verwaltung */
+/* LEADER-VERWALTUNG */
 
 function promoteBot(s){
  s.remote=false;
@@ -1461,7 +1499,6 @@ async function collectOnlineFood(f,s=player){
  if(!currentUser||!onlineMode||!s||!f.id||f.taken)return;
  f.taken=true;
 
- // Sofort lokal entfernen, damit nichts doppelt eingesammelt wird
  delete foodMap[f.id];
  foodsDirty=true;
 
@@ -1483,7 +1520,8 @@ async function collectOnlineFood(f,s=player){
  }catch(e){console.error("Futter:",e)}
 }
 
-/* Eigener Spielerstatus: Position, Score, Länge und kompletter Körper in EINEM Paket */
+/* EIGENER SPIELERSTATUS */
+
 async function updateOwnPlayer(extra={}){
  if(!currentUser||!onlineMode||!player)return;
 
@@ -1506,7 +1544,8 @@ async function updateOwnPlayer(extra={}){
  }catch(e){console.error("Spieler-Update:",e)}
 }
 
-/* Der Leader veröffentlicht Bots (Futter wird nie überschrieben) */
+/* BOTS VERÖFFENTLICHEN */
+
 async function publishArena(){
  if(!onlineMode||!arenaLeader)return;
 
@@ -1549,7 +1588,6 @@ async function joinOnline(){
  try{
   await leaveOnline();
 
-  // Ist niemand sonst aktiv, wird die Arena frisch zurückgesetzt
   const snap=await playersRef.once("value");
   let others=0;
   const now=serverNow();
@@ -1651,12 +1689,10 @@ function startRuntime(){
   claimLeader();
   updateOwnPlayer();
 
-  // Eigenen Status in festem Takt senden (unabhängig von der Framerate)
   runtimeIntervals.push(setInterval(()=>{
    if(onlineMode&&player&&player.alive)updateOwnPlayer();
   },PLAYER_PUBLISH_MS));
 
-  // Leader-Heartbeat + Aufräumen
   runtimeIntervals.push(setInterval(()=>{
    if(!onlineMode||!currentUser)return;
 
@@ -2063,7 +2099,8 @@ function loop(time){
  draw();
 }
 
-/* Der Leader hält die Bot-Anzahl aufrecht und vergrößert bei Bedarf die Arena */
+/* BOT-VERWALTUNG */
+
 function maintainBots(){
  if(!onlineMode||!arenaLeader)return;
 
@@ -2073,7 +2110,6 @@ function maintainBots(){
 
  const real=humanCount();
 
- // Arena-Größe: für alle gleich, liegt in der Datenbank, wächst nur
  const target=WORLD_BASE*(1+Math.floor(Math.max(10,real)/10)*.1);
  if(target>WORLD+1){
   arenaRef.child("size").transaction(cur=>(!cur||cur<target)?target:undefined).catch(()=>{});
