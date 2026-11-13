@@ -1118,7 +1118,7 @@ function startSolo(){
    Der Empfänger füllt die Lücken wieder auf (gleicher Abstand wie lokal). */
 function encodeTrail(trail){
  if(!trail||!trail.length)return"";
- const stride=Math.max(4,Math.ceil(trail.length/110));
+ const stride=Math.max(3,Math.ceil(trail.length/110));
  const out=[];
 
  for(let i=0;i<trail.length;i+=stride){
@@ -1210,7 +1210,8 @@ function applySnapshot(s,d,isNew){
  }
 }
 
-/* Pro Frame: Kopf voraus-berechnen, Versatz ausgleichen, Körper starr mitverschieben */
+/* Pro Frame: Kopf voraus-berechnen, Körper entlang des echten Pfads nachführen
+   und auf exakt s.length Punkte (Abstand BODY_SPACING) begrenzen */
 function updateRemote(s,dt){
  if(s.baseX===undefined||!s.baseTrail)return;
 
@@ -1227,15 +1228,35 @@ function updateRemote(s,dt){
  s.x=s.baseX+Math.cos(s.targetAngle)*s.sp*age+s.offX;
  s.y=s.baseY+Math.sin(s.targetAngle)*s.sp*age+s.offY;
 
- const dx=s.x-s.baseX,dy=s.y-s.baseY;
- const bt=s.baseTrail;
+ // Pfad: aktueller (vorausberechneter) Kopf -> letzter echter Kopf -> echter Körper
+ const path=[{x:s.x,y:s.y},{x:s.baseX+s.offX,y:s.baseY+s.offY}];
+ for(const p of s.baseTrail)path.push({x:p.x+s.offX,y:p.y+s.offY});
 
- if(s.trail.length!==bt.length)s.trail=copyPoints(bt);
+ // Gleichmäßig neu abtasten, maximal s.length Punkte
+ const maxPts=Math.max(1,Math.min(Math.floor(s.length)||START_LENGTH,400));
+ const out=[];
+ let seg=0;
+ let px=path[0].x,py=path[0].y;
+ let need=BODY_SPACING;
 
- for(let i=0;i<bt.length;i++){
-  s.trail[i].x=bt[i].x+dx;
-  s.trail[i].y=bt[i].y+dy;
+ while(out.length<maxPts&&seg<path.length-1){
+  const b=path[seg+1];
+  const dx=b.x-px,dy=b.y-py;
+  const d=Math.hypot(dx,dy);
+
+  if(d>=need){
+   const t=need/d;
+   px+=dx*t;py+=dy*t;
+   out.push({x:px,y:py});
+   need=BODY_SPACING;
+  }else{
+   need-=d;
+   px=b.x;py=b.y;
+   seg++;
+  }
  }
+
+ s.trail=out;
 }
 
 function updateOnlineRemote(dt){
