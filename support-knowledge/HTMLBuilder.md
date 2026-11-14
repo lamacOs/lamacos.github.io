@@ -4,162 +4,166 @@
 
 # Support-Dokumentation: HTMLBuilder
 
-**Website-Name:** HTML Builder  
-**Vermuteter Zweck:** Ein webbasiertes Tool zum Erstellen, Bearbeiten und Live-Vorschau von HTML-Code. Nutzer können HTML in einem Editor schreiben und das Ergebnis sofort in einer Vorschau sehen.  
+**Website-Name:** HTMLBuilder  
+**Vermuteter Zweck:** Ein webbasiertes Tool zum Erstellen, Bearbeiten und Live-Vorschau von HTML-Code. Nutzer können HTML in einem Editor schreiben und das Ergebnis direkt in einer Vorschau (iframe) sehen.  
 **Quellcode-Pfad:** `HTMLBuilder/index.html`  
-**Datum der Erstellung:** 2025-08-07 (basierend auf heutigem Datum)
+**Datum der Erstellung:** 2025-08-14 (basierend auf heutigem Datum)  
+**Hinweis:** Der bereitgestellte Quellcode scheint am Ende abgeschnitten zu sein (`[Datei gekürzt; nur Anfang analysiert]`). Die Dokumentation deckt nur die im Ausschnitt sichtbaren Bereiche ab.
 
 ---
 
 ## 1. Überblick & Voraussetzungen
 
-### 1.1 Zweck der Website
-HTMLBuilder ist eine Single-Page-Application (SPA), die einen **HTML-Editor mit Live-Vorschau** bereitstellt. Sie ermöglicht das Schreiben von HTML-Code in einem Textbereich (`textarea`) und zeigt das gerenderte Ergebnis direkt in einem `iframe` an. Zusätzlich ist ein **KI-gestützter Support-Chat (lamacHub)** fest in die Seite eingebettet.
+### 1.1 Zweck der Anwendung
+HTMLBuilder ist eine Single-Page-Application (SPA), die folgende Kernfunktionen bietet:
+- **HTML-Editor:** Ein Textbereich (`textarea`) zur Eingabe von HTML-Code.
+- **Live-Vorschau:** Ein `iframe`, der den eingegebenen HTML-Code rendert.
+- **Theme-Umschaltung:** Wechsel zwischen Light- und Dark-Mode.
+- **Integrierter KI-Support (lamacHub):** Ein Chat-Widget für Kundensupport.
 
 ### 1.2 Technische Voraussetzungen (Client-Seite)
-- **Moderner Browser** mit Unterstützung für:
+- **Browser:** Moderner Browser mit Unterstützung für:
   - CSS Custom Properties (Variablen)
   - `backdrop-filter` (für Glas-Effekte der Karten)
-  - `iframe`-Sandboxing (Vorschau)
-  - ES6 JavaScript (Pfeilfunktionen, `const`/`let`, `classList`, `fetch` – für den Chat)
-- **Internetverbindung** erforderlich für:
-  - Laden der Schriftart *Inter* (Google Fonts)
-  - Laden des Favicon/Brand-Logos (externes SVG)
-  - Funktion des KI-Support-Chats (Worker-Endpunkt `https://carescape-ai.oslamuoslamu.workers.dev/`)
-- **Keine Server-seitige Installation** nötig; die Datei `index.html` kann lokal geöffnet werden (Einschränkung: Der Chat-Worker blockiert ggf. `file://`-Anfragen wegen CORS).
+  - `iframe` Sandboxing (Standard)
+  - ES6 JavaScript (Arrow Functions, `const`/`let`, `classList`, `dataset`)
+- **Netzwerk:** 
+  - Zugriff auf `fonts.googleapis.com` (Schriftart "Inter").
+  - Zugriff auf `carescape-ai.oslamuoslamu.workers.dev` (für den KI-Chat-Worker).
+- **Keine Installation nötig:** Die Anwendung läuft rein clientseitig im Browser.
 
 ### 1.3 Unterstützte Sprachen
-- UI-Texte: **Deutsch** (fest im Code, z. B. „Kundensupport öffnen“, „Nachricht schreiben …“).
-- Code-Editor: **HTML** (keine Syntax-Highlighting-Bibliothek erkannt – reines `textarea`-Element).
+- UI-Texte: **Deutsch** (fest im HTML verankert: `lang="de"`, Button-Labels, Placeholder).
+- Code-Eingabe: **HTML** (beliebige Tags, wird im `iframe` interpretiert).
 
 ---
 
-## 2. Sichtbare Bereiche & Benutzeroberfläche
+## 2. Benutzeroberfläche – Sichtbare Bereiche
 
-Die Seite besteht aus folgenden Hauptbereichen (von oben nach unten):
+Die Seite ist in folgende Hauptbereiche gegliedert (von oben nach unten):
 
-| Bereich | Beschreibung | Wichtige Elemente (Selektoren/IDs) |
-| :--- | :--- | :--- |
-| **Navbar** | Obere Leiste mit Branding, Theme-Umschalter und Primär-Aktion. | `.navbar`, `.brand img`, `.brand span`, `.theme-btn`, `.action-btn` |
-| **Hero** | Überschrift und Kurzbeschreibung. | `.hero h1`, `.hero p` |
-| **Editor-Bereich (Links)** | Karte mit HTML-Textarea und Aktionsbuttons. | `.grid > .card:first-child`, `textarea`, `.actions` |
-| **Vorschau-Bereich (Rechts)** | Karte mit `iframe` zur Live-Darstellung. | `.grid > .card:last-child`, `#output`, `.preview` |
-| **Footer** | Copyright/Hinweistext. | `footer` |
-| **KI-Support-Chat (Overlay)** | Fester Button rechts unten + aufklappbares Chat-Fenster. | `#lamac-ai`, `#lamac-ai-open`, `#lamac-ai-window` |
+### 2.1 Navigationsleiste (`.navbar`)
+- **Links:** Marken-Logo (`<img>` 44x44px) + Text **"HTML Builder"** (fett, 1.2rem).
+- **Rechts:** 
+  - **Theme-Button** (`.theme-btn`, Beschriftung im Quellcode **nicht sichtbar**, nur Klasse `theme-btn` und Styling als Accent-Button). *Vermutung: Icon-Only Button (z.B. Sonne/Mond).*
+  - Keine weiteren Menüpunkte oder Links im Ausschnitt erkennbar.
 
-### 2.1 Navbar-Details
-- **Brand-Logo:** Externes SVG (`https://raw.githubusercontent.com/lamac04/lamacHub/main/lamacHub.svg`, 44×44 px).
-- **Titel:** „HTML Builder“ (Font-Weight 800).
-- **Theme-Button (`.theme-btn`):** Text „🌙“ / „☀️“ (Wechsel Light/Dark Mode). Speichert Präferenz in `localStorage` (`theme`).
-- **Action-Button (`.action-btn`):** Text „Seite als HTML speichern“. Lädt den **gesamten aktuellen `document.documentElement.outerHTML`** als Datei `html-builder-export.html` herunter.
+### 2.2 Hero-Bereich (`.hero`)
+- Überschrift: **"HTML Builder"** (Orange/Accent-Farbe, 3rem).
+- Untertitel: Kurzbeschreibung (grau/gedämpft), Text im Quellcode **leer** (`<p></p>` oder nicht befüllt). *Im Quellcode nicht eindeutig erkennbar, ob dynamisch befüllt.*
 
-### 2.2 Editor-Karte (Links)
-- **Überschrift:** „HTML Editor“.
-- **Textarea:** `min-height: 250px`, `resize: vertical`, Monospace-Schrift, keine Syntax-Highlighting.
-- **Aktionsleiste (`.actions`):** Drei Buttons (reine `button`-Elemente, **keine `type`-Attribute** → Standard `type="submit"`, aber **kein `<form>`-Elternteil** → verhalten sich wie `type="button"`):
-  1. **„Vorschau aktualisieren“** → rendert Textarea-Inhalt in den Iframe.
-  2. **„Beispiel laden“** → fügt ein vordefiniertes HTML-Beispiel (Bootstrap-CDN, Karten-Layout) in die Textarea ein.
-  3. **„Leeren“** → leert die Textarea komplett.
+### 2.3 Haupt-Arbeitsbereich (`.grid` – 2 Spalten auf Desktop, 1 Spalte < 1000px)
 
-### 2.3 Vorschau-Karte (Rechts)
-- **Überschrift:** „Live Vorschau“.
-- **Platzhalter (`#output`):** `div` mit `min-height: 250px`, initialer Text: „Klicke auf 'Vorschau aktualisieren', um dein HTML zu sehen“.
-- **Iframe (`.preview`):** `width: 100%`, `height: 500px`, `border: none`, `border-radius: 16px`, `background: white`. **Kein `sandbox`-Attribut** erkannt → volle Skript-Ausführung im Iframe möglich (Sicherheitshinweis siehe Abschnitt 6).
+#### Linke Spalte: Editor-Karte (`.card`)
+1.  **Überschrift:** `<h2>` (Text im Quellcode **nicht vorhanden**, nur Styling definiert). *Vermutung: "Editor" oder "HTML-Code".*
+2.  **Textarea (`#editor` – ID im Quellcode **nicht explizit als ID vergeben**, nur Selektor `textarea` im CSS):**
+    - Vollbreite, min. 250px Höhe, vertikal skalierbar (`resize: vertical`).
+    - Monospace-Schrift, 14px, Padding 14px.
+    - Transparenter Hintergrund, Rahmen passend zum Theme.
+    - **Keine Syntax-Highlighting-Funktionen im Quellcode erkennbar** (reines `<textarea>`-Element).
+3.  **Aktionsleiste (`.actions`):**
+    - Container für Buttons (`.action-btn`, Accent-Farbe).
+    - **Keine Buttons im HTML-Ausschnitt definiert.** *Im Quellcode nicht eindeutig erkennbar, welche Aktionen (z. B. "Laden", "Speichern", "Löschen", "In Vorschau rendern") vorgesehen sind. Eventuell per JS nachgeladen.*
 
-### 2.4 KI-Support-Chat (lamacHub)
-- **Öffnen-Button (`#lamac-ai-open`):** Fixiert rechts unten (60×60 px, grün `#007e62`), Icon `💬` (Unicode). `aria-label="Kundensupport öffnen"`.
-- **Fenster (`#lamac-ai-window`):** 390 px breit, max 570 px hoch, fixiert über dem Button. Header dunkel (`#11211d`), Titel „lamacHub Kundenservice“, Untertitel „KI-gestützter Support“.
-- **Nachrichtenbereich (`#lamac-ai-messages`):** Scrollbar, Bot-Nachrichten links (weiß, grauer Rand), User-Nachrichten rechts (grünlich `#d8f8e8`).
-- **Eingabeformular (`#lamac-ai-form`):** Input `maxlength="1800"`, Placeholder „Nachricht schreiben …“, Sende-Button (Pfeil-Icon `➤`).
-- **Markdown-Rendering:** Bot-Antworten unterstützen **Markdown** (Überschriften, Listen, Tabellen, Code-Blöcke, Links, Fett/Kursiv/Strikethrough). HTML wird escaped.
-- **Backend:** `WORKER_URL = "https://carescape-ai.oslamuoslamu.workers.dev/"` (POST, JSON `{ messages: [...] }`, Streaming via `ReadableStream`).
-- **Verlauf:** Wird im Speicher (`history`-Array) gehalten, **nicht** in `localStorage` persistiert (Seitenreload = Verlust).
+#### Rechte Spalte: Vorschau-Karte (`.card`)
+1.  **Überschrift:** `<h2>` (Text im Quellcode **nicht vorhanden**). *Vermutung: "Vorschau" oder "Ergebnis".*
+2.  **Ausgabe-Container (`.output`):**
+    - **Iframe (`#preview` – ID im HTML **nicht explizit vergeben**, CSS selektiert `.preview`):**
+        - 100% Breite, feste Höhe **500px**.
+        - Kein Rahmen (`border: none`), abgerundete Ecken (16px).
+        - Weißer Hintergrund (hartcodiert `background: white` – **passt nicht automatisch zum Darkmode**).
+        - **Sandbox-Attribute oder `srcdoc`-Logik im HTML nicht sichtbar.** *Vermutung: Befüllung erfolgt via JavaScript (`iframe.srcdoc = editorValue`).*
+
+### 2.4 Footer
+- Zentrierter Text (gedämpfte Farbe), Margin-top 40px.
+- **Inhalt im Quellcode leer** (`<footer></footer>`). *Im Quellcode nicht eindeutig erkennbar.*
+
+### 2.5 KI-Support-Widget (`#lamac-ai`) – **Getrennt vom Haupt-Layout (Fixed Position)**
+Ein komplettes, in das HTML eingebettetes Chat-System (lamacHub).
+- **Öffnen-Button (`#lamac-ai-open`):** Fest positioniert (rechts unten, 24px Abstand). Kreis (60px), türkis/grün (`#007e62`), Icon: `🤖` (Emoji/Unicode). `aria-label="Kundensupport öffnen"`.
+- **Chat-Fenster (`#lamac-ai-window`):** Initial versteckt (`display: none`). Erscheint über dem Öffnen-Button (bottom: 96px). Breite max 390px, Höhe max 570px.
+    - **Header:** Titel "lamacHub Kundenservice", Untertitel "KI-gestützter Support". Schließen-Button (×).
+    - **Nachrichtenbereich (`#lamac-ai-messages`):** Scrollbar, `aria-live="polite"`. Startet mit Bot-Nachricht: *"Hallo! Wie kann ich dir weiterhelfen?"*.
+    - **Eingabeformular (`#lamac-ai-form`):**
+        - Input-Feld (`#lamac-ai-input`): Max 1800 Zeichen, Placeholder "Nachricht schreiben …", `autocomplete="off"`, `required`.
+        - Senden-Button: Icon `➤` (Unicode Pfeil), `aria-label="Nachricht senden"`.
+- **Features (aus JS/CSS ableitbar):**
+    - Markdown-Rendering im Bot-Output (Fett, Kursiv, Code, Listen, Tabellen, Links).
+    - Syntax-Highlighting für Code-Blöcke im Bot-Output.
+    - "Tippt"-Animation (3 Punkte) während Wartezeit auf Worker-Antwort.
+    - XSS-Schutz: HTML-Escaping aller Inhalte vor Rendering, Link-Validierung (nur http/https).
+    - Kommunikation via `fetch` an `WORKER_URL` (`https://carescape-ai.oslamuoslamu.workers.dev/`).
+    - Conversation History wird im Speicher (`history` Array) gehalten und mitgesendet.
+    - Responsive: Auf Mobil (<480px) fast Vollbild.
+    - Reduzierte Animation bei `prefers-reduced-motion`.
 
 ---
 
-## 3. Bedienung Schritt für Schritt
+## 3. Bedienung – Schritt für Schritt
 
-### 3.1 HTML schreiben & Vorschau sehen
-1. Öffne `index.html` im Browser.
-2. Schreibe HTML-Code in das **linke Textfeld** („HTML Editor“).
-   - *Hinweis:* Kein Autovervollständigen, kein Highlighting.
-3. Klicke auf **„Vorschau aktualisieren“** (Button links oben in der Aktionsleiste).
-4. Das Ergebnis erscheint im **rechten Iframe** („Live Vorschau“).
-5. Wiederhole Schritte 2–3 nach Änderungen.
+### 3.1 HTML-Code schreiben & Vorschau anzeigen
+> **Hinweis:** Da keine "Render"-Buttons im HTML-Ausschnitt vorhanden sind, wird **vermutet**, dass die Vorschau **automatisch beim Tippen (Live-Update)** oder via **Tastenkombination (z. B. Strg+Enter)** aktualisiert wird. Dies ist im bereitgestellten JS-Ausschnitt **nicht bestätigt**.
 
-### 3.2 Beispiel laden (Starter-Template)
-1. Klicke auf **„Beispiel laden“**.
-2. Die Textarea wird mit einem Bootstrap 5-Beispiel (Hero + 3 Karten) gefüllt.
-3. Klicke **„Vorschau aktualisieren“**, um das Layout zu sehen.
+1.  Seite öffnen (`index.html` im Browser).
+2.  In das große Textfeld (linke Karte) klicken.
+3.  Gültigen HTML-Code eingeben (z. B. `<h1>Hallo Welt</h1><p>Mein erster Test</p>`).
+4.  **Erwartetes Verhalten (Vermutung):** Der rechte iframe (`preview`) zeigt sofort das gerenderte Ergebnis.
+5.  Bei Fehlern im HTML: Browser-rendering-typische Fehleranzeige im Iframe (kein eigenes Error-Reporting im Code sichtbar).
 
-### 3.3 Editor leeren
-1. Klicke auf **„Leeren“**.
-2. Textarea wird sofort geleert (keine Rückfrage).
+### 3.2 Theme wechseln (Light / Dark Mode)
+1.  Button in der Navbar rechts suchen (Accent-farben, wahrscheinlich ein Icon).
+2.  Einmal klicken.
+3.  **Erwartung:** Gesamte Seite (Hintergrund, Karten, Textfarben, Ränder) wechselt das Farbschema per CSS-Variablen (`[data-theme="dark"]` auf `<html>` oder `<body>`).
+    - *Im JS-Ausschnitt ist der Event-Listener für `.theme-btn` **nicht enthalten**. Funktion nur bestätigt, wenn entsprechendes JS existiert (nicht im Ausschnitt).*
 
-### 3.4 Dark / Light Mode wechseln
-1. Klicke auf den Button **„🌙“** (oder „☀️“ im Dark Mode) in der Navbar rechts.
-3. Das Theme wechselt sofort; Wahl wird in `localStorage` gespeichert und beim nächsten Laden wiederhergestellt.
-
-### 3.5 Aktuelle Seite als HTML-Datei speichern
-1. Klicke auf **„Seite als HTML speichern“** in der Navbar.
-2. Browser lädt `html-builder-export.html` herunter (enthält den **kompletten aktuellen DOM**, inkl. Chat-Widget, Styles, Skripte).
-
-### 3.6 KI-Support-Chat nutzen
-1. Klicke auf den **grünen Chat-Button (💬)** rechts unten.
-2. Das Fenster öffnet sich mit Begrüßung: „Hallo! Wie kann ich dir weiterhelfen?“.
-3. Tippe deine Nachricht (max. 1800 Zeichen) in das Eingabefeld.
-4. Drücke **Enter** oder klicke **Sende-Button (➤)**.
-5. Warte auf Antwort (animierte „Tippt…“-Anzeige).
-6. Schließe Fenster über **×-Button** oben rechts im Chat-Header.
+### 3.3 KI-Support (lamacHub) nutzen
+1.  Unten rechts auf den runden **🤖-Button** ("Kundensupport öffnen") klicken.
+2.  Chat-Fenster öffnet sich mit Animation.
+3.  In das Eingabefeld ("Nachricht schreiben …") Text eintippen (max. 1800 Zeichen).
+4.  Enter drücken oder auf **Pfeil-Button (➤)** klicken.
+5.  Eigene Nachricht erscheint rechts (grünlicher Hintergrund).
+6.  Drei pulsierende Punkte ("Tippt...") erscheinen links.
+7.  Antwort der KI erscheint links (weißer Hintergrund, Markdown formatiert: **Fett**, *Kursiv*, `Code`, Listen, Links, Tabellen).
+8.  Bei Bedarf Scrollen (Verlauf bleibt erhalten).
+9.  Zum Schließen: **×-Button** im Chat-Header klicken oder erneut auf 🤖-Button (Toggle-Logik im JS: `open/close` via Klasse `.open`).
 
 ---
 
 ## 4. Eingaben & Ausgaben
 
-| Aktion | Eingabe | Ausgabe / Wirkung |
-| :--- | :--- | :--- |
-| HTML schreiben | Freitext in `textarea` | Keine direkte Ausgabe; nur bei „Vorschau aktualisieren“ |
-| Vorschau aktualisieren | Textarea-Inhalt (String) | `iframe.srcdoc` wird gesetzt → gerendertes HTML im Iframe |
-| Beispiel laden | Keine (Klick) | Textarea wird mit festem HTML-String (Bootstrap-Beispiel) befüllt |
-| Leeren | Keine (Klick) | Textarea `value = ""` |
-| Theme toggeln | Keine (Klick) | `document.documentElement.dataset.theme` = `"dark"` / `"light"`, `localStorage.setItem('theme', ...)` |
-| Seite speichern | Keine (Klick) | Download `html-builder-export.html` (Blob: `document.documentElement.outerHTML`) |
-| Chat senden | Text (≤ 1800 Zeichen) | POST an Worker → Streaming-Antwort → Markdown → HTML im Chat-Fenster |
-| Chat schließen | Klick auf × | `chatWindow.classList.remove('open')` (Display: none) |
+| Bereich | Eingabe (User) | Ausgabe (System) | Hinweise |
+| :--- | :--- | :--- | :--- |
+| **Editor (Textarea)** | HTML-Text (String) | Keine direkte Ausgabe im Editor | Keine Validierung, kein Linting, kein Autocomplete im Code sichtbar. |
+| **Vorschau (Iframe)** | Keine direkte Eingabe | Gerendertes HTML/DOM | **Sicherheit:** Iframe läuft im gleichen Origin (wenn `srcdoc` genutzt) oder `about:blank`. Kein `sandbox`-Attribut im HTML sichtbar -> **Vorsicht bei Skripten im Editor-Code.** |
+| **Chat-Input** | Text (max 1800 Zeichen) | Bot-Antwort (HTML/Markdown) | Request an externen Worker (`carescape-ai...`). History wird mitgesendet. |
+| **Theme-Button** | Klick | Toggle `data-theme` Attribut | Persistenz (LocalStorage) im Ausschnitt **nicht erkennbar**. |
 
 ---
 
 ## 5. Typische Probleme & Fehlerbehebung
 
-| Problem | Mögliche Ursache | Lösung / Workaround |
+| Problem | Mögliche Ursache (basierend auf Code) | Abhilfe / Workaround |
 | :--- | :--- | :--- |
-| **Vorschau bleibt leer / zeigt alten Stand** | „Vorschau aktualisieren“ nicht geklickt | Button **„Vorschau aktualisieren“** drücken (kein Auto-Refresh). |
-| **Skripte/Styles im Iframe funktionieren nicht** | Iframe hat **kein `sandbox`-Attribut**, aber `srcdoc` unterliegt Same-Origin-Policy; externe Ressourcen (CDN) benötigen Internet. | Prüfen: Internetverbindung? CDN-Links (Bootstrap) erreichbar? Browser-Konsole (F12) auf CSP-/Netzwerk-Fehler prüfen. |
-| **Dark Mode wird nicht gespeichert** | `localStorage` deaktiviert / Privater Modus / Speicher voll | Browser-Einstellungen prüfen; manuell Theme-Button nutzen. |
-| **„Seite als HTML speichern“ lädt riesige Datei / Chat mit herunter** | Exportiert **gesamten DOM** (`outerHTML`), inkl. Chat-Widget & Inline-Styles/Skripts. | Erwartetes Verhalten. Für reinen Editor-Code: Textarea-Inhalt manuell kopieren. |
-| **Chat öffnet nicht / keine Antwort** | Worker-Endpunkt blockiert (CORS, Firewall, Adblocker), `file://`-Protokoll, Offline. | Seite über HTTP(S) servieren (lokaler Server: `npx serve`, `python -m http.server`). Adblocker für `carescape-ai.oslamuoslamu.workers.dev` deaktivieren. |
-| **Chat-Verlauf nach Reload weg** | Verlauf nur im RAM (`history`-Array), **nicht** in `localStorage`. | Nicht persistiert – gewollt oder Limitierung. |
-| **Enter im Chat sendet nicht / lädt Seite neu** | Buttons haben **kein `type="button"`**, aber **kein `<form>`-Elternteil** im Haupt-UI → kein Submit. Im Chat-Formular: `form.addEventListener('submit', ...)` mit `e.preventDefault()` → Enter sendet korrekt. | Im Chat: Enter funktioniert. Im Editor: Buttons verhalten sich wie Buttons. |
-| **Schriftart „Inter“ lädt nicht** | Google Fonts blockiert / Offline | Fallback: `sans-serif` (CSS `font-family: Inter, sans-serif`). Lokal hosten für Offline-Nutzung. |
+| **Vorschau bleibt leer / zeigt alten Stand** | Kein Auto-Update-Event-Listener im JS-Ausschnitt gefunden. | Seite neu laden (falls Speicherung im Iframe fehlerhaft) oder **Im Quellcode nicht eindeutig erkennbar**, wie Update getriggert wird. Prüfen: Gibt es einen "Run"-Button im echten Code? |
+| **Dark Mode: Iframe-Hintergrund blendet weiß** | `.preview` hat hartcodiert `background: white;` im CSS. Keine Variable `var(--card)` oder `transparent`. | **Bestätigtes CSS-Problem.** Workaround: Im Editor `<body style="background: var(--bg);">` nutzen oder Browser-Erweiterung "Dark Reader" nutzen. |
+| **Theme-Button reagiert nicht** | JS für `.theme-btn` fehlt im Ausschnitt. | Prüfen, ob separates JS-File geladen wird. Manuell `document.documentElement.dataset.theme = 'dark'` in Konsole setzen zum Test. |
+| **Chat öffnet sich nicht / Button fehlt** | `#lamac-ai` Container oder Script blockiert (Adblocker, CSP). | Prüfen: Lädt `carescape-ai.oslamuoslamu.workers.dev`? Console auf JS-Fehler prüfen (`root.dataset.initialized` verhindert Doppel-Init). |
+| **Chat sendet nicht / "Tippt..." bleibt stehen** | Worker-URL down, CORS-Fehler, Netzwerkblockade. | Netzwerk-Tab prüfen (POST an Worker-URL). Offline: Chat funktioniert **nicht** (reiner Client-Worker-Architektur). |
+| **Markdown im Chat wird nicht gerendert** | `renderMarkdown` Funktion fehlerhaft oder Eingabe zu komplex. | Einfache Texte testen. Code-Blöcke (` ``` `) nutzen. |
+| **Schriftart "Inter" lädt nicht** | `fonts.googleapis.com` blockiert / Offline. | Fallback: `sans-serif` (definiert in `font-family: Inter, sans-serif`). Layout bricht nicht. |
+| **Mobile: Editor & Vorschau übereinander, aber Vorschau fest 500px** | `.preview` hat `height: 500px` fest. Kein `max-height: 50vh` o.ä. | Scrollen im Iframe nötig. Auf kleinen Bildschirmen viel Platzverlust. |
 
 ---
 
 ## 6. Datenschutz, Berechtigungen & Sicherheit
 
-### 6.1 Datenverarbeitung
-| Komponente | Daten | Speicherung | Weitergabe |
-| :--- | :--- | :--- | :--- |
-| **Theme-Präferenz** | `"dark"` / `"light"` | `localStorage` (lokal, Browser) | Nein |
-| **Editor-Inhalt** | HTML-Code (Textarea) | Nur im RAM (DOM) | Nein (außer bei „Seite speichern“ → Download) |
-| **Chat-Verlauf** | User/Bot-Nachrichten | Nur im RAM (`history`-Array) | **Ja** → an `https://carescape-ai.oslamuoslamu.workers.dev/` (POST, JSON) |
-| **Chat-Eingabe** | Text (≤ 1800 Zeichen) | RAM | **Ja** → Worker (siehe oben) |
+### 6.1 Clientseitige Verarbeitung
+- **HTML-Editor & Vorschau:** Laufen **vollständig im Browser**. Keine Daten werden an den Betreiber der HTMLBuilder-Seite gesendet (sofern kein eigenes Backend im fehlenden JS-Teil existiert).
+- **Lokale Speicherung:** `localStorage` / `sessionStorage` Zugriff im Ausschnitt **nicht erkennbar** (außer `root.dataset.initialized` für Chat).
 
-### 6.2 Externe Verbindungen (beim Laden der Seite)
-1. **Google Fonts:** `https://fonts.googleapis.com/css2?family=Inter...` (CSS) → `https://fonts.gstatic.com` (Font-Dateien).
-2. **Brand-Logo:** `https://raw.githubusercontent.com/lamac04/lamacHub/main/lamacHub.svg`.
-3. **Chat-Worker (bei Nutzung):** `https://carescape-ai.oslamuoslamu.workers.dev/` (POST, Streaming).
-
-### 6.3 Sicherheitshinweise
-- **Iframe ohne Sandbox:** Der Vorschau-Iframe nutzt `srcdoc` **ohne `sandbox`-Attribut**. **Beliebiges JavaScript im Editor-Code wird im Iframe ausgeführt** (Same-Origin wie Hauptseite). → **Nicht** für unsicheren Fremdcode nutzen.
-- **Content Security Policy (CSP):** Im Quellcode **kein `<meta http-equiv="Content-Security-Policy">`** erkannt. Externe Skripte/Styles (Bootstrap im Beispiel) laden ohne Integrity-Hashes.
-- **Chat-Worker-URL:** Hardcoded im Code. Kein
+### 6.2 Externe Verbindungen (Third Party)
+1.  **Google Fonts (`fonts.googleapis.com`):**
+    - Lädt Schriftart "Inter" beim Seitenaufruf.
+    - Übermittelt IP-Adresse & User-Agent an Google. **Kein `local` Hosting der Fonts im Code sichtbar.**
+2.  **lamacHub KI-Worker (`https://carescape-ai.oslamuoslamu.workers.dev/`):**
+    - **Wird nur bei Chat-Nutz

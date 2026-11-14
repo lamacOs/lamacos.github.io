@@ -1,7 +1,7 @@
 {
   "name": "lamacHub Support-Wissensdatenbank",
   "language": "de",
-  "generatedAt": "2026-11-13T08:02:45Z",
+  "generatedAt": "2026-11-14T03:04:31Z",
   "repository": "https://github.com/lamacOs/lamacos.github.io",
   "websites": [
     {
@@ -234,6 +234,13 @@
       "path": "Smooth-Animations",
       "document": "support-knowledge/Smooth-Animations.md",
       "url": "https://lamachub.de/Smooth-Animations/"
+    },
+    {
+      "id": "SNAKEBattle",
+      "name": "SNAKEBattle",
+      "path": "SNAKEBattle",
+      "document": "support-knowledge/SNAKEBattle.md",
+      "url": "https://lamachub.de/SNAKEBattle/"
     },
     {
       "id": "Sprach-Berater",
