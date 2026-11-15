@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christmas Countdown</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top, #17452e 0%, #071b13 55%, #020806 100%);
+  color: white;
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  text-shadow: 0 0 20px #e6b84b;
+}
+
+#countdown {
+  font-size: clamp(1.7rem, 5vw, 3rem);
+  margin-top: 15px;
+  letter-spacing: 2px;
+  color: #ffe5a0;
+  text-shadow: 0 0 15px #d49b35;
+}
+
+.subtitle {
+  color: #c8e8d3;
+  margin-top: 15px;
+  font-size: 1.1rem;
+}
+
+#newyear {
+  display: none;
+  font-size: clamp(2.5rem, 9vw, 5rem);
+  margin-top: 25px;
+  color: #ffe5a0;
+  text-shadow: 0 0 25px gold, 0 0 55px #ff3333;
+  animation: pop 1.2s ease forwards;
+}
+
+@keyframes pop {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.snow {
+  position: absolute;
+  top: -15px;
+  color: white;
+  pointer-events: none;
+  animation: snowfall linear forwards;
+  z-index: 0;
+}
+
+@keyframes snowfall {
+  to {
+    transform: translateY(110vh) translateX(60px);
+    opacity: 0.2;
+  }
+}
+
+.tree {
+  font-size: clamp(3rem, 8vw, 5rem);
+  margin-top: 25px;
+  filter: drop-shadow(0 0 15px #27ae60);
+}
+
+.gift {
+  position: absolute;
+  bottom: 15px;
+  font-size: 3rem;
+  animation: gift 2s ease-in-out infinite alternate;
+}
+
+@keyframes gift {
+  to { transform: translateY(-15px) rotate(10deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎄 Countdown bis Weihnachten 🎄</h1>
+
+<div class="tree">🎄</div>
+
+<div id="countdown">Lädt...</div>
+
+<div class="subtitle">
+  Die schönste Zeit des Jahres steht bevor ✨
+</div>
+
+<div id="newyear">
+  🎅 MERRY CHRISTMAS! 🎁
+</div>
+
+<div class="gift">🎁</div>
+
+<script>
+const countdownEl = document.getElementById("countdown");
+const newyearEl = document.getElementById("newyear");
+
+let finished = false;
+
+function getChristmas() {
+  const now = new Date();
+  return new Date(now.getFullYear(), 11, 24, 0, 0, 0);
+}
+
+const target = getChristmas();
+
+function updateCountdown() {
+  if (finished) return;
+
+  const now = new Date();
+  const diff = target - now;
+
+  if (diff <= 0) {
+    finished = true;
+    countdownEl.style.display = "none";
+    document.querySelector(".subtitle").style.display = "none";
+    newyearEl.style.display = "block";
+
+    speak("Merry Christmas! Frohe Weihnachten!");
+    createSnow(150);
+
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200, 100, 400]);
+    }
+
+    return;
+  }
+
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor(diff / 3600000) % 24;
+  const m = Math.floor(diff / 60000) % 60;
+  const s = Math.floor(diff / 1000) % 60;
+
+  countdownEl.textContent =
+    `${d} Tage ${h} Std. ${m} Min. ${s} Sek.`;
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "en-US";
+  msg.rate = 0.9;
+  speechSynthesis.speak(msg);
+}
+
+function createSnow(amount) {
+  for (let i = 0; i < amount; i++) {
+    const snow = document.createElement("div");
+    snow.className = "snow";
+    snow.textContent = Math.random() > 0.5 ? "❄" : "❅";
+
+    snow.style.left = Math.random() * 100 + "vw";
+    snow.style.fontSize = 10 + Math.random() * 20 + "px";
+    snow.style.animationDuration = 3 + Math.random() * 5 + "s";
+
+    document.body.appendChild(snow);
+
+    setTimeout(() => snow.remove(), 8500);
+  }
+}
+
+// Ständiger Schneefall
+setInterval(() => createSnow(3), 250);
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
+
+</body>
+</html>
