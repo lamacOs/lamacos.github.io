@@ -3,7 +3,8 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#071b13">
 <title>Christmas Countdown</title>
 
 <style>
@@ -11,37 +12,48 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
-  height: 100vh;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 20px;
   background: radial-gradient(circle at top, #17452e 0%, #071b13 55%, #020806 100%);
   color: white;
   font-family: system-ui, sans-serif;
   overflow: hidden;
   text-align: center;
+  position: relative;
 }
 
 h1 {
   font-size: clamp(2rem, 6vw, 4rem);
   text-shadow: 0 0 20px #e6b84b;
+  z-index: 1;
 }
 
 #countdown {
-  font-size: clamp(1.7rem, 5vw, 3rem);
+  font-size: clamp(1.4rem, 5vw, 3rem);
   margin-top: 15px;
   letter-spacing: 2px;
   color: #ffe5a0;
   text-shadow: 0 0 15px #d49b35;
+  z-index: 1;
 }
 
 .subtitle {
   color: #c8e8d3;
   margin-top: 15px;
   font-size: 1.1rem;
+  z-index: 1;
 }
 
 #newyear {
@@ -51,6 +63,7 @@ h1 {
   color: #ffe5a0;
   text-shadow: 0 0 25px gold, 0 0 55px #ff3333;
   animation: pop 1.2s ease forwards;
+  z-index: 1;
 }
 
 @keyframes pop {
@@ -77,8 +90,9 @@ h1 {
 
 .tree {
   font-size: clamp(3rem, 8vw, 5rem);
-  margin-top: 25px;
+  margin-top: 10px;
   filter: drop-shadow(0 0 15px #27ae60);
+  z-index: 1;
 }
 
 .gift {
@@ -86,11 +100,87 @@ h1 {
   bottom: 15px;
   font-size: 3rem;
   animation: gift 2s ease-in-out infinite alternate;
+  z-index: 1;
 }
 
 @keyframes gift {
   to { transform: translateY(-15px) rotate(10deg); }
 }
+
+/* Vollbild-Button */
+
+#fullscreenBtn {
+  position: fixed;
+  top: max(15px, env(safe-area-inset-top));
+  right: max(15px, env(safe-area-inset-right));
+  z-index: 1000;
+  padding: 12px 18px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background 0.2s, transform 0.2s;
+}
+
+#fullscreenBtn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: scale(1.05);
+}
+
+#fullscreenBtn:active {
+  transform: scale(0.95);
+}
+
+/* Querformat */
+
+@media (orientation: landscape) {
+  body {
+    padding: 10px 80px;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    margin: 5px 0;
+  }
+
+  .tree {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    margin-top: 0;
+  }
+
+  #countdown {
+    font-size: clamp(1.3rem, 4vw, 2.5rem);
+    margin-top: 5px;
+  }
+
+  .subtitle {
+    margin-top: 5px;
+    font-size: 1rem;
+  }
+
+  .gift {
+    font-size: 2rem;
+  }
+}
+
+/* Kleine Bildschirme */
+
+@media (max-width: 500px) {
+  #countdown {
+    letter-spacing: 0;
+  }
+
+  h1 {
+    max-width: 95%;
+  }
+}
+
+/* Animationen reduzieren */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -101,6 +191,10 @@ h1 {
 </head>
 
 <body>
+
+<button id="fullscreenBtn" onclick="toggleFullscreen()">
+  ⛶ Vollbild
+</button>
 
 <h1>🎄 Countdown bis Weihnachten 🎄</h1>
 
@@ -121,8 +215,46 @@ h1 {
 <script>
 const countdownEl = document.getElementById("countdown");
 const newyearEl = document.getElementById("newyear");
+const fullscreenBtn = document.getElementById("fullscreenBtn");
 
 let finished = false;
+
+/* Vollbildmodus */
+
+async function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+
+      // Querformat anfordern, falls unterstützt
+      if (screen.orientation && screen.orientation.lock) {
+        try {
+          await screen.orientation.lock("landscape");
+        } catch (e) {
+          // Nicht jedes Gerät erlaubt die Sperre
+        }
+      }
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (error) {
+    console.log("Vollbildmodus nicht verfügbar:", error);
+  }
+
+  updateFullscreenButton();
+}
+
+function updateFullscreenButton() {
+  fullscreenBtn.textContent = document.fullscreenElement
+    ? "✕ Vollbild verlassen"
+    : "⛶ Vollbild";
+}
+
+document.addEventListener("fullscreenchange", updateFullscreenButton);
+
+/* Weihnachts-Countdown */
 
 function getChristmas() {
   const now = new Date();
@@ -139,6 +271,7 @@ function updateCountdown() {
 
   if (diff <= 0) {
     finished = true;
+
     countdownEl.style.display = "none";
     document.querySelector(".subtitle").style.display = "none";
     newyearEl.style.display = "block";
@@ -162,6 +295,8 @@ function updateCountdown() {
     `${d} Tage ${h} Std. ${m} Min. ${s} Sek.`;
 }
 
+/* Sprachausgabe */
+
 function speak(text) {
   if (!("speechSynthesis" in window)) return;
 
@@ -171,9 +306,12 @@ function speak(text) {
   speechSynthesis.speak(msg);
 }
 
+/* Schneefall */
+
 function createSnow(amount) {
   for (let i = 0; i < amount; i++) {
     const snow = document.createElement("div");
+
     snow.className = "snow";
     snow.textContent = Math.random() > 0.5 ? "❄" : "❅";
 
@@ -190,8 +328,10 @@ function createSnow(amount) {
 // Ständiger Schneefall
 setInterval(() => createSnow(3), 250);
 
+// Countdown starten
 updateCountdown();
 setInterval(updateCountdown, 1000);
+
 </script>
 
 </body>
