@@ -1,11 +1,21 @@
 
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#071b13">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
 <title>Christmas Countdown</title>
+
+<!-- iOS Web-App -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Christmas">
+
+<!-- Android -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#071b13">
 
 <style>
 * {
@@ -15,18 +25,27 @@
 html, body {
   margin: 0;
   width: 100%;
-  min-height: 100%;
+  height: 100%;
 }
 
 body {
   min-height: 100vh;
   min-height: 100dvh;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   padding: 20px;
-  background: radial-gradient(circle at top, #17452e 0%, #071b13 55%, #020806 100%);
+
+  background: radial-gradient(
+    circle at top,
+    #17452e 0%,
+    #071b13 55%,
+    #020806 100%
+  );
+
   color: white;
   font-family: system-ui, sans-serif;
   overflow: hidden;
@@ -114,26 +133,52 @@ h1 {
   top: max(15px, env(safe-area-inset-top));
   right: max(15px, env(safe-area-inset-right));
   z-index: 1000;
+
   padding: 12px 18px;
   border: 1px solid rgba(255,255,255,0.25);
   border-radius: 12px;
+
   background: rgba(255,255,255,0.12);
   color: white;
+
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition: background 0.2s, transform 0.2s;
 }
 
-#fullscreenBtn:hover {
-  background: rgba(255,255,255,0.25);
-  transform: scale(1.05);
+/* iOS Installationshinweis */
+
+#iosHint {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: max(65px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(90%, 360px);
+
+  padding: 16px;
+  border-radius: 16px;
+
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.2);
+
+  color: white;
+  font-size: 14px;
+  line-height: 1.5;
+  z-index: 2000;
 }
 
-#fullscreenBtn:active {
-  transform: scale(0.95);
+#iosHint button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #27ae60;
+  color: white;
+  font-weight: bold;
 }
 
 /* Querformat */
@@ -168,8 +213,6 @@ h1 {
   }
 }
 
-/* Kleine Bildschirme */
-
 @media (max-width: 500px) {
   #countdown {
     letter-spacing: 0;
@@ -179,8 +222,6 @@ h1 {
     max-width: 95%;
   }
 }
-
-/* Animationen reduzieren */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -195,6 +236,16 @@ h1 {
 <button id="fullscreenBtn" onclick="toggleFullscreen()">
   ⛶ Vollbild
 </button>
+
+<div id="iosHint">
+  <strong>📱 Vollbild auf dem iPhone</strong>
+  <br><br>
+  Tippe auf das Teilen-Symbol in Safari und anschließend auf
+  <strong>„Zum Home-Bildschirm“</strong>.
+  <br>
+  Öffne danach den Countdown über das neue Symbol.
+  <button onclick="closeHint()">Verstanden</button>
+</div>
 
 <h1>🎄 Countdown bis Weihnachten 🎄</h1>
 
@@ -216,45 +267,77 @@ h1 {
 const countdownEl = document.getElementById("countdown");
 const newyearEl = document.getElementById("newyear");
 const fullscreenBtn = document.getElementById("fullscreenBtn");
+const iosHint = document.getElementById("iosHint");
 
 let finished = false;
 
-/* Vollbildmodus */
+/* Geräteerkennung */
+
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+const isStandalone =
+  window.navigator.standalone === true ||
+  window.matchMedia("(display-mode: standalone)").matches;
+
+/* Vollbild */
 
 async function toggleFullscreen() {
+
+  // iOS: Eine installierte Web-App läuft bereits
+  // im eigenständigen Vollbildmodus.
+  if (isIOS) {
+
+    if (!isStandalone) {
+      iosHint.style.display = "block";
+    } else {
+      fullscreenBtn.style.display = "none";
+    }
+
+    return;
+  }
+
+  // Andere Geräte
   try {
     if (!document.fullscreenElement) {
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      }
+      await document.documentElement.requestFullscreen();
 
-      // Querformat anfordern, falls unterstützt
-      if (screen.orientation && screen.orientation.lock) {
+      if (screen.orientation?.lock) {
         try {
           await screen.orientation.lock("landscape");
-        } catch (e) {
-          // Nicht jedes Gerät erlaubt die Sperre
-        }
+        } catch (e) {}
       }
     } else {
       await document.exitFullscreen();
     }
   } catch (error) {
-    console.log("Vollbildmodus nicht verfügbar:", error);
+    console.log("Vollbild nicht verfügbar:", error);
   }
 
   updateFullscreenButton();
 }
 
 function updateFullscreenButton() {
+
+  if (isIOS && isStandalone) {
+    fullscreenBtn.style.display = "none";
+    return;
+  }
+
   fullscreenBtn.textContent = document.fullscreenElement
     ? "✕ Vollbild verlassen"
     : "⛶ Vollbild";
 }
 
+function closeHint() {
+  iosHint.style.display = "none";
+}
+
 document.addEventListener("fullscreenchange", updateFullscreenButton);
 
-/* Weihnachts-Countdown */
+updateFullscreenButton();
+
+/* Weihnachten */
 
 function getChristmas() {
   const now = new Date();
@@ -264,12 +347,14 @@ function getChristmas() {
 const target = getChristmas();
 
 function updateCountdown() {
+
   if (finished) return;
 
   const now = new Date();
   const diff = target - now;
 
   if (diff <= 0) {
+
     finished = true;
 
     countdownEl.style.display = "none";
@@ -298,18 +383,22 @@ function updateCountdown() {
 /* Sprachausgabe */
 
 function speak(text) {
+
   if (!("speechSynthesis" in window)) return;
 
   const msg = new SpeechSynthesisUtterance(text);
   msg.lang = "en-US";
   msg.rate = 0.9;
+
   speechSynthesis.speak(msg);
 }
 
 /* Schneefall */
 
 function createSnow(amount) {
+
   for (let i = 0; i < amount; i++) {
+
     const snow = document.createElement("div");
 
     snow.className = "snow";
@@ -325,10 +414,12 @@ function createSnow(amount) {
   }
 }
 
-// Ständiger Schneefall
+/* Ständiger Schneefall */
+
 setInterval(() => createSnow(3), 250);
 
-// Countdown starten
+/* Countdown starten */
+
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
