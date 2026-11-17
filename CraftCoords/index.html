@@ -1,0 +1,2760 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>CraftCoords – Minecraft Coordinate Manager</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#f7f9fc;
+  --surface:#ffffff;
+  --surface2:#f3f6fa;
+  --text:#192333;
+  --muted:#8793a4;
+  --border:#e8edf3;
+  --orange:#ff7a00;
+  --cyan:#01c7fc;
+  --green:#22a06b;
+  --red:#e5484d;
+  --shadow:0 8px 30px rgba(25,45,75,.045);
+}
+
+body[data-theme="dark"] {
+  --bg:#101722;
+  --surface:#192434;
+  --surface2:#222f41;
+  --text:#edf3fb;
+  --muted:#9aa9bd;
+  --border:#2b394c;
+  --shadow:0 8px 30px rgba(0,0,0,.16);
+}
+
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
+  min-height:100vh;
+  transition:background .2s,color .2s;
+}
+
+button,input,textarea,select {
+  font:inherit;
+}
+
+button {
+  cursor:pointer;
+}
+
+.hidden {
+  display:none!important;
+}
+
+button:focus-visible,input:focus-visible,
+textarea:focus-visible,select:focus-visible {
+  outline:2px solid var(--cyan);
+  outline-offset:2px;
+}
+
+/* AUTH */
+
+.auth-shell {
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:
+    radial-gradient(circle at 10% 10%,rgba(255,122,0,.09),transparent 35%),
+    radial-gradient(circle at 90% 90%,rgba(1,199,252,.09),transparent 35%),
+    var(--bg);
+}
+
+.auth-card {
+  width:min(440px,100%);
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:25px;
+  padding:36px;
+  box-shadow:var(--shadow);
+}
+
+.brand {
+  font-size:25px;
+  font-weight:800;
+  letter-spacing:-1.2px;
+}
+
+.brand span {
+  color:var(--orange);
+}
+
+.auth-card h1 {
+  font-size:28px;
+  letter-spacing:-1px;
+  margin:35px 0 8px;
+}
+
+.auth-card p {
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+  margin-bottom:25px;
+}
+
+.field {
+  margin-bottom:16px;
+}
+
+.field label {
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:8px;
+  color:var(--muted);
+}
+
+.field input,.field textarea,.field select {
+  width:100%;
+  min-height:46px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:var(--bg);
+  color:var(--text);
+  padding:12px 14px;
+  font-size:15px;
+  outline:none;
+  user-select:text;
+  -webkit-user-select:text;
+  pointer-events:auto;
+  touch-action:auto;
+}
+
+.field textarea {
+  resize:vertical;
+  min-height:85px;
+}
+
+.field input:focus,.field textarea:focus,
+.field select:focus {
+  border-color:var(--cyan);
+}
+
+.primary,.secondary,.danger,.google-btn {
+  border:0;
+  border-radius:11px;
+  min-height:44px;
+  padding:11px 16px;
+  font-weight:700;
+  font-size:13px;
+  transition:.2s;
+}
+
+.primary {
+  background:var(--orange);
+  color:white;
+}
+
+.primary:hover {
+  filter:brightness(.94);
+}
+
+.secondary {
+  background:var(--surface2);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+
+.danger {
+  background:rgba(229,72,77,.1);
+  color:var(--red);
+}
+
+.google-btn {
+  width:100%;
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
+
+.google-btn img {
+  width:19px;
+  height:19px;
+}
+
+.full {
+  width:100%;
+}
+
+.auth-switch {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:18px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.link {
+  color:var(--orange);
+  font-weight:700;
+  border:0;
+  background:none;
+}
+
+.auth-error {
+  color:var(--red);
+  font-size:12px;
+  margin-bottom:12px;
+  line-height:1.5;
+}
+
+/* APP LAYOUT */
+
+.app {
+  min-height:100vh;
+  display:flex;
+}
+
+.sidebar {
+  width:250px;
+  flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:25px 17px;
+  display:flex;
+  flex-direction:column;
+  gap:25px;
+}
+
+.sidebar .brand {
+  padding:0 9px;
+}
+
+.sidebar-label {
+  font-size:10px;
+  color:var(--muted);
+  font-weight:800;
+  letter-spacing:1.2px;
+  padding:0 10px;
+  margin-bottom:9px;
+}
+
+.server-select {
+  width:100%;
+  background:var(--surface2);
+  color:var(--text);
+  border:1px solid var(--border);
+  padding:12px;
+  border-radius:11px;
+  outline:none;
+}
+
+.nav {
+  display:grid;
+  gap:5px;
+}
+
+.nav button {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  padding:12px;
+  border-radius:10px;
+  text-align:left;
+  font-size:13px;
+  font-weight:600;
+}
+
+.nav button:hover,.nav button.active {
+  background:rgba(255,122,0,.09);
+  color:var(--orange);
+}
+
+.sidebar-bottom {
+  margin-top:auto;
+}
+
+.user-mini {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:12px 8px;
+  border-top:1px solid var(--border);
+}
+
+.avatar {
+  width:35px;
+  height:35px;
+  display:grid;
+  place-items:center;
+  background:rgba(1,199,252,.14);
+  border-radius:12px;
+  font-weight:800;
+  color:var(--cyan);
+}
+
+.user-mini div:last-child {
+  min-width:0;
+}
+
+.user-mini strong {
+  display:block;
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.user-mini small {
+  color:var(--muted);
+  font-size:10px;
+}
+
+.workspace {
+  flex:1;
+  min-width:0;
+}
+
+.topbar {
+  height:76px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:0 35px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+
+.topbar-title {
+  font-weight:800;
+  font-size:15px;
+}
+
+.topbar-actions {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.search {
+  width:min(270px,30vw);
+  min-height:40px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:9px 12px;
+  background:var(--bg);
+  color:var(--text);
+  outline:none;
+  font-size:12px;
+  user-select:text;
+  -webkit-user-select:text;
+}
+
+.icon-btn {
+  width:39px;
+  height:39px;
+  border-radius:10px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-size:16px;
+}
+
+.content {
+  max-width:1450px;
+  margin:auto;
+  padding:36px;
+}
+
+.page-head {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:30px;
+}
+
+.eyebrow {
+  font-size:10px;
+  letter-spacing:1.3px;
+  font-weight:800;
+  color:var(--orange);
+  margin-bottom:9px;
+}
+
+.page-head h1 {
+  font-size:clamp(25px,4vw,34px);
+  letter-spacing:-1.5px;
+  color:var(--orange);
+}
+
+.page-head p {
+  color:var(--muted);
+  font-size:13px;
+  margin-top:9px;
+  line-height:1.6;
+}
+
+.actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+
+.breadcrumbs {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:23px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.breadcrumbs button {
+  background:none;
+  border:0;
+  color:var(--orange);
+  font-weight:700;
+}
+
+.section-title {
+  font-size:14px;
+  font-weight:800;
+  margin:28px 0 15px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:15px;
+}
+
+.folder-card,.coord-card,.stat-card,.panel {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+}
+
+.folder-card {
+  padding:18px;
+  border-top:3px solid var(--folder-color,var(--orange));
+}
+
+.folder-open {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  background:none;
+  border:0;
+  text-align:left;
+  color:var(--text);
+  margin-bottom:15px;
+}
+
+.folder-icon {
+  width:43px;
+  height:43px;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  background:var(--surface2);
+  font-size:23px;
+}
+
+.folder-open strong {
+  font-size:13px;
+  display:block;
+  overflow-wrap:anywhere;
+}
+
+.folder-open small {
+  color:var(--muted);
+  font-size:10px;
+  display:block;
+  margin-top:5px;
+}
+
+.card-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  border-top:1px solid var(--border);
+  padding-top:12px;
+}
+
+.mini-btn {
+  border:1px solid var(--border);
+  background:var(--surface2);
+  color:var(--muted);
+  padding:7px 9px;
+  border-radius:8px;
+  font-size:11px;
+  font-weight:700;
+}
+
+.mini-btn:hover {
+  color:var(--orange);
+  border-color:var(--orange);
+}
+
+.coord-card {
+  padding:18px;
+  min-width:0;
+}
+
+.coord-top {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.coord-name {
+  background:none;
+  border:0;
+  text-align:left;
+  color:var(--text);
+  font-size:14px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.coord-icon {
+  font-size:21px;
+}
+
+.coord-description {
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.6;
+  margin:12px 0;
+  overflow-wrap:anywhere;
+}
+
+.coord-values {
+  background:var(--surface2);
+  padding:12px;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  gap:6px;
+  font-size:11px;
+  font-weight:700;
+  margin-bottom:12px;
+}
+
+.coord-values span {
+  color:var(--cyan);
+}
+
+.pills {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.pill {
+  padding:5px 8px;
+  background:var(--surface2);
+  color:var(--muted);
+  border-radius:20px;
+  font-size:9px;
+  font-weight:800;
+}
+
+.pill.orange {
+  color:var(--orange);
+  background:rgba(255,122,0,.1);
+}
+
+.pill.green {
+  color:var(--green);
+  background:rgba(34,160,107,.1);
+}
+
+.stats {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:13px;
+  margin-bottom:30px;
+}
+
+.stat-card {
+  padding:19px;
+}
+
+.stat-card small {
+  color:var(--muted);
+  font-size:11px;
+}
+
+.stat-card strong {
+  display:block;
+  font-size:27px;
+  margin-top:8px;
+  letter-spacing:-1px;
+}
+
+.empty {
+  grid-column:1/-1;
+  padding:45px 20px;
+  border:1px dashed var(--border);
+  border-radius:15px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+}
+
+/* MAP */
+
+.map-panel {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:20px;
+}
+
+.map-canvas {
+  position:relative;
+  height:460px;
+  overflow:hidden;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background-color:var(--surface2);
+  background-image:
+    linear-gradient(var(--border) 1px,transparent 1px),
+    linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:35px 35px;
+}
+
+.map-axis {
+  position:absolute;
+  left:50%;
+  top:0;
+  bottom:0;
+  width:1px;
+  background:rgba(1,199,252,.4);
+}
+
+.map-axis.horizontal {
+  top:50%;
+  left:0;
+  right:0;
+  bottom:auto;
+  width:auto;
+  height:1px;
+}
+
+.map-marker {
+  position:absolute;
+  transform:translate(-50%,-50%);
+  background:var(--orange);
+  border:2px solid white;
+  color:white;
+  border-radius:50%;
+  width:28px;
+  height:28px;
+  font-size:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,.2);
+  z-index:2;
+}
+
+.map-marker:hover {
+  transform:translate(-50%,-50%) scale(1.25);
+}
+
+.map-marker-label {
+  position:absolute;
+  left:50%;
+  top:29px;
+  transform:translateX(-50%);
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:4px 6px;
+  font-size:9px;
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+.map-legend {
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:15px;
+}
+
+.tool-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:15px;
+}
+
+.panel {
+  padding:20px;
+}
+
+.panel h3 {
+  font-size:14px;
+  margin-bottom:9px;
+}
+
+.panel p {
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.6;
+  margin-bottom:15px;
+}
+
+.server-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  margin-bottom:10px;
+}
+
+.server-row strong {
+  font-size:13px;
+}
+
+.server-row small {
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  margin-top:4px;
+}
+
+/* MODAL */
+
+.modal-root {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(10,20,35,.5);
+  backdrop-filter:blur(5px);
+  z-index:20;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+
+.modal-root.show {
+  display:flex;
+}
+
+.modal {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:19px;
+  width:min(520px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:25px;
+  box-shadow:0 20px 70px rgba(0,0,0,.2);
+}
+
+.modal h2 {
+  font-size:20px;
+  color:var(--orange);
+  margin-bottom:20px;
+}
+
+.modal-footer {
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  margin-top:20px;
+}
+
+.result-box {
+  padding:15px;
+  background:var(--surface2);
+  border-radius:12px;
+  margin-top:15px;
+  color:var(--cyan);
+  font-size:14px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.toast {
+  position:fixed;
+  z-index:50;
+  bottom:25px;
+  left:50%;
+  transform:translate(-50%,20px);
+  background:var(--text);
+  color:var(--surface);
+  border-radius:12px;
+  padding:13px 18px;
+  font-size:12px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  max-width:90vw;
+  text-align:center;
+}
+
+.toast.show {
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+footer {
+  text-align:center;
+  color:var(--muted);
+  font-size:10px;
+  padding:30px 10px;
+}
+
+@media(max-width:850px) {
+  .app {
+    display:block;
+  }
+
+  .sidebar {
+    width:100%;
+    border-right:0;
+    border-bottom:1px solid var(--border);
+    padding:14px;
+    gap:13px;
+  }
+
+  .sidebar .brand {
+    padding:5px;
+  }
+
+  .sidebar-label {
+    margin-top:4px;
+  }
+
+  .nav {
+    display:flex;
+    overflow-x:auto;
+  }
+
+  .nav button {
+    white-space:nowrap;
+    width:auto;
+  }
+
+  .sidebar-bottom {
+    display:none;
+  }
+
+  .topbar {
+    padding:0 17px;
+    height:65px;
+  }
+
+  .content {
+    padding:25px 17px;
+  }
+
+  .stats {
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:520px) {
+  .auth-card {
+    padding:25px;
+  }
+
+  .page-head {
+    display:block;
+  }
+
+  .page-head .actions {
+    margin-top:17px;
+  }
+
+  .search {
+    width:125px;
+  }
+
+  .map-canvas {
+    height:350px;
+  }
+
+  .stats {
+    gap:9px;
+  }
+
+  .stat-card {
+    padding:14px;
+  }
+}
+</style>
+</head>
+
+<body data-theme="light">
+
+<!-- AUTHENTICATION -->
+
+<div class="auth-shell" id="authScreen">
+  <div class="auth-card">
+    <div class="brand">Craft<span>Coords.</span></div>
+
+    <h1 id="authTitle">Willkommen zurück.</h1>
+    <p id="authDescription">
+      Melde dich an und verwalte deine Minecraft-Welten.
+    </p>
+
+    <form id="authForm">
+      <div class="field hidden" id="nameField">
+        <label>DEIN NAME</label>
+        <input id="displayName" type="text"
+          placeholder="Minecraft-Spieler">
+      </div>
+
+      <div class="field">
+        <label>E-MAIL-ADRESSE</label>
+        <input id="email" type="email"
+          placeholder="name@example.com" required>
+      </div>
+
+      <div class="field">
+        <label>PASSWORT</label>
+        <input id="password" type="password"
+          placeholder="Mindestens 6 Zeichen" minlength="6" required>
+      </div>
+
+      <div class="auth-error" id="authError"></div>
+
+      <button class="primary full" id="authSubmit" type="submit">
+        Anmelden
+      </button>
+    </form>
+
+    <div style="text-align:center;margin:17px 0;color:var(--muted);font-size:11px">
+      ODER
+    </div>
+
+    <button class="google-btn" id="googleLogin">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+      Mit Google anmelden
+    </button>
+
+    <div class="auth-switch">
+      <button class="link" id="switchAuth">Account erstellen</button>
+      <button class="link" id="resetPassword">Passwort vergessen?</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+
+<div class="app hidden" id="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">Craft<span>Coords.</span></div>
+
+    <div>
+      <div class="sidebar-label">DEINE WELTEN</div>
+      <select class="server-select" id="serverSelect"></select>
+      <button class="mini-btn" style="width:100%;margin-top:8px"
+        data-action="add-server">＋ Server hinzufügen</button>
+    </div>
+
+    <div>
+      <div class="sidebar-label">MENÜ</div>
+      <nav class="nav" id="navigation">
+        <button data-view="home" class="active">🏠 Übersicht</button>
+        <button data-view="map">🗺️ Karte</button>
+        <button data-view="favorites">⭐ Favoriten</button>
+        <button data-view="recent">🕘 Zuletzt</button>
+        <button data-view="settings">⚙️ Einstellungen</button>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="user-mini">
+        <div class="avatar" id="userAvatar">C</div>
+        <div>
+          <strong id="userName">Spieler</strong>
+          <small>CraftCoords Account</small>
+        </div>
+      </div>
+      <button class="mini-btn full" id="logoutBtn">Abmelden</button>
+    </div>
+  </aside>
+
+  <section class="workspace">
+    <header class="topbar">
+      <div class="topbar-title" id="pageTitle">Übersicht</div>
+      <div class="topbar-actions">
+        <input class="search" id="searchInput"
+          type="search" placeholder="⌕ Suchen ...">
+        <button class="icon-btn" id="themeButton"
+          aria-label="Design wechseln">🌙</button>
+        <button class="icon-btn" id="topAdd"
+          title="Neue Koordinate">＋</button>
+      </div>
+    </header>
+
+    <main class="content" id="content"></main>
+
+    <footer>CraftCoords · Minecraft World Manager · © 2026 lamacHub</footer>
+  </section>
+</div>
+
+<div class="modal-root" id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="importFile" accept=".json,application/json" class="hidden">
+
+<script type="module">
+
+// ================================================
+// FIREBASE
+// ================================================
+
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  signOut,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  update,
+  remove,
+  push,
+  onValue
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUYcC60jquz4_qDLI-3xzU1x0qFPdXJGs",
+  authDomain: "koordinaten-manager.firebaseapp.com",
+  databaseURL: "https://koordinaten-manager-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "koordinaten-manager",
+  storageBucket: "koordinaten-manager.firebasestorage.app",
+  messagingSenderId: "549953315940",
+  appId: "1:549953315940:web:6b790baa7aefa4a928eb71"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getDatabase(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+
+const $ = id => document.getElementById(id);
+
+let authMode = "login";
+let unsubscribeData = null;
+let toastTimer = null;
+
+const shareId = new URLSearchParams(location.search).get("share");
+
+const state = {
+  user:null,
+  data:{},
+  serverId:null,
+  view:"home",
+  folderId:null,
+  query:"",
+  sharedView:null
+};
+
+// ================================================
+// HELPERS
+// ================================================
+
+function entries(obj) {
+  return Object.entries(obj || {});
+}
+
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[c]);
+}
+
+function safeColor(value) {
+  return /^#[0-9a-f]{6}$/i.test(value || "")
+    ? value : "#ff7a00";
+}
+
+function toast(message) {
+  const t = $("toast");
+  t.textContent = message;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"),2600);
+}
+
+function userPath(path="") {
+  return `users/${state.user.uid}/${path}`;
+}
+
+function getFolders() {
+  return state.data.folders || {};
+}
+
+function getCoordinates() {
+  return state.data.coords || {};
+}
+
+function getServers() {
+  return state.data.servers || {};
+}
+
+function getCurrentCoords() {
+  return entries(getCoordinates()).filter(([id,c]) =>
+    c.serverId === state.serverId
+  );
+}
+
+function getAllCoords() {
+  return entries(getCoordinates());
+}
+
+function categoryIcon(category) {
+  return ({
+    Base:"🏠",
+    Dorf:"🏘️",
+    Farm:"🌾",
+    Mine:"⛏️",
+    Portal:"🔥",
+    Struktur:"🏛️",
+    Sonstiges:"📍"
+  })[category] || "📍";
+}
+
+function escapeFilename(name) {
+  return String(name).replace(/[^a-z0-9_-]/gi,"_");
+}
+
+// ================================================
+// AUTH
+// ================================================
+
+function setAuthMode(mode) {
+  authMode = mode;
+
+  const register = mode === "register";
+
+  $("authTitle").textContent =
+    register ? "Account erstellen." : "Willkommen zurück.";
+
+  $("authDescription").textContent =
+    register
+      ? "Erstelle deinen persönlichen CraftCoords-Account."
+      : "Melde dich an und verwalte deine Minecraft-Welten.";
+
+  $("nameField").classList.toggle("hidden",!register);
+
+  $("authSubmit").textContent =
+    register ? "Account erstellen" : "Anmelden";
+
+  $("switchAuth").textContent =
+    register ? "Zum Login" : "Account erstellen";
+
+  $("resetPassword").classList.toggle("hidden",register);
+
+  $("authError").textContent = "";
+}
+
+$("switchAuth").addEventListener("click",() => {
+  setAuthMode(authMode === "login" ? "register" : "login");
+});
+
+$("authForm").addEventListener("submit",async e => {
+  e.preventDefault();
+  $("authError").textContent = "";
+
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  try {
+    if(authMode === "register") {
+      const credential = await createUserWithEmailAndPassword(
+        auth,email,password
+      );
+
+      const name = $("displayName").value.trim();
+
+      if(name) {
+        await updateProfile(credential.user,{
+          displayName:name
+        });
+      }
+    } else {
+      await signInWithEmailAndPassword(auth,email,password);
+    }
+  } catch(error) {
+    $("authError").textContent = authErrorText(error.code);
+  }
+});
+
+$("googleLogin").addEventListener("click",async () => {
+  try {
+    await signInWithPopup(auth,googleProvider);
+  } catch(error) {
+    $("authError").textContent = authErrorText(error.code);
+  }
+});
+
+$("resetPassword").addEventListener("click",async () => {
+  const email = $("email").value.trim();
+
+  if(!email) {
+    $("authError").textContent =
+      "Bitte zuerst deine E-Mail-Adresse eingeben.";
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth,email);
+    toast("E-Mail zum Zurücksetzen wurde versendet.");
+  } catch(error) {
+    $("authError").textContent = authErrorText(error.code);
+  }
+});
+
+function authErrorText(code) {
+  const messages = {
+    "auth/invalid-email":"Ungültige E-Mail-Adresse.",
+    "auth/user-not-found":"Account nicht gefunden.",
+    "auth/wrong-password":"Falsches Passwort.",
+    "auth/invalid-credential":"Anmeldedaten sind nicht korrekt.",
+    "auth/email-already-in-use":"Diese E-Mail wird bereits verwendet.",
+    "auth/weak-password":"Das Passwort muss mindestens 6 Zeichen haben.",
+    "auth/popup-closed-by-user":"Das Anmeldefenster wurde geschlossen.",
+    "auth/unauthorized-domain":"Diese Domain ist nicht für Firebase freigegeben.",
+    "auth/operation-not-allowed":"Diese Anmeldemethode ist nicht aktiviert.",
+    "auth/network-request-failed":"Netzwerkfehler. Bitte erneut versuchen."
+  };
+
+  return messages[code] || "Fehler: " + code;
+}
+
+$("logoutBtn").addEventListener("click",() => signOut(auth));
+
+onAuthStateChanged(auth,async user => {
+  state.user = user;
+
+  if(unsubscribeData) {
+    unsubscribeData();
+    unsubscribeData = null;
+  }
+
+  if(user) {
+    await startUserData(user);
+  }
+
+  if(shareId) {
+    $("authScreen").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    await loadSharedFolder();
+  } else if(user) {
+    $("authScreen").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    render();
+  } else {
+    $("app").classList.add("hidden");
+    $("authScreen").classList.remove("hidden");
+  }
+});
+
+// ================================================
+// USER DATA
+// ================================================
+
+async function startUserData(user) {
+  const profileRef = ref(db,userPath("profile"));
+  const profile = await get(profileRef);
+
+  if(!profile.exists()) {
+    await set(profileRef,{
+      name:user.displayName || "Minecraft-Spieler",
+      email:user.email || "",
+      createdAt:Date.now()
+    });
+  }
+
+  const serversRef = ref(db,userPath("servers"));
+  const servers = await get(serversRef);
+
+  if(!servers.exists()) {
+    const newServer = push(serversRef);
+
+    await set(newServer,{
+      name:"Meine Survival-Welt",
+      version:"",
+      edition:"Java",
+      createdAt:Date.now()
+    });
+
+    state.serverId = newServer.key;
+  } else {
+    const list = entries(servers.val());
+    state.serverId = list[0][0];
+  }
+
+  unsubscribeData = onValue(ref(db,userPath()),snapshot => {
+    state.data = snapshot.val() || {};
+
+    if(!getServers()[state.serverId]) {
+      state.serverId = entries(getServers())[0]?.[0] || null;
+    }
+
+    render();
+  });
+}
+
+// ================================================
+// THEME
+// ================================================
+
+function applyTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem("craftcoords-theme",theme);
+  $("themeButton").textContent =
+    theme === "dark" ? "☀️" : "🌙";
+}
+
+applyTheme(localStorage.getItem("craftcoords-theme") || "light");
+
+$("themeButton").addEventListener("click",() => {
+  applyTheme(
+    document.body.dataset.theme === "dark" ? "light" : "dark"
+  );
+});
+
+// ================================================
+// SIDEBAR AND RENDERING
+// ================================================
+
+function renderSidebar() {
+  const servers = getServers();
+
+  $("serverSelect").innerHTML = entries(servers).map(([id,s]) =>
+    `<option value="${esc(id)}">${esc(s.name)}</option>`
+  ).join("");
+
+  $("serverSelect").value = state.serverId || "";
+
+  $("userName").textContent =
+    state.user?.displayName ||
+    state.user?.email ||
+    "Spieler";
+
+  $("userAvatar").textContent =
+    ($("userName").textContent[0] || "C").toUpperCase();
+
+  $("navigation").querySelectorAll("button").forEach(button => {
+    button.classList.toggle(
+      "active",button.dataset.view === state.view
+    );
+  });
+}
+
+function render() {
+  if(state.sharedView) {
+    renderShared();
+    return;
+  }
+
+  if(!state.user) return;
+
+  renderSidebar();
+  renderMain();
+}
+
+function renderMain() {
+  const titles = {
+    home:"Übersicht",
+    map:"Koordinatenkarte",
+    favorites:"Favoriten",
+    recent:"Zuletzt besucht",
+    settings:"Einstellungen"
+  };
+
+  $("pageTitle").textContent =
+    state.query ? "Suchergebnisse" : titles[state.view] || "CraftCoords";
+
+  if(state.query) {
+    $("content").innerHTML = renderSearch();
+    return;
+  }
+
+  switch(state.view) {
+    case "map":
+      $("content").innerHTML = renderMap();
+      break;
+    case "favorites":
+      $("content").innerHTML = renderFavorites();
+      break;
+    case "recent":
+      $("content").innerHTML = renderRecent();
+      break;
+    case "settings":
+      $("content").innerHTML = renderSettings();
+      break;
+    default:
+      $("content").innerHTML = renderHome();
+  }
+}
+
+// ================================================
+// HOME / FOLDERS
+// ================================================
+
+function folderCount(id) {
+  return entries(getCoordinates()).filter(([key,c]) =>
+    c.folderId === id && c.serverId === state.serverId
+  ).length;
+}
+
+function renderFolderCard(id,f) {
+  const count = folderCount(id);
+
+  return `
+  <article class="folder-card"
+    style="--folder-color:${safeColor(f.color)}">
+
+    <button class="folder-open"
+      data-action="open-folder" data-id="${esc(id)}">
+      <span class="folder-icon">${esc(f.icon || "📁")}</span>
+      <span>
+        <strong>${esc(f.name)}</strong>
+        <small>${count} Koordinaten · Ordner öffnen</small>
+      </span>
+    </button>
+
+    ${f.description
+      ? `<p class="coord-description">${esc(f.description)}</p>`
+      : ""}
+
+    <div class="card-actions">
+      <button class="mini-btn" data-action="share-folder"
+        data-id="${esc(id)}">🔗 Teilen</button>
+      <button class="mini-btn" data-action="edit-folder"
+        data-id="${esc(id)}">✏️</button>
+      <button class="mini-btn" data-action="delete-folder"
+        data-id="${esc(id)}">🗑️</button>
+    </div>
+  </article>`;
+}
+
+function renderCoordCard(id,c) {
+  return `
+  <article class="coord-card">
+    <div class="coord-top">
+      <button class="coord-name" data-action="details"
+        data-id="${esc(id)}">
+        ${esc(c.name)}
+      </button>
+      <span class="coord-icon">${categoryIcon(c.category)}</span>
+    </div>
+
+    <p class="coord-description">
+      ${esc(c.description || "Keine Beschreibung vorhanden.")}
+    </p>
+
+    <div class="pills">
+      <span class="pill orange">${esc(c.dimension)}</span>
+      <span class="pill">${esc(c.category || "Sonstiges")}</span>
+      ${c.favorite ? '<span class="pill orange">⭐ Favorit</span>' : ""}
+      ${c.visited ? '<span class="pill green">✓ Besucht</span>' : ""}
+    </div>
+
+    <div class="coord-values">
+      <div>X: <span>${c.x}</span></div>
+      <div>Y: <span>${c.y}</span></div>
+      <div>Z: <span>${c.z}</span></div>
+    </div>
+
+    <div class="card-actions">
+      <button class="mini-btn" data-action="copy-coords"
+        data-id="${esc(id)}">📋 XYZ</button>
+      <button class="mini-btn" data-action="copy-tp"
+        data-id="${esc(id)}">⌘ /tp</button>
+      <button class="mini-btn" data-action="favorite"
+        data-id="${esc(id)}">${c.favorite ? "★" : "☆"}</button>
+      <button class="mini-btn" data-action="visited"
+        data-id="${esc(id)}">${c.visited ? "✓" : "○"}</button>
+      <button class="mini-btn" data-action="edit-coord"
+        data-id="${esc(id)}">✏️</button>
+      <button class="mini-btn" data-action="delete-coord"
+        data-id="${esc(id)}">🗑️</button>
+    </div>
+  </article>`;
+}
+
+function folderBreadcrumb() {
+  let ids = [];
+  let current = state.folderId;
+  let safety = 0;
+
+  while(current && getFolders()[current] && safety++ < 50) {
+    ids.unshift(current);
+    current = getFolders()[current].parentId;
+  }
+
+  return `
+  <div class="breadcrumbs">
+    <button data-action="root">Alle Ordner</button>
+    ${ids.map(id =>
+      ` / <button data-action="breadcrumb" data-id="${esc(id)}">
+      ${esc(getFolders()[id].name)}</button>`
+    ).join("")}
+  </div>`;
+}
+
+function renderHome() {
+  const folders = entries(getFolders()).filter(([id,f]) =>
+    f.serverId === state.serverId &&
+    (f.parentId || null) === (state.folderId || null)
+  );
+
+  const coords = getCurrentCoords().filter(([id,c]) =>
+    (c.folderId || null) === (state.folderId || null)
+  );
+
+  const current = state.folderId ? getFolders()[state.folderId] : null;
+
+  const title = current?.name || "Deine Welten.";
+  const description = current?.description ||
+    "Verwalte deine Minecraft-Orte an einem einzigen Platz.";
+
+  const totalCoords = getCurrentCoords().length;
+  const totalFolders = entries(getFolders()).filter(([id,f]) =>
+    f.serverId === state.serverId
+  ).length;
+
+  return `
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">CRAFTCOORDS / WORKSPACE</div>
+      <h1>${esc(title)}</h1>
+      <p>${esc(description)}</p>
+    </div>
+    <div class="actions">
+      <button class="secondary" data-action="new-folder">＋ Ordner</button>
+      <button class="primary" data-action="new-coord">＋ Koordinate</button>
+    </div>
+  </div>
+
+  ${folderBreadcrumb()}
+
+  ${!current ? `
+  <div class="stats">
+    <div class="stat-card"><small>Koordinaten</small><strong>${totalCoords}</strong></div>
+    <div class="stat-card"><small>Ordner</small><strong>${totalFolders}</strong></div>
+    <div class="stat-card"><small>Favoriten</small><strong>${getCurrentCoords().filter(([id,c])=>c.favorite).length}</strong></div>
+    <div class="stat-card"><small>Server</small><strong>${entries(getServers()).length}</strong></div>
+  </div>` : ""}
+
+  <h2 class="section-title">📁 Ordner</h2>
+  <div class="grid">
+    ${folders.length
+      ? folders.map(([id,f])=>renderFolderCard(id,f)).join("")
+      : '<div class="empty">Noch keine Ordner vorhanden.<br>Erstelle deinen ersten Ordner!</div>'}
+  </div>
+
+  <h2 class="section-title">📍 Koordinaten</h2>
+  <div class="grid">
+    ${coords.length
+      ? coords.map(([id,c])=>renderCoordCard(id,c)).join("")
+      : '<div class="empty">Hier sind noch keine Koordinaten.<br>Speichere deinen ersten Minecraft-Ort!</div>'}
+  </div>`;
+}
+
+// ================================================
+// SEARCH
+// ================================================
+
+function renderSearch() {
+  const q = state.query.toLowerCase();
+
+  const results = getAllCoords().filter(([id,c]) => {
+    const server = getServers()[c.serverId];
+    return [
+      c.name,c.description,c.category,c.dimension,
+      c.x,c.y,c.z,server?.name
+    ].join(" ").toLowerCase().includes(q);
+  });
+
+  return `
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">SUCHEN</div>
+      <h1>Suchergebnisse.</h1>
+      <p>${results.length} passende Koordinaten gefunden.</p>
+    </div>
+  </div>
+  <div class="grid">
+    ${results.length
+      ? results.map(([id,c])=>renderCoordCard(id,c)).join("")
+      : '<div class="empty">Keine passenden Ergebnisse gefunden.</div>'}
+  </div>`;
+}
+
+// ================================================
+// FAVORITES
+// ================================================
+
+function renderFavorites() {
+  const items = getCurrentCoords().filter(([id,c])=>c.favorite);
+
+  return `
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">DEINE SAMMLUNG</div>
+      <h1>Favoriten.</h1>
+      <p>Deine wichtigsten Minecraft-Orte.</p>
+    </div>
+  </div>
+  <div class="grid">
+    ${items.length
+      ? items.map(([id,c])=>renderCoordCard(id,c)).join("")
+      : '<div class="empty">Noch keine Favoriten markiert.</div>'}
+  </div>`;
+}
+
+// ================================================
+// RECENTLY VISITED
+// ================================================
+
+function renderRecent() {
+  const recent = entries(state.data.recent)
+    .sort((a,b)=>(b[1].at || 0)-(a[1].at || 0))
+    .slice(0,30);
+
+  const items = recent.map(([key,r]) =>
+    [r.coordId,getCoordinates()[r.coordId]]
+  ).filter(([id,c]) => c);
+
+  return `
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">VERLAUF</div>
+      <h1>Zuletzt besucht.</h1>
+      <p>Deine zuletzt geöffneten Koordinaten.</p>
+    </div>
+  </div>
+  <div class="grid">
+    ${items.length
+      ? items.map(([id,c])=>renderCoordCard(id,c)).join("")
+      : '<div class="empty">Hier erscheint dein Verlauf.</div>'}
+  </div>`;
+}
+
+// ================================================
+// MAP
+// ================================================
+
+function renderMap() {
+  const coords = getCurrentCoords().filter(([id,c]) =>
+    c.dimension === (window.mapDimension || "Overworld")
+  );
+
+  const minX = Math.min(0,...coords.map(([id,c])=>c.x));
+  const maxX = Math.max(0,...coords.map(([id,c])=>c.x));
+  const minZ = Math.min(0,...coords.map(([id,c])=>c.z));
+  const maxZ = Math.max(0,...coords.map(([id,c])=>c.z));
+
+  const rangeX = Math.max(100,maxX-minX);
+  const rangeZ = Math.max(100,maxZ-minZ);
+
+  const markers = coords.map(([id,c]) => {
+    const x = 5 + ((c.x-minX)/rangeX)*90;
+    const y = 5 + ((c.z-minZ)/rangeZ)*90;
+
+    return `
+      <button class="map-marker"
+        style="left:${x}%;top:${y}%"
+        data-action="details" data-id="${esc(id)}"
+        title="${esc(c.name)}">
+        ${categoryIcon(c.category)}
+        <span class="map-marker-label">${esc(c.name)}</span>
+      </button>`;
+  }).join("");
+
+  return `
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">WORLD EXPLORER</div>
+      <h1>Deine Karte.</h1>
+      <p>Eine 2D-Übersicht deiner gespeicherten Orte nach X- und Z-Koordinaten.</p>
+    </div>
+    <select class="server-select" style="max-width:165px"
+      id="mapDimension">
+      ${["Overworld","Nether","End"].map(d =>
+        `<option ${d===(window.mapDimension || "Overworld")?"selected":""}>${d}</option>`
+      ).join("")}
+    </select>
+  </div>
+
+  <div class="map-panel">
+    <div class="map-canvas">
+      <div class="map-axis"></div>
+      <div class="map-axis horizontal"></div>
+      ${markers}
+      ${coords.length ? "" : '<div class="empty" style="position:absolute;top:40%;left:5%;right:5%;background:var(--surface)">Keine Orte in dieser Dimension gespeichert.</div>'}
+    </div>
+    <div class="map-legend">
+      <span>↔ X-Achse</span>
+      <span>↕ Z-Achse</span>
+      <span>${coords.length} Orte</span>
+    </div>
+  </div>`;
+}
+
+window.mapDimension = "Overworld";
+
+// ================================================
+// SETTINGS
+// ================================================
+
+function renderSettings() {
+  const servers = entries(getServers());
+
+  return `
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">ACCOUNT & DATEN</div>
+      <h1>Einstellungen.</h1>
+      <p>Verwalte deine Server, Daten und deinen Account.</p>
+    </div>
+  </div>
+
+  <div class="tool-grid">
+
+    <div class="panel">
+      <h3>👤 Dein Account</h3>
+      <p>${esc(state.user?.email || "")}<br>
+      ${esc(state.user?.displayName || "Minecraft-Spieler")}</p>
+      <button class="secondary full" data-action="logout">Abmelden</button>
+    </div>
+
+    <div class="panel">
+      <h3>💾 Backup</h3>
+      <p>Exportiere deine Daten oder importiere eine vorhandene Sicherung.</p>
+      <button class="primary full" data-action="export">Backup exportieren</button>
+      <button class="secondary full" style="margin-top:9px"
+        data-action="import">Backup importieren</button>
+    </div>
+
+    <div class="panel">
+      <h3>📏 Distanzrechner</h3>
+      <p>Berechne die Entfernung zwischen zwei gespeicherten Orten.</p>
+      <button class="secondary full" data-action="distance">Rechner öffnen</button>
+    </div>
+
+    <div class="panel">
+      <h3>🔥 Nether-Rechner</h3>
+      <p>Rechne Overworld- und Nether-Koordinaten um.</p>
+      <button class="secondary full" data-action="nether">Rechner öffnen</button>
+    </div>
+
+  </div>
+
+  <h2 class="section-title">🌍 Deine Server und Welten</h2>
+
+  <div class="panel">
+    ${servers.map(([id,s])=>`
+      <div class="server-row">
+        <div>
+          <strong>${esc(s.name)}</strong>
+          <small>${esc(s.edition || "Java")} · ${esc(s.version || "Version nicht angegeben")}</small>
+        </div>
+        <div class="actions">
+          <button class="mini-btn" data-action="edit-server"
+            data-id="${esc(id)}">✏️</button>
+          <button class="mini-btn" data-action="delete-server"
+            data-id="${esc(id)}">🗑️</button>
+        </div>
+      </div>
+    `).join("")}
+
+    <button class="primary full" data-action="add-server">
+      ＋ Server hinzufügen
+    </button>
+  </div>
+
+  <p style="margin-top:25px;color:var(--muted);font-size:10px">
+    CraftCoords · © 2026 lamacHub
+  </p>`;
+}
+
+// ================================================
+// MODAL SYSTEM
+// ================================================
+
+function openModal(title,body,onSubmit,submitText="Speichern") {
+  const root = $("modalRoot");
+
+  root.innerHTML = `
+    <div class="modal">
+      <form id="modalForm">
+        <h2>${esc(title)}</h2>
+        <div>${body}</div>
+        <div class="modal-footer">
+          <button type="button" class="secondary" data-close>Abbrechen</button>
+          <button type="submit" class="primary">${esc(submitText)}</button>
+        </div>
+      </form>
+    </div>`;
+
+  root.classList.add("show");
+
+  root.querySelector("[data-close]").onclick = closeModal;
+
+  root.querySelector("form").addEventListener("submit",async e=>{
+    e.preventDefault();
+
+    const button = e.submitter;
+    button.disabled = true;
+
+    try {
+      const result = await onSubmit(new FormData(e.currentTarget));
+      if(result !== false) closeModal();
+    } catch(error) {
+      toast("Fehler: " + error.message);
+      button.disabled = false;
+    }
+  });
+}
+
+function closeModal() {
+  $("modalRoot").classList.remove("show");
+  $("modalRoot").innerHTML = "";
+}
+
+$("modalRoot").addEventListener("click",e=>{
+  if(e.target === $("modalRoot")) closeModal();
+});
+
+// ================================================
+// FOLDER CRUD
+// ================================================
+
+function openFolderModal(id=null) {
+  const existing = id ? getFolders()[id] : null;
+
+  const body = `
+    <div class="field">
+      <label>ORDNERNAME</label>
+      <input name="name" required maxlength="60"
+        value="${esc(existing?.name || "")}" placeholder="Meine Base">
+    </div>
+
+    <div class="field">
+      <label>BESCHREIBUNG</label>
+      <textarea name="description" maxlength="500"
+        placeholder="Was befindet sich in diesem Ordner?">${esc(existing?.description || "")}</textarea>
+    </div>
+
+    <div class="field">
+      <label>SYMBOL (EMOJI)</label>
+      <input name="icon" maxlength="8"
+        value="${esc(existing?.icon || "📁")}" placeholder="📁">
+    </div>
+
+    <div class="field">
+      <label>ORDNERFARBE</label>
+      <input name="color" type="color"
+        value="${safeColor(existing?.color)}">
+    </div>`;
+
+  openModal(id ? "Ordner bearbeiten" : "Neuer Ordner",body,async fd=>{
+    const name = fd.get("name").trim();
+
+    if(!name) throw new Error("Bitte einen Namen eingeben.");
+
+    const folderId = id || push(ref(db,userPath("folders"))).key;
+
+    await set(ref(db,userPath("folders/"+folderId)),{
+      name,
+      description:fd.get("description").trim(),
+      icon:fd.get("icon").trim() || "📁",
+      color:safeColor(fd.get("color")),
+      serverId:existing?.serverId || state.serverId,
+      parentId:existing ? existing.parentId || null : state.folderId || null,
+      createdAt:existing?.createdAt || Date.now(),
+      updatedAt:Date.now()
+    });
+
+    toast("Ordner gespeichert.");
+  });
+}
+
+async function deleteFolder(id) {
+  if(!confirm("Ordner und alle darin enthaltenen Unterordner und Koordinaten löschen?")) return;
+
+  const folders = getFolders();
+  const ids = [id];
+
+  let changed = true;
+
+  while(changed) {
+    changed = false;
+
+    for(const [fid,f] of entries(folders)) {
+      if(f.parentId && ids.includes(f.parentId) && !ids.includes(fid)) {
+        ids.push(fid);
+        changed = true;
+      }
+    }
+  }
+
+  for(const fid of ids) {
+    await remove(ref(db,userPath("folders/"+fid)));
+  }
+
+  for(const [cid,c] of getAllCoords()) {
+    if(ids.includes(c.folderId)) {
+      await remove(ref(db,userPath("coords/"+cid)));
+    }
+  }
+
+  if(ids.includes(state.folderId)) state.folderId = null;
+
+  toast("Ordner gelöscht.");
+}
+
+// ================================================
+// SERVER CRUD
+// ================================================
+
+function openServerModal(id=null) {
+  const existing = id ? getServers()[id] : null;
+
+  const body = `
+    <div class="field">
+      <label>SERVER / WELTNAME</label>
+      <input name="name" required maxlength="60"
+        value="${esc(existing?.name || "")}"
+        placeholder="Survival Server">
+    </div>
+
+    <div class="field">
+      <label>MINECRAFT-VERSION</label>
+      <input name="version" placeholder="z. B. 1.21.10"
+        value="${esc(existing?.version || "")}">
+    </div>
+
+    <div class="field">
+      <label>EDITION</label>
+      <select name="edition">
+        <option ${existing?.edition==="Java"?"selected":""}>Java</option>
+        <option ${existing?.edition==="Bedrock"?"selected":""}>Bedrock</option>
+      </select>
+    </div>`;
+
+  openModal(id ? "Server bearbeiten" : "Neuer Server",body,async fd=>{
+    const name = fd.get("name").trim();
+    if(!name) throw new Error("Servername fehlt.");
+
+    const sid = id || push(ref(db,userPath("servers"))).key;
+
+    await set(ref(db,userPath("servers/"+sid)),{
+      name,
+      version:fd.get("version").trim(),
+      edition:fd.get("edition"),
+      createdAt:existing?.createdAt || Date.now()
+    });
+
+    state.serverId = sid;
+    state.folderId = null;
+    toast("Server gespeichert.");
+  });
+}
+
+async function deleteServer(id) {
+  if(entries(getServers()).length <= 1) {
+    toast("Du brauchst mindestens einen Server.");
+    return;
+  }
+
+  if(!confirm("Server und alle zugehörigen Daten löschen?")) return;
+
+  await remove(ref(db,userPath("servers/"+id)));
+
+  for(const [fid,f] of entries(getFolders())) {
+    if(f.serverId === id) {
+      await remove(ref(db,userPath("folders/"+fid)));
+    }
+  }
+
+  for(const [cid,c] of getAllCoords()) {
+    if(c.serverId === id) {
+      await remove(ref(db,userPath("coords/"+cid)));
+    }
+  }
+
+  state.serverId = entries(getServers()).find(([sid])=>sid!==id)?.[0] || null;
+  state.folderId = null;
+  toast("Server gelöscht.");
+}
+
+// ================================================
+// COORDINATE CRUD
+// ================================================
+
+function openCoordModal(id=null) {
+  const existing = id ? getCoordinates()[id] : null;
+
+  const folderOptions = entries(getFolders()).filter(([fid,f])=>
+    f.serverId === state.serverId
+  );
+
+  const body = `
+    <div class="field">
+      <label>ORTSNAME</label>
+      <input name="name" required maxlength="80"
+        value="${esc(existing?.name || "")}"
+        placeholder="Meine Base">
+    </div>
+
+    <div class="field">
+      <label>BESCHREIBUNG</label>
+      <textarea name="description" maxlength="1000"
+        placeholder="Weitere Informationen...">${esc(existing?.description || "")}</textarea>
+    </div>
+
+    <div class="field">
+      <label>KOORDINATEN</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <input name="x" type="number" step="1" required
+          placeholder="X" value="${existing?.x ?? ""}">
+        <input name="y" type="number" step="1" required
+          placeholder="Y" value="${existing?.y ?? ""}">
+        <input name="z" type="number" step="1" required
+          placeholder="Z" value="${existing?.z ?? ""}">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>DIMENSION</label>
+      <select name="dimension">
+        ${["Overworld","Nether","End"].map(d=>
+          `<option ${d===(existing?.dimension || "Overworld")?"selected":""}>${d}</option>`
+        ).join("")}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>KATEGORIE</label>
+      <select name="category">
+        ${["Base","Dorf","Farm","Mine","Portal","Struktur","Sonstiges"].map(d=>
+          `<option ${d===(existing?.category || "Sonstiges")?"selected":""}>${d}</option>`
+        ).join("")}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>ORDNER</label>
+      <select name="folderId">
+        <option value="">Ohne Ordner</option>
+        ${folderOptions.map(([fid,f])=>
+          `<option value="${esc(fid)}"
+            ${fid===(existing?.folderId || state.folderId)?"selected":""}>
+            ${esc(f.name)}
+          </option>`
+        ).join("")}
+      </select>
+    </div>
+
+    <div style="display:flex;gap:20px">
+      <label style="font-size:12px">
+        <input type="checkbox" name="favorite"
+          ${existing?.favorite?"checked":""}>
+        ⭐ Favorit
+      </label>
+
+      <label style="font-size:12px">
+        <input type="checkbox" name="visited"
+          ${existing?.visited?"checked":""}>
+        ✓ Besucht
+      </label>
+    </div>`;
+
+  openModal(id ? "Koordinate bearbeiten" : "Neue Koordinate",body,async fd=>{
+    const name = fd.get("name").trim();
+    const x = Number(fd.get("x"));
+    const y = Number(fd.get("y"));
+    const z = Number(fd.get("z"));
+
+    if(!name) throw new Error("Bitte einen Namen eingeben.");
+
+    if(![x,y,z].every(Number.isSafeInteger)) {
+      throw new Error("Bitte gültige ganze Zahlen eingeben.");
+    }
+
+    const cid = id || push(ref(db,userPath("coords"))).key;
+
+    await set(ref(db,userPath("coords/"+cid)),{
+      name,
+      description:fd.get("description").trim(),
+      x,y,z,
+      dimension:fd.get("dimension"),
+      category:fd.get("category"),
+      folderId:fd.get("folderId") || null,
+      serverId:state.serverId,
+      favorite:fd.get("favorite")==="on",
+      visited:fd.get("visited")==="on",
+      createdAt:existing?.createdAt || Date.now(),
+      updatedAt:Date.now()
+    });
+
+    toast("Koordinate gespeichert.");
+  });
+}
+
+async function deleteCoord(id) {
+  if(!confirm("Koordinate wirklich löschen?")) return;
+
+  await remove(ref(db,userPath("coords/"+id)));
+  toast("Koordinate gelöscht.");
+}
+
+async function toggleCoord(id,field) {
+  const c = getCoordinates()[id];
+  if(!c) return;
+
+  await update(ref(db,userPath("coords/"+id)),{
+    [field]:!c[field]
+  });
+}
+
+// ================================================
+// DETAILS & RECENT
+// ================================================
+
+async function showDetails(id) {
+  const c = getCoordinates()[id];
+  if(!c) return;
+
+  const server = getServers()[c.serverId];
+
+  const recentRef = push(ref(db,userPath("recent")));
+  await set(recentRef,{
+    coordId:id,
+    at:Date.now()
+  });
+
+  const body = `
+    <div class="pills">
+      <span class="pill orange">${esc(c.dimension)}</span>
+      <span class="pill">${esc(c.category)}</span>
+    </div>
+
+    <div class="result-box">
+      X: ${c.x} &nbsp; Y: ${c.y} &nbsp; Z: ${c.z}
+    </div>
+
+    <p style="font-size:13px;line-height:1.7;margin-top:15px">
+      ${esc(c.description || "Keine Beschreibung.")}
+    </p>
+
+    <p style="font-size:11px;color:var(--muted);margin-top:15px">
+      Server: ${esc(server?.name || "Unbekannt")}
+    </p>
+
+    <button type="button" class="primary full"
+      style="margin-top:15px"
+      id="detailCopy">Koordinaten kopieren</button>`;
+
+  openModal(c.name,body,async()=>true,"Schließen");
+
+  $("detailCopy").onclick = async()=>{
+    await copyText(`${c.x} ${c.y} ${c.z}`);
+  };
+}
+
+// ================================================
+// CLIPBOARD
+// ================================================
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(String(text));
+    toast("In die Zwischenablage kopiert.");
+  } catch {
+    const input = document.createElement("textarea");
+    input.value = String(text);
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand("copy");
+    input.remove();
+    toast("Kopiert.");
+  }
+}
+
+// ================================================
+// NETHER CALCULATOR
+// ================================================
+
+function openNetherModal() {
+  const body = `
+    <div class="field">
+      <label>AKTUELLE DIMENSION</label>
+      <select name="dimension">
+        <option>Overworld</option>
+        <option>Nether</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>X-KOORDINATE</label>
+      <input name="x" type="number" required step="any" value="0">
+    </div>
+
+    <div class="field">
+      <label>Z-KOORDINATE</label>
+      <input name="z" type="number" required step="any" value="0">
+    </div>
+
+    <div id="netherResult" class="result-box">
+      Ergebnis erscheint hier.
+    </div>`;
+
+  openModal("🔥 Nether-Rechner",body,async fd=>{
+    const factor = fd.get("dimension")==="Overworld" ? 8 : 1/8;
+    const x = Number(fd.get("x"));
+    const z = Number(fd.get("z"));
+
+    if(!Number.isFinite(x) || !Number.isFinite(z)) {
+      throw new Error("Ungültige Koordinaten.");
+    }
+
+    const resultX = Math.round(x*factor);
+    const resultZ = Math.round(z*factor);
+
+    $("netherResult").textContent =
+      `X: ${resultX} · Z: ${resultZ}`;
+
+    return false;
+  },"Berechnen");
+}
+
+// ================================================
+// DISTANCE CALCULATOR
+// ================================================
+
+function openDistanceModal() {
+  const coords = getCurrentCoords();
+
+  if(coords.length < 2) {
+    toast("Du brauchst mindestens zwei Koordinaten.");
+    return;
+  }
+
+  const options = coords.map(([id,c])=>
+    `<option value="${esc(id)}">${esc(c.name)} (${esc(c.dimension)})</option>`
+  ).join("");
+
+  const body = `
+    <div class="field">
+      <label>ERSTER ORT</label>
+      <select name="first">${options}</select>
+    </div>
+
+    <div class="field">
+      <label>ZWEITER ORT</label>
+      <select name="second">${options}</select>
+    </div>
+
+    <div id="distanceResult" class="result-box">
+      Entfernung erscheint hier.
+    </div>`;
+
+  openModal("📏 Distanzrechner",body,async fd=>{
+    const a = getCoordinates()[fd.get("first")];
+    const b = getCoordinates()[fd.get("second")];
+
+    if(!a || !b) throw new Error("Koordinaten nicht gefunden.");
+
+    if(a.dimension !== b.dimension) {
+      $("distanceResult").textContent =
+        "Die Orte liegen in unterschiedlichen Dimensionen.";
+      return false;
+    }
+
+    const distance = Math.sqrt(
+      Math.pow(a.x-b.x,2)+
+      Math.pow(a.y-b.y,2)+
+      Math.pow(a.z-b.z,2)
+    );
+
+    $("distanceResult").textContent =
+      `${distance.toFixed(2)} Blöcke Entfernung`;
+
+    return false;
+  },"Berechnen");
+}
+
+// ================================================
+// FOLDER SHARING
+// ================================================
+
+async function shareFolder(id) {
+  const folders = getFolders();
+  const rootFolder = folders[id];
+
+  if(!rootFolder) return;
+
+  const ids = [id];
+  let changed = true;
+
+  while(changed) {
+    changed = false;
+
+    for(const [fid,f] of entries(folders)) {
+      if(f.parentId && ids.includes(f.parentId) && !ids.includes(fid)) {
+        ids.push(fid);
+        changed = true;
+      }
+    }
+  }
+
+  const folderData = {};
+
+  ids.forEach(fid=>{
+    folderData[fid] = folders[fid];
+  });
+
+  const coordData = {};
+
+  for(const [cid,c] of getAllCoords()) {
+    if(ids.includes(c.folderId)) coordData[cid] = c;
+  }
+
+  const idRef = push(ref(db,"sharedFolders"));
+  const shareKey = idRef.key;
+
+  await set(idRef,{
+    ownerUid:state.user.uid,
+    ownerName:state.user.displayName || "Minecraft-Spieler",
+    rootFolderId:id,
+    folders:folderData,
+    coords:coordData,
+    createdAt:Date.now()
+  });
+
+  const url = location.origin + location.pathname + "?share=" + shareKey;
+
+  await copyText(url);
+  toast("Freigabelink erstellt.");
+}
+
+// ================================================
+// SHARED VIEW
+// ================================================
+
+async function loadSharedFolder() {
+  const snapshot = await get(ref(db,"sharedFolders/"+shareId));
+
+  if(!snapshot.exists()) {
+    state.sharedView = {error:true};
+  } else {
+    state.sharedView = snapshot.val();
+  }
+
+  render();
+}
+
+function renderShared() {
+  const share = state.sharedView;
+
+  if(!share) return;
+
+  $("pageTitle").textContent = "Geteilter Ordner";
+
+  if(share.error) {
+    $("content").innerHTML =
+      '<div class="empty">Dieser Freigabelink ist ungültig oder nicht mehr verfügbar.</div>';
+    return;
+  }
+
+  const root = share.folders?.[share.rootFolderId];
+
+  const coords = entries(share.coords).map(([id,c])=>`
+    <article class="coord-card">
+      <div class="coord-top">
+        <strong>${esc(c.name)}</strong>
+        <span>${categoryIcon(c.category)}</span>
+      </div>
+      <p class="coord-description">${esc(c.description || "")}</p>
+      <div class="pills">
+        <span class="pill orange">${esc(c.dimension)}</span>
+        <span class="pill">${esc(c.category)}</span>
+      </div>
+      <div class="coord-values">
+        <div>X: <span>${c.x}</span></div>
+        <div>Y: <span>${c.y}</span></div>
+        <div>Z: <span>${c.z}</span></div>
+      </div>
+    </article>
+  `).join("");
+
+  $("content").innerHTML = `
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">GETEILTER MINECRAFT-ORDNER</div>
+        <h1>${esc(root?.name || "Geteilter Ordner")}</h1>
+        <p>${esc(root?.description || "")}<br>
+        Freigegeben von ${esc(share.ownerName || "Minecraft-Spieler")}</p>
+      </div>
+      <div class="actions">
+        ${state.user
+          ? '<button class="primary" data-action="import-shared">In meinen Account importieren</button>'
+          : '<button class="primary" data-action="go-login">Zum Import anmelden</button>'}
+      </div>
+    </div>
+
+    <div class="grid">
+      ${coords || '<div class="empty">Dieser Ordner enthält keine Koordinaten.</div>'}
+    </div>
+
+    <p style="font-size:11px;color:var(--muted);margin-top:25px">
+      Dieser Freigabelink ermöglicht das Anzeigen der gespeicherten Daten.
+    </p>`;
+}
+
+async function importShared() {
+  const share = state.sharedView;
+  if(!state.user || !share || share.error) return;
+
+  const newIds = {};
+
+  for(const oldId of Object.keys(share.folders || {})) {
+    newIds[oldId] = push(ref(db,userPath("folders"))).key;
+  }
+
+  for(const [oldId,f] of entries(share.folders)) {
+    const newParent = f.parentId
+      ? newIds[f.parentId] || null
+      : null;
+
+    await set(ref(db,userPath("folders/"+newIds[oldId])),{
+      ...f,
+      serverId:state.serverId,
+      parentId:newParent,
+      createdAt:Date.now()
+    });
+  }
+
+  for(const [oldId,c] of entries(share.coords)) {
+    const newId = push(ref(db,userPath("coords"))).key;
+
+    await set(ref(db,userPath("coords/"+newId)),{
+      ...c,
+      serverId:state.serverId,
+      folderId:newIds[c.folderId] || newIds[share.rootFolderId] || null,
+      createdAt:Date.now()
+    });
+  }
+
+  toast("Ordner erfolgreich importiert!");
+}
+
+// ================================================
+// BACKUP EXPORT
+// ================================================
+
+async function exportBackup() {
+  const snapshot = await get(ref(db,userPath()));
+  const data = snapshot.val() || {};
+
+  const blob = new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:"application/json"}
+  );
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "craftcoords-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+  toast("Backup exportiert.");
+}
+
+// ================================================
+// BACKUP IMPORT
+// ================================================
+
+async function importBackup(file) {
+  try {
+    const json = JSON.parse(await file.text());
+
+    if(!json || typeof json !== "object") {
+      throw new Error("Ungültige Backup-Datei.");
+    }
+
+    if(!confirm("Backup importieren? Die Daten werden zu deinem Account hinzugefügt.")) {
+      return;
+    }
+
+    const serverMap = {};
+    const folderMap = {};
+
+    for(const [id,s] of entries(json.servers)) {
+      const newId = push(ref(db,userPath("servers"))).key;
+      serverMap[id] = newId;
+      await set(ref(db,userPath("servers/"+newId)),s);
+    }
+
+    for(const [id] of entries(json.folders)) {
+      folderMap[id] = push(ref(db,userPath("folders"))).key;
+    }
+
+    for(const [id,f] of entries(json.folders)) {
+      await set(ref(db,userPath("folders/"+folderMap[id])),{
+        ...f,
+        serverId:serverMap[f.serverId] || state.serverId,
+        parentId:folderMap[f.parentId] || null
+      });
+    }
+
+    for(const [id,c] of entries(json.coords)) {
+      const newId = push(ref(db,userPath("coords"))).key;
+
+      await set(ref(db,userPath("coords/"+newId)),{
+        ...c,
+        serverId:serverMap[c.serverId] || state.serverId,
+        folderId:folderMap[c.folderId] || null
+      });
+    }
+
+    toast("Backup erfolgreich importiert.");
+  } catch(error) {
+    toast("Import fehlgeschlagen: " + error.message);
+  }
+}
+
+// ================================================
+// EVENT HANDLERS
+// ================================================
+
+$("navigation").addEventListener("click",e=>{
+  const button = e.target.closest("[data-view]");
+  if(!button) return;
+
+  state.view = button.dataset.view;
+  state.folderId = null;
+  state.query = "";
+  $("searchInput").value = "";
+  render();
+});
+
+$("serverSelect").addEventListener("change",e=>{
+  state.serverId = e.target.value;
+  state.folderId = null;
+  render();
+});
+
+$("searchInput").addEventListener("input",e=>{
+  state.query = e.target.value.trim();
+  renderMain();
+});
+
+$("topAdd").addEventListener("click",()=>{
+  if(state.user && !state.sharedView) openCoordModal();
+});
+
+$("content").addEventListener("change",e=>{
+  if(e.target.id === "mapDimension") {
+    window.mapDimension = e.target.value;
+    renderMain();
+  }
+});
+
+$("content").addEventListener("click",async e=>{
+  const button = e.target.closest("[data-action]");
+  if(!button) return;
+
+  const action = button.dataset.action;
+  const id = button.dataset.id;
+
+  switch(action) {
+    case "new-folder":
+      openFolderModal();
+      break;
+
+    case "new-coord":
+      openCoordModal();
+      break;
+
+    case "add-server":
+      openServerModal();
+      break;
+
+    case "open-folder":
+    case "breadcrumb":
+      state.folderId = id;
+      state.view = "home";
+      render();
+      break;
+
+    case "root":
+      state.folderId = null;
+      render();
+      break;
+
+    case "edit-folder":
+      openFolderModal(id);
+      break;
+
+    case "delete-folder":
+      await deleteFolder(id);
+      break;
+
+    case "share-folder":
+      await shareFolder(id);
+      break;
+
+    case "edit-server":
+      openServerModal(id);
+      break;
+
+    case "delete-server":
+      await deleteServer(id);
+      break;
+
+    case "edit-coord":
+      openCoordModal(id);
+      break;
+
+    case "delete-coord":
+      await deleteCoord(id);
+      break;
+
+    case "details":
+      await showDetails(id);
+      break;
+
+    case "favorite":
+      await toggleCoord(id,"favorite");
+      break;
+
+    case "visited":
+      await toggleCoord(id,"visited");
+      break;
+
+    case "copy-coords": {
+      const c = getCoordinates()[id];
+      if(c) await copyText(`${c.x} ${c.y} ${c.z}`);
+      break;
+    }
+
+    case "copy-tp": {
+      const c = getCoordinates()[id];
+      if(c) await copyText(`/tp ${c.x} ${c.y} ${c.z}`);
+      break;
+    }
+
+    case "distance":
+      openDistanceModal();
+      break;
+
+    case "nether":
+      openNetherModal();
+      break;
+
+    case "export":
+      await exportBackup();
+      break;
+
+    case "import":
+      $("importFile").click();
+      break;
+
+    case "import-shared":
+      await importShared();
+      break;
+
+    case "go-login":
+      $("app").classList.add("hidden");
+      $("authScreen").classList.remove("hidden");
+      break;
+
+    case "logout":
+      await signOut(auth);
+      break;
+  }
+});
+
+$("importFile").addEventListener("change",async e=>{
+  const file = e.target.files[0];
+  if(file) await importBackup(file);
+  e.target.value = "";
+});
+
+$("sidebar").addEventListener("click",e=>{
+  const button = e.target.closest('[data-action="add-server"]');
+  if(button) openServerModal();
+});
+
+// ================================================
+// INITIALIZATION
+// ================================================
+
+if(shareId) {
+  $("searchInput").classList.add("hidden");
+  $("topAdd").classList.add("hidden");
+}
+
+</script>
+</body>
+</html>
