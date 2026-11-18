@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Violetta 🌹</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, #32101e 0%, #130812 50%, #050307 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, serif;
+    color: white;
+}
+
+.container {
+    text-align: center;
+    z-index: 2;
+}
+
+h1 {
+    font-size: clamp(45px, 10vw, 85px);
+    font-weight: normal;
+    letter-spacing: 8px;
+    color: #ffe0e8;
+    text-shadow:
+        0 0 10px #ff7399,
+        0 0 30px #ff376d,
+        0 0 70px #c50048;
+    animation: title 3s ease-in-out infinite alternate;
+}
+
+.subtitle {
+    margin-top: 12px;
+    font-size: 14px;
+    letter-spacing: 5px;
+    color: #e7a8bc;
+    opacity: .8;
+}
+
+.rose-container {
+    width: 280px;
+    height: 330px;
+    margin: 25px auto 0;
+    perspective: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rose {
+    width: 200px;
+    height: 250px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotate 12s linear infinite;
+}
+
+.rose img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 25px #ff245c);
+}
+
+.glow {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    background: #e91e63;
+    filter: blur(90px);
+    opacity: .3;
+    border-radius: 50%;
+    animation: pulse 3s infinite alternate;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ffb4c8;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #ff4e83;
+    animation: float linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(360deg);
+    }
+}
+
+@keyframes title {
+    from {
+        text-shadow: 0 0 10px #ff7399, 0 0 30px #ff376d;
+    }
+    to {
+        text-shadow: 0 0 20px #ff7399, 0 0 65px #ff174f;
+    }
+}
+
+@keyframes pulse {
+    from { transform: scale(.8); opacity: .2; }
+    to { transform: scale(1.3); opacity: .45; }
+}
+
+@keyframes float {
+    from {
+        transform: translateY(110vh) translateX(0);
+        opacity: 0;
+    }
+    20% { opacity: 1; }
+    to {
+        transform: translateY(-10vh) translateX(40px);
+        opacity: 0;
+    }
+}
+
+.footer {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #d99aaa;
+    letter-spacing: 2px;
+    opacity: .7;
+}
+</style>
+</head>
+
+<body>
+
+<div class="glow"></div>
+
+<div class="container">
+    <h1>Violetta</h1>
+    <div class="subtitle">✦ A BEAUTIFUL ROSE ✦</div>
+
+    <div class="rose-container">
+        <div class="rose">
+            <img
+                src="https://images.unsplash.com/photo-1494972308805-463bc619d34e?w=600"
+                alt="Eine wunderschöne rote Rose"
+            >
+        </div>
+    </div>
+
+    <div class="footer">Eine Rose nur für dich 🌹</div>
+</div>
+
+<script>
+for (let i = 0; i < 35; i++) {
+    const particle = document.createElement("div");
+    particle.className = "particle";
+
+    particle.style.left = Math.random() * 100 + "vw";
+    particle.style.animationDuration = (5 + Math.random() * 10) + "s";
+    particle.style.animationDelay = (-Math.random() * 15) + "s";
+    particle.style.opacity = Math.random();
+
+    document.body.appendChild(particle);
+}
+</script>
+
+</body>
+</html>
