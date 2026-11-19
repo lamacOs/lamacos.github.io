@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>lamacOs PlayHub</title>
+
+<style>
+:root {
+  --accent: #01C7FC;
+  --accent-hover: #00B3E3;
+  --heading: #FF7A00;
+  --text: #171717;
+  --text-2: #737373;
+  --bg: #FFFFFF;
+  --bg-2: #F7F8FA;
+  --card: #FFFFFF;
+  --border: #E8EAED;
+  --divider: #ECEEF1;
+  --on-accent: #0B1A20;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.08);
+  --radius-s: 10px;
+  --radius-m: 12px;
+  --radius-l: 16px;
+  --radius-xl: 20px;
+  --font: Inter, Poppins, "SF Pro Display", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #F5F5F5;
+    --text-2: #A1A1AA;
+    --bg: #111315;
+    --bg-2: #191C20;
+    --card: #1D2126;
+    --border: #30363D;
+    --divider: #2A2F36;
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.45);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  background: var(--bg-2);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h2, h3 {
+  margin: 0 0 8px;
+  color: var(--heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+h2 { font-size: clamp(28px, 5vw, 36px); line-height: 1.15; }
+h3 { font-size: clamp(21px, 3.5vw, 26px); }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  margin: 32px auto 0;
+  padding: 28px 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  animation: fade-in 220ms ease both;
+}
+
+.container.games {
+  max-width: 1200px;
+  margin-bottom: 48px;
+  padding: 32px 24px;
+}
+
+input, button {
+  width: 100%;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 11px 14px;
+  margin: 6px 0;
+  font-family: inherit;
+  font-size: 15px;
+  border-radius: var(--radius-m);
+}
+
+input {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+input::placeholder { color: var(--text-2); }
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(1, 199, 252, 0.25);
+}
+
+button {
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: background 150ms ease, transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+button:hover { background: var(--bg-2); border-color: var(--text-2); }
+button:active { transform: scale(0.98); }
+button:focus-visible,
+.game-card:focus-visible {
+  outline: 3px solid rgba(1, 199, 252, 0.5);
+  outline-offset: 2px;
+}
+
+/* Primary: erster Button in jedem Formular */
+.container > button:first-of-type,
+.container > input + button:not(:nth-last-of-type(2)):last-child {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+.container > button:first-of-type:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.hint {
+  max-width: 420px;
+  width: calc(100% - 32px);
+  margin: 16px auto 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+#game-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.game-card {
+  text-align: center;
+  cursor: pointer;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.game-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--accent);
+}
+.game-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--bg-2);
+  border-radius: 0;
+}
+.game-card div {
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+iframe {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  border: none;
+  z-index: 999;
+  background: #000;
+}
+
+.back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 20px;
+  z-index: 1000;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  box-shadow: var(--shadow-hover);
+}
+.back-btn:hover { background: var(--accent-hover); }
+
+footer {
+  padding: 24px 16px 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-2);
+  border-top: 1px solid var(--divider);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  .container { margin-top: 20px; padding: 24px 18px; }
+  #game-list { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="auth">
+  <h2>lamacOs PlayHub</h2>
+  <input id="email" type="email" placeholder="E-Mail" />
+  <input id="password" type="password" placeholder="Passwort" />
+  <button onclick="login()">Login</button>
+  <button onclick="showRegister()">Registrieren</button>
+</div>
+
+<div class="container" id="register" style="display:none;">
+  <h3>Registrieren</h3>
+  <input id="reg-email" type="email" placeholder="E-Mail" />
+  <input id="reg-password" type="password" placeholder="Passwort" />
+  <button onclick="register()">Account erstellen</button>
+  <button onclick="hideRegister()">Abbrechen</button>
+</div>
+<p class="hint">Besucht gerne scratch.mit.edu. Dort kommen nähmlich alle hier verfügbaren Spiele her.</p>
+<div class="container" id="upload" style="display:none;">
+  <h3>Spiel hochladen</h3>
+  <input id="game-name" placeholder="Spielname" />
+  <input id="game-link" placeholder="Scratch Link" />
+  <input id="game-cover" placeholder="Cover Bild URL" />
+  <button onclick="uploadGame()">Speichern</button>
+</div>
+
+<div class="container games">
+  <h3>Spiele</h3>
+  <div id="game-list"></div>
+</div>
+
+<footer>© 2026 lamacOs – Alle Rechte vorbehalten.</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+/* 🔥 KORREKTE CONFIG (EU-REGION) */
+const firebaseConfig = {
+  apiKey: "AIzaSyDT58qXz9yl16t3_uxSSVqbxGsXlbqNJiY",
+  authDomain: "poki2-263c6.firebaseapp.com",
+  databaseURL: "https://poki2-263c6-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "poki2-263c6",
+  storageBucket: "poki2-263c6.appspot.com",
+  messagingSenderId: "995713391414",
+  appId: "1:995713391414:web:8c9ccfed82a82f7d27f197"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+/* UI */
+const authDiv = document.getElementById("auth");
+const registerDiv = document.getElementById("register");
+const uploadDiv = document.getElementById("upload");
+const gameList = document.getElementById("game-list");
+
+window.showRegister = () => {
+  authDiv.style.display = "none";
+  registerDiv.style.display = "flex";
+};
+window.hideRegister = () => {
+  authDiv.style.display = "flex";
+  registerDiv.style.display = "none";
+};
+
+/* Auth State */
+onAuthStateChanged(auth, user => {
+  if (user) {
+    authDiv.style.display = "none";
+    uploadDiv.style.display = "flex";
+  } else {
+    authDiv.style.display = "flex";
+    uploadDiv.style.display = "none";
+  }
+});
+
+/* Registrierung */
+window.register = async () => {
+  try {
+    await createUserWithEmailAndPassword(
+      auth,
+      document.getElementById("reg-email").value,
+      document.getElementById("reg-password").value
+    );
+    alert("Registriert!");
+    hideRegister();
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+/* Login */
+window.login = async () => {
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      document.getElementById("email").value,
+      document.getElementById("password").value
+    );
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+/* 🔥 SPIEL HOCHLADEN – FIXED */
+window.uploadGame = async () => {
+  const name = document.getElementById("game-name").value.trim();
+  const link = document.getElementById("game-link").value.trim();
+  const cover = document.getElementById("game-cover").value.trim();
+
+  if (!name || !link || !cover) {
+    alert("Bitte alle Felder ausfüllen!");
+    return;
+  }
+
+  try {
+    await push(ref(db, "games"), {
+      name,
+      link,
+      cover,
+      createdAt: Date.now()
+    });
+    alert("Spiel gespeichert!");
+  } catch (e) {
+    console.error(e);
+    alert("Upload fehlgeschlagen");
+  }
+};
+
+/* Spiele laden (LIVE) */
+onValue(ref(db, "games"), snap => {
+  gameList.innerHTML = "";
+  snap.forEach(c => {
+    const g = c.val();
+    const div = document.createElement("div");
+    div.className = "game-card";
+    div.innerHTML = `<img src="${g.cover}"><div>${g.name}</div>`;
+    div.onclick = () => playGame(g.link);
+    gameList.appendChild(div);
+  });
+});
+
+/* Spiel starten mit Zurück-Button */
+window.playGame = link => {
+  const id = link.match(/projects\/(\d+)/)?.[1];
+  if (!id) return alert("Ungültiger Scratch Link");
+
+  // Iframe erstellen
+  const iframe = document.createElement("iframe");
+  iframe.src = `https://scratch.mit.edu/projects/${id}/embed?autostart=true`;
+  document.body.appendChild(iframe);
+
+  // Zurück-Button erstellen
+  const backBtn = document.createElement("button");
+  backBtn.innerText = "Zurück";
+  backBtn.className = "back-btn";
+
+  backBtn.onclick = () => {
+    iframe.remove();
+    backBtn.remove();
+  };
+
+  document.body.appendChild(backBtn);
+};
+</script>
+
+</body>
+</html>
