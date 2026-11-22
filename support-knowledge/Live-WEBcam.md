@@ -2,196 +2,155 @@
 <!-- source-path: Live-WEBcam -->
 <!-- source-files: ["Live-WEBcam/index.html"] -->
 
-# Support-Dokumentation: Live-WEBcam
+# Support-Dokumentation: Live-WEBcam (lamacOs — Live Kamera)
 
-**Website-Name:** Live-WEBcam (Titel im Browser-Tab: „lamacOs — Live Kamera“)  
-**Vermuteter Zweck:** Webbasierte Anwendung zum Anzeigen eines Live-Kamerabildes (Video-Stream) und zur Generierung/Anzeige eines Zugangscodes. Enthält ein integriertes KI-Support-Widget (lamacHub Kundenservice).  
+**Website-Name:** Live-WEBcam  
+**Vermuteter Zweck:** Webbasierte Anwendung zur Anzeige eines Live-Kamerastreams (Webcam) mit Einbindung eines KI-gestützten Support-Chats (lamacHub Kundenservice).  
 **Quellcode-Pfad:** `Live-WEBcam/index.html`  
-**Datum der Erstellung:** 2025-08-17 (basierend auf heutigem Datum)  
+**Datum der Erstellung:** 2025-08-14 (basierend auf heutigem Datum)
 
 ---
 
-## 1. Überblick
+## 1. Überblick & Zweck
 
-Die Seite besteht aus einer Single-Page-Application (SPA) mit drei Hauptbereichen (Sections), zwischen denen per Buttons navigiert wird:
-1. **Startseite** – Einstieg mit Navigation zu den Funktionen.
-2. **Live Kamera** – Anzeige eines Video-Streams (Webcam/Kamera) mit Verbindungsstatus und Steuerung.
-3. **Zugangscode** – Anzeige eines generierten Codes (Format `XXXX-XXXX`) sowie Eingabefeld für Codes.
+Die Seite **"lamacOs — Live Kamera"** stellt eine zentrale Oberfläche bereit, um einen Live-Videostream einer Kamera (vermutlich Webcam oder IP-Kamera) im Browser darzustellen. Ergänzt wird die Seite durch einen **KI-Support-Chat (lamacHub Kundenservice)**, der als Overlay über die eigentliche Anwendung gelegt wird.
 
-Zusätzlich ist ein **KI-Support-Chat** (lamacHub Kundenservice) fest in der Seite eingebettet, der über einen schwebenden Button geöffnet wird.
+**Hauptfunktionen (aus Code ersichtlich):**
+- Darstellung eines Video-Elements (`<video>`) in einer gestylten Karte.
+- Eingabefeld für einen Code (vermutlich Zugriffscode / Pairing-Code).
+- Buttons für Aktionen (Start/Stop, evtl. Vollbild, Einstellungen – genaue Beschriftungen im HTML nicht vollständig sichtbar, da JS-Logik fehlt).
+- Umschaltung zwischen Light- und Dark-Mode.
+- KI-Chat-Widget (fester Button rechts unten, aufklappbares Fenster).
+
+**Nicht eindeutig erkennbar (fehlende JS-Logik / gekürzter Code):**
+- Wie der Videostream gestartet wird (WebRTC, HLS, MJPEG, statische URL?).
+- Welche Buttons im Detail existieren (nur `.btn` und `.btn-secondary` Klassen definiert).
+- Backend-API für den Videostream oder Code-Validierung.
+- Ob der Code zwingend erforderlich ist oder optional.
 
 ---
 
-## 2. Voraussetzungen (Client-Seite)
+## 2. Voraussetzungen & Unterstützte Umgebungen
 
 | Anforderung | Details |
 |-------------|---------|
-| Browser | Moderner Browser mit Unterstützung für `getUserMedia` (WebRTC), `fetch`, `localStorage`, CSS-Variablen, `backdrop-filter`. Getestet: Chrome/Edge 100+, Firefox 100+, Safari 15+. |
-| Berechtigungen | **Kamera & Mikrofon** (für Live-Kamera-Bereich). Der Browser fragt beim Start des Streams nach Erlaubnis. |
-| Netzwerk | HTTPS (oder `localhost`) – `getUserMedia` erfordert sicheren Kontext. Für den KI-Chat: ausgehende Verbindung zu `https://carescape-ai.oslamuoslamu.workers.dev/`. |
-| JavaScript | Muss aktiviert sein (gesamte Logik läuft clientseitig). |
-| Viewport | Responsive ab 320 px Breite (Mobile First). |
-
-> **Hinweis:** Serverseitige Komponenten (Signaling, TURN/STUN, Backend für Code-Verwaltung) sind **im vorliegenden Quellcode nicht enthalten**. Die Seite scheint als Frontend-Prototyp oder Demo konzipiert zu sein.
+| **Browser** | Moderne Browser mit ES6+ Support (Chrome, Firefox, Safari, Edge aktuelle Versionen). Nutzt `Inter` Font (Google Fonts), CSS Custom Properties, `backdrop-filter`, `clamp()`. |
+| **Netzwerk** | Zugriff auf `fonts.googleapis.com` (Schriftart), `carescape-ai.oslamuoslamu.workers.dev` (KI-Chat Worker), sowie die Video-Quelle (nicht im Code sichtbar). |
+| **Berechtigungen** | Falls lokale Webcam genutzt wird: Kamera-Berechtigung im Browser. Bei IP-Cam/Stream: Keine spezielle Browser-Berechtigung, aber Netzwerkzugriff auf Stream-URL. |
+| **JavaScript** | Muss aktiviert sein (UI-Logik, Theme-Toggle, Chat, Video-Handling). |
+| **Cookies/Storage** | Chat nutzt `localStorage`/`sessionStorage` nicht explizit im Ausschnitt, aber `dataset.initialized` Flag. Worker-URL fest verdrahtet. |
 
 ---
 
-## 3. Sichtbare Bereiche & Navigation
+## 3. Benutzeroberfläche – Sichtbare Bereiche
 
-### 3.1 Navbar (fix oben)
-- **Logo** (36×36 px, `logo.png`) + Titel **„lamacOs“**.
-- **Theme-Toggle** (Button mit Icon `☀️`/`🌙`) – wechselt zwischen Light/Dark Mode. Speichert Wahl in `localStorage` (`theme`).
+### 3.1 Navbar (`.navbar`, sticky top)
+- **Logo** (`.navbar-logo`, 36×36px, abgerundet).
+- **Titel** "lamacOs — Live Kamera" (`.navbar-title`, fett).
+- **Theme-Toggle** (`.theme-toggle`): Button mit Rahmen, wechselt `data-theme="dark"` auf `<html>`. Kein Icon-Text im HTML sichtbar (vermutlich per CSS `::before` oder JS gesetzt).
 
-### 3.2 Sections (nur eine gleichzeitig sichtbar)
-| Section-ID | Überschrift | Hauptinhalt |
-|------------|-------------|-------------|
-| `home` | „Live Kamera“ / „Verbinde dich mit deiner Kamera in Echtzeit“ | Zwei Buttons: **„Live Kamera starten“** → wechselt zu `video`, **„Zugangscode generieren“** → wechselt zu `code`. |
-| `video` | „Live Kamera“ | Video-Element (`<video id="videoElement" autoplay playsinline muted>`), Statusanzeige, Buttons: **„Kamera starten“**, **„Kamera stoppen“**, **„Zurück“**. |
-| `code` | „Zugangscode“ | Großer Code-Display (`XXXX-XXXX`), Eingabefeld für Code, Button **„Code prüfen“**, **„Neuen Code generieren“**, **„Zurück“**. |
+### 3.2 Hauptbereich (`.container`, zentriert, max 1200px)
+- **Sektionen** (`.section`, standardmäßig `display:none`, nur `.active` sichtbar). Im Code nur eine Sektion angedeutet (Video-Bereich).
+- **Video-Karte** (`.video-card`):
+  - `<video>` Element (100% Breite, min-height 200px, schwarzer Hintergrund).
+  - Kein `src` oder `srcObject` im HTML gesetzt → wird per JS zugewiesen.
+- **Code-Display** (`.code-display`): Zeigt einen Code prominent an (groß, Monospace, Buchstabenabstand). Beschriftung "Code" (`.code-display p` muted).
+- **Eingabefeld** (`<input>`): Zentriert, Großbuchstaben, Letter-Spacing, Platzhalter nicht im HTML sichtbar. Vermutlich für Pairing-Code oder Raum-Code.
+- **Status-Bereich** (`.status`): Farblich kodiert (`.connecting` gelb, `.connected` grün, `.error` rot), linker Border-Akzent.
+- **Control-Buttons** (`.control-buttons`): Vertikaler Stapel (Flex column, gap 12px). Buttons nutzen `.btn` (Primär, Orange) oder `.btn-secondary` (Transparent, Border).
 
 ### 3.3 Footer
-- Copyright-Hinweis: „© 2025 lamacOs. Teil von lamacHub.“
-- Links: **Datenschutz**, **Impressum** (href=`#` – **Ziel im Quellcode nicht eindeutig erkennbar**).
+- Einfacher Footer (`.card-bg`, Border top, muted Text, zentriert). Inhalt im HTML nicht sichtbar (gekürzt).
 
-### 3.4 KI-Support-Widget (rechts unten)
-- **Öffnen-Button** (grüner Kreis, Icon `💬`).
-- **Fenster** (390 × 570 px, dunkelgrüner Header „lamacHub Kundenservice“, Chat-Verlauf, Eingabefeld max. 1800 Zeichen, Senden-Button `✈️`).
-- Kommunikation mit Worker: `https://carescape-ai.oslamuoslamu.workers.dev/` (POST, JSON, Streaming-Antwort).
-- Markdown-Rendering im Bot-Antworten (Tabellen, Code-Blöcke, Listen, Links).
+### 3.4 KI-Support-Chat (lamacHub) – `#lamac-ai`
+- **Öffnen-Button** (`#lamac-ai-open`): Fixiert rechts unten (60px Kreis, grün `#007e62`, Icon `🗨️` / Unicode).
+- **Fenster** (`#lamac-ai-window`): Fixiert über dem Button, 390px breit, max 570px hoch, abgerundet, Schatten, Animation beim Öffnen.
+  - **Header**: Titel "lamacHub Kundenservice", Untertitel "KI-gestützter Support", Schließen-Button (×).
+  - **Nachrichtenbereich** (`#lamac-ai-messages`): Scrollbar, Bot-Nachrichten links (weiß, Border), User-Nachrichten rechts (grünlich, `pre-wrap`). Unterstützt Markdown-Rendering (Headlines, Listen, Code, Tabellen, Blockquotes, Links).
+  - **Eingabeformular** (`#lamac-ai-form`): Input (max 1800 Zeichen, autocomplete=off), Senden-Button (Pfeil-Rechts Icon).
+- **Worker-Endpunkt**: `https://carescape-ai.oslamuoslamu.workers.dev/` (fest im Code verdrahtet).
+- **Initialisierungsschutz**: `dataset.initialized = "true"` verhindert doppelte Instanzen.
 
 ---
 
-## 4. Bedienung Schritt für Schritt
+## 4. Bedienung – Schritt für Schritt
 
-### 4.1 Theme wechseln
-1. Klicke auf den **Theme-Button** (☀️/🌙) in der Navbar.
-2. Seite wechselt sofort; Einstellung bleibt beim Neuladen erhalten.
+> **Hinweis:** Da die JavaScript-Logik für Video, Code-Eingabe und Buttons im bereitgestellten Ausschnitt fehlt (oder gekürzt wurde), beschreiben wir nur das, was **visuell und strukturell** bedienbar ist.
 
-### 4.2 Live-Kamera starten
-1. Auf Startseite Button **„Live Kamera starten“** klicken → Section `video` wird eingeblendet.
-2. Button **„Kamera starten“** klicken.
-   - Browser fragt nach Kamera-Berechtigung → **Zulassen**.
-   - Video-Element zeigt Live-Bild.
-   - Status wechselt zu **„Verbunden“** (grün).
-3. **„Kamera stoppen“** beendet Stream, schaltet Kamera-LED aus, Status **„Getrennt“**.
-4. **„Zurück“** führt zur Startseite.
+### 4.1 Theme wechseln (Light / Dark)
+1. Klicke auf den **Theme-Toggle-Button** in der Navbar (rechts, Rahmen-Button).
+2. Die Seite wechselt sofort die Farbvariablen (Hintergrund, Text, Karten, Ränder).
+3. Die Einstellung wird **nicht** im `localStorage` gespeichert (kein Code dazu sichtbar) → nach Reload zurück auf System-Standard (Light).
 
-### 4.3 Zugangscode generieren & prüfen
-1. Startseite → **„Zugangscode generieren“** → Section `code`.
-2. Automatisch wird ein Code `XXXX-XXXX` (Großbuchstaben/Ziffern, ohne Verwechslungszeichen) angezeigt.
-3. **„Neuen Code generieren“** erstellt neuen Code.
-4. Im Eingabefeld kann ein Code eingegeben werden (automatisch Großbuchstaben, Bindestrich nach 4. Zeichen).
-5. **„Code prüfen“** vergleicht Eingabe mit angezeigtem Code → Status **„Code stimmt überein“** (grün) oder **„Code stimmt nicht überein“** (rot).
+### 4.2 Live-Kamera ansehen (Erwarteter Ablauf)
+1. Seite laden → Video-Karte zeigt schwarzen Bereich (Platzhalter).
+2. Falls **Code erforderlich**: Code aus `.code-display` ablesen oder im Eingabefeld eingeben (Großbuchstaben, automatisch uppercase).
+3. **Start-Button** klicken (vermutlich erster `.btn` in `.control-buttons`).
+4. Status wechselt: "Verbinde..." (gelb) → "Verbunden" (grün) → Video läuft.
+5. Bei Fehler: Status rot, Fehlermeldung im Status-Text.
 
-### 4.4 KI-Support nutzen
-1. Klicke auf **Chat-Button** (rechts unten `💬`).
-2. Fenster öffnet sich mit Begrüßung.
-3. Nachricht tippen (max. 1800 Zeichen), **Enter** oder **Senden-Button** `✈️`.
-4. Antwort erscheint als Markdown (Code-Blöcke, Tabellen, Links klickbar).
-5. **Schließen** via `×` im Header oder Klick außerhalb (nicht implementiert – **nur Close-Button**).
+### 4.3 KI-Support-Chat nutzen
+1. Klicke auf den **grünen runden Button** (💬) **unten rechts**.
+2. Chat-Fenster klappt nach oben auf (Animation).
+3. **Erste Bot-Nachricht**: "Hallo! Wie kann ich dir weiterhelfen?".
+4. Nachricht tippen (max 1800 Zeichen), **Enter** oder **Senden-Button** (➤) drücken.
+5. Antwort erscheint als Bot-Nachricht (Markdown gerendert: **Fett**, *Kursiv*, `Code`, Listen, Tabellen, Code-Blöcke).
+6. Schließen: **×-Button** im Header oder erneut auf Öffnen-Button klicken.
+7. **Barrierefreiheit**: `aria-live="polite"`, Rollen `status` für Tipp-Indikator, Labels an Buttons/Input.
 
 ---
 
 ## 5. Eingaben & Ausgaben
 
-| Bereich | Eingabe | Ausgabe / Reaktion |
-|---------|---------|---------------------|
-| Kamera | Button „Kamera starten“ | Video-Stream (lokal), Status-Text, Button-Zustände |
-| Kamera | Button „Kamera stoppen“ | Stream endet, Video schwarz, Status „Getrennt“ |
-| Code | Auto bei Section-Show | Neuer Code `XXXX-XXXX` im Display |
-| Code | Button „Neuen Code generieren“ | Neuer Code |
-| Code | Texteingabe + „Code prüfen“ | Status: „stimmt überein“ / „stimmt nicht überein“ |
-| Chat | Text + Senden | Bot-Antwort (Markdown), Typing-Indikator während Wartezeit |
-| Theme | Button-Klick | CSS-Variablen wechseln, Icon ändert sich, `localStorage` Update |
+| Element | Typ | Validierung / Verhalten | Ausgabe / Reaktion |
+|---------|-----|-------------------------|---------------------|
+| **Theme-Toggle** | Button (Click) | Toggle `data-theme` auf `<html>` | Sofortiges Re-Rendering der CSS-Variablen |
+| **Code-Eingabe** | `<input>` (Text) | `text-transform: uppercase`, `letter-spacing: 2px`, `pattern` nicht gesetzt, `maxlength` nicht gesetzt | Wert per JS auslesbar (kein Submit-Event im HTML) |
+| **Video-Element** | `<video>` | Kein `controls` Attribut → Steuerung nur per JS | Stream-Wiedergabe (autoplay, muted, playsinline vermutlich per JS) |
+| **Control-Buttons** | `<button class="btn">` | `.btn:disabled` → Opazität 0.6, `cursor: not-allowed` | Klick-Handler fehlen im Ausschnitt |
+| **Chat-Input** | `<input id="lamac-ai-input">` | `maxlength="1800"`, `required`, `autocomplete="off"` | Enter/Submit → `addUserMessage()`, dann Worker-Request |
+| **Chat-Senden** | `<button type="submit">` | Disabled während `busy = true` | Sendet History an Worker, zeigt Tipp-Animation (`lamac-typing`) |
+| **Chat-Worker** | `fetch` an `WORKER_URL` | Erwartet Streaming-Response (SSE/Chunked) oder JSON | Rendert Antwort via `renderMarkdown()` in Bot-Blase |
 
 ---
 
 ## 6. Typische Probleme & Fehlerbehebung
 
-| Symptom | Mögliche Ursache (basierend auf Code) | Abhilfe |
-|---------|----------------------------------------|---------|
-| Kamera startet nicht, Status „Fehler: Could not start camera“ | Keine Kamera angeschlossen, Berechtigung verweigert, unsicherer Kontext (HTTP), anderer Tab nutzt Kamera exklusiv. | HTTPS/`localhost` prüfen, Browser-Berechtigungen → Kamera erlauben, andere Tabs schließen, Gerät anschließen. |
-| Video bleibt schwarz / „Getrennt“ | `getUserMedia` liefert Stream, aber `<video>` spielt nicht ab (z. B. `autoplay` blockiert). | Seite neu laden, Browser-Update, manuell `videoElement.play()` in DevTools testen. |
-| Code-Prüfung funktioniert nicht | Eingabe wird auf Großbuchstaben normiert, Bindestrich auto-gesetzt. Falsche Eingabe (z. B. Kleinbuchstaben) wird korrigiert. | Nur A-Z, 0-9 eingeben; Format `XXXX-XXXX` beachten. |
-| Chat sendet nicht / „Fehler bei der Anfrage“ | Worker-URL nicht erreichbar (`carescape-ai.oslamuoslamu.workers.dev`), CORS, Netzwerk-Fehler, Rate-Limit. | Internet prüfen, Adblocker/Proxy testen, später erneut versuchen. |
-| Theme wird nicht gespeichert | `localStorage` deaktiviert (Privater Modus, Browser-Einstellung). | `localStorage` zulassen, Cookies/Site-Daten erlauben. |
-| Navbar/Chat auf Mobile abgeschnitten | CSS `fixed`/`bottom`/`right` Werte, Viewport-Meta vorhanden. | Im Quellcode Media-Queries bis 480 px vorhanden – **auf echten Geräten testen**. |
+| Symptom | Mögliche Ursache (Code-basiert) | Prüfung / Lösung |
+|---------|----------------------------------|-------------------|
+| **Video bleibt schwarz / "Kein Stream"** | `srcObject` oder `src` nicht gesetzt (JS fehlt/fehlgeschlagen). Stream-URL falsch, CORS blockiert, Code ungültig. | DevTools → Network: Prüfen auf Requests an Stream-Server. Console: Fehler bei `getUserMedia` oder `MediaSource`. |
+| **Theme-Toggle wirkt nicht** | `data-theme` Attribut nicht auf `<html>` gesetzt. CSS-Variablen nicht überschrieben. | Element-Inspektor: `<html data-theme="dark">` prüfen. |
+| **Chat öffnet sich nicht** | `#lamac-ai` Container fehlt (HTML nicht geladen), JS-Fehler vor Initialisierung, `dataset.initialized` schon `true`. | Console: Fehler suchen. `document.querySelector("#lamac-ai")` prüfen. |
+| **Chat sendet nicht / keine Antwort** | Worker-URL `carescape-ai.oslamuoslamu.workers.dev` blockiert (CORS, Firewall, Adblocker). `busy` Flag hängt. | Network-Tab: POST an Worker-URL prüfen. Adblocker pausieren. Seite neu laden (reset `initialized`). |
+| **Chat-Nachrichten werden nicht gerendert (Markdown)** | `renderMarkdown()` Funktion nicht definiert (im gekürzten Teil). XSS-Schutz: HTML wird escaped, aber Markdown nicht geparst. | Prüfen, ob `renderMarkdown` global verfügbar ist. Falls nicht → nur Plaintext. |
+| **Layout bricht auf Mobile** | Container Padding, Button-Größen, Chat-Fenster `calc(100vw - 32px)` – sollte funktionieren. | Viewport-Meta vorhanden. `@media (max-width: 768px)` und `480px` Breakpoints definiert. |
+| **Schriftart "Inter" lädt nicht** | `fonts.googleapis.com` blockiert / Offline. | Fallback: `sans-serif` (im `font-family` Stack letzte Position). |
 
 ---
 
-## 7. Datenschutz & Berechtigungen
+## 7. Datenschutz, Berechtigungen & Sicherheit
 
-| Aspekt | Umsetzung im Code |
-|--------|-------------------|
-| **Kamera/Mikrofon** | Werden **nur** nach explizitem Klick auf „Kamera starten“ angefordert (`getUserMedia({ video: true, audio: false })`). Stream bleibt lokal im `<video>`-Element – **kein Upload, kein Recording** im vorliegenden Code. |
-| **Theme-Präferenz** | Gespeichert in `localStorage` (`theme`), nur clientseitig. |
-| **Chat-Verlauf** | Wird im Speicher (`history` Array) gehalten und bei jedem Request an den Worker mitgesendet. **Nicht** in `localStorage` persistiert (Seite neu laden → Verlauf weg). |
-| **Externe Verbindungen** | 1. Google Fonts (`fonts.googleapis.com`) – lädt Schrift „Inter“. 2. Worker-API (`carescape-ai.oslamuoslamu.workers.dev`) – sendet Chat-Nachrichten + Historie. 3. `logo.png` (lokal). |
-| **Cookies** | Keine Cookie-Nutzung im Code erkennbar. |
-| **Datenschutz/Impressum Links** | Platzhalter (`href="#"`) – **Ziel im Quellcode nicht eindeutig erkennbar**. |
-
-> **Hinweis:** Da kein Backend-Code vorliegt, können keine Aussagen zu serverseitiger Speicherung, Logs oder Datenweitergabe getroffen werden.
+| Aspekt | Status im Code | Hinweis |
+|--------|----------------|---------|
+| **Kamera-Zugriff** | Nicht im HTML/JS-Ausschnitt sichtbar (`navigator.mediaDevices.getUserMedia` nicht vorhanden). | Falls lokale Cam genutzt wird: Browser fragt bei Erstzugriff. Kein Hinweistext im UI sichtbar. |
+| **Externe Ressourcen** | Google Fonts (`fonts.googleapis.com`), KI-Worker (`carescape-ai.oslamuoslamu.workers.dev`). | Kein `preconnect` / `dns-prefetch` im Head. Fonts laden blockierend (kein `font-display: swap` im Link-Tag). |
+| **Chat-Daten** | Nachrichten an Worker gesendet (vermutlich inkl. History). Keine lokale Speicherung sichtbar. | **Keine Datenschutzerklärung / Impressum im Code sichtbar.** |
+| **Secrets / Keys** | Worker-URL fest im Frontend-Code → **kein Secret**, aber Endpunkt öffentlich einsehbar. | Keine API-Keys, Tokens, Passwörter im Code gefunden. |
+| **XSS-Schutz Chat** | Bot-Nachrichten: `item.innerHTML = renderMarkdown(text)` – **Risiko**, falls `renderMarkdown` unsicher. User-Nachrichten: `textContent` → sicher. | `renderMarkdown` Implementierung nicht einsehbar (gekürzt). Sollte HTML escapen & nur erlaubte Tags zulassen. |
+| **CSP / Security Headers** | Nicht im HTML definierbar (Meta-Tag fehlt). | Empfehlung: Server-seitig `Content-Security-Policy` setzen (z. B. `script-src 'self'; connect-src 'self' https://carescape-ai.oslamuoslamu.workers.dev; font-src https://fonts.googleapis.com https://fonts.gstatic.com;`). |
 
 ---
 
-## 8. Technische Details (für Entwickler/Support)
+## 8. FAQ – Häufige Fragen
 
-### 8.1 State-Management (Vanilla JS)
-- `currentSection` – aktive Section (`home`, `video`, `code`).
-- `stream` – `MediaStream` Objekt der Kamera.
-- `currentCode` – aktueller Zugangscode (String).
-- `history` (Chat) – Array von `{ role: 'user'|'assistant', content: string }`.
+**F: Warum sehe ich kein Bild in der Video-Karte?**  
+A: Der Video-Stream wird per JavaScript geladen. Prüfen Sie die Browser-Konsole (F12) auf Fehlermeldungen. Möglicherweise ist ein Zugriffscode nötig (siehe Code-Display / Eingabefeld) oder der Stream-Server ist nicht erreichbar.
 
-### 8.2 Wichtige Funktionen (Auszug)
-| Funktion | Zweck |
-|----------|-------|
-| `showSection(id)` | Blendet Sections ein/aus (CSS-Klasse `active`). |
-| `generateCode()` | Erzeugt 8-stelligen Code aus `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` (kein I, O, 1, 0). Format `XXXX-XXXX`. |
-| `startCamera()` / `stopCamera()` | Holt/beendet `MediaStream`, bindet an `<video>`. |
-| `checkCode()` | Vergleicht normierte Eingabe mit `currentCode`. |
-| `sendMessage()` | Baut Request an Worker (POST, JSON, `stream: true`), verarbeitet SSE-ähnliche Text-Chunks, rendert Markdown. |
-| `renderMarkdown()` | Eigene Implementierung (keine externe Lib) – unterstützt: Headlines, Listen, Tabellen, Code-Blöcke, Blockquotes, Links, Inline-Code, HR. |
+**F: Wie wechsle ich in den Dark Mode?**  
+A: Klicken Sie auf den Button mit Rahmen in der Navigationsleiste (rechts neben dem Titel). Die Einstellung wird **nicht dauerhaft gespeichert** – nach Neuladen ist wieder Light Mode aktiv.
 
-### 8.3 CSS-Architektur
-- **Custom Properties** für Theming (`--accent`, `--bg`, `--text`, …).
-- `[data-theme="dark"]` Selektor auf `<html>`.
-- Mobile First, Breakpoints: 768 px, 480 px.
-- Animationen: `fadeIn` (Sections), `lamac-ai-appear` (Chat), `bounce` (Typing-Dots).
+**F: Funktioniert der Chat auch ohne Internet?**  
+A: Nein. Der Chat sendet jede Nachricht an `https://carescape-ai.oslamuoslamu.workers.dev/`. Ohne Verbindung erscheint keine Antwort (kein Offline-Fallback im Code).
 
-### 8.4 Externe Abhängigkeiten
-| Ressource | Zweck | SRI / Integrität |
-|-----------|-------|------------------|
-| `https://fonts.googleapis.com/css2?family=Inter...` | Schriftart Inter | **Nicht im Code** (kein `integrity`-Attribut). |
-| `https://carescape-ai.oslamuoslamu.workers.dev/` | KI-Chat Backend | **Nicht im Code** (kein `integrity`). |
-| `logo.png` | Logo in Navbar | Lokal, relativ. |
-
----
-
-## 9. FAQ
-
-**F: Warum funktioniert die Kamera auf meinem iPhone/Safari nicht?**  
-A: Safari erfordert Benutzerinteraktion (Klick) für `autoplay`. Der Code nutzt `playsinline muted` und startet per Button – das ist korrekt. Prüfen Sie **Einstellungen → Safari → Kamera → „Fragen“ oder „Erlauben“**. HTTPS zwingend.
-
-**F: Wo wird der Zugangscode gespeichert?**  
-A: Nur im Speicher (`currentCode` Variable). Beim Neuladen der Seite wird ein **neuer Code generiert**. Keine Persistenz in `localStorage` oder Server.
-
-**F: Kann ich den Chat-Verlauf exportieren?**  
-A: **Im Quellcode nicht vorgesehen.** Der Verlauf liegt nur im JS-Array `history`. Kein Export-Button, kein Download.
-
-**F: Wie ändere ich die Worker-URL für den Chat?**  
-A: Im Skript-Block des Chat-Widgets: Konstante `WORKER_URL` anpassen. **Im Quellcode hardcodiert.**
-
-**F: Gibt es eine API für die Kamera (z. B. Snapshots, Filter)?**  
-A: **Im Quellcode nicht eindeutig erkennbar.** Nur Start/Stop/Anzeige.
-
-**F: Warum lädt die Schrift „Inter“ nicht offline?**  
-A: Google Fonts wird per `<link>` nachgeladen. Ohne Internet fällt Browser auf System-Schrift zurück (CSS `font-family: Inter, sans-serif`).
-
-**F: Ist die Seite barrierefrei (a11y)?**  
-A: Teilweise: `aria-label` an Buttons, `aria-live` im Chat, semantische Buttons, Fokus-Styles (`outline` auf Inputs). Fehlend: Tastaturnavigation für Chat-Schließen (nur Maus), Kontrast-Prüfung obliegt Deployment.
-
----
-
-## 10. Bekannte Limitationen (aus Quellcode-Sicht)
-
-1. **Kein Signaling/Backend für WebRTC
+**F: Kann ich den Chat-Verlauf löschen?**  
+A: Im Code ist **kein "Verlauf löschen
