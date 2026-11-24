@@ -5,171 +5,167 @@
 # Support-Dokumentation: HTMLBuilder
 
 **Website-Name:** HTMLBuilder  
-**Vermuteter Zweck:** Ein webbasierter Editor zum Erstellen, Bearbeiten und Live-Vorschau von HTML-Code.  
+**Vermuteter Zweck:** Ein webbasierter Editor zum Erstellen und Testen von HTML-Code mit Live-Vorschau, Syntax-Highlighting (durch monospace-Schrift) und Theme-Umschaltung (Light/Dark).  
 **Quellcode-Pfad:** `HTMLBuilder/index.html`  
-**Datum der Erstellung:** 2025-08-07 (basierend auf heutigem Datum)  
+**Datum der Erstellung:** 2025-08-15 (basierend auf heutigem Datum)  
 
 ---
 
 ## 1. Überblick
 
-HTMLBuilder ist eine Single-Page-Application (SPA), die vollständig in einer `index.html` Datei enthalten ist. Sie bietet eine zweigeteilte Oberfläche: links ein Code-Editor (Textarea) für HTML-Eingabe, rechts eine Live-Vorschau (IFrame) des gerenderten Ergebnisses. Zusätzlich sind ein Theme-Wechsler (Light/Dark Mode) und ein eingebetteter KI-Support-Chat (lamacHub) integriert.
+HTMLBuilder ist eine **Single-Page-Application (SPA)**, die vollständig in einer einzelnen `index.html`-Datei enthalten ist. Sie bietet eine zweigeteilte Oberfläche:  
+- **Links:** Ein Textbereich (`<textarea>`) zur Eingabe von HTML-Code.  
+- **Rechts:** Eine Live-Vorschau (`<iframe>`), die den eingegebenen Code rendert.  
 
-**Zielgruppe:** Entwickler, Lernende oder Designer, die schnell HTML-Snippets testen oder prototypen möchten, ohne eine lokale Entwicklungsumgebung aufzusetzen.
+Zusätzlich ist ein **KI-gestützter Support-Chat (lamacHub)** fest in die Seite eingebettet. Die Anwendung läuft rein clientseitig, benötigt keine Server-Komponente für die Kernfunktion (HTML-Rendering) und speichert Daten nicht persistent (kein `localStorage`, keine Datenbank im Code sichtbar).
 
 ---
 
 ## 2. Voraussetzungen
 
 | Anforderung | Details |
-| :--- | :--- |
-| **Browser** | Moderner Browser mit Unterstützung für `CSS Variables`, `Grid Layout`, `backdrop-filter`, `IntersectionObserver` (für Chat-Animationen) und `fetch` API. |
-| **JavaScript** | Muss aktiviert sein (Essentiell für Editor-Logik, Theme-Wechsel, Chat-Funktionalität). |
-| **Netzwerk** | Internetzugang erforderlich für: <br>• Google Fonts (Inter) <br>• KI-Chat-Worker (`https://carescape-ai.oslamuoslamu.workers.dev/`) |
-| **Berechtigungen** | Keine besonderen Browser-Berechtigungen (Kamera, Mikrofon, Standort) erforderlich. Der Chat nutzt `localStorage` nicht offensichtlich, aber `sessionStorage`/`IndexedDB` könnte vom Worker genutzt werden. |
+|-------------|---------|
+| **Browser** | Moderner Browser mit Unterstützung für `CSS Custom Properties`, `Grid Layout`, `backdrop-filter`, `iframe`-Sandboxing (Standard). Getestet mit Chrome/Edge/Firefox/Safari aktuelle Versionen. |
+| **JavaScript** | Muss aktiviert sein (für Theme-Toggle, Live-Vorschau-Update, Chat-Widget). |
+| **Netzwerk** | Für den **Chat** und **Google Fonts (Inter)** ist Internetzugang erforderlich. Der HTML-Builder selbst funktioniert offline nach erstmaligem Laden. |
+| **Berechtigungen** | Keine speziellen Berechtigungen (Kamera, Mikrofon, Standort) notwendig. Der Chat nutzt `fetch` zu einem externen Worker (`carescape-ai.oslamuoslamu.workers.dev`). |
 
 ---
 
 ## 3. Benutzeroberfläche – Bereiche im Detail
 
-Die Oberfläche gliedert sich in folgende Hauptbereiche (von oben nach unten):
-
 ### 3.1 Navigationsleiste (`.navbar`)
-*   **Markenbereich (`.brand`):** Zeigt ein Logo-Bild (44x44px, Quelle im Quellcode nicht sichtbar, `src` Attribut fehlt im Ausschnitt) und den Text "HTML Builder".
-*   **Theme-Button (`.theme-btn`):** Button mit `aria-label` (nicht explizit im HTML, aber `button` Element vorhanden). Wechselt das `data-theme` Attribut am `<html>` Element zwischen `light` (Standard) und `dark`. Speichert die Präferenz **nicht** im `localStorage` (im Quellcode nicht erkennbar), d.h. nach Neuladen wird Standard (Light) geladen.
+- **Markenbereich (`.brand`)**: Zeigt ein Logo-Bild (`<img>`, 44×44px, Quelle im Quellcode nicht sichtbar, `src` fehlt im Ausschnitt) und den Text **"HTML Builder"** (Gewicht 800).
+- **Theme-Button (`.theme-btn`)**: Button mit Beschriftung im Quellcode nicht direkt sichtbar (Icon/Text via JS gesetzt), Hintergrundfarbe `--accent` (#ff7a00). Wechselt zwischen Light/Dark-Mode (setzt Attribut `data-theme="dark"` auf `<html>`).
 
 ### 3.2 Hero-Bereich (`.hero`)
-*   Überschrift: "HTML Builder" (Orange/Accent-Farbe).
-*   Beschreibungstext: "Ein moderner, browserbasierter HTML-Editor mit Live-Vorschau. Schreibe Code links, sieh das Ergebnis rechts – sofort." (Text aus Quellcode rekonstruiert, da im Ausschnitt gekürzt).
+- Überschrift: **"HTML Builder"** (Farbe `--accent`, 3rem).
+- Untertitel: Kurzbeschreibung (Farbe `--muted`), Text im Quellcode nicht vollständig lesbar (gekürzt).
 
-### 3.3 Haupt-Arbeitsbereich (`.grid` → 2 Spalten auf Desktop, 1 Spalte < 1000px)
+### 3.3 Hauptbereich (`.grid` – 2 Spalten, ab 1000px 1 Spalte)
 
-#### Linke Spalte: Editor (`.card`)
-*   **Überschrift:** "HTML Editor"
-*   **Eingabefeld (`textarea`):**
-    *   ID: Nicht explizit im Ausschnitt sichtbar, aber per JS als `document.querySelector('textarea')` ansprechbar.
-    *   Platzhalter-Text: Im Quellcode nicht gesetzt (`placeholder` Attribut fehlt).
-    *   Features: Monospace-Schrift, vertikal skalierbar (`resize: vertical`), Mindesthöhe 250px, Syntax-Highlighting **nicht** vorhanden (reines Textarea).
-*   **Aktionsleiste (`.actions`):**
-    *   Enthält Buttons (`.action-btn`). Im Quellcode sind **keine konkreten Button-Texte/Funktionen** im HTML-Auszug definiert (Der HTML-Teil der `.actions` div ist im Ausschnitt leer/gekürzt).
-    *   *Vermutung:* Typische Buttons wären "Löschen", "Kopieren", "Beispiel laden". **Im Quellcode nicht eindeutig erkennbar.**
+#### Linke Karte: Editor (`.card`)
+- **Überschrift**: "Editor" (vermutet, da `h2` in `.card` vorhanden, Text im Ausschnitt nicht explizit).
+- **Textarea (`#editor` / `textarea`)**:
+  - `min-height: 250px`, `resize: vertical`.
+  - Monospace-Schrift, 14px, Padding 14px.
+  - Hintergrund transparent, Rahmen `var(--border)`.
+  - **Kein Syntax-Highlighting** (reines `<textarea>`-Element).
+- **Aktionsleiste (`.actions`)**:
+  - Buttons (`.action-btn`), Beschriftungen im Quellcode **nicht sichtbar** (HTML für Buttons fehlt im Ausschnitt, nur CSS-Klasse definiert). Vermutet: "Vorschau aktualisieren", "Löschen", "Beispiel laden" – **Im Quellcode nicht eindeutig erkennbar**.
+- **Ausgabebereich (`.output` / `#output`)**:
+  - `min-height: 250px`. Zweck unklar: Möglicherweise für Fehlermeldungen, generierten Code oder Konsolen-Output. **Im Quellcode nicht eindeutig erkennbar**, da kein JS-Logik für `#output` im Ausschnitt vorhanden.
 
-#### Rechte Spalte: Vorschau (`.card`)
-*   **Überschrift:** "Live-Vorschau"
-*   **Ausgabe-Container (`#output`):** Wrapper mit `min-height: 250px`.
-*   **IFrame (`.preview`):**
-    *   Größe: 100% Breite, 500px Höhe.
-    *   `border: none`, `border-radius: 16px`, `background: white` (Hardcoded Weiß, passt sich **nicht** Dark Mode an).
-    *   **Funktionsweise:** Der IFrame wird per JavaScript mit dem Inhalt der Textarea befüllt (siehe Abschnitt 4.1).
+#### Rechte Karte: Vorschau (`.card`)
+- **Überschrift**: "Live Vorschau" (vermutet).
+- **Iframe (`#preview` / `.preview`)**:
+  - `width: 100%`, `height: 500px`, `border: none`, `border-radius: 16px`, `background: white`.
+  - **Sandbox-Attribut**: **Nicht gesetzt** im Quellcode (`<iframe>` ohne `sandbox`). Das bedeutet: Der gerenderte Code hat Zugriff auf das Parent-DOM (Same-Origin), kann Skripte ausführen, Cookies lesen etc. → **Sicherheitshinweis** siehe Abschnitt 6.
 
 ### 3.4 Footer
-*   Copyright/Hinweis-Text (zentriert, gedämpfte Farbe). Inhalt im Ausschnitt nicht lesbar.
+- Zentriert, `margin-top: 40px`, Textfarbe `--muted`. Inhalt im Ausschnitt nicht sichtbar.
 
-### 3.5 KI-Support-Chat (lamacHub) – `#lamac-ai`
-*   **Position:** Fest positioniert (fixed), rechts unten (24px Abstand).
-*   **Öffnen-Button (`#lamac-ai-open`):** Runder Button (60px), türkis/grün (`#007e62`), Icon: "💬" (Unicode).
-*   **Fenster (`#lamac-ai-window`):** 390px breit, max 570px hoch. Erscheint per Slide-Up Animation.
-*   **Header:** Titel "lamacHub Kundenservice", Untertitel "KI-gestützter Support", Schließen-Button (×).
-*   **Nachrichtenbereich (`#lamac-ai-messages`):** Scrollbar, zeigt Bot- (weiß, links) und User-Nachrichten (grünlich, rechts).
-*   **Eingabeformular (`#lamac-ai-form`):** Input-Feld (max 1800 Zeichen), Senden-Button (Pfeil-Icon).
-*   **Markdown-Support:** Bot-Antworten rendern Markdown (Tabellen, Code-Blöcke, Links, Fett/Kursiv).
-*   **Backend:** WebWorker unter `https://carescape-ai.oslamuoslamu.workers.dev/`.
+### 3.5 lamacHub KI-Chat-Widget (`#lamac-ai`)
+- **Fester Button (rechts unten, `#lamac-ai-open`)**: Kreis (60px), grün (#007e62), Icon (Emoji/Unicode `💬` oder ähnlich), `aria-label="Kundensupport öffnen"`.
+- **Fenster (`#lamac-ai-window`)**: 390px × 570px (max), fest positioniert, erscheint über `display: flex` + Klasse `.open`.
+- **Header**: Titel "lamacHub Kundenservice", Untertitel "KI-gestützter Support", Schließen-Button (×).
+- **Nachrichtenbereich (`#lamac-ai-messages`)**: Scrollbar, Blasen-Layout (Bot links/weiß, User rechts/grünlich), unterstützt **Markdown-Rendering** (Tabellen, Codeblöcke, Links, Fett/Kursiv).
+- **Eingabeformular (`#lamac-ai-form`)**:
+  - Input (`#lamac-ai-input`): `maxlength="1800"`, Placeholder "Nachricht schreiben …".
+  - Senden-Button (Pfeil-Icon `➤`).
+- **Backend**: `WORKER_URL = "https://carescape-ai.oslamuoslamu.workers.dev/"` (Cloudflare Worker). Kommunikation via `fetch` (Im Skript angedeutet, Logik im gekürzten Teil).
 
 ---
 
 ## 4. Bedienung – Schritt für Schritt
 
-### 4.1 HTML-Code schreiben & Vorschau aktualisieren
-1.  Öffne die Website.
-2.  Klicke in das **linke Textarea-Feld** ("HTML Editor").
-3.  Gib gültigen HTML-Code ein (z. B. `<h1>Hallo Welt</h1><p>Mein erster Test</p>`).
-    *   *Hinweis:* Es wird **kein** `<html>`, `<head>` oder `<body>` Tag benötigt. Der Inhalt wird direkt in den Body des Iframes injiziert.
-4.  Die Vorschau rechts (**IFrame**) aktualisiert sich **automatisch beim Tippen** (vermutlich `input`-Event-Listener).
-    *   *Im Quellcode nicht eindeutig erkennbar:* Ob ein "Debounce" (Verzögerung) existiert. Bei großem Code könnte die Performance leiden.
+### 4.1 HTML-Code schreiben & testen
+1. **Seite öffnen** → Editor (linke Seite) ist fokussierbar.
+2. **HTML eingeben** (z. B. `<h1>Hallo</h1><p>Welt</p>`).  
+   *Hinweis: Kein Auto-Completion, kein Linting.*
+3. **Vorschau aktualisieren**:  
+   - Im Quellcode **kein Event-Listener für `input`/`keyup` auf der Textarea sichtbar** (JS-Teil fehlt/gekürzt).  
+   - **Vermutung**: Entweder automatisches Update via `input`-Event oder manuell über einen Button in `.actions` (nicht im HTML-Ausschnitt).  
+   - **Fallback**: Seite neu laden oder im DevTools `document.querySelector('iframe').srcdoc = document.querySelector('textarea').value` ausführen.
+4. **Ergebnis prüfen** im rechten Iframe.
 
-### 4.2 Theme wechseln (Light / Dark Mode)
-1.  Klicke auf den **Button rechts in der Navigationsleiste** (Beschriftung im Quellcode nicht sichtbar, vermutlich Icon oder "Dark/Light").
-2.  Die Seite wechselt sofort die Farbvariablen (Hintergrund, Karten, Text, Schatten).
-3.  **Einschränkung:** Der IFrame-Hintergrund bleibt **weiß** (`background: white` im CSS), da er ein separates Dokument ist. Der Dark Mode wirkt sich nur auf die Parent-Seite aus.
+### 4.2 Theme wechseln (Light / Dark)
+1. Button in der Navbar (`.theme-btn`) klicken.
+2. Seite wechselt sofort: Hintergrund, Karten, Textfarben passen sich an (CSS-Variablen).
+3. Zustand wird **nicht persistiert** (kein `localStorage` im Code) → nach Reload zurück auf System-Standard (Light).
 
-### 4.3 KI-Support-Chat nutzen
-1.  Klicke auf den **Sprechblasen-Button (💬)** unten rechts.
-2.  Das Chat-Fenster öffnet sich mit Begrüßung: "Hallo! Wie kann ich dir weiterhelfen?".
-3.  Tippe deine Frage in das Eingabefeld ("Nachricht schreiben …").
-4.  Drücke **Enter** oder klicke den **Pfeil-Button (➤)**.
-5.  Warte auf Antwort (animierte drei Punkte "Tippen...").
-6.  Schließe das Fenster über das **×** oben rechts oder den Button außen (Toggle-Verhalten: Öffnen/Schließen über denselben Button).
+### 4.3 KI-Chat (lamacHub) nutzen
+1. **Öffnen**: Klick auf den runden grünen Button rechts unten ("Kundensupport öffnen").
+2. **Fenster erscheint** mit Willkommensnachricht: *"Hallo! Wie kann ich dir weiterhelfen?"*
+3. **Nachricht tippen** (max. 1800 Zeichen), Enter oder Senden-Button (➤).
+4. **Antwort warten**: Typing-Animation (3 Punkte), dann Markdown-formatierte Antwort.
+5. **Schließen**: Klick auf × im Header oder erneut auf den runden Button.
+6. **Barrierefreiheit**: `aria-live="polite"`, `aria-label`, Fokus-Management (nicht im Code sichtbar, aber ARIA-Attribute vorhanden).
 
 ---
 
 ## 5. Eingaben & Ausgaben
 
 | Bereich | Eingabe | Ausgabe / Reaktion |
-| :--- | :--- | :--- |
-| **Editor (Textarea)** | HTML-Text (String) | Live-Rendering im IFrame (DOM-Elemente). Fehlerhafter HTML wird vom Browser korrigiert dargestellt. |
-| **Theme-Button** | Klick | Toggle `data-theme="dark"` auf `<html>`. CSS-Variablen ändern sich sofort. |
-| **Chat Input** | Text (max 1800 Zeichen) | Sendet Request an Worker-API. Empfängt Streaming- oder Block-Antwort, rendert Markdown im Chat-Verlauf. |
-| **Chat Senden** | Submit-Event | Deaktiviert Button während Request (`busy` Flag), zeigt Typing-Animation. |
+|---------|---------|---------------------|
+| **Editor (Textarea)** | HTML-Text (beliebig, unsicher) | Wird (vermutet) in Iframe gerendert. |
+| **Iframe-Vorschau** | – | Gerendertes HTML/CSS/JS. **Führt Skripte aus** (kein Sandbox). |
+| **Theme-Button** | Klick | Umschaltung CSS-Variablen (`data-theme="dark"` auf `<html>`). |
+| **Chat-Input** | Text (≤1800 Zeichen) | Sendet an `https://carescape-ai.oslamuoslamu.workers.dev/`, zeigt Antwort mit Markdown. |
+| **Chat-Close** | Klick | Versteckt Fenster (`display: none`). |
 
 ---
 
-## 6. Typische Probleme & Fehlerbehebung
+## 6. Datenschutz, Berechtigungen & Sicherheit
+
+| Aspekt | Bewertung |
+|--------|-----------|
+| **Datenverarbeitung (Builder)** | Rein clientseitig. Kein Speichern, kein Senden von Code an Backend. |
+| **Google Fonts (Inter)** | Wird von `fonts.googleapis.com` geladen → IP-Adresse an Google übermittelt. Kein `localStorage`-Cache im Code. |
+| **Chat-Widget** | Sendet Nutzereingaben an **`https://carescape-ai.oslamuoslamu.workers.dev/`** (Cloudflare Worker). Keine Info im Code, welche Daten genau gesendet werden (vermutet: Chat-History + Input). **Keine Einwilligungsabfrage (Cookie-Banner) im Code vorhanden.** |
+| **Iframe-Sicherheit** | **Kritisch**: `<iframe>` **ohne `sandbox`-Attribut**. Eingebetteter Code läuft **Same-Origin** → kann Parent-DOM manipulieren, Cookies/Storage lesen, Netzwerkrequests stellen. **Nicht für fremden/unsicheren Code verwenden.** |
+| **CSP / Security Headers** | Im HTML keine `Content-Security-Policy` (`<meta http-equiv="CSP">`) definiert. |
+| **Externe Skripte** | Keine weiteren externen JS-Dateien (Chat-Logik ist inline). |
+| **Geheimnisse im Code** | `WORKER_URL` ist hardcoded. Keine API-Keys, Tokens, Passwörter im Ausschnitt sichtbar. |
+
+---
+
+## 7. Typische Probleme & Fehlerbehebung
 
 | Problem | Mögliche Ursache | Lösung / Workaround |
-| :--- | :--- | :--- |
-| **Vorschau bleibt leer / zeigt alten Code** | JS-Fehler im `input`-Listener oder IFrame `contentDocument` Zugriff blockiert (CSP/CORS). | 1. Browser-Konsole (F12) prüfen auf Fehler.<br>2. Seite neu laden.<br>3. Prüfen, ob Browser "Third Party Cookies/Storage" blockiert (IFrame ist same-origin `about:blank` bzw `srcdoc`, sollte funktionieren). |
-| **Dark Mode: IFrame Hintergrund blendet weiß** | IFrame hat hardcoded `background: white`. | **Im Quellcode nicht behebbar.** Workaround: Eigenes CSS im Editor hinzufügen: `<style>body{background:#0b1220;color:white}</style>`. |
-| **Chat öffnet nicht / zeigt "Netzwerkfehler"** | Worker-URL `carescape-ai.oslamuoslamu.workers.dev` nicht erreichbar (Firewall, DNS, Offline). | 1. Internet prüfen.<br>2. In neuem Tab Worker-URL aufrufen (sollte 404/Worker-Fehler zeigen, aber erreichbar sein).<br>3. AdBlocker/Privacy-Tools prüfen (blockieren evtl. `workers.dev`). |
-| **Chat sendet nicht / Button dreht sich ewig** | `busy` Flag bleibt `true` (Fehler im Response-Handling), oder Worker antwortet nicht. | Fenster schließen & neu öffnen (Reset State). Seite neu laden. |
-| **Theme wird nach Reload nicht gespeichert** | Kein `localStorage`/`cookie` Logik im Code gefunden. | **Bestätigt:** Nicht implementiert. Manuell nach jedem Laden umschalten. |
-| **Editor: Kein Syntax-Highlighting / Einrückung** | `textarea` Element kann kein Rich-Text/Highlighting. | Externen Editor (VS Code) nutzen & Copy-Paste. Oder Browser-Extension für Textarea-Highlighting. |
+|---------|------------------|----------------------|
+| **Vorschau aktualisiert sich nicht bei Eingabe** | Fehlender `input`-Event-Listener im JS (Code nicht im Ausschnitt). | Prüfen, ob Button in `.actions` existiert ("Aktualisieren"). Andernfalls: Browser-Konsole → `iframe.srcdoc = textarea.value`. |
+| **Theme-Button funktioniert nicht** | JS für Toggle fehlt oder `data-theme` nicht gesetzt. | In DevTools: `document.documentElement.setAttribute('data-theme', 'dark')` testen. |
+| **Chat öffnet sich nicht / bleibt leer** | Netzwerkfehler zum Worker (`carescape-ai...workers.dev`), CSP blockiert `fetch`, JS-Fehler. | Netzwerk-Tab prüfen (403/500/CORS). Offline → Chat nicht nutzbar. |
+| **Chat-Antworten fehlen / "Typing" bleibt** | Worker-Antwort fehlerhaft, `renderMarkdown` wirft Fehler. | Konsole prüfen (SyntaxError im Markdown-Parser). |
+| **Iframe zeigt weiße Seite / Fehler** | Eingabe ungültiges HTML, Skriptfehler im Iframe, Same-Origin-Blockade (z. B. `X-Frame-Options` bei externen URLs im Code). | Einfaches HTML testen (`<h1>Test</h1>`). Externe Ressourcen (Bilder, Fonts) im Code prüfen. |
+| **Layout bricht auf Mobile** | Grid wird bei `<1000px` auf 1 Spalte umgeschaltet (CSS `@media` ok). | Scrollen prüfen; Iframe-Höhe fix 500px → evtl. viel Scrollen nötig. |
+| **Google Fonts lädt nicht** | Offline, Firewall, `fonts.googleapis.com` blockiert. | Fallback: System-Schrift (CSS `font-family: Inter, sans-serif` → fällt auf `sans-serif` zurück). |
 
 ---
 
-## 7. Datenschutz & Berechtigungen
+## 8. FAQ
 
-### 7.1 Lokale Daten
-*   **Keine** offensichtliche Nutzung von `localStorage`, `sessionStorage`, `IndexedDB` oder `Cookies` im Frontend-Code (außer `root.dataset.initialized` für Chat-Verhinderung Doppel-Ladung).
-*   Editor-Inhalt bleibt **nur im RAM** der Seite. Beim Neuladen **verloren**.
+**F: Speichert HTMLBuilder meinen Code automatisch?**  
+A: **Nein.** Im Quellcode ist keine `localStorage`-, `sessionStorage`- oder `IndexedDB`-Logik erkennbar. Beim Neuladen ist der Editor leer.
 
-### 7.2 Externe Verbindungen
-1.  **Google Fonts (`fonts.googleapis.com` / `fonts.gstatic.com`):** Lädt Schriftart "Inter". Überträgt IP-Adresse an Google. Kein `localStorage` Tracking, aber Standard-Google-Logging.
-2.  **KI-Chat Worker (`https://carescape-ai.oslamuoslamu.workers.dev/`):** Sendet Chat-Verlauf (History) an diesen Endpunkt.
-    *   **Achtung:** Der Prompt/Verlauf verlässt den Browser. **Keine sensiblen Daten (Passwörter, API-Keys, PII) in den Chat eingeben.**
-    *   Der Worker steht unter Kontrolle von `oslamuoslamu` (Subdomain von `workers.dev` / Cloudflare).
+**F: Kann ich die Vorschau in einem neuen Fenster öffnen?**  
+A: **Nicht über UI-Elemente im Code.** Manuell möglich: Rechtsklick auf Iframe → "Frame in neuem Tab öffnen" (Browser-Funktion).
 
-### 7.3 Content Security Policy (CSP)
-*   Im Quellcode **kein** `<meta http-equiv="Content-Security-Policy">` Tag vorhanden.
-*   Inline-Styles (`<style>`) und Inline-Scripts (`<script>`) werden ausgeführt. `unsafe-inline` effektiv erlaubt.
-*   IFrame nutzt `srcdoc` (implizit via `document.write` oder `srcdoc` Property im JS), was `unsafe-inline` für das IFrame-Dokument erfordert.
+**F: Warum führt der Iframe meine `<script>`-Tags aus?**  
+A: Das Iframe hat **kein `sandbox`-Attribut** und ist **same-origin**. Es verhält sich wie ein normales Dokument. **Vorsicht bei fremdem Code.**
 
----
+**F: Wie setze ich den Dark Mode dauerhaft?**  
+A: **Nicht möglich** (keine Persistenz). Workaround: Browser-Extension (z. B. "Dark Reader") oder manuell per DevTools `localStorage.setItem('theme','dark')` + eigener Code beim Laden.
 
-## 8. FAQ (Häufige Fragen)
+**F: Werden meine Chat-Nachrichten gespeichert?**  
+A: **Im Quellcode nicht eindeutig erkennbar.** Der Worker (`carescape-ai...`) könnte serverseitig loggen. Lokal im Browser wird `history`-Array nur im Speicher gehalten (Variable `let history = []`), beim Reload weg.
 
-**F: Wie speichere ich meinen HTML-Code?**
-A: **Gar nicht automatisch.** Du musst den Code aus der Textarea kopieren (Strg+A, Strg+C) und lokal in einer `.html` Datei speichern. Es gibt **keinen** "Speichern"- oder "Export"-Button im Quellcode.
+**F: Kann ich den Chat deaktivieren/entfernen?**  
+A: Ja, durch Entfernen des `<div id="lamac-ai">...</div>` Blocks und des zugehörigen `<style>`/`<script>` Blocks aus dem HTML.
 
-**F: Kann ich CSS und JavaScript im Editor schreiben?**
-A: **Ja.** Da der Inhalt in einen IFrame injiziert wird, funktionieren `<style>` Blöcke und `<script>` Blöcke im HTML-Code ganz normal.
-*Beispiel:*
-```html
-<style>body { background: red; }</style>
-<h1>Test</h1>
-<script>console.log("Läuft im IFrame");</script>
-```
+**F: Unterstützt der Editor Syntax-Highlighting?**  
+A: **Nein.** Es ist ein natives `<textarea>` (monospace). Keine Farbkodierung, Einrückungshilfe oder Error-Markierung.
 
-**F: Warum sieht die Vorschau im Dark Mode immer noch weiß aus?**
-A: Der IFrame ist ein eigenes Dokument. Das CSS der Hauptseite (`--bg` Variable) gilt nicht darin. Der IFrame hat fest `background: white` im CSS der Hauptseite definiert. Siehe "Typische Probleme".
-
-**F: Ist der Chat privat?**
-A: Die Nachrichten werden an einen externen Server (`carescape-ai.oslamuoslamu.workers.dev`) gesendet. Lies die Datenschutzerklärung von lamacHub/Cloudflare Workers, falls kritisch. **Nicht für Geheimnisse nutzen.**
-
-**F: Funktioniert die Seite offline?**
-A: **Nein.** Google Fonts und der Chat-Worker benötigen Internet. Der Editor *allein* könnte theoretisch offline funktionieren (Service Worker nicht vorhanden), aber Fonts fehlen dann.
-
-**F: Gibt es Tastenkombinationen (Shortcuts)?**
-A: **Im Quellcode nicht erkennbar.** Keine Event-Listener für `keydown` (außer evtl. im Chat-Formular `Enter` zum Senden).
-
-**F: Warum ist der "Senden"-Button im Chat manchmal deaktiviert?**
-A: Während eine Antwort vom Server verarbeitet wird (`busy = true`), wird der Button per `disabled` Attribut deaktiviert
+**F: Warum lädt die Seite langsam?**  
+A: Mögliche Ursachen: Google Fonts (Inter) blockiert/verzögert, Chat-Worker
